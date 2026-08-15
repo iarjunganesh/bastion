@@ -216,8 +216,8 @@ What that means for Bastion, stated plainly:
 | Sub-question | Bastion | Status |
 |---|---|---|
 | *"complex enough to warrant a multi-agents system?"* | Three agents with different data access; the Escalation Agent provably cannot read what it escalates | Answered by design |
-| *"intelligently delegate to specialized sub-agents?"* | A `SequentialAgent` runs Auditor → policy step → Escalation, each an `LlmAgent` with its own tools. Agent Gateway is the designed call path and **is not provisioned** | ◐ Runs; the Gateway hop does not exist |
-| *"strictly enforced separation of concerns between agents?"* | Enforced in **IAM**, not convention — the strongest answer available to this rubric. But the binding does not exist yet: the three agents share one identity as `sub_agents` of one process | The best card, **not yet played** |
+| *"intelligently delegate to specialized sub-agents?"* | The Orchestrator dispatches the Access Auditor and Escalation Agent over private, authenticated A2A card endpoints; the deterministic policy step remains local because it holds no independent capability | ✅ Deployed; retained cross-service trace capture is next |
+| *"strictly enforced separation of concerns between agents?"* | Enforced in **IAM**, not convention: each agent has its own Cloud Run service account, internal ingress, and only the peer invocation grant it needs | ✅ Deployed; a retained denial capture demonstrates the boundary |
 | *"inter-agent routing logic failure-tolerant… if a worker agent loops or returns a hallucination"* | **Half answered.** Hallucination is bounded: detection is deterministic and runs before any model call, so a fabricated finding has no binding behind it. Retry is *not* — the hand-rolled backoff, circuit breaker and loop guard were deleted with `resilience.py` on 2026-08-15, and Agent Engine's managed retry needs a deployment that does not exist | ◐ Hallucination bounded; **retry unimplemented** |
 | *"an 'Unlikely Hero' outside of standard corporate roles"* | Bastion is squarely a corporate compliance tool | **Does not fit** — appears aimed at the retired track framing |
 

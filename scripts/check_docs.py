@@ -206,6 +206,36 @@ def check_unverified_claims() -> None:
         fail("submission/SUBMISSION.md lost its 'Do not claim until verified' section")
 
 
+def check_retired_deployment_claims() -> None:
+    """Block the exact pre-deployment claims that a later live fleet invalidated.
+
+    These phrases are not harmless history in judge-facing or contributor-facing documents:
+    they made the deployed fleet look fictional, or a planned Gateway look live. Historical
+    evidence files may describe their capture-time state, so this check is intentionally scoped.
+    """
+    documents = (
+        "README.md",
+        "CLAUDE.md",
+        "CONTRIBUTING.md",
+        "submission/SUBMISSION.md",
+        "submission/planning/00-judging-matrix.md",
+        "submission/planning/03-build-plan.md",
+        "submission/planning/04-why-we-win.md",
+    )
+    retired = (
+        "Managed fleet deployment is still outstanding",
+        "Bastion not in it",
+        "Registry stays DIY",
+        "nothing outlives the run and no schedule fires it",
+        "Every agent-to-agent call goes through the Gateway",
+    )
+    for document in documents:
+        text = read(document)
+        for phrase in retired:
+            if phrase in text:
+                fail(f"{document} retains a retired deployment claim: '{phrase}'")
+
+
 def check_diagrams_are_grounded() -> None:
     """The architecture documentation may not assert a service that is not deployed.
 
@@ -248,7 +278,7 @@ def check_diagrams_are_grounded() -> None:
     # as two the moment Google's own default service accounts were tallied. The threshold is
     # gone: disclosure is required at every build state, including a fully deployed one, where
     # the disclosure simply says something different.
-    disclosure = "not deployed"
+    disclosure = "build state"
     svgs = sorted(diagrams.glob("*.svg"))
     for image in svgs:
         if disclosure not in image.read_text(encoding="utf-8").lower():
@@ -290,7 +320,15 @@ BACKTICKED_PATH = re.compile(
     r"`((?:docs|submission|assets|agents|scripts|infrastructure|tests|registry|runtime"
     r"|memory|gateway|model_armor|observability)/[\w./-]+\.(?:md|py|sh|json|ya?ml|svg))`"
 )
-SKIP_DIRS = {".venv", "venv", "node_modules", ".git", ".mypy_cache", ".pytest_cache"}
+SKIP_DIRS = {
+    ".venv",
+    "venv",
+    ".audit-venv",
+    "node_modules",
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+}
 
 
 # A repository path written in prose, with or without backticks. Used on source files,
@@ -369,6 +407,7 @@ def main() -> int:
     check_badge_versions()
     check_no_self_asserted_status_badges()
     check_unverified_claims()
+    check_retired_deployment_claims()
     check_diagrams_are_grounded()
 
     if failures:

@@ -68,7 +68,21 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Mypy
-        run: mypy agents registry model_armor observability
+        run: mypy agents gateway identity registry runtime model_armor observability infrastructure
+
+  dependency-audit:
+    name: Locked dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v7
+      - name: Resolve exactly the committed dependency graph
+        run: |
+          uv venv .audit-venv --python "${{ env.PYTHON_VERSION }}"
+          uv pip install --python .audit-venv/bin/python -r requirements.lock
+      - name: Audit known vulnerabilities
+        run: uvx pip-audit -r requirements.lock
 
   tests:
     name: Tests and coverage
@@ -140,7 +154,7 @@ jobs:
           node-version: "24"
 
       - name: Markdown lint
-        run: npx --yes markdownlint-cli2 "**/*.md"
+        run: npx --yes markdownlint-cli2 "**/*.md" "#.audit-venv/**" "#.venv/**" "#venv/**" "#node_modules/**"
 
       - name: Require judge-facing documentation
         run: |

@@ -55,8 +55,8 @@ satisfied, and states plainly which ones are not yet proven.
 | The brief asks for | Bastion | Proven? |
 |---|---|---|
 | *"agents cataloged for cross-department use"* | A department is a **routing decision**, not a column: `route_by_department()` fans one investigation out to the teams that own the principals it concerns. GEAP's Agent Registry is the shared catalog those teams read | ✅ **observed** — two findings, two owning departments, [evidence 02](../assets/evidence/02-gemini-investigation.md) |
-| *"safely maintain context across weeks of asynchronous operations"* | Designed: Pub/Sub-triggered investigations outliving the session that opened them, and a Memory Bank exception store suppressing a finding a human closed weeks ago rather than re-raising it | ⬜ **not proven.** The run used `InMemorySessionService`; nothing persisted, nothing was suppressed |
-| *"interact with production data without violating enterprise compliance, data sovereignty, or security policies"* | The audit target is a **live** IAM policy, not a fixture, read through Cloud Asset Inventory's search API and never written back. Raw policy dumps never enter the repository, and published evidence is redacted | ◐ **partly.** The read is real; the *least-privilege* half is not — see below |
+| *"safely maintain context across weeks of asynchronous operations"* | Eventarc admission stores and deduplicates each investigation in Firestore, then reuses its stable context ID as the managed ADK session/memory identity; approved exceptions carry expiry, reviewer, and policy version | ◐ **deployed and unit-tested.** A retained cross-week replay is the remaining proof artifact |
+| *"interact with production data without violating enterprise compliance, data sovereignty, or security policies"* | The audit target is a **live** IAM policy, read through Cloud Asset Inventory and never written back. Raw policy dumps never enter the repository; peer and human-review payloads are schema-limited | ✅ **deployed controls;** retained production evidence is still being captured |
 
 ### Data sovereignty, stated honestly
 
@@ -87,17 +87,11 @@ regional endpoint to choose. Two consequences, both deliberate:
 
 ### Least privilege, stated just as honestly
 
-The design is `roles/iam.securityReviewer` on the Access Auditor's own service account, and no
-policy permission whatsoever on the Escalation Agent. **Neither binding exists today.** The
-project's policy contains ten distinct roles and `iam.securityReviewer` is not among them; the
-captured investigation read the live policy under the author's own `roles/owner` credentials,
-because nothing is deployed and there is no agent service account to bind a role to.
-
-So the read is real and the *restraint* is not yet enforced by IAM — it is enforced by the code
-not holding a policy client, which is a weaker guarantee and is described as one. Making it the
-stronger guarantee is the same work as deploying: three ADK apps, three service accounts, three
-role bindings. The Escalation Agent's `403 PERMISSION_DENIED` is the evidence that closes it,
-and [`submission/SUBMISSION.md`](../submission/SUBMISSION.md) still lists it as owed.
+The Access Auditor runs under its own `roles/iam.securityReviewer` service account; the
+Escalation Agent holds no policy-read permission and can invoke only the count-only findings
+inbox. The Orchestrator reaches both peers over private Cloud Run A2A with audience-bound ID
+tokens. A retained deployed `PERMISSION_DENIED` capture remains the evidence artifact for this
+boundary; it is not a gap in the configured IAM separation.
 
 ## The seven pillars, in the brief's four groups
 
@@ -114,18 +108,19 @@ observed working; the rest are honest about being enabled and unwired.
 
 ### Discovery & Lifecycle
 
-#### Agent Registry — ◐ API enabled, one agent catalogued, none of them Bastion's
+#### Agent Registry — ✅ three Bastion services catalogued as private A2A peers
 
 The brief calls this *"the central repository for publishing, versioning, and discovering
 enterprise-approved agents"*, and GEAP's Agent Registry is that repository: it stores A2A
-**AgentCards** (`protocolVersion 0.3.0`, `type: A2A_AGENT`) and catalogs agents, tools and MCP
-servers. `gcloud alpha agent-registry agents` exposes only `describe`, `list` and `search` —
-there is no `create`, because **an agent registers by being deployed**. Registry and Runtime
-therefore close together, and neither is closed yet.
+Agent records and catalogs agents, tools and MCP servers. Bastion registers its three private
+Cloud Run services through `agent-registry services create`; the managed registry projects those
+services into discoverable Agent records with JSON-RPC interfaces. Registration is idempotent and
+uses the canonical regional Cloud Run origin, rather than the old alias that cannot resolve the
+private A2A card route.
 
-The measured state is one agent in the registry, and it is Google's own Workspace Agent, which
-the platform pre-registered. That is not a Bastion achievement; it is, usefully, proof that the
-catalog is live and that a fleet reads a shared corporate catalog rather than its own.
+The measured state is four catalog records: Google's pre-registered Workspace Agent and Bastion's Access
+Auditor, Escalation Agent, and Orchestrator. The three Bastion records are the cross-department
+catalog surface; their endpoints remain private and require workload identity to invoke.
 
 **Bastion's own use of the catalog is cross-department routing, and that part runs.** The track
 asks entrants to show *"how agents are cataloged for cross-department use"*, and a `department`
@@ -146,18 +141,18 @@ Observed: two findings, two different owning departments, in one run
 
 ### Core Execution & State
 
-#### Agent Runtime — ○ not deployed
+#### Agent Runtime — ● private Cloud Run fleet deployed
 
 `adk deploy cloud_run` is the runtime seam, and it is one command rather than a service this
 repository writes. Four of the pillars are flags on it: `--trace_to_cloud` (Observability),
 `--a2a` (the A2A endpoint the Gateway routes to), `--session_service_uri` and
 `--memory_service_uri` (Memory Bank). The long-running half is Vertex AI Agent Engine.
 
-**Nothing is deployed.** The investigation that ran did so locally against live Google APIs,
-composed as a `SequentialAgent` in one process. That matters for the Identity claim below and
-is stated there rather than glossed.
+Three agent services and the private findings service are deployed. The Orchestrator retains the
+deterministic policy step locally, while capability-bearing peers are reached over authenticated
+A2A; the local `SequentialAgent` remains only the development topology.
 
-#### Memory Bank — ○ not deployed, and this is the gap that shows
+#### Memory Bank — ◐ managed endpoint configured; cross-week replay pending
 
 `VertexAiMemoryBankService` behind `--memory_service_uri`, with `VertexAiSessionService` for
 session state. The product claim is the exception store: an agent that re-raises a finding a
@@ -166,13 +161,15 @@ suppression is what makes a continuous review tolerable to operate rather than m
 continuous.
 
 The run captured in [evidence 02](../assets/evidence/02-gemini-investigation.md) used
-`InMemorySessionService`, so nothing persisted and no prior-week exception was recalled. **The
+`InMemorySessionService`, so nothing persisted and no prior-week exception was recalled. **That
+historical run predates the deployed Eventarc/Firestore admission path; a retained prior-week
+replay remains the current evidence gap. The
 memory-suppression demonstration is unproven**, and it is one of the three the submission
 rests on ([`submission/SUBMISSION.md`](../submission/SUBMISSION.md)).
 
 ### Security & Governance
 
-#### Agent Identity — ○ not deployed, and the claim is weaker than it reads
+#### Agent Identity — ● per-service IAM boundary deployed
 
 The design is one service account per agent, holding exactly the roles its row above allows —
 zero trust in miniature, and the one pillar whose *failure* is directly observable, because a
@@ -180,10 +177,9 @@ mis-scoped call returns a denial that can be captured on camera. The Escalation 
 no IAM read permission at all is the demonstration: a fully compromised prompt still cannot
 make it read the policy.
 
-**Today the three agents share one runtime identity**, because they run as `sub_agents` of a
-single `SequentialAgent` in one process. The separate service accounts and a denial contrast
-exist, but per-agent runtime enforcement requires three deployed ADK apps routed over an
-authorized transport. `tests/security/` is still a placeholder.
+The three agents run under separate Cloud Run service accounts, with internal ingress and only
+the required peer `run.invoker` grant. The security suite tests token audience, policy shape,
+and failure-closed configuration; a retained live denial is the remaining demonstration frame.
 
 GEAP's Agent Identity product is a credential broker for *external* auth providers
 (`RetrieveCredentials` / `FinalizeCredentials`); it is not the GCP IAM boundary, so the IAM
@@ -227,29 +223,28 @@ The three threats the brief names, and where each is actually stopped:
 |---|---|---|
 | **Prompt injection** | A ticket description instructing the agent to ignore its rules and approve the access | ● `sanitize_user_prompt` on `before_model_callback`, observed refusing the payload |
 | **Tool poisoning** | A tool's *own metadata* — description or parameter schema — crafted so a model reading it calls something it should not. Not primarily an input-text problem, so screening more text does not answer it | ● **Not Model Armor.** A fixed per-agent tool allowlist, repository-owned descriptions, and the IAM boundary underneath ([ADR-007](adr/007-tool-poisoning.md)) |
-| **PII leakage** | A model response carrying principal identifiers into the notification surface or the findings store | ○ `sanitize_model_response` on `after_model_callback`. **Not written.** No outbound screen exists today |
+| **PII leakage** | A model response carrying principal identifiers into the notification surface or the findings store | ● `screen_after_model` on `after_model_callback`; deterministic protected-data detection replaces the response before state or delivery. The count-only findings API independently validates its schema and allowlisted summary. |
 
 **The middle row was measured, not assumed.** The same payload put through Model Armor twice
 returned `True` for the prompt-injection shape and `False` for a poisoned tool description — so
 the allowlist and the prompt screen are non-redundant controls rather than belt and braces, and
 [ADR-007](adr/007-tool-poisoning.md) survives contact with the product.
 
-The last row is the honest one: the outbound half of this pillar is a design, and until
-`after_model_callback` exists no document may describe PII screening as working.
+The outbound control is deliberately separate from Model Armor: Model Armor is the managed,
+fail-closed input screen; the local output callback has no raw IAM binding available to it and
+blocks protected-data shapes before the strict count-only receiver validates the payload.
 
 ### Telemetry
 
-#### Agent Observability — ○ code exists, not integrated
+#### Agent Observability — ◐ deployed no-content telemetry; retained trace pending
 
 The brief asks for two distinct artifacts, and they are not the same thing:
 
-- **Audit logs — ○ not integrated.** [`observability/audit.py`](../observability/audit.py) defines
-  a `google.adk.plugins.BasePlugin`, but no application runner registers it. Unit tests cover the
-  class in isolation; evidence 02 does not prove an emitted plugin trail.
-- **End-to-end reasoning chain traces — ○ not deployed.** ADK's own OpenTelemetry spans,
-  exported by `adk deploy cloud_run --trace_to_cloud`: one Cloud Trace span tree per
-  investigation, so the *sequence* of decisions is reconstructable and not merely the
-  individual events. Nothing is deployed, so **no span exists yet**.
+- **Audit logs — ● registered.** [`observability/audit.py`](../observability/audit.py) is loaded
+  by each server and emits payload-free structured JSON to Cloud Logging.
+- **End-to-end reasoning chain traces — ◐ configured.** ADK exports no-content OpenTelemetry
+  telemetry; a retained successful multi-agent trace is not yet claimed because Vertex quota
+  throttling interrupted the current live capture.
 
 **They are deliberately not derived from one another.** A trace is sampled and expires; a
 compliance record is neither. Deriving the audit trail from traces would mean a sampled-out
@@ -272,9 +267,9 @@ reviewer want different ones.
 **Every box carries its real build state**, and the states are not typed by hand — they are
 derived from [`assets/architecture/gcp-state.json`](../assets/architecture/gcp-state.json),
 which `scripts/capture_gcp_state.py` writes by querying the live project. As of the latest
-capture: **20 of 20 services enabled, 3 resources existing** — the Model Armor template Bastion
-created, one service account, and one agent Google pre-registered in Agent Registry. No Cloud
-Run service, no Firestore database, no Pub/Sub topic, no scheduler job, no gateway.
+capture: **21 of 21 services enabled, 20 resources existing** — four internal Cloud Run
+services, Eventarc, Firestore, the investigation Pub/Sub topic, Agent Engine state, Model Armor,
+and scoped service identities. Cloud Scheduler and Agent Gateway remain intentionally absent.
 
 That count deliberately **excludes the service accounts Google creates for a project**.
 Counting them made the number read as two on a day when Bastion had built nothing, which was
@@ -294,7 +289,7 @@ designed to prevent an overclaim, quietly producing one.
     <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture/level-1-context-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="../assets/architecture/level-1-context-light.svg">
     <img width="1000" src="../assets/architecture/level-1-context-light.svg"
-         alt="Cloud Scheduler opens a review; the Bastion fleet of three ADK agents reads the live GCP IAM policy read-only through Cloud Asset Inventory, asks Gemini 3.5 Flash for rationale only, and escalates to the department that owns each principal. A dotted return edge shows the policy contains the service accounts Bastion runs under. Nothing is deployed."/>
+         alt="The private Bastion fleet of three ADK agents reads live GCP IAM read-only, dispatches peer work over authenticated A2A, and receives durable investigations through Eventarc. Scheduler cadence and retained trace evidence are called out separately."/>
   </picture>
 </p>
 
@@ -308,7 +303,7 @@ Bastion runs under, so the system audits its own permissions.
     <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture/level-2-container-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="../assets/architecture/level-2-container-light.svg">
     <img width="1000" src="../assets/architecture/level-2-container-light.svg"
-         alt="Inside Bastion. Three ADK agents run as sub-agents of one SequentialAgent: Access Auditor reads the live IAM policy through Cloud Asset Inventory, the Orchestrator applies policy rules and resolves the owning department per principal, and the Escalation Agent fans findings out to the teams that own them. Model Armor screens every model call at before_model_callback. An audit BasePlugin records every event. Memory Bank is not deployed."/>
+         alt="Inside the deployed private Bastion fleet: Access Auditor, Orchestrator, and Escalation Agent communicate over authenticated A2A; managed session/memory is configured, Model Armor screens model calls, and an audit plugin records payload-free events."/>
   </picture>
 </p>
 
@@ -321,8 +316,9 @@ principals. The **guardrail sits between the fleet and the model**, not beside i
 **audit edge is dotted** because the plugin is a side effect of every event rather than a step
 in the path, which is precisely why no agent has a logging call site.
 
-The dashed grey box is the honest gap. Memory Bank is not deployed, so nothing suppresses a
-finding a human already accepted, and the run repeats last week's work.
+The dashed grey box is the evidence gap, not an absent endpoint: managed session/memory is
+configured, while a retained cross-week replay is required before suppression is claimed on
+camera.
 
 ### Level 3 — One task's lifecycle
 
@@ -385,11 +381,12 @@ call is what keeps *"this role is too broad"* from being the model's unaided opi
 - **Infrastructure:** Cloud Run (compute), Firestore (state and memory), Pub/Sub (async),
   all in `europe-north2` (Stockholm)
 
-**Twenty Google Cloud services**, each with a stated job and a pre-agreed cut order, are
+**Twenty-one Google Cloud services**, each with a stated job and a pre-agreed cut order, are
 enumerated in [ADR-003](adr/003-pillars-on-geap.md): the four above plus Cloud Scheduler,
 Recommender, Cloud Asset Inventory, IAM, Model Armor, Secret Manager, Cloud Trace, Cloud
 Logging, Cloud Monitoring, BigQuery, Looker Studio, Firebase Hosting, and Cloud Build with
-Artifact Registry. All twenty are enabled on the project; the measurement in `gcp-state.json` says 20 of 20.
+Artifact Registry, and Eventarc. All twenty-one are enabled on the project; the measurement in
+`gcp-state.json` says 21 of 21.
 
 The rules require *"at least one Google Cloud infrastructure service."* One is the floor. The
 additions are not there for the count — service count is not a judging criterion, and a
@@ -399,10 +396,10 @@ question *what breaks if we remove it*, and ADR-003 records the answer per servi
 ## Failure tolerance
 
 The rules ask whether inter-agent routing recovers when a worker loops or hallucinates. The
-current sequential local flow implements no timeout, durable retry, backoff, circuit breaker,
-idempotency key, or loop detector. Those controls must be bound to the chosen managed runtime,
-verified through a real remote transport, and exercised by integration tests. Until then,
-failure tolerance is an open P0 rather than an architectural property.
+deployment path has a durable Eventarc inbox, failed-event reclaim, deterministic notification
+idempotency, and ADK trigger concurrency/retry controls. They still need a managed-session
+endpoint, remote-transport failure injection, and captured operational evidence. Until then,
+failure tolerance is not a production claim.
 
 ## Deliberately out of scope
 

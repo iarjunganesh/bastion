@@ -55,15 +55,15 @@ the interface is the decision:
 
 | Pillar | Primary | Same-interface fallback |
 |---|---|---|
-| Memory Bank | `VertexAiMemoryBankService` — GEAP's managed Memory Bank | Firestore implementation of `BaseMemoryService` |
-| Agent Runtime | Vertex AI Agent Engine via `agent_engines.AdkApp` | Cloud Run + Pub/Sub push, which stays for the HTTP surfaces regardless |
-| Agent Registry | **DIY over Firestore** — `agent_engines` has publish, list, and delete, but no versioning, ownership, or scope | — |
+| Memory Bank | Managed Agent Engine session/memory endpoints plus Firestore investigation identity | Retained cross-week replay is still owed |
+| Agent Runtime | Private Cloud Run agents with Eventarc admission; Agent Engine is provisioned | Retained multi-agent trace is still owed |
+| Agent Registry | Managed Agent Registry service records for all three private A2A peers | — |
 
 Identity, Gateway, Model Armor, and Observability are standard GCP primitives on either path.
 
-**Superseded 2026-08-15.** The `DIY FALLBACK` banner is moot: the files it sat on were deleted
-and comes out as each pillar is wired. The sections below describe the implementation; read
-them as the design rather than as a fallback awaiting a verdict.
+**Current-state correction, 2026-08-15.** The DIY fallback was deleted. The rest of this planning
+note is retained for design rationale; where it differs from the live proof ledger,
+[ADR-006](../../docs/adr/006-pillar-coverage.md) and the root README win.
 
 > The agent roster lives in the "Three agents" table near the top of this document. Policy
 > Enforcer was merged into the Orchestrator to fit the 18-day schedule; agent count isn't
@@ -79,15 +79,24 @@ status report.
 
 ### 1. Agent Registry (Discovery & Lifecycle)
 
-Firestore collection (`/registry/{agent_id}`) storing name, version, owner, **department**, **skills**, **scopes**, and status. A small Cloud Run API (GEAP Agent Registry) exposes list/register/deprecate, plus `/cards` — the validated routing view the Gateway reads. The record is an **agent card** ([ADR-005](../../docs/adr/005-adk-as-the-agent-framework.md)), so an agent is reachable *because* its card declares a skill; that is what makes the catalog consulted on every hop rather than a table a new team merely browses.
+The managed Agent Registry contains three Bastion service records: Access Auditor, Escalation
+Agent, and Orchestrator. Each advertises its canonical internal JSON-RPC/A2A endpoint; the
+endpoint remains IAM-protected, so cataloguing enables governed discovery rather than public
+reachability. Department routing remains repository-owned policy, not an ungoverned registry
+label.
 
 ### 2. Agent Runtime (Core Execution & State)
 
-Cloud Run services triggered by Pub/Sub messages, so investigations run asynchronously and survive across sessions — an investigation started Monday can still be "in progress" when checked Thursday. Each agent run is a Cloud Run job with a bounded timeout and an explicit retry policy owned by the Orchestrator.
+Eventarc delivers Pub/Sub investigations to the private Orchestrator. Its Firestore transaction
+deduplicates the CloudEvent and establishes a stable investigation ID before the Cloud Run A2A
+workflow begins. The managed Agent Engine endpoint is provisioned for session/memory continuity;
+the retained cross-week replay is still a required proof artifact.
 
 ### 3. Memory Bank (Core Execution & State)
 
-Firestore collection (`/investigations/{id}/findings`) plus a `/exceptions` collection for "reviewed and accepted" items. This is what makes the "recall a prior week's exception" demo moment possible — the agent isn't re-flagging something a human already cleared three weeks ago.
+Firestore stores the durable investigation identity and the private findings inbox; managed Agent
+Engine session/memory endpoints carry the agent context. A prior-week exception suppression run
+has not yet been retained as evidence and is not claimed as complete.
 
 ### 4. Agent Identity (Security & Governance)
 
@@ -106,7 +115,7 @@ more text does not defend a poisoned tool declaration. Its control is the fixed 
 allowlist in [ADR-007](../../docs/adr/007-tool-poisoning.md).
 
 **One escalation surface, and it is the dashboard.** Earlier drafts left this as "dashboard OR
-Slack, pick one". Slack appears nowhere in the twenty services of
+Slack, pick one". Slack appears nowhere in the twenty-one services of
 [ADR-003](../../docs/adr/003-pillars-on-geap.md), and the read-only findings API behind
 Firebase Hosting is already the judge path — so the choice was made when that ADR was accepted,
 and leaving it open in three planning documents was staleness, not an open question.

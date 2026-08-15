@@ -13,8 +13,18 @@ allowed to claim, is in [`submission/planning/07-release-plan.md`](submission/pl
 
 ## [Unreleased]
 
-Pre-`v0.1.0`. The repository is not yet under version control; the first commit and tag land
-once the scaffold runs end to end.
+Pre-`v0.1.0`. The initial untagged repository commits are published on `main`; no release tag
+exists because the managed deployment evidence is not yet earned.
+
+### Added — reproducible fleet controls
+
+- A complete Cloud Run image context, private A2A ID-token transport, registry publication
+  script, deployment verifier, Firestore/Pub/Sub bootstrap, and an explicit non-memory runtime
+  requirement.
+- Durable replay, security, and concurrent gateway-policy tests; a transitive `uv` lock and
+  known-vulnerability audit gate.
+- Field-level data governance and release operations objectives that distinguish configured
+  controls from deployment evidence still owed.
 
 ### Added — architecture diagrams that state their own build state
 

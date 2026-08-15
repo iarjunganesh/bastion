@@ -6,7 +6,8 @@
   applies policy rules and resolves the owning department for each principal, and the
   Escalation Agent fans findings out to the teams that own them. Every model call is screened
   by Model Armor at ADK's before_model_callback before it reaches Gemini. An audit BasePlugin
-  records every event with no call site in any agent. Memory Bank is not deployed, so nothing
+  records every event with no call site in any agent. Managed Agent Engine session/memory is
+  configured; a retained cross-week replay is the remaining evidence.
   suppresses a finding a human already accepted.</desc>
 
   <!-- Hand-placed on purpose. 16:9 at 1920x1080 so a frame drops straight into an OBS scene. -->
@@ -77,7 +78,7 @@ svg {
   <!-- The fleet -->
   <rect x="400" y="330" width="880" height="290" rx="18"
         fill="var(--group)" stroke="var(--blue-d)" stroke-width="2" stroke-dasharray="6 6"/>
-  <text class="grouptxt" x="424" y="612">SequentialAgent — three ADK agents, ONE process today</text>
+  <text class="grouptxt" x="424" y="612">Three private ADK services · authenticated A2A dispatch</text>
 
   <g>
     <rect x="424" y="386" width="266" height="200" rx="14" fill="var(--blue)" stroke="var(--blue-d)" stroke-width="3"/>
@@ -106,19 +107,19 @@ svg {
     <rect class="ghostbox" x="60" y="180" width="310" height="120"/>
     <text class="ghosttx"  x="215" y="228">Memory Bank</text>
     <text class="ghostsub" x="215" y="258">would suppress a re-raised finding</text>
-    <text class="ghostsub" x="215" y="284">○ NOT DEPLOYED</text>
+    <text class="ghostsub" x="215" y="284">◐ managed endpoint · replay evidence pending</text>
   </g>
   <g>
     <rect class="box" x="60" y="350" width="310" height="126"/>
     <text class="label" x="215" y="394">Pub/Sub</text>
     <text class="sub"   x="215" y="424">opens an investigation</text>
-    <text class="sub"   x="215" y="452">◐ enabled, no topic</text>
+    <text class="sub"   x="215" y="452">● topic + Eventarc durable inbox</text>
   </g>
   <g>
     <rect class="box" x="60" y="560" width="310" height="120"/>
     <text class="label" x="215" y="608">GEAP Agent Registry</text>
     <text class="sub"   x="215" y="638">the shared corporate catalog</text>
-    <text class="sub"   x="215" y="664">◐ live — Bastion not in it</text>
+    <text class="sub"   x="215" y="664">● 3 private services catalogued</text>
   </g>
   <g>
     <rect x="60" y="742" width="310" height="128" rx="14" fill="var(--amber)" stroke="var(--amber-d)" stroke-width="3"/>
@@ -263,6 +264,6 @@ svg {
     <circle cx="680" cy="1046" r="9" fill="none" stroke="var(--ghost)" stroke-width="2"/>
     <text class="legend" x="698" y="1054">not started</text>
   </g>
-  <text class="footb" x="1860" y="1046" text-anchor="end">Measured 2026-08-15 · 20 of 20 services enabled · NOT DEPLOYED</text>
+  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-15 · 21/21 APIs · private fleet live</text>
   <text class="foot"  x="1860" y="1016" text-anchor="end">One process, one identity. Per-agent service accounts need three deployed apps — see ARCHITECTURE.md.</text>
 </svg>

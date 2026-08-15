@@ -42,7 +42,7 @@ registry exists." GEAP's Registry is a separate surface, and the probe never loo
 negative result from one namespace was recorded as a fact about the platform.
 
 The correction also revealed that the three governance pillars are **one composed stack**
-rather than three independent ones: Agent Gateway enforces policy through IAM and
+rather than three independent ones: a provisioned Agent Gateway would enforce policy through IAM and
 Identity-Aware Proxy, **delegates content sanitization to Model Armor**, and **authorises on
 Agent Identity as the principal**, secured with mTLS and DPoP. Bastion had them as three
 unrelated modules, which is a worse architecture than the one Google ships.
@@ -102,8 +102,9 @@ defence against a poisoned tool declaration.
 
 That record hedged with a documented fallback and a hard cutoff date, in case the managed
 service did not ship in time. It shipped: `google-cloud-modelarmor` exposes
-`sanitize_user_prompt` and `sanitize_model_response`, and `model_armor/guardrails.py` calls the
-first from ADK's `before_model_callback`. **The fallback is withdrawn** — a second Gemini call
+`sanitize_user_prompt` and `sanitize_model_response`; `model_armor/guardrails.py` calls the
+first from ADK's `before_model_callback`, while a deterministic `after_model_callback` blocks
+protected data before the count-only findings receiver. **The fallback is withdrawn** — a second Gemini call
 asking "is this an injection?" would have been a weaker control described in stronger words.
 
 Screening **fails closed**: an unset template or an exception on the screening path refuses the
@@ -112,8 +113,9 @@ while every document still claims it works.
 
 ### The GCP service surface and the cut order (was ADR-006)
 
-Twenty services, each with a job — seventeen from this record plus the three GEAP
-surfaces enabled 2026-08-15 (`networkservices`, `agentregistry`, `agentidentity`). GEAP consolidates several of them, so the count is no
+Twenty-one services, each with a job — seventeen from this record, Eventarc for durable
+investigation delivery, plus the three GEAP surfaces enabled 2026-08-15
+(`networkservices`, `agentregistry`, `agentidentity`). GEAP consolidates several of them, so the count is no
 longer the interesting number — the **cut order** is, and it is unchanged: BigQuery and Looker
 Studio go first, then Cloud Asset Inventory, then Secret Manager. The judge path, the
 Recommender API, and Cloud Scheduler are **not** cut, because each is load-bearing for a

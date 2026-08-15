@@ -20,15 +20,23 @@ CATALOG = {
 
 
 def call(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(  # noqa: S603 - constant executable and repository-owned arguments
+    completed = subprocess.run(  # noqa: S603 - constant executable and repository-owned arguments
         [GCLOUD, *args, "--project", PROJECT, "--quiet"],
-        check=check,
+        check=False,
         text=True,
         capture_output=True,
     )
+    if check and completed.returncode:
+        raise RuntimeError(completed.stderr.strip() or completed.stdout.strip())
+    return completed
 
 
 def main() -> None:
+    project_number = call(
+        "projects", "describe", PROJECT, "--format=value(projectNumber)"
+    ).stdout.strip()
+    if not project_number:
+        raise RuntimeError("could not resolve the project number for canonical Cloud Run URLs")
     for service, description in CATALOG.items():
         existing = call(
             "agent-registry",
@@ -40,16 +48,10 @@ def main() -> None:
         )
         if existing.returncode == 0:
             continue
-        uri = call(
-            "run",
-            "services",
-            "describe",
-            service,
-            f"--region={REGION}",
-            "--format=value(status.url)",
-        ).stdout.strip()
-        if not uri:
-            raise RuntimeError(f"Cloud Run service {service} has no URL")
+        agent_name = service.removeprefix("bastion-").replace("-", "_")
+        # Agent Registry's interface enum names the A2A transport as JSON-RPC.  The
+        # agent card is a discovery document; consumers invoke this private endpoint.
+        uri = f"https://{service}-{project_number}.{REGION}.run.app/a2a/{agent_name}"
         call(
             "agent-registry",
             "services",
@@ -59,7 +61,7 @@ def main() -> None:
             f"--display-name={service}",
             f"--description={description}",
             "--agent-spec-type=no-spec",
-            f"--interfaces=protocolBinding=a2a,url={uri}",
+            f'--interfaces=[{{"protocolBinding":"jsonrpc","url":"{uri}"}}]',
         )
     print(f"Registered {len(CATALOG)} Bastion agents in Agent Registry location {REGION}.")
 

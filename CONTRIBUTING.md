@@ -69,8 +69,8 @@ npx markdownlint-cli2 "**/*.md"
 still fail the build on formatting. The coverage floor is 100% and matches real coverage; a
 floor below it is a decoration, not a gate.
 
-**Every agent-to-agent call goes through the Gateway**, including when a direct call would
-be shorter. The pattern is the point.
+**Every deployed agent-to-agent call uses private Cloud Run A2A with workload identity.** The
+managed Agent Gateway is not provisioned; contributors must not describe it as the current path.
 
 ## The two rules that matter most here
 

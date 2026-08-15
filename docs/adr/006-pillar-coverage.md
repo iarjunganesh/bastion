@@ -11,16 +11,16 @@ and not when its service is enabled.
 
 | Pillar | The proof that closes it | State on 2026-08-15 |
 |---|---|---|
-| **Agent Registry** | The fleet is published in the managed Agent Registry, and a finding routes to the department the catalog says owns it | ⚠️ **Half earned.** Cross-department routing **ran live** — one investigation, two findings, two owning teams ([evidence 02](../../assets/evidence/02-gemini-investigation.md)). The managed Registry API is enabled; `skills create` failed on a network error and **nothing is registered** |
-| **Agent Runtime** | An investigation started, survives the process that started it, and is still resumable later ([ADR-003](003-pillars-on-geap.md)) | `adk deploy agent_engine` is the path; **nothing deployed, nothing resumes** |
-| **Memory Bank** | A finding suppressed on run *n+1* because a human approved it on run *n* | `VertexAiMemoryBankService` is the backend; **suppression never run** |
-| **Agent Identity** | The Escalation Agent's `403 PERMISSION_DENIED`, captured, on a real IAM policy read | Asserted **offline** — the module holds no policy client and a test enforces that; no deployed service account to be denied |
-| **Agent Gateway** | Every inter-agent call routed through it, with the route decision logged and an unregistered target rejected | `networkservices` API enabled 2026-08-15; **gateway not created** |
+| **Agent Registry** | The fleet is published in the managed Agent Registry, and a finding routes to the department the catalog says owns it | ✅ **Published 2026-08-15.** The three private JSON-RPC/A2A Cloud Run services are registered and projected as managed agent records; cross-department routing ran live — one investigation, two findings, two owning teams ([evidence 02](../../assets/evidence/02-gemini-investigation.md)). |
+| **Agent Runtime** | An investigation started, survives the process that started it, and is still resumable later ([ADR-003](003-pillars-on-geap.md)) | Private Cloud Run + Eventarc admission and Agent Engine session/memory are deployed; a retained cross-week replay remains the proof artifact |
+| **Memory Bank** | A finding suppressed on run *n+1* because a human approved it on run *n* | Managed Agent Engine session/memory endpoints and Firestore investigation identity are deployed; **retained suppression replay still owed** |
+| **Agent Identity** | The Escalation Agent's `403 PERMISSION_DENIED`, captured, on a real IAM policy read | Separate deployed service accounts and private IAM-authenticated calls enforce least privilege; a retained live denial capture is still owed |
+| **Agent Gateway** | Every inter-agent call routed through it, with the route decision logged and an unregistered target rejected | **Planned proof, not current path.** `networkservices` is enabled; deployed peers use private Cloud Run A2A with IAM authentication. |
 | **Model Armor** | A malicious ticket blocked before it reaches the model | ✅ **Earned 2026-08-15.** Prompt injection blocked live by the `bastion-guardrail` template in `europe-west4` ([evidence 01](../../assets/evidence/01-model-armor-block.md)). **Still owed:** the same block observed *through* an agent |
-| **Agent Observability** | Two artifacts, not one — see below | Audit log is a `BasePlugin` on the Runner, **built and tested**; traces come from `--trace_to_cloud` and have **no deployed run yet** |
+| **Agent Observability** | Two artifacts, not one — see below | Payload-free structured audit logging and no-content ADK telemetry are deployed; a retained successful multi-agent trace is still owed |
 
-**Two of seven are earned, and one is half earned.** That ratio is the honest state, and it is recorded here
-rather than in prose that can be read generously.
+This ledger distinguishes deployed controls from proof artifacts still being retained, rather
+than treating an enabled API or a passing unit test as a completed pillar.
 
 ## Context
 
@@ -65,9 +65,9 @@ built and never connected. The audit half is now called from four modules; the t
 wired into each agent's decision step as part of the ADK rewrite
 ([ADR-005](005-adk-as-the-agent-framework.md)), not a later pass.
 
-The Registry proof implies a **deploy-time registration step**, which does not exist in
-`infrastructure/deploy.sh` today. A registry nothing publishes to is a database, and the
-track's word is *"publishing"*.
+The Registry proof has a **deploy-time registration step** in
+`infrastructure/register_agents.py`: it idempotently publishes the three canonical private
+JSON-RPC endpoints. The managed Registry then projects them as discoverable Agent records.
 
 If the schedule forces a cut, the cut is a **pillar's proof downgraded and disclosed**, not a
 pillar quietly left in the diagram. The cut order for services is fixed in

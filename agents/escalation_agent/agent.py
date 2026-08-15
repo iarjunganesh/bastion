@@ -17,11 +17,13 @@ the absence.
 from __future__ import annotations
 
 import os
+from hashlib import sha256
 from typing import Any
 
 import httpx
 from google.adk.agents import LlmAgent
 
+from gateway.cloud_run_auth import CloudRunIdTokenAuth
 from model_armor.guardrails import screen_after_model, screen_before_model
 from model_armor.redaction import notification_summary, validate_risk_categories
 
@@ -51,7 +53,6 @@ NOTIFY_ENDPOINT_VAR = "BASTION_FINDINGS_ENDPOINT"
 
 def notify_human(
     investigation_id: str,
-    idempotency_key: str,
     finding_count: int,
     risk_categories: list[str],
     department: str,
@@ -68,8 +69,8 @@ def notify_human(
 
     TODO(week2): read the endpoint from Secret Manager rather than the environment.
     """
-    if not investigation_id or not idempotency_key:
-        raise ValueError("investigation_id and idempotency_key are required")
+    if not investigation_id:
+        raise ValueError("investigation_id is required")
     if finding_count <= 0:
         # An access review that pages a human on a clean run is one people turn off.
         return {"delivered": False, "department": department, "reason": "nothing to escalate"}
@@ -79,8 +80,15 @@ def notify_human(
     if not endpoint:
         raise RuntimeError("BASTION_FINDINGS_ENDPOINT is not configured")
 
+    # A language model may choose which routed department to notify, but it may not select a
+    # delivery identity. This stable key lets the receiving system collapse Eventarc retries.
+    idempotency_key = sha256(f"{investigation_id}:{department}".encode()).hexdigest()
     transport = httpx.HTTPTransport(retries=NOTIFY_RETRIES)
-    with httpx.Client(timeout=NOTIFY_TIMEOUT, transport=transport) as client:
+    with httpx.Client(
+        timeout=NOTIFY_TIMEOUT,
+        transport=transport,
+        auth=CloudRunIdTokenAuth(endpoint),
+    ) as client:
         response = client.post(
             endpoint,
             headers={"Idempotency-Key": idempotency_key},
@@ -101,8 +109,8 @@ INSTRUCTION = """You are Bastion's Escalation Agent.
 
 You receive findings that have already been reviewed, scored, and **routed to the department
 that owns them**. For each department in the routing result, call `notify_human` with the
-supplied investigation id and idempotency key, its department id, finding count, and only
-allowlisted risk categories.
+supplied investigation id, its department id, finding count, and only allowlisted risk
+categories. The tool derives its idempotency key; never invent one.
 
 Notify each department separately. Never merge departments into one message — a finding that
 lands on the wrong team's desk is a finding nobody acts on.

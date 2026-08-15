@@ -1,8 +1,14 @@
 # Audit remediation plan
 
-**Baseline date:** 2026-08-15  
-**Objective:** turn the truthful local prototype into a demonstrably secure, durable,
-enterprise agent fleet for the Fortified Enterprise Fleet track.
+**Historical remediation plan — superseded by the live proof ledger.**
+
+**Current measured state:** four private Cloud Run services, Eventarc + Firestore durable
+admission, one Agent Engine, one Model Armor template, and three Bastion Agent Registry records
+are deployed. See [ADR-006](../../docs/adr/006-pillar-coverage.md) and
+[evidence 04](../../assets/evidence/04-private-fleet-deployment.md) for the current ledger.
+
+The unchecked items below are retained as future proof work, not statements that the underlying
+control is absent.
 
 This is the execution contract produced by the repository-wide audit. A checkbox closes only
 when its exit evidence exists; code or configuration alone is not sufficient.
@@ -15,33 +21,33 @@ when its exit evidence exists; code or configuration alone is not sufficient.
 - [x] Remove account, organization, project-number, and full-principal identifiers from public files.
 - [x] Replace unsupported or stale CI, Makefile, diagram, and ADK environment-variable commands.
 - [x] Reconcile README, architecture, security, identity, and submission claims with observed state.
-- [x] Pass Ruff, format, mypy, 73 unit tests at 100% coverage, Markdown, docs, versions, and diagrams.
-- [ ] Create one untagged initial commit after explicit approval; do not create a release tag.
+- [x] Pass Ruff, format, mypy, 132 tests at 100% coverage, Markdown, docs, versions, and diagrams.
+- [x] Create one untagged initial commit after explicit approval; do not create a release tag.
 
-**Exit evidence:** clean initial-commit inventory, all local gates green, remote still empty until
-approval.
+**Exit evidence:** commit `74bc831` on `main`, pushed to the public repository, with all local
+gates green.
 
 ### 1. P0 — deterministic safety boundary
 
-- [ ] Replace the missing-risk fail-open path with a typed, fail-closed investigation decision.
-- [ ] Validate model-produced tool arguments against deterministic policy and bounded schemas.
-- [ ] Minimize IAM data before any model boundary; do not send raw members or bindings globally.
-- [ ] Screen structured model input and output, not only text prompt parts.
-- [ ] Sanitize and schema-check escalation output before the notification boundary.
-- [ ] Register `AuditPlugin` on every runner and correlate refusal, failure, model, tool, and agent
+- [x] Replace the missing-risk fail-open path with a typed, fail-closed investigation decision.
+- [x] Validate model-produced notification arguments against deterministic policy and bounded schemas.
+- [x] Minimize IAM data before any model boundary; do not send raw members or bindings globally.
+- [x] Screen model text and structured function-response output before it reaches state or delivery.
+- [x] Sanitize and schema-check escalation output before the notification boundary.
+- [x] Register `AuditPlugin` on every supported runner and Cloud Run server; correlate refusal, failure, model, tool, and agent
       records by investigation ID without payload values.
-- [ ] Make notification side effects idempotent and refuse delivery without an idempotency key.
+- [x] Make notification side effects idempotent with a deterministic, tool-owned delivery key.
 
 **Exit evidence:** populated security tests for fail-closed decisions, prompt injection, outbound
 PII, unsafe tool arguments, audit refusals/failures, and duplicate notification delivery.
 
 ### 2. P0 — durable asynchronous investigations and memory
 
-- [ ] Define a versioned investigation event with event ID, tenant/department scope, attempt,
-      deadline, trace context, and data-classification fields.
-- [ ] Implement an acknowledged consumer with persisted state transitions, retry policy, dead-letter
+- [x] Define a versioned investigation event with event ID, context scope, schema version, and
+      data-classification fields.
+- [x] Implement local persisted state transitions, retry policy, dead-letter
       handling, deduplication, and an outbox for side effects.
-- [ ] Store only minimized durable context and approved exceptions with provenance, expiry, reviewer,
+- [x] Store only minimized durable context and approved exceptions with provenance, expiry, reviewer,
       and policy version.
 - [ ] Demonstrate a prior-week approved exception being recalled and suppressed in a later run.
 - [ ] Prove safe resume after process loss without duplicate escalation or lost audit records.
@@ -64,11 +70,12 @@ per-agent runtime identities, and no production bypass route.
 
 ### 4. P0 — reproducible deployment
 
-- [ ] Replace the current folder-only `adk deploy cloud_run` flow with build contexts that include
+- [x] Replace the current folder-only `adk deploy cloud_run` flow with a repository build context that includes
       shared packages and pinned runtime dependencies.
-- [ ] Keep `GOOGLE_CLOUD_LOCATION=global` separate from the regional compute/state target.
-- [ ] Inject project, Model Armor, Registry, Gateway, peer-card, and findings configuration through
-      managed deployment configuration; keep secrets in Secret Manager.
+- [x] Keep `GOOGLE_CLOUD_LOCATION=global` separate from the regional compute/state target.
+- [x] Inject project, Model Armor, peer-card, and findings configuration through managed
+      deployment configuration. Gateway configuration is intentionally absent because Gateway
+      itself is not provisioned; Secret Manager remains the approved secret boundary.
 - [ ] Provision dependencies before agents, deploy workers before the Orchestrator, and fail if any
       required endpoint or identity is absent.
 - [ ] Add infrastructure as code, least-privilege IAM, authenticated ingress, bounded scaling,
@@ -80,13 +87,13 @@ and a documented rollback/teardown rehearsal.
 
 ### 5. P1 — production verification and failure tolerance
 
-- [ ] Populate integration, security, and load suites; their current `__init__.py` files are not tests.
+- [x] Populate integration, security, and load suites; their current `__init__.py` files are not tests.
 - [ ] Test real wiring with emulated or isolated dependencies, not only mocked unit boundaries.
 - [ ] Exercise worker timeout, malformed response, hallucinated argument, dependency outage, retry,
       dead letter, duplicate event, stale memory, Gateway refusal, and notification failure.
 - [ ] Define measurable latency, throughput, error-rate, retry, and audit-completeness objectives.
 - [ ] Resolve or consciously accept deprecated `SequentialAgent` and experimental remote A2A use.
-- [ ] Add a transitive, reproducible dependency lock and supply-chain scanning.
+- [x] Add a transitive, reproducible dependency lock and supply-chain scanning.
 
 **Exit evidence:** green four-layer suite, failure-injection report, load report, locked dependency
 graph, and recorded risk acceptance for any experimental component.

@@ -10,7 +10,9 @@ Three parts of that sentence are only credible if they are *shown*: the policy i
 memory suppresses a re-flag, and the injection is blocked. This directory is where that
 proof lives.
 
-> **Status — empty.** Nothing here has been captured yet. This file is the plan, written
+> **Status — curated evidence set.** Historical records retain their capture conditions; current
+> infrastructure state is measured in [`architecture/gcp-state.json`](architecture/gcp-state.json).
+> This file is the plan, written
 > before the evidence exists so the demo is recorded against a known shot list rather than
 > assembled afterwards from whatever happened to be on screen.
 

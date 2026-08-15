@@ -11,6 +11,8 @@ import argparse
 import os
 import shutil
 import subprocess
+import urllib.error
+import urllib.request
 from collections.abc import Sequence
 
 from identity.policy import IDENTITIES, validate_identities
@@ -38,6 +40,35 @@ def run(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
 def exists(args: Sequence[str]) -> bool:
     result = run(*args, check=False)
     return result.returncode == 0
+
+
+def model_armor_template_accessible() -> bool:
+    """Check the regional REST endpoint, not gcloud's unreliable Model Armor command.
+
+    The Cloud SDK command can return ``PERMISSION_DENIED`` even for a project Owner holding the
+    documented Viewer and User roles. The direct regional endpoint is the same control-plane API
+    used by the Python client and is the path the runtime actually relies on.
+    """
+    token = subprocess.run(  # noqa: S603 - fixed gcloud executable and arguments
+        [GCLOUD, "auth", "print-access-token"],
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+    if token.returncode != 0 or not token.stdout.strip():
+        return False
+    uri = (
+        f"https://modelarmor.{MODEL_ARMOR_LOCATION}.rep.googleapis.com/v1/projects/{PROJECT}"
+        f"/locations/{MODEL_ARMOR_LOCATION}/templates/{MODEL_ARMOR_TEMPLATE}"
+    )
+    request = urllib.request.Request(  # noqa: S310 - fixed regional Google API endpoint
+        uri, headers={"Authorization": f"Bearer {token.stdout.strip()}"}
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30):  # noqa: S310 - fixed URI above
+            return True
+    except urllib.error.HTTPError, urllib.error.URLError, TimeoutError:
+        return False
 
 
 def ensure_api(service: str) -> None:
@@ -81,6 +112,7 @@ def main() -> None:
         "pubsub.googleapis.com",
         "run.googleapis.com",
         "cloudbuild.googleapis.com",
+        "eventarc.googleapis.com",
         "artifactregistry.googleapis.com",
         "secretmanager.googleapis.com",
         "modelarmor.googleapis.com",
@@ -102,15 +134,7 @@ def main() -> None:
         ]
         if missing:
             raise SystemExit(f"Required APIs are disabled: {', '.join(missing)}")
-        if not exists(
-            (
-                "model-armor",
-                "templates",
-                "describe",
-                MODEL_ARMOR_TEMPLATE,
-                f"--location={MODEL_ARMOR_LOCATION}",
-            )
-        ):
+        if not model_armor_template_accessible():
             raise SystemExit(
                 "Model Armor template is absent or caller lacks access; provisioner requires "
                 "modelarmor.templates.get"
@@ -127,15 +151,7 @@ def main() -> None:
         run("firestore", "databases", "create", f"--database={DATABASE}", f"--location={REGION}")
     if not exists(("pubsub", "topics", "describe", TOPIC)):
         run("pubsub", "topics", "create", TOPIC)
-    if not exists(
-        (
-            "model-armor",
-            "templates",
-            "describe",
-            MODEL_ARMOR_TEMPLATE,
-            f"--location={MODEL_ARMOR_LOCATION}",
-        )
-    ):
+    if not model_armor_template_accessible():
         raise SystemExit(
             "Model Armor template must be created by an approved Model Armor administrator "
             "before deployment"

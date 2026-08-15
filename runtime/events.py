@@ -16,9 +16,9 @@ class Inbox(Protocol):  # pragma: no cover - type-only adapter contract
 
 def decode_pubsub_event(envelope: dict[str, Any]) -> InvestigationEvent:
     """Validate the CloudEvents-shaped Pub/Sub envelope before it reaches an agent."""
-    event_id = str(envelope.get("id") or "")
+    cloud_event_id = str(envelope.get("id") or "")
     encoded = envelope.get("data", {}).get("message", {}).get("data")
-    if not event_id:
+    if not cloud_event_id:
         raise ValueError("missing Pub/Sub event id or message data")
     if not isinstance(encoded, str):
         raise ValueError("missing Pub/Sub event id or message data")
@@ -28,9 +28,10 @@ def decode_pubsub_event(envelope: dict[str, Any]) -> InvestigationEvent:
         raise ValueError("invalid Pub/Sub payload") from exc
     if not isinstance(payload, dict):
         raise ValueError("Pub/Sub payload must be an object")
+    event_id = payload.get("event_id")
     context_id = payload.get("context_id")
-    if not isinstance(context_id, str) or not context_id:
-        raise ValueError("context_id is required")
+    if not isinstance(event_id, str) or not isinstance(context_id, str) or not context_id:
+        raise ValueError("event_id and context_id are required")
     return InvestigationEvent(event_id=event_id, context_id=context_id)
 
 

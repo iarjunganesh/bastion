@@ -52,7 +52,7 @@ class FirestoreDurableStore:  # pragma: no cover - requires the Firestore emulat
         @firestore.transactional
         def transition(transaction: Any) -> bool:
             snapshot = reference.get(transaction=transaction)
-            if not snapshot.exists or snapshot.get("status") != "received":
+            if not snapshot.exists or snapshot.get("status") not in {"received", "failed"}:
                 return False
             transaction.update(
                 reference,

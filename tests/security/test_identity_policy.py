@@ -25,6 +25,7 @@ def test_escalation_cannot_gain_policy_read():
     changed = (
         *IDENTITIES[:2],
         WorkloadIdentity("escalation-agent-sa", frozenset({"roles/cloudasset.viewer"})),
+        *IDENTITIES[3:],
     )
     with pytest.raises(ValueError, match="may not read IAM"):
         validate_identities(changed)

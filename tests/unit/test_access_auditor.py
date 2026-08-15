@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -35,7 +36,7 @@ def test_fetch_reads_through_cloud_asset_inventory_not_a_subprocess():
 
     assert policy == {"bindings": [{"role": "roles/owner", "members": ["user:a@example.com"]}]}
     request = client.return_value.search_all_iam_policies.call_args.kwargs["request"]
-    assert request.scope == "projects/bastion-test-project"
+    assert request.scope == f"projects/{os.environ['GCP_PROJECT_ID']}"
 
 
 def test_fetch_stops_at_the_result_cap():
@@ -78,6 +79,16 @@ def test_every_member_of_a_broad_binding_is_flagged_separately():
     assert len({f["finding_id"] for f in findings}) == 2
     assert all(f["department"] == "security-engineering" for f in findings)
     assert all("member" not in finding and "role" not in finding for finding in findings)
+
+
+def test_finding_id_requires_a_long_secret_and_changes_with_the_key(monkeypatch):
+    monkeypatch.delenv(auditor.FINDING_HMAC_KEY_VAR)
+    with pytest.raises(RuntimeError, match=auditor.FINDING_HMAC_KEY_VAR):
+        auditor.finding_id("user:a@example.com", "roles/owner")
+    monkeypatch.setenv(auditor.FINDING_HMAC_KEY_VAR, "a" * 32)
+    first = auditor.finding_id("user:a@example.com", "roles/owner")
+    monkeypatch.setenv(auditor.FINDING_HMAC_KEY_VAR, "b" * 32)
+    assert first != auditor.finding_id("user:a@example.com", "roles/owner")
 
 
 def test_an_empty_policy_yields_no_findings():

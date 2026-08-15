@@ -88,16 +88,21 @@ policy_step = LlmAgent(
     output_key="policy_decisions",
 )
 
-# ADK serves an agent's card at this path when `adk deploy cloud_run --a2a` is used.
-A2A_CARD_PATH = "/.well-known/agent-card.json"
+# A deployed Bastion service exposes exactly one staged A2A app beneath its own name.  The
+# card path is explicit so an origin cannot accidentally resolve to a generic or sibling card.
+A2A_CARD_PATH = "/a2a/{agent_name}/.well-known/agent-card.json"
 
 AUDITOR_CARD_VAR = "BASTION_AUDITOR_CARD_URL"
 ESCALATION_CARD_VAR = "BASTION_ESCALATION_CARD_URL"
 
 
-def card_url(value: str) -> str:
+def card_url(value: str, agent_name: str) -> str:
     """Accept either a full agent-card URL or the service origin it lives under."""
-    return value if value.endswith(".json") else f"{value.rstrip('/')}{A2A_CARD_PATH}"
+    return (
+        value
+        if value.endswith(".json")
+        else f"{value.rstrip('/')}{A2A_CARD_PATH.format(agent_name=agent_name)}"
+    )
 
 
 def build_sub_agents() -> list[Any]:
@@ -136,14 +141,14 @@ def build_sub_agents() -> list[Any]:
         return [
             RemoteA2aAgent(
                 name="access_auditor",
-                agent_card=card_url(auditor),
+                agent_card=card_url(auditor, "access_auditor"),
                 description="Reads the live IAM policy and flags anomalies. Read-only.",
                 httpx_client=private_a2a_client(auditor),
             ),
             policy_step,
             RemoteA2aAgent(
                 name="escalation_agent",
-                agent_card=card_url(escalation),
+                agent_card=card_url(escalation, "escalation_agent"),
                 description="Packages high-risk findings for the owning department.",
                 httpx_client=private_a2a_client(escalation),
             ),

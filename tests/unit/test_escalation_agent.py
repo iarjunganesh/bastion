@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+from hashlib import sha256
 from unittest.mock import patch
 
 import httpx
@@ -23,7 +24,7 @@ def _endpoint():
 def test_posts_when_something_needs_review(_endpoint):
     with patch.object(escalation.httpx, "Client") as client:
         result = escalation.notify_human(
-            "investigation-1", "delivery-1", 3, ["overly_broad_role"], "data-platform"
+            "investigation-1", 3, ["overly_broad_role"], "data-platform"
         )
 
     assert result == {"delivered": True, "department": "data-platform", "count": 3}
@@ -38,13 +39,15 @@ def test_posts_when_something_needs_review(_endpoint):
         "risk_categories": ["overly_broad_role"],
         "summary": "Access-review findings require attention: overly_broad_role",
     }
-    assert posted.call_args.kwargs["headers"] == {"Idempotency-Key": "delivery-1"}
+    assert posted.call_args.kwargs["headers"] == {
+        "Idempotency-Key": sha256(b"investigation-1:data-platform").hexdigest()
+    }
 
 
 def test_silent_when_nothing_is_escalated(_endpoint):
     """An access review that pages a human on a clean run is one people turn off."""
     with patch.object(escalation.httpx, "Client") as client:
-        result = escalation.notify_human("investigation-1", "delivery-1", 0, [], "data-platform")
+        result = escalation.notify_human("investigation-1", 0, [], "data-platform")
 
     assert result["delivered"] is False
     client.assert_not_called()
@@ -57,17 +60,13 @@ def test_missing_endpoint_fails_closed_for_the_outbox():
         patch.object(escalation.httpx, "Client") as c,
         pytest.raises(RuntimeError, match="BASTION_FINDINGS_ENDPOINT"),
     ):
-        escalation.notify_human(
-            "investigation-1", "delivery-1", 2, ["overly_broad_role"], "platform-infra"
-        )
+        escalation.notify_human("investigation-1", 2, ["overly_broad_role"], "platform-infra")
     c.assert_not_called()
 
 
 def test_the_client_carries_an_explicit_timeout(_endpoint):
     with patch.object(escalation.httpx, "Client") as client:
-        escalation.notify_human(
-            "investigation-1", "delivery-1", 1, ["overly_broad_role"], "security-engineering"
-        )
+        escalation.notify_human("investigation-1", 1, ["overly_broad_role"], "security-engineering")
 
     timeout = client.call_args.kwargs["timeout"]
     assert isinstance(timeout, httpx.Timeout)
@@ -83,9 +82,7 @@ def test_retries_cover_connection_failures_only(_endpoint):
         patch.object(escalation.httpx, "Client"),
         patch.object(escalation.httpx, "HTTPTransport") as transport,
     ):
-        escalation.notify_human(
-            "investigation-1", "delivery-1", 1, ["overly_broad_role"], "security-engineering"
-        )
+        escalation.notify_human("investigation-1", 1, ["overly_broad_role"], "security-engineering")
 
     assert transport.call_args.kwargs["retries"] == escalation.NOTIFY_RETRIES
 
@@ -99,7 +96,6 @@ def test_the_tool_cannot_be_handed_bindings():
     params = inspect.signature(escalation.notify_human).parameters
     assert list(params) == [
         "investigation_id",
-        "idempotency_key",
         "finding_count",
         "risk_categories",
         "department",
@@ -111,11 +107,9 @@ def test_the_tool_cannot_be_handed_bindings():
 
 def test_notification_rejects_model_supplied_text_and_unknown_categories(_endpoint):
     with pytest.raises(ValueError, match="investigation_id"):
-        escalation.notify_human("", "delivery-1", 1, ["overly_broad_role"], "security-engineering")
+        escalation.notify_human("", 1, ["overly_broad_role"], "security-engineering")
     with pytest.raises(ValueError, match="unknown or unsafe"):
-        escalation.notify_human(
-            "investigation-1", "delivery-1", 1, ["free text"], "security-engineering"
-        )
+        escalation.notify_human("investigation-1", 1, ["free text"], "security-engineering")
 
 
 def test_the_module_holds_no_policy_client():

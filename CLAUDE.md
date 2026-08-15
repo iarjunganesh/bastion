@@ -31,19 +31,18 @@ They were asserted as done in judge-facing documents for two days *before* they 
 is the failure mode this repository exists to argue against, so treat a green claim as owing
 evidence, not the reverse.
 
-**What exists:** three ADK agents, cross-department routing, Model Armor screening on
-`before_model_callback`, an unregistered audit `BasePlugin`, 73 unit tests at 100% coverage, a six-job CI
-workflow, **seven** ADRs (six merged away 2026-08-15), three documentation gates, and the
-judge-facing document set.
+**What exists:** three ADK agents, cross-department routing, fail-closed Model Armor input
+screening, deterministic protected-data output screening, a private count-only findings inbox,
+four private Cloud Run services, Eventarc/Firestore durable admission, an Agent Engine instance,
+three managed Agent Registry service records, 132 unit tests at 100% coverage, and a green
+eight-job CI workflow.
 
-**What does not exist:** any deployed Cloud Run service, any Agent Engine deployment, any Agent
-Gateway, any registered Agent Registry entry, any Firestore database, any Pub/Sub topic, any
-Cloud Trace span.
+**What remains intentionally unclaimed:** a provisioned Agent Gateway, a retained successful
+multi-agent trace, duplicate-delivery evidence, and a cross-week memory replay. The absence of
+those proof artifacts must never be reworded into a completed capability.
 
-The latest counts-only state capture records four service accounts, one Model Armor template,
-and one pre-existing Agent Registry entry; it records no deployed runtime, Gateway, database,
-topic, or schedule. `scripts/capture_gcp_state.py` keeps counts separate and never commits
-principal identifiers.
+The latest counts-only state capture records 20 deployed resources and 21 of 21 required APIs.
+`scripts/capture_gcp_state.py` keeps counts separate and never commits principal identifiers.
 
 **Observed proof points so far.** The Model Armor block
 ([evidence 01](assets/evidence/01-model-armor-block.md)) and the real-IAM investigation with
@@ -73,9 +72,9 @@ private operator notes; they do not belong in a public access-governance reposit
 | Project alias | `bastion-fleet-2026` |
 | Model | `gemini-3.5-flash` at **`locations/global`** |
 | Model Armor | `bastion-guardrail` at **`europe-west4`** |
-| Regional target | `europe-north2` for compute and state; not yet deployed |
+| Regional target | `europe-north2` for private compute and state; Model Armor is in `europe-west4`, Gemini uses `global` |
 | Budget | Alert configured; account details intentionally omitted |
-| Public URL | Not deployed |
+| Public URL | Deliberately none — every Bastion Cloud Run service has internal ingress and IAM invocation |
 
 The project's default Compute Engine service account holds a broad predefined role. It is an
 unseeded, real finding class and must be referenced generically in public evidence. Never commit
@@ -157,16 +156,17 @@ issue or a screen recording. A principal shown once on camera is a principal to 
   about is far worse than an awkward correction.
 
 **Cloud Run deploys with `min-instances=0` and an explicit `max-instances` cap**, and
-authenticated by default. Exactly one service is deliberately public — the read-only findings
-API behind the dashboard — and it never serves the raw policy.
+authenticated by default. The findings API is also internal-only and accepts an IAM-authenticated,
+count-only escalation payload; it never serves the raw policy.
 
 **Do not write a claim before it is verified.** This project's entire pitch is auditability. A
 README asserting a working Model Armor block before one has been observed is precisely the
 failure the product is about. `submission/SUBMISSION.md` holds the list of claims not yet
 earned; move an item out of it only after seeing the thing work.
 
-**Every agent-to-agent call goes through the Gateway**, including when a direct call would be
-shorter. The pattern is the point, and it is what the observability layer logs.
+**Every deployed agent-to-agent call uses private Cloud Run A2A with workload identity.** Agent
+Gateway is an enabled managed surface, but is not provisioned; do not describe it as the current
+data plane. Its future routing proof remains in `submission/SUBMISSION.md`.
 
 **Never reimplement a managed GEAP product.** Every pillar the track names has a managed
 service behind it, and Bastion uses it ([ADR-003](docs/adr/003-pillars-on-geap.md)). This rule
@@ -217,9 +217,9 @@ Four layers, each answering a different question:
 | Layer | Question it answers | Run |
 |---|---|---|
 | `tests/unit/` | Does this function behave? | `make test-unit` |
-| `tests/integration/` | Placeholder — deployed wiring | not yet available |
-| `tests/security/` | Placeholder — end-to-end controls | not yet available |
-| `tests/load/` | Placeholder — Gateway concurrency | not yet available |
+| `tests/integration/` | Durable replay and idempotent notification flow | `make test-integration` |
+| `tests/security/` | Policy, identity, and private-Cloud-Run auth contracts | `make test-security` |
+| `tests/load/` | Concurrent admission/refusal policy contract | `make test-load` |
 
 `tests/conftest.py` patches the import-time clients — `firestore.Client()`, the Cloud Trace
 exporter, `os.environ["GCP_PROJECT_ID"]` — at conftest import time, not in a fixture, because
@@ -229,10 +229,10 @@ pytest imports test modules during collection before any fixture runs.
 be a credential path into the project Bastion audits. Every outbound call is mocked; a test
 that needs Google APIs is testing the wrong thing.
 
-The IAM-denial contrast and direct Model Armor block are captured as evidence, but the security
-test directory is empty. Model Armor is wired as a `before_model_callback`; outbound response
-sanitization and the through-agent proof are still owed. No document may collapse those partial
-proofs into an end-to-end security claim.
+The IAM-denial contrast and direct Model Armor block are captured as evidence. Model Armor is
+wired as a `before_model_callback`, and outbound response screening is locally verified. The
+through-agent managed-service proof is still owed; no document may collapse that into an
+end-to-end deployment claim.
 
 Python is type-hinted on public functions, `ruff` clean, no bare `except`. `make ci` runs lint,
 typecheck, tests, coverage, markdown, and the documentation gate, and must pass before a commit.

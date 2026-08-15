@@ -12,13 +12,4 @@ case "$BASTION_AGENT_DIR" in
   *) echo "Invalid BASTION_AGENT_DIR: $BASTION_AGENT_DIR" >&2; exit 64 ;;
 esac
 
-exec adk api_server \
-  --host=0.0.0.0 \
-  --port="$PORT" \
-  --a2a \
-  --trace_to_cloud \
-  --otel_to_cloud \
-  --extra_plugins=observability.audit.AuditPlugin \
-  --session_service_uri="$BASTION_SESSION_SERVICE_URI" \
-  --memory_service_uri="$BASTION_MEMORY_SERVICE_URI" \
-  "/app/agents/$BASTION_AGENT_DIR"
+exec python -m infrastructure.agent_server

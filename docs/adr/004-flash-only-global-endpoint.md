@@ -9,8 +9,8 @@ set whose central claim rests on a measurement rather than a judgement.
 Every model call in Bastion uses **`gemini-3.5-flash`** through the Vertex AI **`global`**
 location. There is no Pro tier and no per-step model split.
 
-Cloud Run and regional state are designed for **`europe-north2`** (Stockholm), but are not yet
-deployed. The model location and infrastructure region are independent settings and must not
+Cloud Run and regional state are deployed in **`europe-north2`** (Stockholm). The model location
+and infrastructure region are independent settings and must not
 be conflated in configuration.
 
 ## Context

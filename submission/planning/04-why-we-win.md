@@ -12,7 +12,10 @@ The stronger clip may be the one nobody planned: the policy Bastion reads contai
 
 Nothing about Bastion waits for a person to type a question. An investigation is triggered, runs across multiple agents, and only surfaces a human when there is something a human actually needs to decide. The chat-loop pattern never appears anywhere in the architecture.
 
-**Two claims in that sentence are not yet earned, and this file is where we admit it.** *Asynchronously* and *persists state across sessions* are the design; today one `SequentialAgent` runs in one process with `InMemorySessionService`, so nothing outlives the run and no schedule fires it. That is the second of the track's three demands, and it is the one at zero.
+**The durable admission path is deployed, but its strongest proof is still owed.** Eventarc
+admits a Pub/Sub investigation into Firestore and Agent Engine session/memory; no Scheduler job
+is provisioned. A retained cross-week replay, not the configuration itself, is the remaining
+evidence for the second track demand.
 
 ## Why "enterprise" is earned, not decorative
 
@@ -26,7 +29,9 @@ A bastion is a fortified projecting structure — the part of a fortress built t
 
 ## Multimodal UX angle (for the Best Multimodal UX bonus prize)
 
-The Escalation Agent's output isn't just text — it's a structured finding (who, what, risk score, evidence trail) rendered as a small dashboard, served read-only behind Firebase Hosting so a judge can reach it without credentials.
+The Escalation Agent's output is a schema-limited, count-only review record in Bastion's private
+Firestore-backed findings inbox. A public Firebase-hosted judge dashboard is a future submission
+surface, not a deployed feature.
 
 **Not a voice/audio digest.** An earlier version of this section proposed one. It would mean a second Google model, and [ADR-002](../../docs/adr/002-three-agents.md) fixed bonus scope: blog and social post in, additional models out. Adding a model to collect 0.2 is the same mistake as adding a service to lengthen the stack list, which [ADR-003](../../docs/adr/003-pillars-on-geap.md) already refuses. Best Multimodal UX is a prize to be *eligible* for, not one to bend the architecture toward.
 

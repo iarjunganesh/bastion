@@ -13,7 +13,8 @@ COPY model_armor /app/model_armor
 COPY observability /app/observability
 COPY registry /app/registry
 COPY runtime /app/runtime
-COPY infrastructure/start-agent.sh /app/start-agent.sh
+COPY infrastructure /app/infrastructure
+RUN cp /app/infrastructure/start-agent.sh /app/start-agent.sh
 RUN chmod 0555 /app/start-agent.sh && chown -R bastion:bastion /app
 
 USER bastion

@@ -62,7 +62,7 @@ class DurableStore:
     def claim(self, event_id: str) -> bool:
         cursor = self.connection.execute(
             "UPDATE investigations SET status='running', attempts=attempts+1, updated_at=? "
-            "WHERE event_id=? AND status='received'",
+            "WHERE event_id=? AND status IN ('received', 'failed')",
             (now(), event_id),
         )
         self.connection.commit()

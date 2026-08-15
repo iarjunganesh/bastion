@@ -16,11 +16,12 @@ not when it has been built. Scoring detail lives in
       ([ADR-005](../docs/adr/005-adk-as-the-agent-framework.md)); three `LlmAgent`s execute under
       a `SequentialAgent` as of 2026-08-15.
 - [x] At least one GCP infrastructure service in use — Cloud Asset Inventory reads the live
-      IAM policy. Managed fleet deployment is still outstanding.
+      IAM policy; four private Cloud Run services, Firestore, Pub/Sub/Eventarc, Agent Engine,
+      Model Armor, and Agent Registry are deployed ([evidence 04](../assets/evidence/04-private-fleet-deployment.md)).
 - [ ] The submission reasonably addresses the Fortified Enterprise Fleet challenge: all
       seven pillars present with a visible artifact each.
-- [ ] Repository history starts **inside the submission period (Aug 3–31, 2026)**; any
-      reused snippet is disclosed in the README.
+- [x] Repository history starts **inside the submission period (Aug 3–31, 2026)**; any
+      reused snippet is disclosed in the README. Initial baseline: `74bc831`.
 - [ ] Repository public with a license, **or** shared with `testing@devpost.com` and
       `cloudhackathons@google.com`.
 - [ ] Category on the Devpost form set to **Fortified Enterprise Fleet**.
@@ -28,16 +29,16 @@ not when it has been built. Scoring detail lives in
 - [ ] Architecture diagram attached as an image.
 - [ ] Spin-up instructions in the README, written for someone who has never seen the repo.
 
-- [ ] **Hosted Project URL** — *"a hosted project is highly encouraged."* Not pass/fail, and
-      judges *"are not required to test the Project."* Plan: stay live through the Sept 1 –
-      Oct 1 judging window, which costs nothing at `min-instances=0`.
+- [ ] **Hosted Project URL** — the fleet is private by design, so no public judge UI exists yet.
+      This is encouraged rather than pass/fail; do not expose an internal service merely to fill it.
 - [ ] Pre-existing code, if any, disclosed in the README.
 
 ## Prerequisites
 
 - [x] Hackathon GCP credits received and redeemed (account identifiers intentionally omitted).
 - [x] GCP project created, APIs enabled, **budget alert set before the first deploy**.
-- [ ] GEAR badge claimed via the Google Developer Program profile.
+- [x] [Gemini Enterprise Agent Ready (GEAR) badge](https://developers.google.com/profile/badges/community/gear?u=iarjunganesh)
+      claimed via the Google Developer Program profile.
 - [ ] Devpost registration complete.
 
 ## The evidence each pillar owes
@@ -45,7 +46,9 @@ not when it has been built. Scoring detail lives in
 Each row is a screenshot or clip that must exist before recording. The plan for capturing
 them is [`../assets/README.md`](../assets/README.md).
 
-- [ ] **Registry** — three agents listed with name, version, owner, declared scope.
+- [x] **Registry** — three private Bastion JSON-RPC services are published in Agent Registry
+      ([evidence 04](../assets/evidence/04-private-fleet-deployment.md)). Version and owner
+      metadata remain an enhancement, not proof already captured.
 - [ ] **Runtime** — an investigation still in progress across a gap in time, not one
       synchronous run.
 - [x] **Real IAM, end to end** — one investigation read the live policy through Cloud Asset
@@ -59,7 +62,7 @@ them is [`../assets/README.md`](../assets/README.md).
       `access-auditor-sa` is permitted the same call in the same moment
       ([evidence 03](../assets/evidence/03-escalation-agent-denied.md)). Produced by
       impersonation from a workstation, **not** by a deployed agent refused mid-run — that
-      stronger version arrives with the deployment.
+      stronger production-trace capture is still owed.
 - [ ] **Gateway** — an inter-agent call logged as an A2A task, and three refusals shown:
       an unregistered caller, an undeclared skill, and a rate limit.
 - [ ] **Audit trail** — the records for one investigation, correlated by `context_id`,

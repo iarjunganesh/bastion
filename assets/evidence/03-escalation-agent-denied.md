@@ -78,9 +78,11 @@ emails are masked above. No principal from the audited project appears in this f
 
 ## What it does not close
 
-- **Nothing is deployed.** These service accounts exist and are bound, but no Cloud Run service
-  runs under them yet. The denial was produced by impersonation from a workstation, not by a
-  deployed agent being refused mid-investigation. That stronger version arrives with the
-  deployment, and this file is replaced rather than deleted when it does.
-- `tests/security/` is still empty. A future static test should ensure the Escalation Agent
-  imports no policy client; this evidence catches a different failure, a bad IAM grant.
+- **Historical capture condition.** These service accounts were created before the private Cloud
+  Run fleet existed. Current deployment state is measured in
+  [`../architecture/gcp-state.json`](../architecture/gcp-state.json); this record remains the
+  safe, redacted denial baseline. The denial was produced by workstation impersonation, not by
+  a deployed agent being refused mid-investigation. A retained service-originated denial is the
+  stronger remaining evidence.
+- The security suite now exercises the Cloud Run audience, identity-policy shape, and private
+  peer transport. A retained deployed denial is the remaining evidence artifact.

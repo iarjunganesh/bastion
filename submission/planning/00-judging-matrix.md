@@ -19,10 +19,10 @@ done. Corrected below; the gaps are recorded in
 |---|---|---|
 | Gemini 3.5+ via Gemini API or Vertex AI | `gemini-3.5-flash` via Vertex AI on `global`, at the three call sites in ADR-001 (Flash is named explicitly on the overview) | ✅ **Met 2026-08-15** — 5 model calls in one investigation |
 | At least one Google agent framework | Google ADK — one of the four the rules accept (*"Google ADK, GenAI SDK, Antigravity SDK or GenKit"*), chosen in ADR-005 | ✅ **Met 2026-08-15** — three ADK `LlmAgent`s executed |
-| At least one GCP infra service | Cloud Run (compute) + Firestore (state) + Pub/Sub (async) | ◐ Firestore and Pub/Sub imported; nothing deployed |
+| At least one GCP infra service | Cloud Run (compute) + Firestore (state) + Pub/Sub/Eventarc (async) | ✅ Private fleet deployed; retained end-to-end trace evidence pending |
 | Reasonably addresses the Fortified Enterprise Fleet challenge | All seven components present with one observable proof each | ◐ **Two of seven proven** — the Model Armor block and the real-IAM investigation with cross-department routing; ledger in [ADR-006](../../docs/adr/006-pillar-coverage.md) |
-| Newly built during Submission Period (Aug 3–31, 2026) | Repository history starts with this baseline inside the window; verify the initial commit timestamp before final submission | ⬜ Initial commit pending explicit approval |
-| Hosted Project URL | *"A hosted project is highly encouraged"* — a submission field, not pass/fail. Judges *"are not required to test the Project."* Stay live through judging (Sept 1 – Oct 1): at `min-instances=0` that costs nothing, and teardown forfeits a field for no saving | ⬜ Nothing hosted |
+| Newly built during Submission Period (Aug 3–31, 2026) | Repository history starts with the approved baseline inside the window | ✅ Initial commit `74bc831`; subsequent delivery is preserved on backup branches |
+| Hosted Project URL | *"A hosted project is highly encouraged"* — a submission field, not pass/fail. Judges *"are not required to test the Project."* | ◐ Private Cloud Run fleet is deployed; there is no public judge UI or hosted URL yet |
 
 ## Stage 2 — Weighted Scoring
 
@@ -34,8 +34,8 @@ The brief's own wording, verbatim, and where each clause is answered:
 
 | Fortified Enterprise Fleet sub-criteria | Evidence in Bastion |
 |---|---|
-| *"how agents are cataloged for cross-department use"* | Agent Registry publishes name, **version**, owner, declared scope, and an approval status — the brief calls it *"the central repository for publishing, versioning, and discovering enterprise-approved agents"*, so `active` means approved-for-reuse rather than merely running |
-| *"how they safely maintain context across weeks of asynchronous operations"* | Pub/Sub-triggered investigations outlive the session that opened them; the Memory Bank recalls a prior week's approved exception instead of re-flagging it; BigQuery carries findings across runs so the *series* is visible, not just the latest state |
+| *"how agents are cataloged for cross-department use"* | Agent Registry contains the three private Bastion JSON-RPC services. Department ownership is enforced by repository routing policy; version/approval metadata is not yet demonstrated. |
+| *"how they safely maintain context across weeks of asynchronous operations"* | Eventarc admission deduplicates into Firestore and maps a stable investigation ID to Agent Engine session/memory. A retained prior-week suppression replay is still owed. |
 | *"how they interact with production data without violating enterprise compliance, data sovereignty, or security policies"* | Access Auditor reads the **real IAM policy of a live project**, read-only via `roles/iam.securityReviewer`, never written back. The Escalation Agent provably cannot read it at all. Infrastructure is pinned to `europe-north2`; **model traffic is `global` and cannot be region-pinned**, which is stated in the architecture rather than glossed |
 
 ### The seven components, in the brief's four groups
@@ -57,8 +57,8 @@ separately from **reasoning chain traces**. Each needs its own artifact.
 The recommended toolkit is the **Gemini Enterprise Agent Platform**. Resolved on its due date
 in [ADR-003](../../docs/adr/003-pillars-on-geap.md): GEAP is not an alternative to the
 scaffold, it is a backend behind ADK's service interfaces. Memory Bank and Runtime take the
-managed path; the Registry stays DIY because `agent_engines` offers no versioning, ownership,
-or scope — three of the words in the brief's own definition.
+managed path; the Registry is the managed Agent Registry service, with three Bastion records
+published. Rich version/ownership metadata is a remaining evidence gap, not a DIY substitute.
 
 **Note the strongest claim available here:** the data is real, not simulated. Most hackathon submissions in this track will demo against invented enterprise data. Auditing a real IAM policy — including the permissions of Bastion's own agents — is the single biggest differentiator on this 40% criterion.
 
@@ -67,7 +67,7 @@ or scope — three of the words in the brief's own definition.
 | Sub-criteria | Evidence |
 |---|---|
 | Clean, modularized, maintainable system | **Six of the seven pillars are managed GEAP products, and Bastion holds the seam rather than a module** — ~3,460 lines that reimplemented them were deleted 2026-08-15 ([ADR-003](../../docs/adr/003-pillars-on-geap.md)). What survives is one callback or one function per pillar. **A folder is not a pillar** — what "done" means for each is [ADR-006](../../docs/adr/006-pillar-coverage.md) |
-| State management | `VertexAiMemoryBankService` and `VertexAiSessionService`, reached through `adk deploy cloud_run --memory_service_uri`/`--session_service_uri` — flags, not a module ([ADR-003](../../docs/adr/003-pillars-on-geap.md)). The Firestore-backed implementation that used to sit here was deleted. **Not deployed**, so nothing persists yet |
+| State management | Managed Agent Engine session/memory URIs plus Firestore's durable Eventarc inbox ([ADR-003](../../docs/adr/003-pillars-on-geap.md)). The Firestore-backed implementation that used to sit here was deleted. **Deployed;** a retained cross-week replay is still owed |
 | Tools isolated and scoped for security | Each agent's tool set is a fixed allowlist, and the Escalation Agent's tool takes a **count** rather than findings — the signature is the control ([ADR-007](../../docs/adr/007-tool-poisoning.md)). Per-agent service accounts and the Agent Gateway hop are **designed and unbuilt**: the three agents currently share one identity as `sub_agents` of one process |
 | Failure-tolerant multi-agent routing | ◐ **Half answered.** *Hallucination* is bounded and always was: detection is deterministic and runs before any model call, so a fabricated finding has no binding behind it. *Retry* is **not** — the hand-rolled backoff, circuit breaker and loop guard went with `resilience.py` on 2026-08-15, and Agent Engine's managed retry needs a deployment that does not exist. The rules page asks this directly, so the gap is named rather than glossed |
 

@@ -1,110 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080"
-     role="img" aria-label="Bastion — the access review that reviews itself">
-  <title>Bastion — the access review that reviews itself</title>
-
-  <!--
-    The 16:9 title card. `banner-light.svg` / `banner-dark.svg` stay at 1200x320 because that is
-    the shape a README wants; this one is 1920x1080 because that is the shape OBS wants, and
-    letterboxing a 3.75:1 banner into a 16:9 scene wastes two thirds of the frame.
-
-    Theme handling is NOT the `prefers-color-scheme` block the 1200x320 pair carries. An SVG
-    referenced by an `<img>` tag — which is how GitHub renders every README image — does not
-    inherit the host page's colour scheme, so that media query resolves against the browser
-    default and a light-mode reader gets the dark palette. Measured, not assumed. So this file
-    is a MASTER: scripts/render_diagrams.py emits -light and -dark variants from the sentinel
-    blocks below, and the README pairs them in a <picture> element.
-
-    SMIL rather than CSS animation, for the same reason: CSS animation is ignored inside an
-    `<img>`-loaded SVG. The 6s timeline is shared with logo-animated.svg; changing one means
-    changing both.
-  -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Bastion private enterprise agent fleet">
+  <title>Bastion — a private enterprise agent fleet for access governance</title>
+  <!-- Master artwork. render_diagrams.py emits fixed light and dark variants and the Devpost GIF. -->
   <style>
 /* PALETTE:LIGHT */
-svg {
-  --bg-a:#F8FAFC; --bg-b:#E2E8F0; --ink:#0B1B2B; --sub:#334155; --muted:#64748B;
-  --accent:#1D4ED8; --rule:#F59E0B; --plate:#0B1B2B; --plate-ink:#E2E8F0;
-}
+svg { --bg:#F6F8FC; --grid:#DCE5F2; --ink:#10233D; --sub:#4B627E; --muted:#71839A; --card:#FFFFFF; --stroke:#B8C9DC; --blue:#2563EB; --cyan:#06B6D4; --amber:#F59E0B; --green:#16A34A; --halo:#DBEAFE; --shadow:#36597B; }
 /* /PALETTE:LIGHT */
 /* PALETTE:DARK */
 @media (prefers-color-scheme: dark) {
-svg {
-  --bg-a:#0B1B2B; --bg-b:#0D1117; --ink:#F1F5F9; --sub:#CBD5E1; --muted:#94A3B8;
-  --accent:#8AB4F8; --rule:#F59E0B; --plate:#F1F5F9; --plate-ink:#0B1B2B;
-}
+svg { --bg:#081424; --grid:#16314D; --ink:#F4F8FF; --sub:#C4D3E6; --muted:#91A7BF; --card:#10233D; --stroke:#31516F; --blue:#7CB3FF; --cyan:#5EE7F7; --amber:#F8BE45; --green:#57D887; --halo:#12355C; --shadow:#000000; }
 }
 /* /PALETTE:DARK */
   </style>
-
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="var(--bg-a)"/>
-      <stop offset="1" stop-color="var(--bg-b)"/>
-    </linearGradient>
-    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3B82F6"/>
-      <stop offset="1" stop-color="#1D4ED8"/>
-    </linearGradient>
-    <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#F59E0B" stop-opacity="0"/>
-      <stop offset="0.5" stop-color="#F59E0B" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#F59E0B" stop-opacity="0"/>
-    </linearGradient>
-    <clipPath id="shieldClip">
-      <path d="M128 16 L224 52 v72 c0 60-40 100-96 116 C72 224 32 184 32 124 V52 Z"/>
-    </clipPath>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--bg)"/><stop offset="1" stop-color="var(--halo)"/></linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--blue)"/><stop offset="1" stop-color="var(--cyan)"/></linearGradient>
+    <filter id="lift" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="var(--shadow)" flood-opacity=".18"/></filter>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="var(--grid)" stroke-width="1" opacity=".65"/></pattern>
+    <path id="p-registry" d="M960 540 C790 420 570 330 390 300"/><path id="p-eventarc" d="M960 540 C980 390 1030 300 1110 245"/><path id="p-armor" d="M960 540 C1140 425 1370 350 1535 350"/><path id="p-firestore" d="M960 540 C930 690 820 790 650 835"/><path id="p-engine" d="M960 540 C1120 695 1330 770 1510 790"/>
   </defs>
-
-  <rect width="1920" height="1080" fill="url(#bg)"/>
-  <rect x="0" y="1068" width="1920" height="12" fill="var(--rule)"/>
-
-  <!-- The animated mark, inline rather than referenced: an `<img>`-loaded SVG cannot pull in
-       another file, so `<use href="logo-animated.svg#…">` renders as nothing on GitHub. -->
-  <g transform="translate(268,300) scale(1.7)">
-    <path d="M128 16 L224 52 v72 c0 60-40 100-96 116 C72 224 32 184 32 124 V52 Z" fill="url(#shield)"/>
-    <path d="M32 52 h32 v22 h-32 Z M96 52 h32 v22 h-32 Z M160 52 h32 v22 h-32 Z" fill="#0B1B2B" opacity="0.22"/>
-
-    <g clip-path="url(#shieldClip)">
-      <rect x="-140" y="16" width="120" height="240" fill="url(#sweep)">
-        <animate attributeName="x" values="-140;-140;260;260" keyTimes="0;0.45;0.78;1"
-                 dur="6s" repeatCount="indefinite"/>
-      </rect>
+  <rect width="1920" height="1080" fill="url(#background)"/><rect width="1920" height="1080" fill="url(#grid)" opacity=".72"/><rect width="1920" height="9" fill="var(--amber)"/>
+  <g font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif">
+    <text x="96" y="110" font-size="34" font-weight="700" letter-spacing="8" fill="var(--blue)">BASTION</text><text x="96" y="158" font-size="25" fill="var(--sub)">PRIVATE ENTERPRISE AGENT FLEET · ACCESS GOVERNANCE</text>
+    <g transform="translate(1468 79)"><rect width="356" height="54" rx="27" fill="var(--card)" stroke="var(--stroke)"/><circle cx="30" cy="27" r="8" fill="var(--green)"><animate attributeName="opacity" values="1;.35;1" dur="1.6s" repeatCount="indefinite"/></circle><text x="52" y="34" font-size="21" font-weight="700" fill="var(--ink)">PRIVATE FLEET · LIVE</text></g>
+    <!-- The moving evidence packets make the trusted path legible at a glance. -->
+    <g fill="none" stroke="var(--blue)" stroke-width="3" opacity=".62"><use href="#p-registry"/><use href="#p-eventarc"/><use href="#p-armor"/><use href="#p-firestore"/><use href="#p-engine"/></g>
+    <g fill="var(--amber)"><circle r="9"><animateMotion dur="6s" repeatCount="indefinite" path="M960 540 C790 420 570 330 390 300"/></circle><circle r="9"><animateMotion dur="6s" begin="-1.2s" repeatCount="indefinite" path="M960 540 C980 390 1030 300 1110 245"/></circle><circle r="9"><animateMotion dur="6s" begin="-2.4s" repeatCount="indefinite" path="M960 540 C1140 425 1370 350 1535 350"/></circle><circle r="9"><animateMotion dur="6s" begin="-3.6s" repeatCount="indefinite" path="M960 540 C930 690 820 790 650 835"/></circle><circle r="9"><animateMotion dur="6s" begin="-4.8s" repeatCount="indefinite" path="M960 540 C1120 695 1330 770 1510 790"/></circle></g>
+    <!-- Five managed-service stations orbit the control plane. -->
+    <g filter="url(#lift)">
+      <g transform="translate(160 220)"><rect width="310" height="124" rx="20" fill="var(--card)" stroke="var(--stroke)" stroke-width="2"/><circle cx="39" cy="43" r="17" fill="var(--blue)"/><text x="72" y="49" font-size="22" font-weight="700" fill="var(--ink)">AGENT REGISTRY</text><text x="32" y="93" font-size="18" fill="var(--sub)">3 private A2A services</text></g>
+      <g transform="translate(952 178)"><rect width="320" height="124" rx="20" fill="var(--card)" stroke="var(--stroke)" stroke-width="2"/><circle cx="39" cy="43" r="17" fill="var(--amber)"/><text x="72" y="49" font-size="22" font-weight="700" fill="var(--ink)">EVENTARC</text><text x="32" y="93" font-size="18" fill="var(--sub)">durable admission</text></g>
+      <g transform="translate(1450 288)"><rect width="310" height="124" rx="20" fill="var(--card)" stroke="var(--stroke)" stroke-width="2"/><circle cx="39" cy="43" r="17" fill="var(--green)"/><text x="72" y="49" font-size="22" font-weight="700" fill="var(--ink)">MODEL ARMOR</text><text x="32" y="93" font-size="18" fill="var(--sub)">fails closed</text></g>
+      <g transform="translate(432 770)"><rect width="330" height="124" rx="20" fill="var(--card)" stroke="var(--stroke)" stroke-width="2"/><circle cx="39" cy="43" r="17" fill="var(--cyan)"/><text x="72" y="49" font-size="22" font-weight="700" fill="var(--ink)">FIRESTORE</text><text x="32" y="93" font-size="18" fill="var(--sub)">dedupe + findings inbox</text></g>
+      <g transform="translate(1408 732)"><rect width="330" height="124" rx="20" fill="var(--card)" stroke="var(--stroke)" stroke-width="2"/><circle cx="39" cy="43" r="17" fill="var(--blue)"/><text x="72" y="49" font-size="22" font-weight="700" fill="var(--ink)">AGENT ENGINE</text><text x="32" y="93" font-size="18" fill="var(--sub)">session + memory</text></g>
     </g>
-
-    <g fill="none" stroke="#0B1B2B" stroke-width="13" stroke-linecap="round" opacity="0.92">
-      <path d="M104 116 v-16 a24 24 0 0 1 48 0 v16">
-        <animateTransform attributeName="transform" type="translate"
-                          values="0 0; 0 0; 0 -16; 0 -16; 0 0; 0 0"
-                          keyTimes="0;0.22;0.34;0.66;0.78;1"
-                          dur="6s" repeatCount="indefinite"/>
-      </path>
+    <!-- Central governed control plane. -->
+    <g transform="translate(960 540)"><circle r="266" fill="none" stroke="var(--blue)" stroke-width="2" stroke-dasharray="8 18" opacity=".34"><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="24s" repeatCount="indefinite"/></circle><circle r="205" fill="var(--halo)" opacity=".72"><animate attributeName="r" values="196;211;196" dur="2.8s" repeatCount="indefinite"/></circle><circle r="174" fill="var(--card)" stroke="var(--blue)" stroke-width="4" filter="url(#lift)"/><path d="M0 -124 L102 -84 V-8 C102 80 44 127 0 146 C-44 127-102 80-102-8 V-84Z" fill="url(#core)"/><path d="M-42 4 L-9 37 L51 -31" fill="none" stroke="white" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/><text y="-184" text-anchor="middle" font-size="19" font-weight="800" letter-spacing="4" fill="var(--blue)">GOVERNED CONTROL PLANE</text><text y="188" text-anchor="middle" font-size="21" font-weight="700" fill="var(--ink)">BASTION</text><text y="219" text-anchor="middle" font-size="17" fill="var(--sub)">policy before model · identity before action</text></g>
+    <!-- The three cards name isolated authority boundaries, not vague agent bubbles. -->
+    <g filter="url(#lift)">
+      <g transform="translate(708 354)"><rect width="252" height="108" rx="18" fill="var(--card)" stroke="var(--blue)" stroke-width="3"/><rect width="252" height="10" rx="5" fill="var(--blue)"/><text x="24" y="50" font-size="18" font-weight="800" fill="var(--blue)">ORCHESTRATOR</text><text x="24" y="82" font-size="16" fill="var(--sub)">routes only approved peers</text></g>
+      <g transform="translate(535 566)"><rect width="262" height="108" rx="18" fill="var(--card)" stroke="var(--cyan)" stroke-width="3"/><rect width="262" height="10" rx="5" fill="var(--cyan)"/><text x="24" y="50" font-size="18" font-weight="800" fill="var(--cyan)">ACCESS AUDITOR</text><text x="24" y="82" font-size="16" fill="var(--sub)">read-only IAM evidence</text></g>
+      <g transform="translate(1123 566)"><rect width="262" height="108" rx="18" fill="var(--card)" stroke="var(--amber)" stroke-width="3"/><rect width="262" height="10" rx="5" fill="var(--amber)"/><text x="24" y="50" font-size="18" font-weight="800" fill="var(--amber)">ESCALATION</text><text x="24" y="82" font-size="16" fill="var(--sub)">count-only human review</text></g>
     </g>
-
-    <rect x="86" y="116" width="84" height="66" rx="12" fill="#0B1B2B" opacity="0.92"/>
-
-    <g transform="translate(128 149)">
-      <circle r="11" fill="#F59E0B"/>
-      <rect x="-3.5" y="6" width="7" height="20" rx="3" fill="#F59E0B"/>
-      <g>
-        <rect x="-2.5" y="-30" width="5" height="19" rx="2.5" fill="#F59E0B" opacity="0.95"/>
-        <rect x="2" y="-26" width="8" height="4" rx="2" fill="#F59E0B" opacity="0.95"/>
-        <rect x="2" y="-19" width="6" height="4" rx="2" fill="#F59E0B" opacity="0.95"/>
-        <animateTransform attributeName="transform" type="rotate"
-                          values="0;0;90;90;0;0" keyTimes="0;0.18;0.32;0.68;0.8;1"
-                          dur="6s" repeatCount="indefinite"/>
-      </g>
-    </g>
+    <g transform="translate(96 968)"><rect width="1728" height="1" fill="var(--stroke)"/><text y="45" font-size="21" font-weight="700" fill="var(--ink)">PRIVATE CLOUD RUN</text><text x="276" y="45" font-size="21" fill="var(--muted)">·</text><text x="306" y="45" font-size="21" font-weight="700" fill="var(--ink)">A2A / JSON-RPC</text><text x="560" y="45" font-size="21" fill="var(--muted)">·</text><text x="590" y="45" font-size="21" font-weight="700" fill="var(--ink)">21/21 APIS ENABLED</text><text x="922" y="45" font-size="21" fill="var(--muted)">·</text><text x="952" y="45" font-size="21" font-weight="700" fill="var(--ink)">20 DEPLOYED RESOURCES</text></g>
   </g>
-
-  <text x="740" y="452" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="152" font-weight="700" fill="var(--ink)" letter-spacing="3">BASTION</text>
-  <text x="746" y="536" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="46" fill="var(--sub)">The access review that reviews itself.</text>
-  <text x="746" y="604" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="30" fill="var(--muted)">Three agents auditing a live GCP IAM policy — including their own permissions.</text>
-  <text x="746" y="652" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="30" fill="var(--muted)">They remember what a human approved, and refuse to be instructed by their inputs.</text>
-
-  <g>
-    <rect x="746" y="712" width="880" height="62" rx="12" fill="var(--plate)"/>
-    <text x="774" y="753" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="28" font-weight="600" fill="var(--plate-ink)">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</text>
-  </g>
-
-  <text x="746" y="836" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="26" font-weight="600" fill="var(--accent)">google-adk 2.7.0 · Gemini 3.5 Flash · Model Armor · Cloud Asset Inventory</text>
-  <text x="746" y="878" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="24" fill="var(--muted)">Mid-build — the fleet runs against live Google APIs. Nothing is deployed.</text>
 </svg>

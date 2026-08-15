@@ -1,6 +1,6 @@
 .PHONY: help install test test-unit test-integration test-security test-load test-fast \
         coverage lint format format-check typecheck markdown docs versions diagrams ci \
-        run-orchestrator iam-policy deploy teardown clean
+        run-orchestrator iam-policy deploy teardown audit-dependencies clean
 
 PYTHON ?= python
 PROJECT ?= $(GCP_PROJECT_ID)
@@ -53,9 +53,13 @@ format-check:
 	ruff format --check .
 
 typecheck:
-	mypy agents registry model_armor observability
+	mypy agents gateway identity registry runtime model_armor observability infrastructure
 
-ci: lint format-check typecheck coverage markdown docs versions diagrams
+audit-dependencies:
+	uv pip install --system -r requirements.lock
+	uvx pip-audit -r requirements.lock
+
+ci: lint format-check typecheck coverage markdown docs versions diagrams audit-dependencies
 
 docs:
 	$(PYTHON) scripts/check_docs.py

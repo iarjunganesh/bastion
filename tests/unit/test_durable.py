@@ -43,6 +43,10 @@ def test_failed_investigation_is_recorded(store):
     store.receive(item)
     store.claim(item.event_id)
     store.finish(item.event_id, failed=True)
+    # Eventarc retries the same CloudEvent after a 5xx. A recorded failure must be
+    # claimable again, while completed/running work remains exactly-once.
+    assert store.claim(item.event_id)
+    store.finish(item.event_id)
 
 
 def test_outbox_is_idempotent_and_dead_letters_after_bounded_retries(store):

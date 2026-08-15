@@ -6,7 +6,8 @@
   live GCP IAM policy read-only through Cloud Asset Inventory, asks Gemini 3.5 Flash for
   rationale only, and escalates to the department that owns each principal. A dotted return
   edge shows that the policy being read contains the service accounts Bastion itself runs
-  under. Nothing is deployed; the fleet ran locally against live Google APIs.</desc>
+  under. The private Cloud Run fleet and Eventarc inbox are deployed; scheduler cadence and
+  retained end-to-end evidence remain deliberately distinct.</desc>
 
   <!-- Hand-placed on purpose. Auto-layout produced the unreadable diagram this replaced.
        16:9 at 1920x1080 so a frame can be dropped straight into an OBS scene. -->
@@ -45,6 +46,12 @@ svg {
             orient="auto-start-reverse">
       <path d="M0 0 L10 5 L0 10 z" fill="var(--red-d)"/>
     </marker>
+    <linearGradient id="control-core" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--blue)"/><stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+    <filter id="control-lift" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000000" flood-opacity=".24"/>
+    </filter>
   </defs>
 
   <rect class="bg" x="0" y="0" width="1920" height="1080"/>
@@ -69,15 +76,24 @@ svg {
     <text class="sub"   x="215" y="596">◐ enabled, no job</text>
   </g>
 
-  <!-- BASTION, centre -->
+  <!-- BASTION, centre: a visible control plane rather than an anonymous blue box. -->
   <g>
-    <rect x="640" y="420" width="520" height="250" rx="16"
-          fill="var(--blue)" stroke="var(--blue-d)" stroke-width="3"/>
-    <text class="label on" x="900" y="492">BASTION</text>
-    <text class="on-sub"   x="900" y="530">three ADK agents · SequentialAgent</text>
-    <text class="on-sub"   x="900" y="562">Access Auditor · Orchestrator · Escalation</text>
-    <text class="on-sub"   x="900" y="616">● ran locally against live Google APIs</text>
-    <text class="on-sub"   x="900" y="646">○ nothing deployed</text>
+    <circle cx="900" cy="545" r="254" fill="none" stroke="var(--blue)" stroke-width="2" stroke-dasharray="8 17" opacity=".35">
+      <animateTransform attributeName="transform" type="rotate" from="0 900 545" to="360 900 545" dur="24s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="900" cy="545" r="222" fill="var(--blue)" opacity=".08">
+      <animate attributeName="r" values="210;230;210" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="610" y="396" width="580" height="296" rx="28" fill="var(--card)" stroke="var(--blue)" stroke-width="4" filter="url(#control-lift)"/>
+    <rect x="610" y="396" width="580" height="14" rx="7" fill="url(#control-core)"/>
+    <path d="M704 454 L760 476 V518 C760 566 728 593 704 605 C680 593 648 566 648 518 V476Z" fill="url(#control-core)"/>
+    <path d="M676 521 L696 541 L733 503" fill="none" stroke="white" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="792" y="470" style="fill:var(--blue);font:700 17px 'Segoe UI',system-ui,sans-serif;letter-spacing:3px">GOVERNED CONTROL PLANE</text>
+    <text x="792" y="516" style="fill:var(--ink);font:700 34px 'Segoe UI',system-ui,sans-serif">BASTION</text>
+    <text x="792" y="552" style="fill:var(--muted);font:400 20px 'Segoe UI',system-ui,sans-serif">three isolated ADK agents · private A2A</text>
+    <line x1="648" y1="626" x2="1152" y2="626" stroke="var(--grid)" stroke-width="2"/>
+    <text x="674" y="660" style="fill:var(--green-d);font:700 18px 'Segoe UI',system-ui,sans-serif">● LIVE</text>
+    <text x="760" y="660" style="fill:var(--muted);font:400 18px 'Segoe UI',system-ui,sans-serif">Cloud Run · Eventarc · Agent Registry</text>
   </g>
 
   <!-- LIVE IAM, right -->
@@ -106,24 +122,24 @@ svg {
   </g>
 
   <!-- Edges -->
-  <path class="edgeline" id="e-sched" d="M360 545 L630 545" marker-end="url(#arrow)"/>
+  <path class="edgeline" id="e-sched" d="M360 545 L600 545" marker-end="url(#arrow)"/>
   <text class="edgetxt" x="495" y="525">opens a review</text>
 
-  <path class="edgeline" id="e-iam" d="M1160 520 L1430 520" stroke-width="6" marker-end="url(#arrow)"/>
+  <path class="edgeline" id="e-iam" d="M1200 545 L1430 545" stroke-width="6" marker-end="url(#arrow)"/>
   <text class="edgetxt" x="1295" y="498">reads, read-only</text>
 
-  <path d="M1440 610 C1300 700, 1060 700, 940 680" fill="none"
+  <path d="M1440 610 C1300 720, 1060 720, 940 702" fill="none"
         stroke="var(--red-d)" stroke-width="3" stroke-dasharray="10 10" marker-end="url(#arrow-red)">
     <animate attributeName="stroke-dashoffset" from="40" to="0" dur="1.5s" repeatCount="indefinite"/>
   </path>
   <text class="edgetxt" x="1230" y="726" fill="var(--red-d)">contains Bastion’s own service accounts</text>
 
-  <path class="edgeline" d="M1120 430 C1230 340, 1250 300, 1292 268" marker-end="url(#arrow)"/>
+  <path class="edgeline" d="M1200 450 C1230 360, 1250 300, 1292 268" marker-end="url(#arrow)"/>
   <text class="edgetxt" x="1215" y="372">rationale only — never the raw policy</text>
 
-  <path class="edgeline" d="M900 680 L900 820" marker-end="url(#arrow)"/>
-  <path class="edgeline" d="M840 690 C700 760, 640 780, 610 820" marker-end="url(#arrow)"/>
-  <path class="edgeline" d="M960 690 C1100 760, 1160 780, 1190 820" marker-end="url(#arrow)"/>
+  <path class="edgeline" d="M900 702 L900 820" marker-end="url(#arrow)"/>
+  <path class="edgeline" d="M840 702 C700 760, 640 780, 610 820" marker-end="url(#arrow)"/>
+  <path class="edgeline" d="M960 702 C1100 760, 1160 780, 1190 820" marker-end="url(#arrow)"/>
   <text class="edgetxt" x="420" y="742">escalates to the team that owns the principal</text>
 
   <!-- One investigation, in two beats: green out, red back to the owning teams.
@@ -134,13 +150,19 @@ svg {
        this edge"; sliding one across a component's own label says the request is skimming over
        the agent rather than being handled by it. Those opacity keyTimes are derived from where
        the path crosses x=630 and x=1160 — the card's edges — as a fraction of the path length. -->
+  <!-- Never animate a packet through a component. Two edge-local packets make the hand-off
+       explicit: one reaches the private control plane, the next leaves it for the IAM read. -->
   <circle r="11" fill="var(--green)">
-    <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.08;0.45;1"
-                   calcMode="linear"
-                   path="M360 545 L630 545 L900 545 L1160 520 L1430 520"/>
-    <animate attributeName="opacity" values="0;1;1;0;0;1;1;0;0"
-             keyTimes="0;0.08;0.17;0.19;0.34;0.36;0.45;0.48;1" dur="6s"
-             repeatCount="indefinite"/>
+    <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.04;0.23;1"
+                   calcMode="linear" path="M360 545 L600 545"/>
+    <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.04;0.23;0.27;1"
+             dur="6s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="11" fill="var(--green)">
+    <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.42;0.61;1"
+                   calcMode="linear" path="M1200 545 L1430 545"/>
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.38;0.42;0.61;0.65;1"
+             dur="6s" repeatCount="indefinite"/>
   </circle>
 
   <!-- The findings, fanning out to the teams that own the principals. Three dots rather than
@@ -151,20 +173,20 @@ svg {
     <circle r="10">
       <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0;1;1"
                      keyTimes="0;0.55;0.80;1" calcMode="linear"
-                     path="M840 690 C700 760, 640 780, 610 820"/>
+                     path="M840 702 C700 760, 640 780, 610 820"/>
       <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.55;0.58;0.80;0.84;1"
                dur="6s" repeatCount="indefinite"/>
     </circle>
     <circle r="10">
       <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0;1;1"
-                     keyTimes="0;0.55;0.80;1" calcMode="linear" path="M900 680 L900 820"/>
+                     keyTimes="0;0.55;0.80;1" calcMode="linear" path="M900 702 L900 820"/>
       <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.55;0.58;0.80;0.84;1"
                dur="6s" repeatCount="indefinite"/>
     </circle>
     <circle r="10">
       <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0;1;1"
                      keyTimes="0;0.55;0.80;1" calcMode="linear"
-                     path="M960 690 C1100 760, 1160 780, 1190 820"/>
+                     path="M960 702 C1100 760, 1160 780, 1190 820"/>
       <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.55;0.58;0.80;0.84;1"
                dur="6s" repeatCount="indefinite"/>
     </circle>
@@ -179,6 +201,6 @@ svg {
     <circle cx="720" cy="1046" r="9" fill="none" stroke="var(--edge)" stroke-width="2"/>
     <text class="legend" x="738" y="1054">not started</text>
   </g>
-  <text class="footb" x="1860" y="1046" text-anchor="end">Measured 2026-08-15 · 20 of 20 services enabled · NOT DEPLOYED</text>
-  <text class="foot"  x="1860" y="1016" text-anchor="end">No Cloud Run service, no Firestore database, no Pub/Sub topic, no gateway, no trace.</text>
+  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-15 · 21/21 APIs · 20 deployed resources</text>
+  <text class="foot"  x="1860" y="1016" text-anchor="end">Private fleet + Eventarc live · Scheduler cadence and retained trace evidence pending.</text>
 </svg>

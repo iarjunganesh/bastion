@@ -52,10 +52,13 @@ values only. This file therefore contains no principal from the audited project.
 
 ## What is still not proven
 
-- **Nothing is deployed.** This ran locally against live Google APIs. No Cloud Run service, no
-  Agent Engine deployment, no Cloud Trace span.
+- **Historical capture condition.** This run was local against live Google APIs, before the
+  private Cloud Run fleet and Eventarc inbox were deployed. Current deployment state is measured
+  in [`../architecture/gcp-state.json`](../architecture/gcp-state.json); this record is retained
+  as proof of the live-policy baseline, not as a statement of the current fleet.
 - **The Model Armor block was not exercised here** — the investigation prompt is benign, so the
   guardrail correctly passed it through. The block itself is
   [evidence 01](01-model-armor-block.md).
-- **No memory.** `InMemorySessionService` was used, so nothing persisted and no prior-week
-  exception was recalled. The Memory Bank suppression proof is still owed.
+- **No cross-week replay in this historical run.** `InMemorySessionService` was used at capture
+  time, so no
+  prior-week exception was recalled. The deployed managed-memory replay remains the proof owed.

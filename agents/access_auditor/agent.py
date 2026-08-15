@@ -16,6 +16,7 @@ model thought so" — and it means the model never receives the raw policy docum
 
 from __future__ import annotations
 
+import hmac
 import os
 from functools import lru_cache
 from hashlib import sha256
@@ -50,6 +51,7 @@ OVERLY_BROAD_ROLES = {"roles/owner", "roles/editor"}
 # A single project's policy is small, but the API paginates and an unbounded walk over a large
 # organisation scope would be a surprising amount of work for an agent turn.
 MAX_POLICY_RESULTS = 500
+FINDING_HMAC_KEY_VAR = "BASTION_FINDING_HMAC_KEY"
 
 
 def project_id() -> str:
@@ -66,6 +68,14 @@ def project_id() -> str:
             "GCP_PROJECT_ID is not set. Copy .env.example to .env, or export it — "
             "see the Quick Start in README.md."
         ) from None
+
+
+def finding_id(member: str, role: str) -> str:
+    """Return a keyed opaque identifier, never a reversible plain fingerprint."""
+    key = os.environ.get(FINDING_HMAC_KEY_VAR)
+    if key is None or len(key) < 32:
+        raise RuntimeError(f"{FINDING_HMAC_KEY_VAR} must contain at least 32 secret characters")
+    return hmac.new(key.encode(), f"{member}\x00{role}".encode(), sha256).hexdigest()[:24]
 
 
 @lru_cache(maxsize=1)
@@ -113,7 +123,7 @@ def find_anomalies(policy: IamPolicy) -> list[Finding]:
         if role not in OVERLY_BROAD_ROLES:
             continue
         for member in binding.get("members", []):
-            fingerprint = sha256(f"{member}\x00{role}".encode()).hexdigest()[:24]
+            fingerprint = finding_id(member, role)
             findings.append(
                 Finding(
                     finding_id=fingerprint,

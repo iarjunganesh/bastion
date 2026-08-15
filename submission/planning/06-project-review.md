@@ -58,7 +58,7 @@ Recommended cuts, in order:
 
 1. **Drop from 4 agents to 3.** Merge Policy Enforcer into the Orchestrator. Agent *count* is not graded; separation of concerns is, and three agents demonstrates it fine. Saves ~2 days.
 2. **Gateway stays thin.** Registration check + logging, and no retries at the gateway layer — those live in the Orchestrator, next to the policy that acts on them ([ADR-002](../../docs/adr/002-three-agents.md)). It *does* carry rate limiting with eviction, which this line originally ruled out: an unbounded per-`agent_id` counter is a memory-exhaustion path, and `agent_id` is attacker-supplied.
-3. **Escalation output: the dashboard.** Settled by [ADR-003](../../docs/adr/003-pillars-on-geap.md) — Slack is not among the twenty services, and the read-only findings API behind Firebase Hosting is already the judge path.
+3. **Escalation output: the dashboard.** Settled by [ADR-003](../../docs/adr/003-pillars-on-geap.md) — Slack is not among the twenty-one services, and the read-only findings API behind Firebase Hosting is already the judge path.
 4. **Treat the blog post as Week 3 optional.** It's worth 0.2 and takes 2 hours; do it only if the demo video is already recorded.
 
 What must *not* be cut: all seven pillars need at least a visible artifact, Model Armor's blocking moment, cross-session memory recall, and the video. Those are the scored items.

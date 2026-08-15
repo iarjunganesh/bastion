@@ -1,0 +1,20 @@
+# Keep Cloud Run source builds small, deterministic, and free of local credentials or test state.
+.gcloudignore
+.git
+.gitignore
+.audit-venv/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+.env
+.env.*
+*.pem
+.tmp/
+.takes/
+*.log

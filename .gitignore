@@ -11,6 +11,7 @@ coverage.xml
 # Virtualenvs
 .venv/
 venv/
+.audit-venv/
 
 # Env / secrets
 .env

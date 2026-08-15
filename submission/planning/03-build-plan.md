@@ -13,8 +13,9 @@ Supersedes the earlier 21-day version, which was mis-dated (see `06-project-revi
 > ([ADR-003](../../docs/adr/003-pillars-on-geap.md)); the three agents were rewritten on ADK
 > 2.7.0; and all three pass/fail requirements were met in code that ran
 > ([evidence 02](../../assets/evidence/02-gemini-investigation.md)). What stands today is three
-> ADK agents, cross-department routing, 73 tests at 100% coverage, seven ADRs, and the six-job
-> CI workflow. **Still not deployed; the initial untagged commit is being prepared.**
+> ADK agents, cross-department routing, 132 tests at 100% coverage, seven ADRs, and the current
+> Historical build-plan note. The initial commit and private fleet deployment are complete; use
+> the current release ledger for active proof work.
 
 ## Status of prerequisites
 
@@ -89,7 +90,7 @@ Supersedes the earlier 21-day version, which was mis-dated (see `06-project-revi
 
 - Orchestrator retry/escalation when the Auditor times out or returns low confidence (directly graded under Architecture)
 - Escalation Agent → the dashboard. One surface, and it was settled by
-  [ADR-003](../../docs/adr/003-pillars-on-geap.md) — Slack is not among the twenty services
+  [ADR-003](../../docs/adr/003-pillars-on-geap.md) — Slack is not among the twenty-one services
 - Render the architecture diagram as an actual image
 - README spin-up instructions, written for someone who has never seen the repo
 - **Checkpoint: if the core loop still isn't solid by Sun Aug 23, cut to 2 agents and protect the video**
@@ -131,7 +132,7 @@ Do not plan work here. This day exists to absorb something going wrong.
 | ~~Model Armor doesn't work in time~~ | **Retired.** It works, and was observed blocking on Aug 15; [ADR-003](../../docs/adr/003-pillars-on-geap.md) withdrew the Gemini-based fallback rather than leave a weaker control described in stronger words |
 | ~~GEAP evaluation eats the schedule~~ | **Retired.** Decided Aug 14 inside the cap ([ADR-003](../../docs/adr/003-pillars-on-geap.md)) |
 | ~~Pass/fail gates unmet~~ | **Retired Aug 15.** All three met in code that ran: 5 Gemini calls, three ADK `LlmAgent`s, and Cloud Asset Inventory against the live policy |
-| **Nothing deployed** | The one requirement with no partial credit ([ADR-006](../../docs/adr/006-pillar-coverage.md)). Not-live at judging is permitted; never-deployed is not |
+| **Private fleet deployed** | The one requirement with no partial credit is met ([ADR-006](../../docs/adr/006-pillar-coverage.md)); remaining work is retained operational evidence |
 | Core loop slips past Aug 23 | Cut to 2 agents; the video matters more than agent count |
 | Demo recording goes badly | Raw clips recorded Aug 24, three days before they're needed |
 | Field is now 2,327 participants | Differentiation comes from real IAM data + the live injection block + the captured denial, not more features |

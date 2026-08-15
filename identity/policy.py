@@ -23,7 +23,10 @@ IDENTITIES = (
             {
                 "roles/aiplatform.user",
                 "roles/datastore.user",
+                "roles/cloudtrace.agent",
+                "roles/logging.logWriter",
                 "roles/modelarmor.user",
+                "roles/monitoring.metricWriter",
                 "roles/pubsub.publisher",
             }
         ),
@@ -33,16 +36,34 @@ IDENTITIES = (
         frozenset(
             {
                 "roles/cloudasset.viewer",
+                "roles/aiplatform.user",
+                "roles/cloudtrace.agent",
                 "roles/iam.securityReviewer",
+                "roles/logging.logWriter",
                 "roles/modelarmor.user",
+                "roles/monitoring.metricWriter",
                 "roles/recommender.iamViewer",
+                "roles/secretmanager.secretAccessor",
             }
         ),
     ),
     WorkloadIdentity(
         "escalation-agent-sa",
-        frozenset({"roles/secretmanager.secretAccessor", "roles/modelarmor.user"}),
+        frozenset(
+            {
+                "roles/aiplatform.user",
+                "roles/cloudtrace.agent",
+                "roles/logging.logWriter",
+                "roles/modelarmor.user",
+                "roles/monitoring.metricWriter",
+            }
+        ),
     ),
+    WorkloadIdentity("findings-api-sa", frozenset({"roles/datastore.user"})),
+    # Eventarc's delivery identity is not an agent and never receives production-data access.
+    # It can receive the Pub/Sub event; its only Cloud Run permission is granted per-service in
+    # deploy.sh, so it cannot invoke a peer or the findings inbox.
+    WorkloadIdentity("eventarc-invoker-sa", frozenset({"roles/eventarc.eventReceiver"})),
 )
 
 
@@ -52,8 +73,10 @@ def validate_identities(identities: tuple[WorkloadIdentity, ...] = IDENTITIES) -
         "orchestrator-sa",
         "access-auditor-sa",
         "escalation-agent-sa",
+        "findings-api-sa",
+        "eventarc-invoker-sa",
     }:
-        raise ValueError("exactly the three declared workload identities are required")
+        raise ValueError("exactly the declared Bastion identities are required")
     for identity in identities:
         if identity.roles & BROAD_ROLES:
             raise ValueError("broad role is forbidden")

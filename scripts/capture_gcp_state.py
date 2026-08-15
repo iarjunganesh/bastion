@@ -42,6 +42,7 @@ REGION = "europe-north2"
 SERVICES = {
     "Vertex AI": "aiplatform.googleapis.com",
     "Cloud Run": "run.googleapis.com",
+    "Eventarc": "eventarc.googleapis.com",
     "Firestore": "firestore.googleapis.com",
     "Pub/Sub": "pubsub.googleapis.com",
     "Cloud Scheduler": "cloudscheduler.googleapis.com",
@@ -96,6 +97,11 @@ MODEL_ARMOR_LOCATION = "europe-west4"
 MODEL_ARMOR_ENDPOINT = (
     f"https://modelarmor.{MODEL_ARMOR_LOCATION}.rep.googleapis.com/v1"
     f"/projects/{PROJECT}/locations/{MODEL_ARMOR_LOCATION}/templates"
+)
+AGENT_ENGINE_LOCATION = "europe-west4"
+AGENT_ENGINE_ENDPOINT = (
+    f"https://{AGENT_ENGINE_LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT}"
+    f"/locations/{AGENT_ENGINE_LOCATION}/reasoningEngines"
 )
 
 
@@ -170,6 +176,32 @@ def model_armor_templates() -> int:
     return len(payload.get("templates", []))
 
 
+def agent_engines() -> int:
+    """Count durable Agent Engine instances without writing their resource IDs to Git."""
+    try:
+        completed = subprocess.run(  # noqa: S603 - fixed argv, no shell
+            [gcloud(), "auth", "print-access-token"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return 0
+    token = completed.stdout.strip()
+    if completed.returncode != 0 or not token:
+        return 0
+    request = urllib.request.Request(  # noqa: S310 - fixed Google API endpoint
+        AGENT_ENGINE_ENDPOINT, headers={"Authorization": f"Bearer {token}"}
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310
+            payload = json.loads(response.read().decode("utf-8"))
+    except urllib.error.URLError, TimeoutError, json.JSONDecodeError:
+        return 0
+    return len(payload.get("reasoningEngines", []))
+
+
 def capture() -> dict[str, Any]:
     apis = enabled_apis()
     return {
@@ -184,6 +216,7 @@ def capture() -> dict[str, Any]:
         "resources": {
             **{name: len(run(args)) for name, args in PROBES.items()},
             "model_armor_templates": model_armor_templates(),
+            "agent_engines": agent_engines(),
             "service_accounts_created": own_service_accounts(),
         },
     }

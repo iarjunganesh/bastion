@@ -120,17 +120,17 @@ def test_the_policy_instruction_forbids_rescoring():
 def test_card_url_accepts_a_service_origin():
     """Give it an origin and it derives the well-known card path."""
     assert (
-        orchestrator.card_url("https://bastion-access-auditor-x.a.run.app")
-        == "https://bastion-access-auditor-x.a.run.app/.well-known/agent-card.json"
+        orchestrator.card_url("https://bastion-access-auditor-x.a.run.app", "access_auditor")
+        == "https://bastion-access-auditor-x.a.run.app/a2a/access_auditor/.well-known/agent-card.json"
     )
-    assert orchestrator.card_url("https://x.a.run.app/") == (
-        "https://x.a.run.app/.well-known/agent-card.json"
+    assert orchestrator.card_url("https://x.a.run.app/", "escalation_agent") == (
+        "https://x.a.run.app/a2a/escalation_agent/.well-known/agent-card.json"
     )
 
 
 def test_card_url_passes_a_full_card_url_through():
     full = "https://x.a.run.app/a2a/auditor/.well-known/agent-card.json"
-    assert orchestrator.card_url(full) == full
+    assert orchestrator.card_url(full, "access_auditor") == full
 
 
 def test_local_topology_composes_the_peers_in_process(monkeypatch):

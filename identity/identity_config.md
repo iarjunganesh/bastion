@@ -7,9 +7,9 @@ predefined broad role where a narrower one will do.
 This is the one pillar whose failure is directly observable. A mis-scoped call returns a
 denial, and that denial is the artifact — see the verification step below.
 
-> The three service accounts now exist and a least-privilege IAM contrast has been captured.
-> The agents still execute as `sub_agents` of one `SequentialAgent` in a local process, so the
-> runtime does not yet enforce those identities. The table below is the deployment target.
+> The three agent service accounts now back distinct private Cloud Run services. Runtime identity
+> separation is enforced at the service boundary; the next evidence item is a retained deployed
+> denial capture rather than an unimplemented identity model.
 
 ## Service accounts
 
@@ -19,9 +19,9 @@ wrong identity and the least-privilege claim becomes false in the artifact that 
 
 | Service | Service account | IAM roles |
 |---|---|---|
-| Orchestrator | `orchestrator-sa@PROJECT.iam.gserviceaccount.com` | `roles/datastore.user` scoped to `investigations`, `roles/pubsub.publisher` |
-| Access Auditor | `access-auditor-sa@PROJECT.iam.gserviceaccount.com` | **`roles/iam.securityReviewer`** — read-only on the live IAM policy — plus `roles/cloudasset.viewer` and `roles/recommender.iamViewer` |
-| Escalation Agent | `escalation-agent-sa@PROJECT.iam.gserviceaccount.com` | Write-only on the findings endpoint, `roles/secretmanager.secretAccessor` for that endpoint's URL. **No IAM read of any kind** |
+| Orchestrator | `orchestrator-sa@PROJECT.iam.gserviceaccount.com` | `roles/aiplatform.user` for managed ADK state/model calls, `roles/datastore.user`, `roles/modelarmor.user`, `roles/pubsub.publisher` |
+| Access Auditor | `access-auditor-sa@PROJECT.iam.gserviceaccount.com` | **`roles/iam.securityReviewer`** — read-only on the live IAM policy — plus `roles/aiplatform.user`, `roles/cloudasset.viewer`, `roles/modelarmor.user`, `roles/recommender.iamViewer`, and HMAC-secret access |
+| Escalation Agent | `escalation-agent-sa@PROJECT.iam.gserviceaccount.com` | `roles/aiplatform.user` and `roles/modelarmor.user`; write-only to the findings endpoint. **No IAM read of any kind** |
 
 **There were five rows here, and two of them were for services that no longer exist.** Gateway
 and Registry each had a service account, because each used to be a Cloud Run service in this
@@ -62,19 +62,18 @@ same call from the Auditor's account on camera.
 
 The captured denial is recorded in
 [`../assets/evidence/03-escalation-agent-denied.md`](../assets/evidence/03-escalation-agent-denied.md).
-The `tests/security/` directory is still empty; deployed identity enforcement needs its own
-repeatable test before the pillar is complete.
+The security suite exercises the token audience, peer-invocation boundary, and policy shape;
+the retained deployed denial is the remaining proof artifact.
 
-## TODO
+## Delivery ledger
 
-- [ ] Split the `SequentialAgent` so each agent is its own deployable with its own
-      `root_agent`. Until this lands the three share one identity and the table above cannot
-      be true of anything
+- [x] Split the agents into private deployables with their own `root_agent`, Cloud Run service,
+      and workload identity
 - [x] Create the three service accounts (`gcloud iam service-accounts create ...`)
-- [ ] Grant each the roles above, and nothing else. Verify with a query that returns **roles
+- [x] Grant each the declared baseline roles. Verify with a query that returns **roles
       and no identities** — `gcloud projects get-iam-policy "$PROJECT"
       --flatten="bindings[].members" --filter="bindings.members:<sa>"
       --format="value(bindings.role)"`. The unfiltered form returns every principal in the
       project and must not be printed; see [`../SECURITY.md`](../SECURITY.md)
-- [ ] Wire Workload Identity so Cloud Run services assume these SAs natively (no key files)
+- [x] Wire Cloud Run services to assume their service accounts natively (no key files)
 - [x] Capture the Escalation Agent denial

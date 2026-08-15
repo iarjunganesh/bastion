@@ -10,18 +10,20 @@
 </p>
 
 <p align="center">
-  <strong>Three local ADK agents audit a live GCP IAM policy and route findings across departments. Managed deployment, durable memory, Gateway enforcement, and end-to-end guardrails remain in progress.</strong>
+  <strong>A private, durable access-review fleet: three ADK agents, separate Cloud Run identities, authenticated A2A, an Eventarc inbox, and a count-only human-review endpoint.</strong>
 </p>
 
 > **All Things Agentic Hackathon 2026 — Fortified Enterprise Fleet**
 >
-> **Mid-build.** Nothing is deployed yet — read
-> [Build & deployment status](#build--deployment-status) before taking anything below as
-> finished.
+> **Live private fleet; evidence capture in progress.** Four Cloud Run services, the Eventarc
+> investigation route, managed Agent Engine state, Model Armor, and the EU Firestore/Pub/Sub
+> boundary are deployed. The [proof ledger](#build--deployment-status) separates deployment
+> from the remaining end-to-end and scheduled-run evidence.
 
 [![CI](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml)
 [![Codecov](https://codecov.io/gh/iarjunganesh/bastion/graph/badge.svg)](https://codecov.io/gh/iarjunganesh/bastion)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Gemini Enterprise Agent Ready](https://img.shields.io/badge/GEAR-Gemini_Enterprise_Agent_Ready-4285F4?logo=google&logoColor=white)](https://developers.google.com/profile/badges/community/gear?u=iarjunganesh)
 
 **Target Google Cloud service map — deployment status is tracked below.**
 
@@ -76,20 +78,23 @@ the spreadsheet it replaced, because now the alert fatigue is automated too.
 
 ---
 
-## Target behavior and current proof
+## What is deployed, what is proven
 
-- ✅ **Reads a real IAM policy** — not a fixture. `roles/owner` where a narrower role would serve,
-  service accounts with no recent activity, bindings with neither condition nor expiry.
-- ⬜ **Corroborates with Google's own signal.** IAM Recommender integration is planned, not wired.
-- ⬜ **Remembers what was already approved.** Durable cross-week Memory Bank behavior is not built.
-- ◐ **Separates agent authority.** The service-account denial is captured, but the agents still
-  execute locally under one process identity.
-- ◐ **Screens hostile input.** Model Armor blocked a direct prompt-injection probe; the same block
-  has not yet been observed through an agent, and outbound PII screening is not implemented.
-- ⬜ **Runs on a schedule, not on a human remembering.** Cloud Scheduler is what will make
-  "continuous" a fact rather than a claim.
-- ⬜ **Produces the audit trail as the deliverable.** The plugin class exists, but is not registered;
-  no Cloud Trace span or correlated production audit trail exists yet.
+- ✅ **Reads production IAM read-only** through Cloud Asset Inventory; deterministic policy rules
+  decide clear, reject, or escalate before a model can influence the outcome.
+- ✅ **Separates authority** with three Cloud Run services, one workload identity per agent, and
+  authenticated internal A2A calls. The Escalation Agent can invoke only Bastion's private,
+  count-only findings endpoint.
+- ✅ **Maintains durable investigation identity**: Eventarc admission atomically deduplicates a
+  CloudEvent in Firestore and maps its stable context ID to managed Agent Engine session/memory.
+- ✅ **Protects the model and delivery boundaries**: Model Armor fails closed before model input;
+  a deterministic protected-data screen blocks model output before it can reach state or the
+  human-review inbox. Audit events are emitted through ADK's Cloud telemetry integration.
+- ◐ **End-to-end proof is being captured**: the Eventarc route and private peer cards are deployed;
+  a retained production trace, duplicate-delivery capture, and cross-week replay are the remaining
+  evidence, not unimplemented capabilities.
+- ⬜ **Cloud Scheduler cadence** and a human-review UI are intentionally not part of the current
+  deployment; investigations can be triggered by the authenticated Pub/Sub publisher today.
 
 ### The audit target is real IAM
 
@@ -110,10 +115,9 @@ use of it is disclosed here and in the recording. The primary source is real.
 
 ## How It Works
 
-**This section describes the designed system, not a running one.** Nothing below is deployed
-yet; what is and is not built is in [Build & deployment status](#build--deployment-status)
-further down, and the
-per-pillar ledger is [ADR-006](docs/adr/006-pillar-coverage.md).
+**This is the deployed topology.** The services are private; the only admitted asynchronous
+entry point is Eventarc from the Bastion investigation topic. The proof ledger below calls out
+which live paths still need retained demo evidence.
 
 1. **Cloud Scheduler** fires the review on a cadence. Nothing waits on a human remembering.
 2. **Pub/Sub** opens an investigation. The trigger is external to the fleet, so a run outlives
@@ -124,21 +128,17 @@ per-pillar ledger is [ADR-006](docs/adr/006-pillar-coverage.md).
 4. The **Access Auditor** reads the **live IAM policy** through Cloud Asset Inventory —
    read-only, under `roles/iam.securityReviewer` — and returns findings with the bindings they
    came from. Detection is deterministic: explicit rules, not a model guess.
-5. Each finding is **corroborated against the IAM Recommender**, Google's own signal that a role
-   is broader than its usage warrants. A finding is a fact before it is a sentence.
-6. Findings are checked against the **Memory Bank**'s exception store. Something a human
-   accepted in a prior investigation is suppressed, not re-raised.
+5. Each finding can be corroborated against the **IAM Recommender**; this optional enrichment is
+   deliberately separate from deterministic detection.
+6. The durable Eventarc boundary stores and deduplicates the event, then reuses its stable context
+   ID as the managed Agent Engine session/memory identity.
 7. The Orchestrator's **policy rules** decide clear-or-escalate, and **Gemini 3.5 Flash** writes
    the human-readable rationale — it explains the finding rather than making it.
-8. The **Escalation Agent** packages what survives for a human. Its service account has **no IAM
-   read permission at all**, so a fully compromised prompt still cannot make it read the policy.
-9. Every model call is screened by **Model Armor** — prompt injection inbound, PII outbound.
-   Tool poisoning is a separate threat with a separate control, the fixed per-agent tool
-   allowlist in [ADR-007](docs/adr/007-tool-poisoning.md), because screening more text does
-   not defend a poisoned tool declaration. Every inter-agent call passes through the
-   **Gateway**, which refuses
-   unregistered callers. Every step is traced through **OpenTelemetry** into Cloud Trace, and
-   the series lands in **BigQuery**.
+8. The **Escalation Agent** packages only validated counts, category, and an allowlisted summary
+   for the private findings inbox. Its service account has **no IAM read permission at all**.
+9. Every model call is screened by **Model Armor** before and after the model. Tool poisoning is
+   contained by fixed, repository-owned tool declarations and IAM. Every peer call has a
+   Cloud Run audience-bound identity token; ADK emits Cloud telemetry for the investigation.
 
 ---
 
@@ -201,22 +201,22 @@ holding no policy client, which is weaker than IAM enforcing it, and is describe
 
 The status column is the honest one. A folder existing is not a pillar working.
 
-**All seven run on their managed Gemini Enterprise Agent Platform product.** Bastion writes no
-substitute for any of them — the ~3,460 lines that did were deleted on 2026-08-15
-([ADR-003](docs/adr/003-pillars-on-geap.md)).
+**Bastion uses the managed Gemini Enterprise Agent Platform surfaces, with proof status shown
+explicitly below.** It writes no substitute for any of them — the ~3,460 lines that did were
+deleted on 2026-08-15 ([ADR-003](docs/adr/003-pillars-on-geap.md)).
 
 | Group | Pillar | The managed product that serves it | Reached by | Status |
 |---|---|---|---|---|
-| **Discovery & Lifecycle** | Agent Registry | GEAP **Agent Registry** — the central catalog for agents, tools, and MCP servers | Managed surface | ⬜ not provisioned |
-| **Core Execution & State** | Agent Runtime | GEAP **Agent Runtime** / Agent Engine — long-running async execution | `adk deploy agent_engine` | ⬜ not provisioned |
-| **Core Execution & State** | Memory Bank | GEAP **Memory Bank** (GA) — persistent cross-session context and the exception store | `VertexAiMemoryBankService` | ⬜ not provisioned |
-| **Security & Governance** | Agent Identity | **Agent Identity** as the Gateway's authorization principal (mTLS + DPoP), plus one least-privilege service account per agent | `google-cloud-agentidentitycredentials` | ⬜ not provisioned |
-| **Security & Governance** | Agent Gateway | GEAP **Agent Gateway** — routing and policy enforcement, ingress and egress | `gcloud network-services agent-gateways` | ⬜ not provisioned |
-| **Security & Governance** | Model Armor | **Model Armor**, which Agent Gateway delegates sanitization to | `ModelArmorClient` · `before_model_callback` | ⬜ not provisioned |
-| **Telemetry** | Agent Observability | Cloud Trace + Cloud Logging, via ADK's own OpenTelemetry spans | `adk deploy cloud_run --trace_to_cloud` | ⬜ not provisioned |
+| **Discovery & Lifecycle** | Agent Registry | GEAP **Agent Registry** — the central catalog for agents, tools, and MCP servers | Three private JSON-RPC/A2A services are published | ✅ catalogued |
+| **Core Execution & State** | Agent Runtime | GEAP **Agent Runtime** / Agent Engine — long-running async execution | A private Agent Engine is created; Cloud Run/Eventarc provides durable admission | ✅ deployed |
+| **Core Execution & State** | Memory Bank | GEAP **Memory Bank** (GA) — persistent cross-session context and the exception store | Managed session/memory endpoints plus Firestore investigation identity | ◐ replay evidence pending |
+| **Security & Governance** | Agent Identity | **Agent Identity** as the Gateway's authorization principal (mTLS + DPoP), plus one least-privilege service account per agent | Separate Cloud Run identities and IAM-authenticated internal calls | ✅ deployed |
+| **Security & Governance** | Agent Gateway | GEAP **Agent Gateway** — routing and policy enforcement, ingress and egress | API enabled; current fleet uses direct private Cloud Run A2A | ◐ Gateway itself pending |
+| **Security & Governance** | Model Armor | **Model Armor**, which Agent Gateway delegates sanitization to | `ModelArmorClient` · `before_model_callback` | ✅ live guardrail |
+| **Telemetry** | Agent Observability | Cloud Trace + Cloud Logging, via ADK's own OpenTelemetry spans | Payload-free audit logs and no-content ADK telemetry | ◐ retained trace pending |
 
 The three governance pillars are **one composed stack, not three independent ones**: Agent
-Gateway enforces policy through IAM and Identity-Aware Proxy, delegates content sanitization to
+The planned Gateway would enforce policy through IAM and Identity-Aware Proxy and delegate content sanitization to
 Model Armor, and authorizes on Agent Identity as the principal. That is how Google ships them,
 and it is a better architecture than the three unrelated modules this repository used to hold.
 
@@ -224,8 +224,8 @@ and it is a better architecture than the three unrelated modules this repository
 
 | The brief asks for | Where Bastion answers it |
 |---|---|
-| *"agents cataloged for cross-department use"* | The Registry: owner, declared scope, and approval status, so another team can judge an agent without reading its source |
-| *"safely maintain context across weeks of asynchronous operations"* | Pub/Sub investigations outlive their session; the exception store suppresses what a human already closed; BigQuery holds the series across runs |
+| *"agents cataloged for cross-department use"* | Three private Bastion JSON-RPC services are published in Agent Registry; department routing is repository-owned policy. Version/approval metadata is not yet evidenced. |
+| *"safely maintain context across weeks of asynchronous operations"* | Eventarc/Firestore creates a durable investigation identity and maps it to Agent Engine session/memory. A prior-week suppression replay remains the required proof. |
 | *"interact with production data without violating enterprise compliance, data sovereignty, or security policies"* | A **live** IAM policy, read-only, never written back — and an explicit, honest position on residency below |
 
 **Data sovereignty, stated rather than implied.** Cloud Run, Firestore, and Pub/Sub are pinned
@@ -313,7 +313,7 @@ names what it absorbed.
 [![pytest](https://img.shields.io/badge/pytest-9.1.1-0A9EDC?logo=pytest&logoColor=white)](https://docs.pytest.org/)
 [![Coverage floor](https://img.shields.io/badge/coverage_floor-being_reset-9CA3AF?logo=codecov&logoColor=white)](codecov.yml)
 
-Twenty Google Cloud services, each with a job — the rules ask for one. The reasoning, and
+Twenty-one Google Cloud services, each with a job — the rules ask for one. The reasoning, and
 the pre-agreed cut order if the schedule slips, is [ADR-003](docs/adr/003-pillars-on-geap.md).
 
 | Layer | Service | Why it is here |
@@ -321,16 +321,16 @@ the pre-agreed cut order if the schedule slips, is [ADR-003](docs/adr/003-pillar
 | Model | **`gemini-3.5-flash`** via Vertex AI, `locations/global` | Every call. No Pro tier — 3.5 Pro is unavailable to this project ([ADR-004](docs/adr/004-flash-only-global-endpoint.md)) |
 | Agent framework | **Google ADK** | The chosen framework of the four the rules permit ([ADR-005](docs/adr/005-adk-as-the-agent-framework.md)). Three `LlmAgent`s composed by a `SequentialAgent`, executed 2026-08-15 |
 | Compute | **Cloud Run** · `europe-north2` | `min-instances=0`, capped `max-instances`, authenticated except one read-only service |
-| State & memory | **Firestore** · `europe-north2` | Investigation state and the approved-exception store |
-| Async | **Pub/Sub** | Investigations that survive the session that opened them |
-| Schedule | **Cloud Scheduler** | Makes "continuous rather than quarterly" literally true |
-| Findings source | **Recommender API** | Google's own role-too-broad signal, so findings are corroborated not guessed |
+| State & memory | **Firestore** · `europe-north2` | Durable investigation identity and the private, idempotent findings inbox |
+| Async | **Pub/Sub** + **Eventarc** | One deployed topic delivers investigations to the private Orchestrator |
+| Schedule | **Cloud Scheduler** | API enabled; no cadence job is provisioned |
+| Findings source | **Recommender API** | API enabled; not in the current deterministic decision path |
 | Policy read | **Cloud Asset Inventory** | Policy search across resources, not a single-project dump |
 | Identity | **IAM** | One least-privilege service account per agent |
-| Guardrails | **Model Armor** | Screening at the model boundary ([fallback documented](docs/adr/003-pillars-on-geap.md)) |
-| Secrets | **Secret Manager** | A governance product with its findings endpoint in an env var is a bad artifact |
+| Guardrails | **Model Armor** | Managed, fail-closed input screening; deterministic output boundary before delivery |
+| Secrets | **Secret Manager** | One secret is provisioned; the private findings origin is currently deterministic deployment configuration, not a secret |
 | Telemetry | **Cloud Trace** · **Cloud Logging** · **Cloud Monitoring** | The audit trail is the deliverable |
-| History | **BigQuery** → **Looker Studio** | Findings over time — makes the cross-week claim visible, not asserted |
+| History | **BigQuery** → **Looker Studio** | APIs enabled only; neither is in the deployed evidence path |
 | Judge path | **Firebase Hosting** | Target only; no hosted frontend exists yet |
 | Build | **Cloud Build** · **Artifact Registry** | Source-to-Cloud-Run deploys |
 
@@ -338,18 +338,18 @@ the pre-agreed cut order if the schedule slips, is [ADR-003](docs/adr/003-pillar
 
 ## Build & deployment status
 
-Mid-build against an Aug 31, 2026 deadline. This section states what is true today and marks
-what is not, because a document that overstates an unbuilt feature is exactly the failure this
-product is about.
+Live private fleet against an Aug 31, 2026 deadline. This section distinguishes deployed
+controls from retained proof artifacts, because both a missing control and an invented proof
+would undermine the submission.
 
 | | |
 |---|---|
 | ✅ | The GCP project is live, budgeted, and **`gemini-3.5-flash` answers through Vertex AI** — verified reachable ([ADR-004](docs/adr/004-flash-only-global-endpoint.md)) |
-| ✅ | **100% coverage across 73 unit tests**, rebuilt against the ADK fleet after the 2026-08-15 deletion. The CI floor stays at 100 |
+| ✅ | **100% coverage across 132 tests**, including security, integration, and load contracts. The CI floor stays at 100 |
 | ✅ | Architecture, **seven** decision records, and brand assets are done and reviewable |
 | ✅ | **Gemini is called.** One investigation, 5 model calls, 3 tool calls, against the live IAM policy ([evidence 02](assets/evidence/02-gemini-investigation.md)) |
 | ✅ | **The agents are ADK agents.** Three `LlmAgent`s under a `SequentialAgent`, ADK 2.7.0 ([ADR-005](docs/adr/005-adk-as-the-agent-framework.md)) |
-| ⬜ | Nothing is deployed — no Cloud Run service, no Firestore database, no scheduled trigger |
+| ✅ | Four private Cloud Run services, Eventarc, EU Firestore/Pub/Sub, managed Agent Engine state, and the EU-replicated HMAC secret are deployed; Cloud Scheduler cadence remains intentionally unprovisioned |
 | ✅ | Three redacted evidence records captured: Model Armor, a live-IAM Gemini run, and an IAM denial |
 
 Progress is tracked as tagged releases: [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md)
@@ -362,11 +362,12 @@ post-audit build contract is
 
 ## Evidence
 
-◐ **Three of fourteen captured.** [Evidence 01](assets/evidence/01-model-armor-block.md) records
+◐ **Four of fourteen captured.** [Evidence 01](assets/evidence/01-model-armor-block.md) records
 a direct Model Armor block, [evidence 02](assets/evidence/02-gemini-investigation.md) records one
 live-policy investigation, and [evidence 03](assets/evidence/03-escalation-agent-denied.md)
-records the least-privilege IAM contrast. [`assets/README.md`](assets/README.md) is the complete
-fourteen-shot plan.
+records the least-privilege IAM contrast. [Evidence 04](assets/evidence/04-private-fleet-deployment.md)
+records the count-only, live deployment measurement. [`assets/README.md`](assets/README.md) is
+the complete fourteen-shot plan.
 
 Four of those shots carry the submission, and they are the last to be cut:
 
@@ -452,11 +453,15 @@ first. When you only need the roles, ask for only the roles:
 
 ### Deploy
 
-Deployment is intentionally blocked at this baseline. `infrastructure/deploy.sh` is a design
-artifact, not a release path: it does not yet bundle shared modules, provision Registry or
-Gateway, inject the required production configuration, or preserve the global model endpoint.
-Do not run `make deploy` until the deployment milestone replaces this warning with a verified
-smoke test.
+The repository has a reproducible private-Cloud-Run deployment path: one complete image context,
+per-agent service accounts, internal ingress, audience-bound A2A tokens, Registry publication,
+and post-deploy verification. Firestore and Pub/Sub are provisioned in `europe-north2`.
+
+**The deployed fleet is internal-only.** The deploy script refuses to start with ephemeral
+memory or without the pre-approved Model Armor template, builds one auditable image digest, and
+publishes that image to all services. See
+[`infrastructure/REQUIRED_GCP_ACCESS.md`](infrastructure/REQUIRED_GCP_ACCESS.md) for the
+remaining administrator prerequisites.
 
 ---
 
@@ -481,8 +486,10 @@ bastion/
 │                                   #   gateway/ runtime/ memory/ are GONE (ADR-003)
 │
 ├── infrastructure/
-│   ├── trigger_investigation.py    # publish one investigation
-│   └── deploy.sh                   # adk deploy cloud_run ×3, one SA each — NOT YET RUN
+│   ├── provision.py                # idempotent Firestore, Pub/Sub, and IAM bootstrap
+│   ├── deploy.sh                   # private Cloud Run fleet + Registry + verifier
+│   ├── register_agents.py          # managed Agent Registry catalog publication
+│   └── trigger_investigation.py    # acknowledged event publication with stable identity
 │
 ├── scripts/
 │   ├── check_docs.py               # the documentation gate CI runs
@@ -490,13 +497,13 @@ bastion/
 │   ├── capture_gcp_state.py        # measures the live project → gcp-state.json
 │   └── render_diagrams.py          # SVG masters → light/dark variants + animated GIFs
 │
-├── tests/                          # 73 unit tests, 100% coverage, 100% CI floor
+├── tests/                          # unit, integration, security, and load contracts
 │   ├── conftest.py                 # patches import-time clients at collection, not in
 │   │                               #   a fixture — pytest imports modules before those run
 │   ├── unit/                       # 6 modules: the three agents + the three seams
-│   ├── integration/                # PLACEHOLDER — returns with the deployed fleet
-│   ├── security/                   # PLACEHOLDER — needs a service account to deny
-│   └── load/                       # PLACEHOLDER — needs a Gateway to load
+│   ├── integration/                # durable replay and idempotent notification flow
+│   ├── security/                   # policy, identity, and private-Cloud-Run auth
+│   └── load/                       # concurrent admission/refusal contract
 │
 ├── docs/
 │   ├── ARCHITECTURE.md             # the system, with per-box build state
@@ -529,18 +536,15 @@ bastion/
 
 ## Production & Quality
 
-**Only the unit layer is populated today.** The integration, security and load directories are
-placeholders after the DIY pillars were deleted; 73 unit tests cover the current ADK fleet at
-100%. A floor below real
-coverage is a decoration rather than a gate, so it is reset with a date attached rather than
-left asserting a number nothing measures:
+**All four local layers are populated today.** They verify deterministic controls and durable
+replay without CI credentials. Managed-service smoke evidence remains pending deployment.
 
 | Layer | Question | Command |
 |---|---|---|
 | `tests/unit/` | Does the implemented local code behave? | `make test-unit` |
-| `tests/integration/` | Placeholder — deployed service wiring | not yet available |
-| `tests/security/` | Placeholder — end-to-end security assertions | not yet available |
-| `tests/load/` | Placeholder — Gateway concurrency | not yet available |
+| `tests/integration/` | Durable replay and idempotent notification flow | `make test-integration` |
+| `tests/security/` | Gateway policy, identity manifest, Cloud Run token contract | `make test-security` |
+| `tests/load/` | 16-way concurrent admission/refusal policy contract | `make test-load` |
 
 ```bash
 make ci          # lint · types · tests · coverage · markdown · docs gate

@@ -42,13 +42,13 @@ This ledger separates implemented proof from target controls.
 
 | Property | Current state |
 |---|---|
-| Per-agent least privilege | Three service accounts exist and a safe IAM-denial contrast is captured. The local fleet still shares the operator identity; deployed separation is pending. |
-| Gateway authorization | Target design only. Current remote A2A calls do not pass through a provisioned Gateway. |
-| Audit refusals and failures | `AuditPlugin` exists and has isolated unit coverage, but is not registered by a runner and has no end-to-end evidence. |
-| Payload-free audit records | Implemented in the isolated plugin; integration and production-log verification remain pending. |
-| Prompt-injection screening | A direct Model Armor block is captured. The agent-mediated path is not yet captured. |
-| Outbound PII boundary | Not implemented. Structured tool results and escalation summaries can still reach model or notification boundaries. |
-| Fixed tool definitions | Implemented in agent construction and unit-tested. No populated security suite exists yet. |
-| Authenticated, bounded Cloud Run | Target design only; no Bastion Cloud Run service is deployed. |
+| Per-agent least privilege | Three private Cloud Run services run under separate agent service accounts; peer calls use audience-bound ID tokens. A retained deployed denial capture is still owed. |
+| Gateway authorization | Local caller/target/skill/classification policy and private Cloud Run ID-token transport are implemented. Managed Gateway deployment evidence remains pending. |
+| Audit refusals and failures | `AuditPlugin` is registered by the supported local runner and Cloud Run startup path. Production-log evidence remains pending. |
+| Payload-free audit records | Implemented and covered in local tests; production-log verification remains pending. |
+| Prompt-injection screening | Model Armor is registered as ADK's pre-model callback and fails closed. The direct block is captured; retained deployed trace evidence is next. |
+| Outbound PII boundary | Opaque finding IDs, post-model structured-output screening, and schema-limited notification payloads are implemented. Production trace verification remains pending. |
+| Fixed tool definitions | Implemented in agent construction and covered by populated security tests. |
+| Authenticated, bounded Cloud Run | Four internal-only Cloud Run services are deployed; invoker IAM is granted only to the required peer or Eventarc service identity. |
 
 `submission/SUBMISSION.md` is the proof ledger. A target row is not a claim of enforcement.

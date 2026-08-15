@@ -11,13 +11,18 @@ from runtime.events import decode_pubsub_event, new_investigation_payload
 from runtime.firestore import _now
 
 
-def _envelope(payload: object, event_id: str = "00000000-0000-0000-0000-000000000001") -> dict:
+def _envelope(
+    payload: object,
+    cloud_event_id: str = "pubsub-message-123",
+) -> dict:
     encoded = base64.b64encode(json.dumps(payload).encode()).decode()
-    return {"id": event_id, "data": {"message": {"data": encoded}}}
+    return {"id": cloud_event_id, "data": {"message": {"data": encoded}}}
 
 
 def test_decoded_pubsub_event_preserves_context_and_delivery_identity():
-    event = decode_pubsub_event(_envelope({"context_id": "week-42"}))
+    event = decode_pubsub_event(
+        _envelope({"event_id": "00000000-0000-0000-0000-000000000001", "context_id": "week-42"})
+    )
     assert event.event_id == "00000000-0000-0000-0000-000000000001"
     assert event.context_id == "week-42"
 
@@ -29,7 +34,7 @@ def test_decoded_pubsub_event_preserves_context_and_delivery_identity():
         {"id": "x"},
         {"data": {"message": {"data": "e30="}}},
         _envelope([]),
-        _envelope({"context_id": "x"}, event_id="not-base64"),
+        _envelope({"context_id": "x"}, cloud_event_id="not-a-uuid"),
     ],
 )
 def test_invalid_pubsub_envelopes_are_rejected(envelope):
