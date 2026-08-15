@@ -1,0 +1,16 @@
+# Development and CI toolchain, pinned to the latest release of each as of 2026-08-13.
+#
+# Pinned, not floating: an unpinned linter means a release published on a Tuesday can turn
+# a green build red without a line of this repository changing. The README badges quote
+# these exact versions, and scripts/check_docs.py fails if the two ever disagree.
+
+-r requirements.txt
+
+ruff==0.16.3
+mypy==2.3.0
+pytest==9.1.1
+pytest-cov==7.1.0
+
+# The Orchestrator's retry, circuit breaking and fan-out are async, so the tests that
+# prove the failure-tolerance claim have to be too.
+pytest-asyncio==1.4.0

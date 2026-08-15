@@ -1,0 +1,47 @@
+# Codecov configuration.
+#
+# The floor is 100% because that is what the suite actually holds. A gate set below real
+# coverage is a decoration, not a gate. If a change genuinely cannot be covered, lower this
+# deliberately and say why in the pull request — do not let it drift down unnoticed.
+#
+# What matters more than the number: the five claims in CLAUDE.md's testing strategy are
+# each covered by a test that fails if the claim stops being true. A repository whose whole
+# argument is auditability cannot report coverage it has not earned.
+
+coverage:
+  precision: 1
+  round: down
+  range: "90...100"
+
+  status:
+    project:
+      default:
+        target: 100%
+        threshold: 0%
+    patch:
+      default:
+        target: 100%
+        threshold: 0%
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: true
+
+flags:
+  pytest:
+    paths:
+      - agents/
+      - registry/
+      - runtime/
+      - memory/
+      - gateway/
+      - model_armor/
+      - observability/
+
+ignore:
+  - "tests/**"
+  - "infrastructure/**"   # deploy scripts, exercised by deploying rather than by pytest
+  - "scripts/**"          # the documentation gate, which CI runs directly
+  - "docs/**"
+  - "assets/**"

@@ -1,0 +1,120 @@
+name: Release
+
+run-name: "${{ github.event.head_commit.message || format('Release {0}', github.ref_name) }}"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.14"
+  COVERAGE_FLOOR: "100"
+
+jobs:
+  quality:
+    name: Release quality gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      GOOGLE_CLOUD_PROJECT: "bastion-ci-mock"
+      GOOGLE_CLOUD_LOCATION: "global"
+      GOOGLE_GENAI_USE_VERTEXAI: "TRUE"
+      GCP_PROJECT_ID: "bastion-ci-mock"
+      GCP_REGION: "europe-north2"
+      VERTEX_AI_MODEL: "gemini-3.5-flash"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Ruff
+        run: ruff check .
+
+      - name: Mypy
+        run: mypy agents registry model_armor observability
+
+      - name: Pytest and coverage
+        run: pytest tests --cov --cov-report=xml --cov-fail-under=${{ env.COVERAGE_FLOOR }}
+
+      - name: Documentation agrees with the repository
+        run: python scripts/check_docs.py
+
+      - name: Documented versions match dependency pins
+        run: python scripts/check_versions.py
+
+      - name: Diagram theme variants are current
+        run: python scripts/render_diagrams.py --check --no-gif
+
+      # A tag claims something became true. If CHANGELOG.md has no section for this
+      # version, the claim has no written record — and this project's whole argument
+      # is that claims carry records.
+      - name: Changelog has a section for this tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          grep -q "^## \[${VERSION}\]" CHANGELOG.md || {
+            echo "::error::CHANGELOG.md has no '## [${VERSION}]' section."
+            exit 1
+          }
+
+  publish:
+    name: Publish GitHub release
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract changelog section
+        id: changelog
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          python - "$VERSION" <<'PY' >> "$GITHUB_OUTPUT"
+          import re
+          import sys
+
+          version = sys.argv[1]
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          match = re.search(
+              rf"## \[{re.escape(version)}\][^\n]*\n(.*?)(?=\n## \[|\Z)",
+              text,
+              re.DOTALL,
+          )
+          body = match.group(1).strip() if match else f"Bastion {version}"
+          print("body<<CHANGELOG_BODY")
+          print(body)
+          print("CHANGELOG_BODY")
+          PY
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Bastion ${{ github.ref_name }}"
+          body: ${{ steps.changelog.outputs.body }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') }}
+
+

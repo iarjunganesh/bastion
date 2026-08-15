@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="Bastion — the access review that reviews itself">
+  <title>Bastion — the access review that reviews itself</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1B2B"/>
+      <stop offset="1" stop-color="#111F33"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#60A5FA"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FBBF24" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#FBBF24" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#FBBF24" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="shieldClip">
+      <path d="M128 16 L224 52 v72 c0 60-40 100-96 116 C72 224 32 184 32 124 V52 Z"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1200" height="320" fill="url(#bg)"/>
+  <rect x="0" y="316" width="1200" height="4" fill="#F59E0B"/>
+
+  <!--
+    The animated mark, inline rather than referenced: an SVG loaded through `<img>` cannot pull
+    in another file, so `<use href="logo-animated.svg#…">` and a nested `<image>` both render as
+    nothing on GitHub. SMIL is used for the same reason it is used in the standalone mark — CSS
+    animation is ignored inside an `<img>`-loaded SVG. The 6s timeline is shared with
+    `logo-animated.svg` and `banner-light.svg`; changing one means changing all three.
+  -->
+  <g transform="translate(84,64) scale(0.75)">
+    <path d="M128 16 L224 52 v72 c0 60-40 100-96 116 C72 224 32 184 32 124 V52 Z" fill="url(#shield)"/>
+    <path d="M32 52 h32 v22 h-32 Z M96 52 h32 v22 h-32 Z M160 52 h32 v22 h-32 Z" fill="#0B1B2B" opacity="0.35"/>
+
+    <g clip-path="url(#shieldClip)">
+      <rect x="-140" y="16" width="120" height="240" fill="url(#sweep)">
+        <animate attributeName="x" values="-140;-140;260;260" keyTimes="0;0.45;0.78;1"
+                 dur="6s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+
+    <g fill="none" stroke="#0B1B2B" stroke-width="13" stroke-linecap="round">
+      <path d="M104 116 v-16 a24 24 0 0 1 48 0 v16">
+        <animateTransform attributeName="transform" type="translate"
+                          values="0 0; 0 0; 0 -16; 0 -16; 0 0; 0 0"
+                          keyTimes="0;0.22;0.34;0.66;0.78;1"
+                          dur="6s" repeatCount="indefinite"/>
+      </path>
+    </g>
+
+    <rect x="86" y="116" width="84" height="66" rx="12" fill="#0B1B2B"/>
+
+    <g transform="translate(128 149)">
+      <circle r="11" fill="#FBBF24"/>
+      <rect x="-3.5" y="6" width="7" height="20" rx="3" fill="#FBBF24"/>
+      <g>
+        <rect x="-2.5" y="-30" width="5" height="19" rx="2.5" fill="#FBBF24" opacity="0.95"/>
+        <rect x="2" y="-26" width="8" height="4" rx="2" fill="#FBBF24" opacity="0.95"/>
+        <rect x="2" y="-19" width="6" height="4" rx="2" fill="#FBBF24" opacity="0.95"/>
+        <animateTransform attributeName="transform" type="rotate"
+                          values="0;0;90;90;0;0" keyTimes="0;0.18;0.32;0.68;0.8;1"
+                          dur="6s" repeatCount="indefinite"/>
+      </g>
+    </g>
+  </g>
+
+  <text x="320" y="132" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="76" font-weight="700" fill="#F1F5F9" letter-spacing="1">BASTION</text>
+  <text x="322" y="178" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="25" fill="#CBD5E1">The access review that reviews itself.</text>
+  <text x="322" y="222" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="19" fill="#94A3B8">Three agents auditing a live GCP IAM policy — including their own permissions.</text>
+  <text x="322" y="262" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#60A5FA">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</text>
+</svg>

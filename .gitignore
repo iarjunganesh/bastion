@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# Virtualenvs
+.venv/
+venv/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+
+# Local hackathon workflow state and raw working notes. Curated, redacted evidence
+# belongs under assets/evidence/; these files may contain account or project details.
+.devpost-hackathon-state.json
+.tmp/
+
+# GCP credentials. Bastion audits IAM for a living; a leaked service-account key in
+# the repo of an access-governance project is the worst possible artifact to ship.
+*-sa-key.json
+*service-account*.json
+application_default_credentials.json
+gha-creds-*.json
+
+# Captured IAM policy dumps — real project IDs, real principals, real email addresses.
+# Redacted copies belong in assets/evidence/ and are committed deliberately, never by glob.
+*.iam-policy.json
+data/iam-raw/
+
+# Raw screen captures. The takes that survive get copied into assets/demo-video/
+# under the names submission/DEMO_SCRIPT.md gives them; the rest are discarded attempts.
+.takes/
+
+# Logs
+*.log
+
+# OS / IDE
+.DS_Store
+desktop.ini
+Thumbs.db
+.vscode/
+.idea/

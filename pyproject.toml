@@ -1,0 +1,71 @@
+[project]
+name = "bastion"
+version = "0.1.0"
+description = "A fleet of governance agents auditing a live GCP IAM policy — including their own permissions"
+requires-python = ">=3.14"
+license = { file = "LICENSE" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "ANN201", "S"]
+ignore = [
+  "S101",  # assert is fine in tests
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["ANN201", "S"]
+
+[tool.mypy]
+python_version = "3.14"
+# `ignore_missing_imports` stays: the Google client libraries ship incomplete stubs, and
+# chasing them would mean silencing real findings with blanket ignores. Everything Bastion
+# writes is checked strictly.
+ignore_missing_imports = true
+strict = true
+warn_unused_ignores = true
+warn_unreachable = true
+disallow_any_generics = true
+disallow_untyped_defs = true
+no_implicit_reexport = true
+
+[[tool.mypy.overrides]]
+# The suite mocks at the module boundary, so annotating every fixture and patch target
+# would add noise without catching anything the assertions do not already pin.
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+# Explicit rather than "auto": a plain `def test_...` that should have been `async def`
+# silently passes under auto mode without running its assertions.
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+  "load: concurrency and overhead checks on the Gateway (deselect with -m 'not load')",
+]
+
+[tool.coverage.run]
+branch = true
+source = [
+  "agents",
+  "gateway",
+  "identity",
+  "registry",
+  "runtime",
+  "model_armor",
+  "observability",
+]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+  "pragma: no cover",
+  "if __name__ == .__main__.:",
+  "raise NotImplementedError",
+]
+

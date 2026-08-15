@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080"
+     role="img" aria-label="Bastion — the access review that reviews itself">
+  <title>Bastion — the access review that reviews itself</title>
+
+  <!--
+    The 16:9 title card. `banner-light.svg` / `banner-dark.svg` stay at 1200x320 because that is
+    the shape a README wants; this one is 1920x1080 because that is the shape OBS wants, and
+    letterboxing a 3.75:1 banner into a 16:9 scene wastes two thirds of the frame.
+
+    Theme handling is NOT the `prefers-color-scheme` block the 1200x320 pair carries. An SVG
+    referenced by an `<img>` tag — which is how GitHub renders every README image — does not
+    inherit the host page's colour scheme, so that media query resolves against the browser
+    default and a light-mode reader gets the dark palette. Measured, not assumed. So this file
+    is a MASTER: scripts/render_diagrams.py emits -light and -dark variants from the sentinel
+    blocks below, and the README pairs them in a <picture> element.
+
+    SMIL rather than CSS animation, for the same reason: CSS animation is ignored inside an
+    `<img>`-loaded SVG. The 6s timeline is shared with logo-animated.svg; changing one means
+    changing both.
+  -->
+  <style>
+/* PALETTE:LIGHT */
+svg {
+  --bg-a:#F8FAFC; --bg-b:#E2E8F0; --ink:#0B1B2B; --sub:#334155; --muted:#64748B;
+  --accent:#1D4ED8; --rule:#F59E0B; --plate:#0B1B2B; --plate-ink:#E2E8F0;
+}
+/* /PALETTE:LIGHT */
+/* PALETTE:DARK */
+@media (prefers-color-scheme: dark) {
+svg {
+  --bg-a:#0B1B2B; --bg-b:#0D1117; --ink:#F1F5F9; --sub:#CBD5E1; --muted:#94A3B8;
+  --accent:#8AB4F8; --rule:#F59E0B; --plate:#F1F5F9; --plate-ink:#0B1B2B;
+}
+}
+/* /PALETTE:DARK */
+  </style>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--bg-a)"/>
+      <stop offset="1" stop-color="var(--bg-b)"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#F59E0B" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#F59E0B" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#F59E0B" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="shieldClip">
+      <path d="M128 16 L224 52 v72 c0 60-40 100-96 116 C72 224 32 184 32 124 V52 Z"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <rect x="0" y="1068" width="1920" height="12" fill="var(--rule)"/>
+
+  <!-- The animated mark, inline rather than referenced: an `<img>`-loaded SVG cannot pull in
+       another file, so `<use href="logo-animated.svg#…">` renders as nothing on GitHub. -->
+  <g transform="translate(268,300) scale(1.7)">
+    <path d="M128 16 L224 52 v72 c0 60-40 100-96 116 C72 224 32 184 32 124 V52 Z" fill="url(#shield)"/>
+    <path d="M32 52 h32 v22 h-32 Z M96 52 h32 v22 h-32 Z M160 52 h32 v22 h-32 Z" fill="#0B1B2B" opacity="0.22"/>
+
+    <g clip-path="url(#shieldClip)">
+      <rect x="-140" y="16" width="120" height="240" fill="url(#sweep)">
+        <animate attributeName="x" values="-140;-140;260;260" keyTimes="0;0.45;0.78;1"
+                 dur="6s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+
+    <g fill="none" stroke="#0B1B2B" stroke-width="13" stroke-linecap="round" opacity="0.92">
+      <path d="M104 116 v-16 a24 24 0 0 1 48 0 v16">
+        <animateTransform attributeName="transform" type="translate"
+                          values="0 0; 0 0; 0 -16; 0 -16; 0 0; 0 0"
+                          keyTimes="0;0.22;0.34;0.66;0.78;1"
+                          dur="6s" repeatCount="indefinite"/>
+      </path>
+    </g>
+
+    <rect x="86" y="116" width="84" height="66" rx="12" fill="#0B1B2B" opacity="0.92"/>
+
+    <g transform="translate(128 149)">
+      <circle r="11" fill="#F59E0B"/>
+      <rect x="-3.5" y="6" width="7" height="20" rx="3" fill="#F59E0B"/>
+      <g>
+        <rect x="-2.5" y="-30" width="5" height="19" rx="2.5" fill="#F59E0B" opacity="0.95"/>
+        <rect x="2" y="-26" width="8" height="4" rx="2" fill="#F59E0B" opacity="0.95"/>
+        <rect x="2" y="-19" width="6" height="4" rx="2" fill="#F59E0B" opacity="0.95"/>
+        <animateTransform attributeName="transform" type="rotate"
+                          values="0;0;90;90;0;0" keyTimes="0;0.18;0.32;0.68;0.8;1"
+                          dur="6s" repeatCount="indefinite"/>
+      </g>
+    </g>
+  </g>
+
+  <text x="740" y="452" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="152" font-weight="700" fill="var(--ink)" letter-spacing="3">BASTION</text>
+  <text x="746" y="536" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="46" fill="var(--sub)">The access review that reviews itself.</text>
+  <text x="746" y="604" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="30" fill="var(--muted)">Three agents auditing a live GCP IAM policy — including their own permissions.</text>
+  <text x="746" y="652" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="30" fill="var(--muted)">They remember what a human approved, and refuse to be instructed by their inputs.</text>
+
+  <g>
+    <rect x="746" y="712" width="880" height="62" rx="12" fill="var(--plate)"/>
+    <text x="774" y="753" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="28" font-weight="600" fill="var(--plate-ink)">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</text>
+  </g>
+
+  <text x="746" y="836" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="26" font-weight="600" fill="var(--accent)">google-adk 2.7.0 · Gemini 3.5 Flash · Model Armor · Cloud Asset Inventory</text>
+  <text x="746" y="878" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="24" fill="var(--muted)">Mid-build — the fleet runs against live Google APIs. Nothing is deployed.</text>
+</svg>

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"
+     role="img" aria-labelledby="bastionTitle bastionDesc">
+  <title id="bastionTitle">Bastion</title>
+  <desc id="bastionDesc">A shield with a padlock. A key turns in the lock, the shackle lifts, and
+  an audit sweep passes over the shield before it closes again — the vault opens only when the
+  review is done.</desc>
+
+  <!--
+    Animated with SMIL rather than CSS keyframes: SMIL animates SVG geometry attributes
+    (`transform`, `stroke-dashoffset`) inside a file loaded through `<img>`, which is how GitHub
+    and the README render it. CSS animation is ignored in that context, so a CSS version would
+    look correct in a browser tab and be a still image everywhere it is actually used.
+
+    Theme handling is deliberate too: `prefers-color-scheme` inside an `<img>`-loaded SVG follows
+    the *system* setting, not the host page, so it cannot be relied on to match a README. Every
+    colour here is therefore explicit and reads on both light and dark backgrounds — the shield
+    supplies its own ground rather than borrowing the page's.
+  -->
+
+  <defs>
+    <linearGradient id="animShield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="animSweep" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#F59E0B" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#F59E0B" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#F59E0B" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="animShieldClip">
+      <path d="M128 16 L224 52 v72 c0 60-40 100-96 116 C72 224 32 184 32 124 V52 Z"/>
+    </clipPath>
+  </defs>
+
+  <path d="M128 16 L224 52 v72 c0 60-40 100-96 116 C72 224 32 184 32 124 V52 Z"
+        fill="url(#animShield)"/>
+
+  <path d="M32 52 h32 v22 h-32 Z M96 52 h32 v22 h-32 Z M160 52 h32 v22 h-32 Z"
+        fill="#0B1B2B" opacity="0.22"/>
+
+  <!-- The audit sweep: the system inspecting itself, clipped to the shield so it reads as a
+       pass over the surface rather than a band across the canvas. -->
+  <g clip-path="url(#animShieldClip)">
+    <rect x="-140" y="16" width="120" height="240" fill="url(#animSweep)">
+      <animate attributeName="x" values="-140;-140;260;260" keyTimes="0;0.45;0.78;1"
+               dur="6s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Shackle. Lifts as the key turns, then drops back: the vault closes again, which is the
+       point — an access review that leaves the door open has not finished. -->
+  <g fill="none" stroke="#0B1B2B" stroke-width="13" stroke-linecap="round" opacity="0.92">
+    <path d="M104 116 v-16 a24 24 0 0 1 48 0 v16">
+      <animateTransform attributeName="transform" type="translate"
+                        values="0 0; 0 0; 0 -16; 0 -16; 0 0; 0 0"
+                        keyTimes="0;0.22;0.34;0.66;0.78;1"
+                        dur="6s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Lock body -->
+  <rect x="86" y="116" width="84" height="66" rx="12" fill="#0B1B2B" opacity="0.92"/>
+
+  <!-- Keyhole and the key that turns in it. The key rotates about the keyhole centre, so the
+       motion reads as unlocking rather than as a shape sliding past. -->
+  <g transform="translate(128 149)">
+    <circle r="11" fill="#F59E0B"/>
+    <rect x="-3.5" y="6" width="7" height="20" rx="3" fill="#F59E0B"/>
+    <g>
+      <rect x="-2.5" y="-30" width="5" height="19" rx="2.5" fill="#F59E0B" opacity="0.95"/>
+      <rect x="2" y="-26" width="8" height="4" rx="2" fill="#F59E0B" opacity="0.95"/>
+      <rect x="2" y="-19" width="6" height="4" rx="2" fill="#F59E0B" opacity="0.95"/>
+      <animateTransform attributeName="transform" type="rotate"
+                        values="0;0;90;90;0;0" keyTimes="0;0.18;0.32;0.68;0.8;1"
+                        dur="6s" repeatCount="indefinite"/>
+    </g>
+  </g>
+
+  <!--
+    Motion is decoration here, never information: the shield, lock, keyhole and audit mark are
+    all present and correct at t=0, so a reader who suppresses animation loses nothing. This is
+    also why there is no reduced-motion fallback drawing — the still frame IS the logo.
+  -->
+</svg>

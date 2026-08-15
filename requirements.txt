@@ -1,0 +1,48 @@
+# Exact pins, not ranges: a submission judged in October must install the same tree the
+# demo was recorded against. `scripts/check_versions.py` holds every document that names a
+# version to what is pinned here, and `--check-upstream` catches a pin that has gone stale.
+
+# The agent framework, with the extras that carry the Fortified Enterprise Fleet pillars:
+#   a2a             -> a2a-sdk: AgentCard, Task, TaskState — the inter-agent contract
+#   agent-identity  -> credential brokering, the principal Agent Gateway authorises on
+#   gcp             -> aiplatform[agent-engines], bigquery, pubsub, secret-manager,
+#                      and the OpenTelemetry GCP exporters
+#   otel-gcp        -> Cloud Trace / Cloud Logging exporters for `--trace_to_cloud`
+#   mcp, tools      -> tool surface; Agent Registry catalogs MCP servers alongside agents
+#   eval            -> `adk eval`, the reasoning-chain evidence the track asks for
+#
+# NOT installed, deliberately: the `antigravity` extra. `google-antigravity` ships protobuf 7
+# gencode while a2a-sdk and google-cloud-aiplatform both pin protobuf<7, so it cannot coexist
+# with the Gateway and Runtime pillars. See docs/adr/007-adk-as-the-agent-framework.md.
+google-adk[a2a,agent-identity,gcp,otel-gcp,mcp,tools,eval]==2.7.0
+
+# Pinned explicitly because the ADK extras above do not carry them, and the versions a
+# document may name must resolve to something.
+a2a-sdk==1.1.2
+google-cloud-aiplatform==1.164.0
+
+# The governance data sources — see docs/adr/006-gcp-service-surface.md.
+# Cloud Asset Inventory is how the Access Auditor reads the live IAM policy: `gcloud` is not
+# present in a Cloud Run image, so a subprocess call to it cannot be the read path.
+google-cloud-asset==4.4.0
+google-cloud-recommender==2.22.0
+google-cloud-modelarmor==0.7.1
+
+# Findings history and scheduling.
+google-cloud-firestore==2.28.1
+google-cloud-scheduler==2.20.0
+google-cloud-bigquery==3.43.0
+
+# Observability. OpenTelemetry is held at 1.42.1, the newest release google-adk accepts
+# (it pins opentelemetry-api/sdk <=1.42.1). Raise both together when ADK does.
+opentelemetry-api==1.42.1
+opentelemetry-sdk==1.42.1
+opentelemetry-exporter-gcp-trace==1.14.0
+google-cloud-trace==1.20.0
+google-cloud-logging==3.16.2
+
+# Outbound HTTP for the escalation surface. httpx rather than requests: explicit
+# connect/read timeout budgets, and transport retries that do not replay an already-sent
+# request. Flask is gone — ADK serves its own FastAPI/Starlette app.
+httpx==0.28.1
+python-dotenv==1.2.2

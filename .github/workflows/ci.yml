@@ -1,0 +1,246 @@
+name: CI Quality Gate
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.14"
+  # The suite covers every line and branch of the pillar and agent modules. The floor is
+  # the number it actually holds: a floor below real coverage is not a gate, it is a
+  # decoration. If a change cannot be covered, the honest move is to say so in the PR and
+  # lower this deliberately — not to let it drift down unnoticed.
+  COVERAGE_FLOOR: "100"
+
+jobs:
+  lint:
+    name: Ruff lint and format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Ruff check
+        run: ruff check .
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+  typecheck:
+    name: Mypy type check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Mypy
+        run: mypy agents registry model_armor observability
+
+  tests:
+    name: Tests and coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Fake values satisfy module-level config; unit tests mock every outbound call.
+    # CI deliberately holds no GCP credentials — a workflow able to read a real IAM
+    # policy would be a credential path into the project Bastion audits.
+    env:
+      GOOGLE_CLOUD_PROJECT: "bastion-ci-mock"
+      GOOGLE_CLOUD_LOCATION: "global"
+      GOOGLE_GENAI_USE_VERTEXAI: "TRUE"
+      GCP_PROJECT_ID: "bastion-ci-mock"
+      GCP_REGION: "europe-north2"
+      VERTEX_AI_MODEL: "gemini-3.5-flash"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Pytest with coverage gate
+        run: >-
+          pytest tests
+          --cov
+          --cov-report=term-missing
+          --cov-report=xml
+          --cov-fail-under=${{ env.COVERAGE_FLOOR }}
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+          if-no-files-found: ignore
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          flags: pytest
+          name: bastion-pytest
+          fail_ci_if_error: false
+
+  docs:
+    name: Documentation hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Markdown lint
+        run: npx --yes markdownlint-cli2 "**/*.md"
+
+      - name: Require judge-facing documentation
+        run: |
+          for path in README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md LICENSE \
+            docs/ARCHITECTURE.md docs/adr/README.md submission/planning/07-release-plan.md \
+            submission/SUBMISSION.md assets/README.md \
+            assets/architecture/gcp-state.json assets/brand/logo-animated.svg; do
+            test -f "$path" || { echo "::error::missing $path"; exit 1; }
+          done
+
+      - name: Reject unfinished public documentation markers
+        run: |
+          if grep -RInE '\[to fill\]|TBD|FIXME|XXX|lorem ipsum' \
+            README.md CHANGELOG.md SECURITY.md docs/ARCHITECTURE.md docs/adr submission; then
+            echo "::error::Unfinished marker in judge-facing documentation."
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Every counted claim in this repository ("seven pillars", "six ADRs") has been
+      # wrong at least once, and each time it was caught by a human reading carefully —
+      # which is neither reliable nor repeatable. Hence the gate.
+      - name: Documentation agrees with the repository
+        run: python scripts/check_docs.py
+
+      - name: Documented versions match dependency pins
+        run: python scripts/check_versions.py
+
+  secrets:
+    name: No credentials committed
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Bastion audits IAM for a living. A service-account key or a raw policy dump in
+      # this repository would discredit the submission more thoroughly than any missing
+      # feature. .gitignore covers the common shapes; this fails the build if one slips.
+      - name: Scan for service-account keys and IAM dumps
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -Ei '(-sa-key|service-account.*\.json|application_default_credentials|\.iam-policy\.json)$'; then
+            echo "::error::Credential or raw IAM policy dump found in tracked files."
+            exit 1
+          fi
+          if git grep -qIE '"type"[[:space:]]*:[[:space:]]*"service_account"' -- '*.json'; then
+            echo "::error::A service-account key appears to be committed."
+            exit 1
+          fi
+          if git grep -qIE '(AIza[0-9A-Za-z_-]{35}|-----BEGIN [A-Z ]*PRIVATE KEY-----)'; then
+            echo "::error::An API key or private key appears to be committed."
+            exit 1
+          fi
+          echo "No credentials or raw policy dumps in tracked files."
+
+  diagrams:
+    name: Architecture claims are grounded
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # The architecture diagrams are inline mermaid, rendered by GitHub in the reader's
+      # own theme, so there is nothing to re-render here and nothing to fall out of sync
+      # with a source file. What CI checks instead is that the build state shown in the
+      # docs is still derived from a measurement of the live project, and that no image
+      # asserting undeployed infrastructure has been committed.
+      #
+      # This job cannot re-run the measurement: CI holds no GCP credentials, deliberately.
+      # `scripts/capture_gcp_state.py --check` is a local step, run before tagging.
+      - name: Documentation build state is derived, not typed
+        run: python scripts/check_docs.py
+
+      # The light/dark variants are emitted from one master, because an SVG loaded via <img>
+      # does not inherit the page's colour scheme and GitHub renders README images that way.
+      # --no-gif because rasterising needs a browser this runner does not have; the SVG is the
+      # checked artifact and the GIF is derived from it locally.
+      - name: Diagram theme variants are current
+        run: python scripts/render_diagrams.py --check --no-gif
+
+      - name: State file carries no principals
+        run: |
+          set -euo pipefail
+          if grep -nE '(@|serviceAccount:|user:|roles/)' assets/architecture/gcp-state.json; then
+            echo "::error::gcp-state.json records counts, never principals."
+            exit 1
+          fi
+          echo "State file is counts only."
+
+
+
+
