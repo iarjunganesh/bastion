@@ -1,0 +1,9 @@
+{
+  "ignores": [
+    ".audit-venv/**",
+    ".tmp/**",
+    ".venv/**",
+    "venv/**",
+    "node_modules/**"
+  ]
+}

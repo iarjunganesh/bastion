@@ -15,7 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VERSION: "3.14"
+  # Match Agent Runtime's deployed interpreter so syntax cannot pass CI and fail only after a
+  # ten-minute managed build.
+  PYTHON_VERSION: "3.12"
   # The suite covers every line and branch of the pillar and agent modules. The floor is
   # the number it actually holds: a floor below real coverage is not a gate, it is a
   # decoration. If a change cannot be covered, the honest move is to say so in the PR and
@@ -161,7 +163,7 @@ jobs:
           for path in README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md LICENSE \
             docs/ARCHITECTURE.md docs/adr/README.md submission/planning/07-release-plan.md \
             submission/SUBMISSION.md assets/README.md \
-            assets/architecture/gcp-state.json assets/brand/logo-animated.svg; do
+            assets/architecture/gcp-state.json assets/brand/banner-dark.svg; do
             test -f "$path" || { echo "::error::missing $path"; exit 1; }
           done
 
@@ -228,21 +230,16 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      # The architecture diagrams are inline mermaid, rendered by GitHub in the reader's
-      # own theme, so there is nothing to re-render here and nothing to fall out of sync
-      # with a source file. What CI checks instead is that the build state shown in the
-      # docs is still derived from a measurement of the live project, and that no image
-      # asserting undeployed infrastructure has been committed.
-      #
-      # This job cannot re-run the measurement: CI holds no GCP credentials, deliberately.
-      # `scripts/capture_gcp_state.py --check` is a local step, run before tagging.
+      # CI cannot re-run the live measurement because it deliberately holds no GCP credentials.
+      # It checks the committed count-only state, documentation references, and generated SVG
+      # variants. Live capture remains an approved-operator release step.
       - name: Documentation build state is derived, not typed
         run: python scripts/check_docs.py
 
       # The light/dark variants are emitted from one master, because an SVG loaded via <img>
       # does not inherit the page's colour scheme and GitHub renders README images that way.
-      # --no-gif because rasterising needs a browser this runner does not have; the SVG is the
-      # checked artifact and the GIF is derived from it locally.
+      # Rasterising needs a browser/ffmpeg the runner does not have; SVG is the deterministic
+      # checked artifact and GIF is derived locally.
       - name: Diagram theme variants are current
         run: python scripts/render_diagrams.py --check --no-gif
 

@@ -1,4 +1,4 @@
-FROM python:3.14-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 RUN useradd --create-home --uid 10001 bastion
@@ -14,7 +14,8 @@ COPY observability /app/observability
 COPY registry /app/registry
 COPY runtime /app/runtime
 COPY infrastructure /app/infrastructure
-RUN cp /app/infrastructure/start-agent.sh /app/start-agent.sh
+RUN cp /app/infrastructure/start-agent.sh /app/start-agent.sh \
+    && sed -i 's/\r$//' /app/start-agent.sh
 RUN chmod 0555 /app/start-agent.sh && chown -R bastion:bastion /app
 
 USER bastion

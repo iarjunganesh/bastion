@@ -2,12 +2,12 @@
 name = "bastion"
 version = "0.1.0"
 description = "A fleet of governance agents auditing a live GCP IAM policy — including their own permissions"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 license = { file = "LICENSE" }
 
 [tool.ruff]
 line-length = 100
-target-version = "py314"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "ANN201", "S"]
@@ -19,7 +19,7 @@ ignore = [
 "tests/**" = ["ANN201", "S"]
 
 [tool.mypy]
-python_version = "3.14"
+python_version = "3.12"
 # `ignore_missing_imports` stays: the Google client libraries ship incomplete stubs, and
 # chasing them would mean silencing real findings with blanket ignores. Everything Bastion
 # writes is checked strictly.

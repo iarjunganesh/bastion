@@ -11,7 +11,8 @@ permissions:
   contents: read
 
 env:
-  PYTHON_VERSION: "3.14"
+  # Match the interpreter used by both Agent Runtime and the Cloud Run image.
+  PYTHON_VERSION: "3.12"
   COVERAGE_FLOOR: "100"
 
 jobs:
@@ -46,8 +47,11 @@ jobs:
       - name: Ruff
         run: ruff check .
 
+      - name: Ruff format
+        run: ruff format --check .
+
       - name: Mypy
-        run: mypy agents registry model_armor observability
+        run: mypy agents gateway identity registry runtime model_armor observability infrastructure
 
       - name: Pytest and coverage
         run: pytest tests --cov --cov-report=xml --cov-fail-under=${{ env.COVERAGE_FLOOR }}
