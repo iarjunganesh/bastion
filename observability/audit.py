@@ -26,7 +26,9 @@ from dataclasses import asdict, dataclass, field
 from functools import lru_cache
 from typing import Any
 
+from google.adk.agents.base_agent import BaseAgent
 from google.adk.agents.callback_context import CallbackContext
+from google.adk.agents.invocation_context import InvocationContext
 from google.adk.models.llm_request import LlmRequest
 from google.adk.models.llm_response import LlmResponse
 from google.adk.plugins import BasePlugin
@@ -98,6 +100,42 @@ class AuditPlugin(BasePlugin):
     def __init__(self, name: str = "bastion-audit") -> None:
         super().__init__(name=name)
 
+    async def before_run_callback(self, *, invocation_context: InvocationContext) -> None:
+        record(
+            "investigation.run",
+            outcome="started",
+            actor=getattr(getattr(invocation_context, "agent", None), "name", "unknown"),
+            invocation_id=_invocation(invocation_context),
+        )
+
+    async def after_run_callback(self, *, invocation_context: InvocationContext) -> None:
+        record(
+            "investigation.run",
+            outcome="completed",
+            actor=getattr(getattr(invocation_context, "agent", None), "name", "unknown"),
+            invocation_id=_invocation(invocation_context),
+        )
+
+    async def before_agent_callback(
+        self, *, agent: BaseAgent, callback_context: CallbackContext
+    ) -> None:
+        record(
+            "agent.run",
+            outcome="started",
+            actor=agent.name,
+            invocation_id=_invocation(callback_context),
+        )
+
+    async def after_agent_callback(
+        self, *, agent: BaseAgent, callback_context: CallbackContext
+    ) -> None:
+        record(
+            "agent.run",
+            outcome="completed",
+            actor=agent.name,
+            invocation_id=_invocation(callback_context),
+        )
+
     async def before_model_callback(
         self, *, callback_context: CallbackContext, llm_request: LlmRequest
     ) -> LlmResponse | None:
@@ -109,6 +147,50 @@ class AuditPlugin(BasePlugin):
             detail={"model": getattr(llm_request, "model", None)},
         )
         return None
+
+    async def after_model_callback(
+        self, *, callback_context: CallbackContext, llm_response: LlmResponse
+    ) -> None:
+        del llm_response
+        record(
+            "model.request",
+            outcome="completed",
+            actor=getattr(callback_context, "agent_name", "unknown"),
+            invocation_id=_invocation(callback_context),
+        )
+
+    async def on_model_error_callback(
+        self,
+        *,
+        callback_context: CallbackContext,
+        llm_request: LlmRequest,
+        error: Exception,
+    ) -> None:
+        record(
+            "model.request",
+            outcome="failed",
+            actor=getattr(callback_context, "agent_name", "unknown"),
+            invocation_id=_invocation(callback_context),
+            detail={
+                "model": getattr(llm_request, "model", None),
+                "error": type(error).__name__,
+            },
+        )
+
+    async def before_tool_callback(
+        self,
+        *,
+        tool: BaseTool,
+        tool_args: dict[str, Any],
+        tool_context: ToolContext,
+    ) -> None:
+        record(
+            "tool.call",
+            outcome="started",
+            actor=tool.name,
+            invocation_id=_invocation(tool_context),
+            detail={"args": sorted(tool_args)},
+        )
 
     async def after_tool_callback(
         self,

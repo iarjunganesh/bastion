@@ -102,6 +102,72 @@ async def test_model_requests_are_recorded_and_never_blocked(emitted):
     assert record["actor"] == "access_auditor"
 
 
+@pytest.mark.asyncio
+async def test_run_and_agent_lifecycle_are_correlated(emitted):
+    plugin = audit.AuditPlugin()
+    context = SimpleNamespace(invocation_id="inv-life", agent=SimpleNamespace(name="orchestrator"))
+    callback = SimpleNamespace(invocation_id="inv-life")
+    agent = SimpleNamespace(name="access_auditor")
+
+    assert await plugin.before_run_callback(invocation_context=context) is None
+    assert await plugin.before_agent_callback(agent=agent, callback_context=callback) is None
+    assert await plugin.after_agent_callback(agent=agent, callback_context=callback) is None
+    assert await plugin.after_run_callback(invocation_context=context) is None
+
+    records = emitted()
+    assert [(item["event"], item["outcome"]) for item in records] == [
+        ("investigation.run", "started"),
+        ("agent.run", "started"),
+        ("agent.run", "completed"),
+        ("investigation.run", "completed"),
+    ]
+    assert {item["invocation_id"] for item in records} == {"inv-life"}
+
+
+@pytest.mark.asyncio
+async def test_model_completion_and_failure_are_payload_free(emitted):
+    plugin = audit.AuditPlugin()
+    context = SimpleNamespace(invocation_id="inv-model", agent_name="policy")
+    request = SimpleNamespace(model="gemini-3.5-flash")
+
+    assert (
+        await plugin.after_model_callback(
+            callback_context=context, llm_response=SimpleNamespace(content="secret")
+        )
+        is None
+    )
+    assert (
+        await plugin.on_model_error_callback(
+            callback_context=context,
+            llm_request=request,
+            error=RuntimeError("principal user:a@example.com"),
+        )
+        is None
+    )
+
+    records = emitted()
+    assert records[0]["outcome"] == "completed"
+    assert records[1]["detail"] == {"error": "RuntimeError", "model": "gemini-3.5-flash"}
+    assert "a@example.com" not in json.dumps(records)
+
+
+@pytest.mark.asyncio
+async def test_tool_start_records_names_not_values(emitted):
+    plugin = audit.AuditPlugin()
+    assert (
+        await plugin.before_tool_callback(
+            tool=SimpleNamespace(name="audit_iam_policy"),
+            tool_args={"member": "user:a@example.com"},
+            tool_context=SimpleNamespace(invocation_id="inv-tool"),
+        )
+        is None
+    )
+    (record,) = emitted()
+    assert record["outcome"] == "started"
+    assert record["detail"] == {"args": ["member"]}
+    assert "a@example.com" not in json.dumps(record)
+
+
 def test_a_missing_invocation_id_is_recorded_not_raised():
     """Losing the event is worse than recording 'unknown'."""
     assert audit._invocation(SimpleNamespace()) == "unknown"
