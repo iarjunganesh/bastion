@@ -1,19 +1,35 @@
-# Operations objectives and release checks
+# Operations objectives and release gates
 
-These are release objectives, not observed production metrics. The fleet must not claim them as
-met until Cloud Monitoring records a full investigation run.
+The live project has four log-based metrics, five enabled alert policies, a 365-day regional
+analytics log bucket, a payload-free audit sink, and the **Bastion Fleet Operations** dashboard.
+These are configured controls; the objectives below are service targets, not historical SLO
+attainment claims.
 
-| Signal | Objective | Alert / release condition |
+| Signal | Objective | Live detection / response |
 |---|---|---|
-| Investigation completion | 99% of accepted events complete within 10 minutes | Alert when a received/running event exceeds 10 minutes |
-| Duplicate effects | Zero duplicate notification keys | Block release if outbox has duplicate delivered keys |
-| Audit completeness | One audit record for every model/tool/refusal/error action | Alert on a trace invocation with no matching audit record |
-| Gateway refusals | Refusal rate is visible by caller/target/reason | Alert on a 5× baseline spike; investigate rather than auto-open access |
-| Model Armor failures | Any unavailable/blocked decision is fail-closed | Alert on error/refusal spike; never retry by bypassing Armor |
-| Dead letters | Zero unresolved dead letters | Page the owning department on a dead-letter transition |
-| Cost | Cloud Run max instances remains ≤ `BASTION_MAX_INSTANCES` | Alert on budget anomaly and suspend scheduler before widening IAM scope |
+| Investigation completion | 99% of admitted events finish within 10 minutes | Stuck-delivery alert; inspect Firestore status/lease and Eventarc delivery |
+| Duplicate effects | Zero duplicate review records | Deterministic idempotency key and create-once receiver; replay returns `accepted=false` |
+| Audit failures | Every supported run/agent/model/tool action has a terminal audit event | Audit-failure metric and alert; correlate by invocation ID |
+| Policy refusals | Refusal rate remains explainable by bounded reason | Refusal-spike alert; never bypass policy to restore throughput |
+| Model Armor | Unavailable or matched screening always fails closed | Dedicated failure/refusal metric and alert |
+| Dead letters | Zero unresolved review messages | Backlog alert on `bastion-dead-letter-review`; investigate before replay |
+| Cost/capacity | Cloud Run max instances stays within `BASTION_MAX_INSTANCES` | Deployment verifier plus platform budget controls; no automatic IAM widening |
 
-The private deployment emits no-content ADK telemetry and structured payload-free audit JSON to
-Cloud Logging. `infrastructure/verify_fleet.py` verifies private ingress, workload identities,
-and internal classification after deployment. Alert policies and dashboards remain an approved
-platform-owner provisioning task; they are deliberately not represented as deployed controls.
+## Release procedure
+
+1. Run the Python 3.12 quality gates from the README.
+2. Deploy one immutable image to the four Cloud Run services.
+3. Configure Registry, Gateway, Runtime, IAM, DLQ, audit routing, metrics, alerts, and dashboard.
+4. Run `python -m infrastructure.verify_fleet` and `python -m infrastructure.smoke_test`.
+5. Capture only redacted counts/statuses in `assets/evidence/`.
+
+`infrastructure/rollback.py` is dry-run by default and permits only one of the two newest safe
+revisions. `infrastructure/teardown.py` is also dry-run by default and preserves Firestore,
+secrets, managed Runtime/Memory, and audit logs. Applying teardown requires the exact project ID.
+
+## Failure semantics
+
+A handler admits an event before execution, owns a bounded lease, returns `503` for a concurrent
+or failed attempt so Eventarc retains delivery, and acknowledges an already-completed replay.
+Expired leases are reclaimable. Delivery stops after five attempts at the dead-letter review
+subscription. Dependency errors are audited by class without leaking response content.

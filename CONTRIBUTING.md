@@ -1,82 +1,58 @@
 # Contributing
 
-Bastion is a solo hackathon submission on an 18-day schedule. This document exists so the
-conventions are written down rather than remembered — including for the author, three days
-from now, at midnight.
+Bastion is a solo hackathon submission, but the repository treats every change as an auditable
+production change.
 
-## Before you change anything
+## Before changing code
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — what the system is.
-- [`docs/adr/`](docs/adr/README.md) — decisions that constrain the implementation. If a
-  change contradicts one, amend that ADR in the same commit or add a new one. The code and
-  the decision record are not allowed to disagree silently.
-- [`submission/planning/03-build-plan.md`](submission/planning/03-build-plan.md) — what is supposed to be true today.
+Read [architecture](docs/ARCHITECTURE.md), [ADRs](docs/adr/README.md),
+[security](SECURITY.md), and the [submission proof ledger](submission/SUBMISSION.md). Amend an ADR
+in the same change when implementation reverses a recorded decision.
 
-## Setup
-
-```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt -r requirements-dev.txt
-
-cp .env.example .env       # edit GOOGLE_CLOUD_PROJECT, GCP_PROJECT_ID, Model Armor
-gcloud auth application-default login
-python -m dotenv run -- adk run --in_memory agents/orchestrator \
-  "Run one Bastion access-review investigation."
-```
-
-There is no `make` on the author's Windows machine, so every command shown here is the direct
-form. The `Makefile` remains the canonical description of *what* each step does, and CI runs on
-Linux where `make` exists.
-
-**There is no `make` on the author's Windows machine** — not in PowerShell, not in Git Bash.
-The `Makefile` stays the canonical description of *what* each step does, and CI runs on Linux
-where `make` exists, but anything typed here needs the direct command:
+## Python 3.12 setup
 
 ```powershell
-python -m venv .venv; .venv\Scripts\Activate.ps1; pip install -r requirements-dev.txt
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements-dev.txt
 Copy-Item .env.example .env
 gcloud auth application-default login
-python infrastructure/trigger_investigation.py --mock-data
 ```
 
-`GOOGLE_CLOUD_LOCATION=global` and `GCP_REGION=europe-north2` are **different settings**. Gemini
-3.5 has no regional endpoint, so collapsing them 404s every model call with a message that
-reads like a permissions failure ([ADR-004](docs/adr/004-flash-only-global-endpoint.md)).
+`GOOGLE_CLOUD_LOCATION=global` is the Gemini endpoint; `GCP_REGION=europe-north2` is workload
+placement. Do not merge them.
 
-## Conventions
-
-**Commits** use a `type: subject` prefix — `feat:`, `fix:`, `docs:`, `chore:`, `release:`.
-The subject says what became true, not which files moved.
-
-**Releases** are annotated tags, `vX.Y.Z`, following
-[`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md). Minor bump for a capability a judge
-could watch; patch for a fix or captured evidence. **Never re-point a tag** — if `v0.6.0`
-was wrong, `v0.6.1` fixes it. `CHANGELOG.md` is updated in the change that earns the entry,
-not at release time.
-
-**Python** is type-hinted on public functions, `ruff` clean, no bare `except`. `make ci` runs
-lint, typecheck, and tests together; without `make`, that is:
+## Quality gates
 
 ```powershell
-ruff check .; ruff format --check .
-mypy agents registry runtime memory gateway model_armor observability
-pytest tests -q --cov --cov-fail-under=100
+ruff check .
+ruff format --check .
+mypy agents gateway identity registry runtime model_armor observability infrastructure
+pytest tests --cov --cov-report=term-missing --cov-fail-under=100
 python scripts/check_docs.py
+python scripts/check_versions.py
+python scripts/render_diagrams.py --check
 npx markdownlint-cli2 "**/*.md"
 ```
 
-`ruff format --check` is a separate gate from `ruff check` — a change that lints clean can
-still fail the build on formatting. The coverage floor is 100% and matches real coverage; a
-floor below it is a decoration, not a gate.
+CI also runs dependency audit and secret scanning. Coverage remains 100% for statements and
+branches. Add unit, integration, security, or load coverage at the boundary you change.
 
-**Every deployed agent-to-agent call uses private Cloud Run A2A with workload identity.** The
-managed Agent Gateway is not provisioned; contributors must not describe it as the current path.
+## Safety and evidence
 
-## The two rules that matter most here
+- Never commit or print credentials, raw IAM/Asset output, principals, private endpoints, full
+  environments, prompts/responses, or unredacted findings.
+- Keep tool declarations fixed and repository-owned.
+- Preserve the production route through managed Runtime, Gateway/IAP, and Registry; the Eventarc
+  dispatcher must not gain a direct worker credential.
+- Label a capability implemented, deployed, observed, or configured precisely.
+- Regenerate `gcp-state.json` only from live GCP and keep it count-only.
+- Edit architecture and 16:9 SVG masters, then regenerate variants/GIFs. Do not hand-edit generated
+  variants.
 
-**Never commit a credential or a raw IAM policy dump.** See [`SECURITY.md`](SECURITY.md).
+## Commits and releases
 
-**Do not write a claim before it is verified.** This project's entire argument is
-auditability. A README asserting a working injection block before one has been observed is
-the exact failure the product is about. `submission/SUBMISSION.md` holds the list of
-claims that are not yet earned; move an item out of it only after seeing the thing work.
+Commit subjects describe what became true. Do not rewrite existing history, amend another
+contributor's commit, or move a tag without explicit instruction. Update `CHANGELOG.md` and every
+affected documentation/evidence claim in the same change. A release tag is optional and separate
+from an ordinary push to `main`.

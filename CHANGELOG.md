@@ -4,17 +4,47 @@ All notable changes to this project are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioning per
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-An entry describes **what became true**, not which files moved. A capability appears here only
-once it has been observed working — see the "Verified" and "Not yet true" sections, which are
-part of the record rather than a disclaimer appended to it.
+An entry describes **what became true**, not which files moved. Historical sections preserve the
+state known on their date; current proof and limitations are recorded together.
 
-The release ladder from `v0.1.0` to `v1.0.0`, with target dates and what each version is
-allowed to claim, is in [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
+The current release process is in
+[`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
 ## [Unreleased]
 
-Pre-`v0.1.0`. The initial untagged repository commits are published on `main`; no release tag
-exists because the managed deployment evidence is not yet earned.
+### Added — governed managed Runtime path
+
+- Deployed the Orchestrator to Python 3.12 managed Agent Runtime with Agent Identity and
+  Agent-to-Anywhere Gateway binding; catalogued it beside two institutionally described A2A
+  worker cards and approved platform destinations.
+- Reduced Cloud Run Orchestrator to durable Eventarc admission and Runtime dispatch. Deployment
+  now reconciles away its peer secret, direct worker invoker grants, and obsolete Model Armor and
+  Pub/Sub roles, leaving no production local-graph bypass.
+- Added Firestore leases/reclaim, failure/retry semantics, five-attempt dead-letter delivery,
+  idempotent findings, private findings IAM, full payload-free AuditPlugin lifecycle, fail-closed
+  Model Armor, and deterministic protected-data screening.
+- Added Windows 11 bootstrap, live fleet verification/smoke, safe rollback, dry-run-first teardown,
+  count-only state capture, and idempotent observability provisioning.
+- Provisioned a 365-day regional audit bucket and sink, four log metrics, five alert policies, and
+  the Bastion Fleet Operations dashboard. The bucket remains unlocked; immutability is not claimed.
+- Standardized Docker, Runtime, GitHub Actions, release workflow, commands, and documentation on
+  Python 3.12.
+- Expanded the suite to 161 tests with 100% statement and branch coverage across populated unit,
+  integration, security, and load suites.
+- Reconciled every Markdown claim and architecture/banner label with the 2026-08-16 measured live
+  state: 21/21 APIs and 33 deployed resources.
+
+### Changed — visual system
+
+- Preserved the corrected architecture arrows/status dots and refreshed generated theme variants
+  and GIFs from their reviewed masters.
+- Updated banner and architecture facts for managed Runtime, Memory, Gateway, Registry, and the
+  current count-only deployment measurement.
+
+## Pre-deployment baseline — 2026-08-15
+
+The following historical notes describe the first untagged baseline before the managed P0/P1
+remediation above. Statements such as “not yet” are retained as chronology, not current status.
 
 ### Added — reproducible fleet controls
 
@@ -387,7 +417,7 @@ A sweep of every markdown file against the captured requirement. What it found:
 - `submission/planning/00-judging-matrix.md` — the open question about the rules page contradicting the
   overview is resolved; the two now agree.
 - **Every dependency pinned to its latest release**, verified against PyPI on 2026-08-13, and
-  the toolchain moved to **Python 3.14** across `pyproject.toml`, both workflows, and the
+  the toolchain uses **Python 3.12** across `pyproject.toml`, both workflows, and the
   documentation. Exact pins rather than ranges: a submission judged in October has to install
   the same tree the demo was recorded against.
 - Ruff's rule set widened to `E, F, I, UP, B, SIM, ANN201, S`, which surfaced twelve real

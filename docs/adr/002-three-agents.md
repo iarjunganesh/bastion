@@ -44,13 +44,10 @@ service account, a fourth registry entry, and a fourth failure mode.
 
 ## Consequences
 
-**The failure-tolerance half of that rubric is answered in code, not prose.**
-ADK's orchestration agents and Agent Engine's own retry
-delegates retry and backoff to Agent Engine, and bounds iteration with ADK's `LoopAgent`
-guard — the last because a worker that keeps returning "not done yet" raises nothing and
-times out on nothing, so neither retries nor breakers would ever see it. Hallucination
-bounding rides on ADR-001's deterministic detection: a fabricated finding has no binding
-behind it and is dropped before it reaches a human.
+**The failure-tolerance half of that rubric is answered in code, not prose.** Eventarc and
+Firestore provide durable admission, leases, retry, deduplication, and a five-attempt dead-letter
+route. The managed Runtime owns agent execution. Deterministic schemas reject malformed or
+fabricated findings before a human side effect, whose idempotency key collapses replays.
 
 The Orchestrator carries two responsibilities — routing and policy. That is a real cohesion
 cost, and it is why the policy rules stay a small, explicit, separately testable unit inside
@@ -64,5 +61,4 @@ The rules page also asks for an *"Unlikely Hero" outside of standard corporate r
 Bastion is squarely a corporate compliance tool and does not fit that phrasing, which
 appears aimed at the retired track framing. Recorded rather than papered over.
 
-If the core loop is still not solid by Aug 23, the build plan's checkpoint cuts to two
-agents. That would supersede this record.
+The three-agent split is deployed: one managed Runtime Orchestrator and two A2A workers.

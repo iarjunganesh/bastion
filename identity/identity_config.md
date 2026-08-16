@@ -1,79 +1,35 @@
-# Agent Identity — Security & Governance pillar
+# Workload identity contract
 
-Zero-trust: every service runs under its own GCP service account with the minimum IAM roles
-it needs. There is no shared "agents" service account, and no service account holds a
-predefined broad role where a narrower one will do.
+Bastion has no key files and no shared agent service account. `identity/policy.py` is the
+machine-checked baseline; this document explains the deployed split.
 
-This is the one pillar whose failure is directly observable. A mis-scoped call returns a
-denial, and that denial is the artifact — see the verification step below.
-
-> The three agent service accounts now back distinct private Cloud Run services. Runtime identity
-> separation is enforced at the service boundary; the next evidence item is a retained deployed
-> denial capture rather than an unimplemented identity model.
-
-## Service accounts
-
-Three, one per deployed agent. `infrastructure/deploy.sh` names exactly these; if a row is
-added here it must be added there in the same change, or a service will deploy under the
-wrong identity and the least-privilege claim becomes false in the artifact that proves it.
-
-| Service | Service account | IAM roles |
+| Workload | Identity | Capabilities |
 |---|---|---|
-| Orchestrator | `orchestrator-sa@PROJECT.iam.gserviceaccount.com` | `roles/aiplatform.user` for managed ADK state/model calls, `roles/datastore.user`, `roles/modelarmor.user`, `roles/pubsub.publisher` |
-| Access Auditor | `access-auditor-sa@PROJECT.iam.gserviceaccount.com` | **`roles/iam.securityReviewer`** — read-only on the live IAM policy — plus `roles/aiplatform.user`, `roles/cloudasset.viewer`, `roles/modelarmor.user`, `roles/recommender.iamViewer`, and HMAC-secret access |
-| Escalation Agent | `escalation-agent-sa@PROJECT.iam.gserviceaccount.com` | `roles/aiplatform.user` and `roles/modelarmor.user`; write-only to the findings endpoint. **No IAM read of any kind** |
+| Managed Orchestrator | Agent Runtime Agent Identity | Gateway/IAP egress to catalogued destinations; Vertex, Firestore, Model Armor, logs, traces, metrics; worker invocation |
+| Durable ingress | `orchestrator-sa` | Invoke managed Runtime; Firestore state; logs, traces, metrics; no peer origin secret, worker invoker, Model Armor, or Pub/Sub publisher role |
+| Access Auditor | `access-auditor-sa` | Read-only IAM security review, Cloud Asset, Recommender, Vertex/Model Armor, HMAC and A2A secrets |
+| Escalation Agent | `escalation-agent-sa` | Vertex/Model Armor, A2A secret, private findings invocation; no IAM/Asset read |
+| Findings API | `findings-api-sa` | Firestore create/read for idempotent review records |
+| Eventarc delivery | `eventarc-invoker-sa` | Invoke only durable ingress; Eventarc receiver |
 
-**There were five rows here, and two of them were for services that no longer exist.** Gateway
-and Registry each had a service account, because each used to be a Cloud Run service in this
-repository. [ADR-003](../docs/adr/003-pillars-on-geap.md) replaced both with managed GEAP
-products on 2026-08-15 and ~3,460 lines were deleted; a managed product is not a service this
-project deploys, so it is not an identity this project creates. The rows outlived the code by
-a day.
+Managed Google service agents retain their product service-agent roles. They are not Bastion
+workload identities and are not represented as agents.
 
-**There is no Policy Enforcer service account either.**
-[ADR-002](../docs/adr/002-three-agents.md) merged that agent into the Orchestrator. A row for it
-survived here long after the merge, and `deploy.sh` would have stood the service up — the same
-failure as the Gateway and Registry rows, one decision earlier. Three occurrences of one shape
-is a pattern, so: **this table is derived from what `deploy.sh` deploys, and nothing else.**
+## Enforced route
 
-**The audit target is the live IAM policy, not a Firestore collection.** An earlier version
-of this file scoped the Access Auditor to a custom role on an `entitlements` collection —
-left over from the mock-data design that [ADR-001](../docs/adr/001-real-iam-not-mock-data.md)
-rejected. The Auditor reads real bindings through `roles/iam.securityReviewer`, and the
-policy it reads contains the three accounts above.
+The Eventarc identity can reach only the Cloud Run ingress. The ingress can reach the managed
+Runtime but cannot authenticate directly to workers. The Runtime's Agent Identity is admitted by
+Gateway IAP per Registry resource and by worker invocation policy; workers additionally validate
+the origin secret. Escalation alone can invoke the IAM-private findings API.
 
-**The escalation surface is the dashboard's findings API, not Slack.** The agent reads
-`BASTION_FINDINGS_ENDPOINT` and posts a typed body carrying a count. It held
-`SLACK_WEBHOOK_URL` and a free-text `text` field until 2026-08-15, which contradicted ADR-003 —
-Slack is not among the twenty services — and a free-text field is where principal identifiers
-end up.
+`infrastructure/deploy.sh` reconciles stale grants from the former direct-peer topology.
+`infrastructure/verify_fleet.py` fails when the dispatcher retains a peer secret or lacks its
+managed Runtime target.
 
-## Verification test (Week 2 milestone)
+## Verification
 
-Call `projects.getIamPolicy` from the **Escalation Agent's** service account and confirm it
-fails with `PERMISSION_DENIED`. That denial is the proof-point for zero-trust access control
-in the demo; screenshot it. It is the shot the storyboard was missing, and it is the answer to
-the rules page's *"clear, strictly enforced separation of concerns between agents"* — the one
-sub-question an IAM-enforced fleet answers better than a convention-based one.
-
-**The denial is safe to film; a success would not be.** The call returns an error, not a
-policy, so nothing sensitive reaches the screen. Do not "check it works first" by running the
-same call from the Auditor's account on camera.
-
-The captured denial is recorded in
-[`../assets/evidence/03-escalation-agent-denied.md`](../assets/evidence/03-escalation-agent-denied.md).
-The security suite exercises the token audience, peer-invocation boundary, and policy shape;
-the retained deployed denial is the remaining proof artifact.
-
-## Delivery ledger
-
-- [x] Split the agents into private deployables with their own `root_agent`, Cloud Run service,
-      and workload identity
-- [x] Create the three service accounts (`gcloud iam service-accounts create ...`)
-- [x] Grant each the declared baseline roles. Verify with a query that returns **roles
-      and no identities** — `gcloud projects get-iam-policy "$PROJECT"
-      --flatten="bindings[].members" --filter="bindings.members:<sa>"
-      --format="value(bindings.role)"`. The unfiltered form returns every principal in the
-      project and must not be printed; see [`../SECURITY.md`](../SECURITY.md)
-- [x] Wire Cloud Run services to assume their service accounts natively (no key files)
-- [x] Capture the Escalation Agent denial
+The captured negative test in
+[assets/evidence/03-escalation-agent-denied.md](../assets/evidence/03-escalation-agent-denied.md)
+shows the Escalation identity denied IAM policy access. Security tests cover token audience and
+origin-secret rejection. Production smoke verifies anonymous findings denial and a successful
+write under the real Escalation identity, then confirms the duplicate is collapsed.

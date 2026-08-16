@@ -1,98 +1,44 @@
-# ADR-006: What "done" means for each of the seven pillars
+# ADR-006: Observable proof closes each pillar
 
-**Status:** Accepted
-**Date:** 2026-08-13
+**Status:** Accepted 2026-08-13; proof ledger refreshed 2026-08-16  
+**Traces to:** [hackathon brief](../../submission/DEVPOST.md)
 
 ## Decision
 
-Each of the seven components the track names has **one observable proof** that closes it.
-A pillar is done when that proof exists and has been seen — not when its module compiles,
-and not when its service is enabled.
+A pillar is complete only when implementation, deployment, and an observable proof agree. An
+enabled API or folder name is not proof.
 
-| Pillar | The proof that closes it | State on 2026-08-15 |
+| Pillar | Observable proof | Current state |
 |---|---|---|
-| **Agent Registry** | The fleet is published in the managed Agent Registry, and a finding routes to the department the catalog says owns it | ✅ **Published 2026-08-15.** The three private JSON-RPC/A2A Cloud Run services are registered and projected as managed agent records; cross-department routing ran live — one investigation, two findings, two owning teams ([evidence 02](../../assets/evidence/02-gemini-investigation.md)). |
-| **Agent Runtime** | An investigation started, survives the process that started it, and is still resumable later ([ADR-003](003-pillars-on-geap.md)) | Private Cloud Run + Eventarc admission and Agent Engine session/memory are deployed; a retained cross-week replay remains the proof artifact |
-| **Memory Bank** | A finding suppressed on run *n+1* because a human approved it on run *n* | Managed Agent Engine session/memory endpoints and Firestore investigation identity are deployed; **retained suppression replay still owed** |
-| **Agent Identity** | The Escalation Agent's `403 PERMISSION_DENIED`, captured, on a real IAM policy read | Separate deployed service accounts and private IAM-authenticated calls enforce least privilege; a retained live denial capture is still owed |
-| **Agent Gateway** | Every inter-agent call routed through it, with the route decision logged and an unregistered target rejected | **Planned proof, not current path.** `networkservices` is enabled; deployed peers use private Cloud Run A2A with IAM authentication. |
-| **Model Armor** | A malicious ticket blocked before it reaches the model | ✅ **Earned 2026-08-15.** Prompt injection blocked live by the `bastion-guardrail` template in `europe-west4` ([evidence 01](../../assets/evidence/01-model-armor-block.md)). **Still owed:** the same block observed *through* an agent |
-| **Agent Observability** | Two artifacts, not one — see below | Payload-free structured audit logging and no-content ADK telemetry are deployed; a retained successful multi-agent trace is still owed |
+| Agent Registry | Three governed agents and approved platform destinations are discoverable; routing rejects unknown departments | **Deployed and verified.** Two worker cards plus managed Runtime entry; metadata/routing tests pass. |
+| Agent Runtime | A managed identity-bearing Runtime accepts a session and streams events | **Observed.** A live session returned streamed events through the Gateway-bound deployment. |
+| Memory Bank | Durable context and an approved exception survive process restart and suppress a later matching opaque finding | **Implemented and integration-tested.** Managed Memory endpoint is live; no claim that a wall-clock week elapsed during testing. |
+| Agent Identity | The write-scoped agent is denied a real IAM read while the read-scoped agent succeeds | **Observed.** Redacted denial is [evidence 03](../../assets/evidence/03-escalation-agent-denied.md). |
+| Agent Gateway | Runtime is Gateway-bound, IAP is fail-closed, and no production direct-peer credential remains | **Deployed and verified.** Fleet verifier checks Gateway policy and dispatcher bypass removal. |
+| Model Armor | Injection is refused by the managed template; unavailable screening also refuses | **Observed and tested.** Direct managed refusal is [evidence 01](../../assets/evidence/01-model-armor-block.md); callback/refusal seams are covered. |
+| Agent Observability | Payload-free correlated actions are retained and operational signals are alertable | **Deployed and verified.** Regional sink/bucket, four metrics, five policies, and dashboard are live. |
 
-This ledger distinguishes deployed controls from proof artifacts still being retained, rather
-than treating an enabled API or a passing unit test as a completed pillar.
+## Two different kinds of proof
 
-## Context
+Reasoning traces explain a run; compliance audit records establish what actions occurred. Bastion
+configures both and never treats a sampled trace as the retained audit record. Audit events are
+payload-free and correlate by invocation/event ID.
 
-The track names seven components in four groups, and the temptation with a list like that is
-to create seven folders and treat the list as satisfied. That is what happened: every pillar
-has a module, and on 2026-08-13 exactly one of them — Memory Bank — had a working
-implementation of the thing its name promises. Six had a docstring and a `TODO`.
+## Submission artifact constraints
 
-The failure mode is specific and worth naming: **a folder per pillar reads, in a repository
-tree, as a pillar per folder.** The architecture diagram, the README, and this ADR set all
-inherited that reading.
+| Artifact | Closure rule |
+|---|---|
+| Architecture image | Generated variants match reviewed SVG masters and measured GCP counts |
+| Spin-up instructions | Python 3.12 Windows bootstrap uses explicit project/region/engine inputs |
+| Deployment proof | Count-only capture plus live verifier and smoke results |
+| Demo video | Under four minutes, public, and shows load-bearing proof without sensitive data |
 
-Observability is the clearest case. The track asks for *"OpenTelemetry-compliant **audit
-logs** and end-to-end **reasoning chain traces**"* — two artifacts, joined by "and". Audit
-logs answer *what did the fleet do*, and survive for compliance. Reasoning-chain traces
-answer *why did it decide that*, and are what a judge follows in Cloud Trace. It is easy to
-build the second and call the pillar done; the first is what a compliance product is actually
-for.
-
-## Rationale
-
-- **A proof is falsifiable; a checklist is not.** "Registry: done" invites the question of
-  what done meant. "The Orchestrator refuses an unregistered target" can be attempted and
-  can fail.
-- Each proof above is something a **camera can point at**, which matters because the video
-  carries the submission — judges are explicitly not required to run anything.
-- Three of the seven proofs are already the claims `submission/SUBMISSION.md` lists as
-  unearned: the Identity denial, the Model Armor block, and the memory suppression run. This
-  record does not add new obligations so much as extend the existing ledger to all seven.
-- Ordering falls out of dependency rather than preference: Registry and Gateway unblock the
-  routing that Identity's denial is observed *through*, so they precede it.
+The first three are repository-complete. Video publication and Devpost form submission remain
+human publication tasks and are not infrastructure defects.
 
 ## Consequences
 
-**Observability needs a second artifact.** Structured audit logs to Cloud Logging — one
-record per agent decision, with the investigation id, the actor, and the outcome — are
-separate from the trace and must not be derived from it. A trace is sampled and expires; an
-audit log for a compliance product is neither.
-
-**`traced_agent_call` having one call site, in a test, is the tell** that half the pillar was
-built and never connected. The audit half is now called from four modules; the trace half is
-wired into each agent's decision step as part of the ADK rewrite
-([ADR-005](005-adk-as-the-agent-framework.md)), not a later pass.
-
-The Registry proof has a **deploy-time registration step** in
-`infrastructure/register_agents.py`: it idempotently publishes the three canonical private
-JSON-RPC endpoints. The managed Registry then projects them as discoverable Agent records.
-
-If the schedule forces a cut, the cut is a **pillar's proof downgraded and disclosed**, not a
-pillar quietly left in the diagram. The cut order for services is fixed in
-[ADR-003](003-pillars-on-geap.md); pillars are not on that list, because all seven are
-named by the track and dropping one silently is the failure this record exists to prevent.
-
-## Absorbed record: submission artifacts are engineering constraints (was ADR-012)
-
-Folded in on 2026-08-15, because it is the same idea as this record applied to the submission
-rather than to the pillars: **an artifact is done when it exists and has been seen.**
-
-The architecture diagram, the spin-up instructions, the ~4-minute video, and the proof the
-backend ran on Google Cloud are required submission fields. Treating them as a filing step at
-the end makes them the first things to be cut when the schedule slips, which inverts their
-value — judges are explicitly not required to run anything, so the video and the diagram carry
-the submission.
-
-They are therefore build constraints with the same standard of proof as a pillar:
-
-| Artifact | Done when |
-|---|---|
-| Architecture diagram | It is derived from `assets/architecture/gcp-state.json`, which is measured from the live project |
-| Spin-up instructions | Someone other than the author has run them start to finish |
-| Demo video | The four load-bearing shots are captured, redacted, and in order |
-| Deployment proof | A console frame showing the service running, not a claim that it did |
-
-`scripts/check_docs.py` fails the build on a committed architecture image while fewer than two
-resources are deployed — the gate lifts itself once there is a real system to draw.
+Documentation must use **implemented**, **deployed**, **observed**, and **not claimed** precisely.
+The evidence index is [assets/README.md](../../assets/README.md), the deployment inventory is
+[gcp-state.json](../../assets/architecture/gcp-state.json), and the handoff checklist is
+[submission/SUBMISSION.md](../../submission/SUBMISSION.md).

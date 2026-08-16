@@ -1,25 +1,34 @@
 # Data governance and sovereignty inventory
 
-Bastion reviews a project IAM policy for the authorised purpose of detecting over-broad access.
-It is not a general identity directory, and no raw policy dump is retained or sent to a model.
+Bastion uses production IAM only for read-only access review. Raw policy data is processed by
+deterministic code and is neither persisted by Bastion nor sent to Gemini.
 
-| Field | Source | Processing boundary | Persistence | Retention / deletion | Residency and access |
-|---|---|---|---|---|---|
-| Raw IAM member and role | Cloud Asset Inventory | Deterministic Auditor only | Never persisted by Bastion | Process memory only | Read by `access-auditor-sa` through read-only IAM/Asset roles in the audited project |
-| Opaque finding ID | HMAC/fingerprint of raw binding | Policy, routing, model, and notification | Firestore investigation/exception record | Exception expires at `approved_until`; investigation retention policy must be configured before deployment | Firestore database is `europe-north2`; agent runtime identity has `datastore.user` only |
-| Department and risk category | Deterministic department catalog / rules | Policy, model, notification | Firestore and payload-free audit event | Same investigation policy | EU workload boundary; no principal or resource identifier present |
-| Model prompt / response | Minimized category, department, opaque ID | Model Armor before input; deterministic protected-data callback after output | Not retained by Bastion | Cloud-provider telemetry subject to configured retention | Gemini uses `GOOGLE_CLOUD_LOCATION=global`; this is **not** an EU data-residency claim. Model Armor is in `europe-west4`. Minimisation is the control before either boundary. |
-| Human notification | Count, department, allowlisted categories, deterministic summary | Private, IAM-authenticated findings endpoint | Firestore-backed idempotent review record | Retention policy must be configured by the platform owner | The endpoint validates source, department, categories, deterministic summary, and idempotency key; Bastion sends no binding values |
-| Audit record | Event type, actor, invocation ID, argument names, error class | Structured stdout / Cloud Logging | Cloud Logging after deployment | Logging retention must be set by the approved platform owner | No argument values, principal values, or exception messages are emitted |
+| Data | Boundary | Persistence and retention | Residency / processor |
+|---|---|---|---|
+| IAM member, role, resource, binding | Access Auditor deterministic tool only | Process memory; never a Bastion record | Source GCP project; read-only Auditor identity |
+| Opaque finding ID, category, score, department | Policy, orchestration, routing | Firestore investigation record; exceptions expire at `approved_until` | `europe-north2` |
+| Session and durable memory | Managed Agent Runtime and Memory Bank | Managed sessions/memory; deletion follows platform-owner lifecycle | `europe-west4` |
+| Minimized prompt/response | Model Armor, Gemini, deterministic output screen | Bastion does not persist content; provider telemetry follows project settings | Armor `europe-west4`; Gemini `global` |
+| Human-review request | Private findings API | Count, department, categories, deterministic summary, idempotency key | Firestore `europe-north2` |
+| Audit event | Cloud Logging | Payload-free event metadata, 365-day log-bucket retention | `europe-west4` |
+| Dead letter | Pub/Sub review subscription | Failed event envelope until operator acknowledgement/retention expiry | `europe-north2` |
 
-## Operating rules
+## Boundary rules
 
-- Do not use production IAM dumps as test fixtures or evidence.
-- Do not put endpoint URLs, credentials, raw principal identifiers, or Model Armor template output
-  in Git, screen recordings, or prompt text.
-- The Cloud Run deployment rejects ephemeral memory and unauthenticated ingress.
-- A deployment owner must configure the Firestore/Cloud Logging retention policy and document the
-  approved duration before taking the service beyond the demonstration environment.
+- Raw members, roles, resources, and bindings stop before the model boundary.
+- No principal, resource, prompt, response, tool value, or exception message enters audit logs.
+- Model output is untrusted until the deterministic protected-data screen passes.
+- Notification fields and categories are allowlisted; free-form destinations and binding data
+  are not part of the tool contract.
+- The HMAC key and A2A origin credential remain in Secret Manager and are never printed.
+- `global` model processing is disclosed explicitly and is not described as EU residency.
 
-This inventory is deliberately a release gate, not a blanket statement of compliance. The
-post-deployment evidence must prove the configured retention and access policies.
+## Deletion and legal ownership
+
+Firestore investigation retention, managed Memory lifecycle, and dead-letter disposition remain
+platform-owner policies; Bastion supplies deterministic identifiers and expiry semantics but does
+not claim a legal retention basis. The audit bucket is configured for 365 days and remains
+unlocked. Locking it would be irreversible and is outside an automated deployment.
+
+Committed evidence is redacted and count-only. The current measured inventory is
+[assets/architecture/gcp-state.json](../assets/architecture/gcp-state.json).

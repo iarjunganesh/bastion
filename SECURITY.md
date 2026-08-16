@@ -1,54 +1,53 @@
 # Security policy
 
-Bastion reads a live cloud project's IAM policy. That makes a handful of ordinary security
-practices non-optional here, and worth stating plainly.
+Bastion reads production IAM, so minimisation and least privilege are release controls rather
+than conventions. This is a hackathon project, not supported production software; there is no
+support or patch SLA.
 
 ## Reporting a vulnerability
 
-Open a GitHub issue for anything non-sensitive. For anything that would expose a
-credential or a principal, contact the maintainer privately rather than filing publicly.
+Open a GitHub issue only for non-sensitive reports. Send any credential, principal, endpoint,
+or policy exposure privately to the maintainer.
 
-This is a hackathon submission, not production software. There is no support commitment
-and no patch SLA.
+## Never commit or print
 
-## What this repository must never contain
+- service-account keys, ADC files, access tokens, secret values, or `.env` contents;
+- raw `get-iam-policy` or Cloud Asset output;
+- unredacted findings, principal identifiers, private endpoint inventories, or full runtime
+  environment dumps.
 
-- Service-account keys, application-default-credentials files, or any exported credential.
-- A raw `get-iam-policy` dump. These carry real principal identifiers and real email
-  addresses. `.gitignore` covers the usual filenames, but the obligation belongs to
-  whoever commits, not to the pattern list.
-- Unredacted findings. Anything published under `assets/evidence/` is redacted
-  deliberately before it is committed.
+Use a narrow projection such as `--format="value(bindings.role)"`. Terminal scrollback, CI logs,
+issues, and recordings are disclosure surfaces. If a credential is exposed, rotate it before
+rewriting history.
 
-**And never *print* one.** The trap is not `echo $KEY` — nobody writes that. It is a broad
-read of a store that happens to contain principals: `gcloud projects get-iam-policy`,
-`gcloud secrets versions access`, `gcloud run services describe` with its full environment,
-`cat .env`, `printenv`. Terminal output is not ephemeral; it lands in scrollback, in session
-transcripts, and in anything later pasted into an issue or a screen recording. Redirect to a
-gitignored file and grep that, or ask for the one field you need —
-`--format="value(bindings.role)"` returns roles and no identities. The narrow query is not
-merely tidier; it *is* the control.
+## Enforced production boundaries
 
-**Demo recordings are the highest-risk surface here**, because the whole point is showing a
-real policy on screen. The redaction pass runs before a capture is kept, never after it is
-uploaded.
-
-If a credential does land in history, rotate it first and rewrite history second. The
-rotation is what matters; the rewrite is cosmetic once the value is public.
-
-## Security-property ledger
-
-This ledger separates implemented proof from target controls.
-
-| Property | Current state |
+| Boundary | Deployed control and proof |
 |---|---|
-| Per-agent least privilege | Three private Cloud Run services run under separate agent service accounts; peer calls use audience-bound ID tokens. A retained deployed denial capture is still owed. |
-| Gateway authorization | Local caller/target/skill/classification policy and private Cloud Run ID-token transport are implemented. Managed Gateway deployment evidence remains pending. |
-| Audit refusals and failures | `AuditPlugin` is registered by the supported local runner and Cloud Run startup path. Production-log evidence remains pending. |
-| Payload-free audit records | Implemented and covered in local tests; production-log verification remains pending. |
-| Prompt-injection screening | Model Armor is registered as ADK's pre-model callback and fails closed. The direct block is captured; retained deployed trace evidence is next. |
-| Outbound PII boundary | Opaque finding IDs, post-model structured-output screening, and schema-limited notification payloads are implemented. Production trace verification remains pending. |
-| Fixed tool definitions | Implemented in agent construction and covered by populated security tests. |
-| Authenticated, bounded Cloud Run | Four internal-only Cloud Run services are deployed; invoker IAM is granted only to the required peer or Eventarc service identity. |
+| Agent separation | The managed Orchestrator has an Agent Identity. Auditor, Escalation, durable ingress, and findings API use distinct service accounts. The Escalation identity has no IAM read role. |
+| Governed egress | Runtime egress is bound to `bastion-egress`; IAP is default-deny and grants that Agent Identity per Registry destination. The Cloud Run dispatcher has no peer credential or worker invoker binding. |
+| Worker origin | Worker origins are network-reachable for cross-region Gateway traffic, but every non-health A2A request requires the Secret Manager origin credential. Missing or wrong credentials return `401`. |
+| Findings write | The findings API is IAM-private. Only the Escalation service identity has `run.invoker`; anonymous requests return `403`. Schema validation, an allowlist, and a deterministic key collapse replays. |
+| Model boundary | Deterministic rules minimise IAM data before Gemini. Model Armor is a fail-closed pre-model callback; deterministic output screening blocks protected shapes. |
+| Model authority | Missing/invalid risk fails closed. The model cannot create an exception, modify IAM, choose an endpoint, expand a tool schema, or clear an investigation. |
+| Audit trail | `AuditPlugin` covers run, agent, model, tool, refusal, and error seams. Records include correlation metadata, argument names, and exception classes, never values, prompts, responses, or exception messages. |
+| Durability | Firestore owns admission, leases, attempts, terminal state, exceptions, and notification idempotency. Eventarc has a five-attempt dead-letter policy and review subscription. |
+| Retention | Payload-free audit logs route to a `europe-west4` analytics bucket with 365-day retention. The bucket is intentionally not locked because locking is irreversible. |
 
-`submission/SUBMISSION.md` is the proof ledger. A target row is not a claim of enforcement.
+The two worker services carry an `allUsers` Cloud Run invoker binding only because Cloud Run IAM
+cannot receive the managed Runtime's Agent Identity through Agent Gateway as an ordinary service
+account token. This is not anonymous application access: the required origin secret is validated
+before A2A processing, and Gateway IAP independently constrains the Runtime's destination. The
+private findings API uses ordinary Cloud Run IAM and has no `allUsers` binding.
+
+## Residual risks
+
+- Gemini 3.5 Flash uses Vertex AI `global`; Bastion therefore makes no regional-residency claim
+  for model processing. Data minimisation is the boundary control.
+- ADK 2.7 `RemoteA2aAgent` is experimental, and `SequentialAgent` is deprecated while `Workflow`
+  cannot yet serve as an `LlmAgent` sub-agent. Versions are pinned and covered by local and live
+  gates; [ADR-005](docs/adr/005-adk-as-the-agent-framework.md) records acceptance.
+- Audit retention is configured but not WORM/immutable. Locking the bucket requires a separate,
+  explicit platform-owner decision.
+
+The grounded deployment and evidence ledger is [submission/SUBMISSION.md](submission/SUBMISSION.md).

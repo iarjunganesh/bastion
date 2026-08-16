@@ -60,16 +60,14 @@ record nothing would say so.
 
 ## Consequences
 
-**This is testable without a deployment**, unlike the other two guardrail claims. A test can
+**This is testable without a deployment**, unlike the other two guardrail claims. Tests
 assert that each agent's tool set is fixed, that the Escalation Agent holds no
 policy-reading tool, and that no tool description is interpolated from external input. That
-belongs in `tests/security/`. The fixed tool sets have unit coverage today, but the security
-suite itself is still empty — making this one part of the guardrail story that can be earned
-before Cloud Run exists, not one that is already earned.
+belong in `tests/security/`. The populated security suite asserts the fixed tool surface,
+origin authentication, protected-output boundary, and IAM shape.
 
-The IAM runtime half is **not** provable until deployment. The allowlist half is provable now,
-and the two must not be conflated in prose: a passing unit test proves the tool set, not the
-deployed denial boundary.
+The IAM runtime half is separately proven by the deployed Escalation denial capture. A passing
+test proves the tool set; the denial proves the workload boundary.
 
 If a tool ever needs a dynamic description — for instance, a Registry-driven target list —
 this record is amended first, because that change reopens the threat this closes.

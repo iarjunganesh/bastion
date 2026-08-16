@@ -1,134 +1,59 @@
-# ADR-003: The seven pillars run on GEAP, not on reimplementations of it
+# ADR-003: Use the managed enterprise agent platform
 
-**Status:** Accepted 2026-08-13. **Amended 2026-08-15** — the original conclusion was wrong
-about two pillars, and the error is recorded rather than edited away.
-**Date:** 2026-08-15
+**Status:** Accepted 2026-08-13; amended 2026-08-15 and verified 2026-08-16  
+**Traces to:** [hackathon brief](../../submission/DEVPOST.md)
 
 ## Decision
 
-Every pillar the Fortified Enterprise Fleet track names is served by its **managed Gemini
-Enterprise Agent Platform product**, reached through ADK where ADK has a seam for it. Bastion
-writes no substitute for any of them.
+Bastion composes the seven named pillars from managed Google Cloud products rather than
+reimplementing them.
 
-| Pillar | What serves it | Reached by |
-|---|---|---|
-| **Agent Registry** | GEAP **Agent Registry** — catalogs agents, tools, and MCP servers | Managed surface |
-| **Agent Runtime** | GEAP **Agent Runtime** / Agent Engine | `adk deploy agent_engine`, `vertexai.agent_engines.AdkApp` |
-| **Memory Bank** | GEAP **Memory Bank** (GA) | `VertexAiMemoryBankService`, `--memory_service_uri` |
-| **Agent Identity** | Agent credential brokering; per-agent service accounts for GCP IAM | `google-cloud-agentidentitycredentials`; Gateway authorises on it |
-| **Agent Gateway** | GEAP **Agent Gateway** | `gcloud network-services agent-gateways` |
-| **Model Armor** | **Model Armor**, delegated to by Agent Gateway | `ModelArmorClient`, `before_model_callback` |
-| **Agent Observability** | Cloud Trace + Cloud Logging via ADK | `adk deploy cloud_run --trace_to_cloud` |
+| Pillar | Deployed implementation |
+|---|---|
+| Agent Registry | Regional Registry catalog for the managed Orchestrator, two worker Agent Cards, and approved Google API endpoints |
+| Agent Runtime | Python 3.12 managed Runtime source deployment with Agent Identity |
+| Memory Bank | Separate managed engine used for durable sessions and memory |
+| Agent Identity | Runtime Agent Identity plus distinct Cloud Run workload service accounts |
+| Agent Gateway | `bastion-egress`, IAP authorization extension, and fail-closed auth policy |
+| Model Armor | Regional template used by fail-closed ADK pre-model callbacks |
+| Agent Observability | ADK no-content telemetry, payload-free audit logs, regional retention, metrics, alerts, and dashboard |
 
-Sessions use `VertexAiSessionService`, with ADK's `InMemorySessionService` in tests.
+Firestore and Eventarc complement the managed Runtime: they own trigger admission, leases, retry,
+deduplication, and dead-letter delivery across process loss.
 
-## Context
+## Context and amendment
 
-**This record previously concluded that Agent Registry had no managed equivalent and must be
-built DIY over Firestore.** It also never evaluated Agent Gateway at all, so that pillar was
-built as a Flask service by default rather than by decision. Both were wrong:
-
-- **Agent Registry is a managed GEAP product** — *"a unified catalog that lets you securely
-  store, discover, and manage Model Context Protocol (MCP) servers, tools, and AI agents
-  across your organization."* It covers publishing and discovery, and extends past the
-  track's wording by cataloging MCP servers and tools, not only agents.
-- **Agent Gateway is a managed GEAP product** — the networking component that *"secures and
-  governs connectivity for all agentic interactions"*, with ingress and egress modes,
-  configured through `gcloud network-services agent-gateways`.
-
-**The error was one of scope, not of method.** The 2026-08-13 probe asked whether a registry
-surface existed *in `vertexai.agent_engines`*, found none, and generalised that to "no managed
-registry exists." GEAP's Registry is a separate surface, and the probe never looked at it. A
-negative result from one namespace was recorded as a fact about the platform.
-
-The correction also revealed that the three governance pillars are **one composed stack**
-rather than three independent ones: a provisioned Agent Gateway would enforce policy through IAM and
-Identity-Aware Proxy, **delegates content sanitization to Model Armor**, and **authorises on
-Agent Identity as the principal**, secured with mTLS and DPoP. Bastion had them as three
-unrelated modules, which is a worse architecture than the one Google ships.
+The first version incorrectly concluded that Registry had no managed equivalent and implemented a
+DIY catalog and Gateway. That conclusion came from searching one SDK namespace rather than the
+platform. On 2026-08-15 those substitutes were removed in favor of the actual managed services.
+The amendment remains recorded because it explains the current architecture and prevents a
+future return to parallel, weaker control planes.
 
 ## Rationale
 
-- **Reimplementing a managed pillar argues against the submission.** The track asks how an
-  organisation adopts enterprise agent infrastructure. Answering with a hand-rolled Flask
-  router is a worse answer to *Architectural Discipline* (30%) than using the product, and it
-  costs schedule that the pass/fail gates need.
-- **ADK is the seam, and it holds.** Verified against the pinned tree
-  (`google-adk==2.7.0`): `VertexAiMemoryBankService`, `VertexAiSessionService`,
-  `BaseMemoryService`/`BaseSessionService`, `google.adk.a2a`, `google.adk.plugins.BasePlugin`,
-  and `vertexai.agent_engines.AdkApp` all import cleanly. Memory and session backends stay a
-  configuration change rather than a rewrite.
-- **The A2A contract is a dependency, not a file.** `a2a-sdk` supplies `AgentCard`,
-  `AgentSkill`, `Task`, `TaskState`, `TaskStatus` and `Message`. Bastion's deleted A2A envelope
-  module reimplemented the first three.
-- **`europe-north2` survives.** It is one of 48 Vertex AI locations on `bastion-fleet-2026`,
-  and `reasoningEngines` LIST returns `HTTP 200` there. The regional risk this record raised
-  on 2026-08-13 did not materialise. **A 200 on LIST is not proof that a deploy succeeds** —
-  that is settled by deploying one trivial agent, which is the first build task.
+- The track asks how institutions adopt official enterprise infrastructure; the managed products
+  are the architecture, not decorative API enablement.
+- Gateway, IAP, Agent Identity, Registry, and Model Armor compose an authorization and content-
+  safety chain that a repository-owned proxy would only imitate.
+- ADK 2.7 supplies managed session/memory seams, A2A agents, plugins, and Agent Runtime support.
+- The public proof can distinguish platform enforcement from local policy code.
+
+## Regions
+
+Cloud Run, Firestore, Pub/Sub, and Eventarc use `europe-north2`. Runtime, Memory Bank, Gateway,
+Registry, Model Armor, and the audit bucket use `europe-west4`. Gemini 3.5 Flash uses Vertex AI
+`global`; that is not an EU residency claim.
 
 ## Consequences
 
-**~3,460 lines were deleted on 2026-08-15**, across `gateway/`, `registry/`, `runtime/`,
-`memory/`, `model_armor/`, `observability/`, the Orchestrator's hand-rolled retry and circuit
-breaker, and the ten test files bound to them. The `DIY FALLBACK` banner problem this record
-described is resolved by the files no longer existing.
+- Runtime egress is bound to Gateway and IAP grants its Agent Identity per Registry resource.
+- The Cloud Run dispatcher has no peer credential or worker invoker grant, so it cannot bypass
+  the managed path.
+- Model Armor fails closed; there is no fallback model classifier.
+- Agent Cards and A2A types come from the official SDK/protocol, while department routing and
+  classification remain deterministic repository policy.
+- Versions and managed configuration are release gates. Experimental/deprecated ADK surfaces are
+  pinned and explicitly accepted in [ADR-005](005-adk-as-the-agent-framework.md).
 
-**Coverage is not 100% while the rewrite lands.** The CI floor was measured against modules
-that were deleted. Lowering it is a deliberate act with a date attached, not a drift — see
-[ADR-006](006-pillar-coverage.md).
-
-**Data residency now has two answers, and both must be stated before either is claimed.**
-Memory Bank being managed means investigation state may leave `europe-north2`, and the model
-endpoint is already `global` ([ADR-004](004-flash-only-global-endpoint.md)). The track names
-data sovereignty explicitly, so the residency note in `README.md` covers both or neither.
-
-**Agent Gateway and Agent Registry are two GCP surfaces that must actually be provisioned.**
-Neither has been created on `bastion-fleet-2026` yet. Until they are, this record describes
-an intention, and nothing may claim them as built.
-
-## Absorbed records
-
-Three earlier records were folded into this one on 2026-08-15, because each described a
-decision this one now makes. They are deleted rather than left as files: a brand-new repository
-with thirteen records, six of them describing premises that no longer exist, costs a judge more
-attention than it earns.
-
-### Model Armor (was ADR-004)
-
-Model Armor screens the model boundary. The tool allowlist screens the tool boundary
-([ADR-007](007-tool-poisoning.md)), and Agent Gateway screens the agent boundary — three
-controls that **compose rather than overlap**, which is why screening more text is not a
-defence against a poisoned tool declaration.
-
-That record hedged with a documented fallback and a hard cutoff date, in case the managed
-service did not ship in time. It shipped: `google-cloud-modelarmor` exposes
-`sanitize_user_prompt` and `sanitize_model_response`; `model_armor/guardrails.py` calls the
-first from ADK's `before_model_callback`, while a deterministic `after_model_callback` blocks
-protected data before the count-only findings receiver. **The fallback is withdrawn** — a second Gemini call
-asking "is this an injection?" would have been a weaker control described in stronger words.
-
-Screening **fails closed**: an unset template or an exception on the screening path refuses the
-call. A missing environment variable must not be able to silently disable a security control
-while every document still claims it works.
-
-### The GCP service surface and the cut order (was ADR-006)
-
-Twenty-one services, each with a job — seventeen from this record, Eventarc for durable
-investigation delivery, plus the three GEAP surfaces enabled 2026-08-15
-(`networkservices`, `agentregistry`, `agentidentity`). GEAP consolidates several of them, so the count is no
-longer the interesting number — the **cut order** is, and it is unchanged: BigQuery and Looker
-Studio go first, then Cloud Asset Inventory, then Secret Manager. The judge path, the
-Recommender API, and Cloud Scheduler are **not** cut, because each is load-bearing for a
-scoring criterion rather than for a feature.
-
-`scripts/capture_gcp_state.py` writes the measured state of these services by querying the live
-project, so any diagram derived from it is measured rather than typed.
-
-### Cross-department catalog and multi-week context (was ADR-010)
-
-The track asks that agents be *"cataloged for cross-department use"* and *"safely maintain
-context across weeks of asynchronous operations."* Both are now managed products rather than
-schema decisions: Agent Registry carries the catalog, and Memory Bank carries the context. What
-survives from that record is the **obligation**, not the implementation — an investigation
-opened Monday must still be resumable on Thursday, and a finding a human closed weeks ago must
-be suppressed rather than re-raised. [ADR-006](006-pillar-coverage.md) holds the proof for each.
+The live measured state is [gcp-state.json](../../assets/architecture/gcp-state.json); observable
+closure for each pillar is [ADR-006](006-pillar-coverage.md).

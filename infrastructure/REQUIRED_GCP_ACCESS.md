@@ -1,29 +1,42 @@
 # Required GCP access
 
-The deployment is designed to fail closed. The account running the provisioning command needs
-access to the existing Model Armor template, plus ordinary project deployment permissions.
+Run provisioning as an approved project deployer. Agent identities never receive deployment or
+administrative roles.
 
-An approved project administrator should grant the deployment principal one of the following
-least-privilege options before running `python -m infrastructure.provision --apply`:
+## Deployer prerequisites
 
-- `roles/modelarmor.user` to use an existing template; and
-- `modelarmor.templates.get` on `bastion-guardrail` (or the organisation's equivalent custom
-  role).
+- Google Cloud CLI authenticated for the target project and Application Default Credentials;
+- Python 3.12 and Git for Windows Bash at `C:\Program Files\Git\bin\bash.exe`;
+- project permissions equivalent to Service Usage Admin, Cloud Run Admin, Eventarc Admin,
+  Pub/Sub Admin, Artifact Registry Admin/Writer, Cloud Build Editor/Builder, Service Account
+  Admin/User, Secret Manager Admin, Monitoring Editor, Logging Config Writer, and the permissions
+  to manage Agent Runtime, Agent Registry, Agent Gateway/IAP, Firestore, and Model Armor;
+- access to an existing Model Armor template. Only its administrator needs
+  `roles/modelarmor.admin`; agents receive `roles/modelarmor.user` where needed.
 
-Only a designated Model Armor administrator needs `roles/modelarmor.admin`, and only if the
-template itself must be created or changed. Do not grant that role to agent service accounts.
+## Required inputs
 
-The Cloud Run deployer also needs the normal build/deploy permissions: Cloud Run Admin, Service
-Account User for each Bastion workload identity, Artifact Registry Writer, and Cloud Build
-Builder. Those deployment roles belong to the human or CI deployer, never to an agent runtime.
+`bootstrap.ps1` requires the project ID plus existing Memory and Runtime Agent Engine IDs. It
+uses explicit defaults `europe-north2` for Cloud Run/data transport, `europe-west4` for managed
+agent controls, and `global` for Gemini.
 
-Before deployment, an approved secret administrator must ensure a random ≥32-character value in
-Secret Manager and set `BASTION_FINDING_HMAC_SECRET` to that secret's ID. The Bastion project has
-an EU-replicated `bastion-finding-hmac` secret ready for this purpose. Only the Access Auditor
-needs `Secret Manager Secret Accessor` on it; the deployment injects it as
-`BASTION_FINDING_HMAC_KEY` and never commits or logs the value.
+The bootstrap creates missing generated 256-bit HMAC and A2A secrets without printing values.
+It grants the HMAC only to the Auditor; it grants the A2A origin secret to both workers, Google
+Runtime deployment identities, and the managed Runtime Agent Identity. The Cloud Run dispatcher
+does not receive that secret.
 
-The organisation must also supply `BASTION_FINDINGS_ENDPOINT`: the authenticated internal
-findings-review API that accepts Bastion's count-only, idempotent escalation payload. This is a
-business-owned integration point; it must not be replaced with an invented public URL or a Slack
-webhook. The deployment fails closed until it is set.
+The findings endpoint is deployed by Bastion. No external webhook is required: only the
+Escalation service identity receives `roles/run.invoker` and the endpoint stores a count-only,
+idempotent review record.
+
+## Windows 11 command
+
+```powershell
+.\infrastructure\bootstrap.ps1 `
+  -Project 'YOUR_PROJECT_ID' `
+  -MemoryAgentEngineId 'YOUR_MEMORY_ENGINE_ID' `
+  -RuntimeAgentEngineId 'YOUR_RUNTIME_ENGINE_ID'
+```
+
+Provisioning and verification are idempotent. Rollback and teardown are separate, dry-run-first
+commands and are never invoked by bootstrap.
