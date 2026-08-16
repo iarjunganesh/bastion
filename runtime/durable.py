@@ -9,13 +9,22 @@ from __future__ import annotations
 import json
 import sqlite3
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
 
 def now() -> str:
     return datetime.now(UTC).isoformat()
+
+
+DEFAULT_LEASE_SECONDS = 660
+
+
+def lease_deadline(seconds: int) -> str:
+    if seconds <= 0:
+        raise ValueError("lease duration must be positive")
+    return (datetime.now(UTC) + timedelta(seconds=seconds)).isoformat()
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,7 +50,8 @@ class DurableStore:
             """
             CREATE TABLE IF NOT EXISTS investigations (
               event_id TEXT PRIMARY KEY, context_id TEXT NOT NULL, payload TEXT NOT NULL,
-              status TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL);
+              status TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL,
+              lease_until TEXT);
             CREATE TABLE IF NOT EXISTS outbox (
               delivery_key TEXT PRIMARY KEY, event_id TEXT NOT NULL, payload TEXT NOT NULL,
               status TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, last_error TEXT);
@@ -50,28 +60,45 @@ class DurableStore:
               policy_version TEXT NOT NULL);
             """
         )
+        columns = {
+            str(row["name"])
+            for row in self.connection.execute("PRAGMA table_info(investigations)").fetchall()
+        }
+        if "lease_until" not in columns:
+            self.connection.execute("ALTER TABLE investigations ADD COLUMN lease_until TEXT")
+            self.connection.commit()
 
     def receive(self, event: InvestigationEvent) -> bool:
         cursor = self.connection.execute(
-            "INSERT OR IGNORE INTO investigations VALUES (?, ?, ?, 'received', 0, ?)",
+            "INSERT OR IGNORE INTO investigations "
+            "(event_id, context_id, payload, status, attempts, updated_at, lease_until) "
+            "VALUES (?, ?, ?, 'received', 0, ?, NULL)",
             (event.event_id, event.context_id, json.dumps(asdict(event)), now()),
         )
         self.connection.commit()
         return cursor.rowcount == 1
 
-    def claim(self, event_id: str) -> bool:
+    def claim(self, event_id: str, *, lease_seconds: int = DEFAULT_LEASE_SECONDS) -> bool:
+        claimed_at = now()
         cursor = self.connection.execute(
-            "UPDATE investigations SET status='running', attempts=attempts+1, updated_at=? "
-            "WHERE event_id=? AND status IN ('received', 'failed')",
-            (now(), event_id),
+            "UPDATE investigations SET status='running', attempts=attempts+1, updated_at=?, "
+            "lease_until=? WHERE event_id=? AND (status IN ('received', 'failed') OR "
+            "(status='running' AND (lease_until IS NULL OR lease_until<=?)))",
+            (claimed_at, lease_deadline(lease_seconds), event_id, claimed_at),
         )
         self.connection.commit()
         return cursor.rowcount == 1
 
+    def status(self, event_id: str) -> str | None:
+        row = self.connection.execute(
+            "SELECT status FROM investigations WHERE event_id=?", (event_id,)
+        ).fetchone()
+        return None if row is None else str(row["status"])
+
     def finish(self, event_id: str, *, failed: bool = False) -> None:
         status = "failed" if failed else "completed"
         cursor = self.connection.execute(
-            "UPDATE investigations SET status=?, updated_at=? "
+            "UPDATE investigations SET status=?, updated_at=?, lease_until=NULL "
             "WHERE event_id=? AND status='running'",
             (status, now(), event_id),
         )
@@ -117,10 +144,22 @@ class DurableStore:
         self.connection.commit()
 
     def is_approved(self, finding_id: str, at: str | None = None) -> bool:
+        return self.approved_exception(finding_id, at=at) is not None
+
+    def approved_exception(
+        self, finding_id: str, *, at: str | None = None
+    ) -> dict[str, str] | None:
         row = self.connection.execute(
-            "SELECT approved_until FROM exceptions WHERE finding_id=?", (finding_id,)
+            "SELECT approved_until, reviewer, policy_version FROM exceptions WHERE finding_id=?",
+            (finding_id,),
         ).fetchone()
-        return row is not None and row["approved_until"] > (at or now())
+        if row is None or str(row["approved_until"]) <= (at or now()):
+            return None
+        return {
+            "approved_until": str(row["approved_until"]),
+            "reviewer": str(row["reviewer"]),
+            "policy_version": str(row["policy_version"]),
+        }
 
     def _outbox_transition(self, delivery_key: str, status: str, error: str | None) -> None:
         cursor = self.connection.execute(

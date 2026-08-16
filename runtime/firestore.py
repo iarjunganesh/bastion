@@ -8,12 +8,12 @@ idempotency decision must survive restarts and weeks between human approvals.
 from __future__ import annotations
 
 from dataclasses import asdict
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from google.cloud import firestore
 
-from runtime.durable import InvestigationEvent
+from runtime.durable import DEFAULT_LEASE_SECONDS, InvestigationEvent
 
 
 def _now() -> datetime:  # pragma: no cover - exercised against the Firestore emulator
@@ -39,28 +39,51 @@ class FirestoreDurableStore:  # pragma: no cover - requires the Firestore emulat
                 return False
             transaction.create(
                 reference,
-                {"event": asdict(event), "status": "received", "attempts": 0, "updated_at": _now()},
+                {
+                    "event": asdict(event),
+                    "status": "received",
+                    "attempts": 0,
+                    "updated_at": _now(),
+                    "lease_until": None,
+                },
             )
             return True
 
         return bool(insert(transaction))
 
-    def claim(self, event_id: str) -> bool:
+    def claim(self, event_id: str, *, lease_seconds: int = DEFAULT_LEASE_SECONDS) -> bool:
+        if lease_seconds <= 0:
+            raise ValueError("lease duration must be positive")
         reference = self.investigations.document(event_id)
         transaction = self.client.transaction()
 
         @firestore.transactional
         def transition(transaction: Any) -> bool:
             snapshot = reference.get(transaction=transaction)
-            if not snapshot.exists or snapshot.get("status") not in {"received", "failed"}:
+            claimed_at = _now()
+            status = snapshot.get("status") if snapshot.exists else None
+            lease_until = snapshot.get("lease_until") if snapshot.exists else None
+            stale_running = status == "running" and (
+                lease_until is None or lease_until <= claimed_at
+            )
+            if status not in {"received", "failed"} and not stale_running:
                 return False
             transaction.update(
                 reference,
-                {"status": "running", "attempts": firestore.Increment(1), "updated_at": _now()},
+                {
+                    "status": "running",
+                    "attempts": firestore.Increment(1),
+                    "updated_at": claimed_at,
+                    "lease_until": claimed_at + timedelta(seconds=lease_seconds),
+                },
             )
             return True
 
         return bool(transition(transaction))
+
+    def status(self, event_id: str) -> str | None:
+        snapshot = self.investigations.document(event_id).get()
+        return str(snapshot.get("status")) if snapshot.exists else None
 
     def finish(self, event_id: str, *, failed: bool = False) -> None:
         reference = self.investigations.document(event_id)
@@ -73,7 +96,11 @@ class FirestoreDurableStore:  # pragma: no cover - requires the Firestore emulat
                 raise ValueError("invalid investigation transition")
             transaction.update(
                 reference,
-                {"status": "failed" if failed else "completed", "updated_at": _now()},
+                {
+                    "status": "failed" if failed else "completed",
+                    "updated_at": _now(),
+                    "lease_until": None,
+                },
             )
 
         transition(transaction)
@@ -130,8 +157,19 @@ class FirestoreDurableStore:  # pragma: no cover - requires the Firestore emulat
         )
 
     def is_approved(self, finding_id: str, at: str | None = None) -> bool:
+        return self.approved_exception(finding_id, at=at) is not None
+
+    def approved_exception(
+        self, finding_id: str, *, at: str | None = None
+    ) -> dict[str, str] | None:
         snapshot = self.exceptions.document(finding_id).get()
-        return bool(snapshot.exists and snapshot.get("approved_until") > (at or _now().isoformat()))
+        if not snapshot.exists or snapshot.get("approved_until") <= (at or _now().isoformat()):
+            return None
+        return {
+            "approved_until": str(snapshot.get("approved_until")),
+            "reviewer": str(snapshot.get("reviewer")),
+            "policy_version": str(snapshot.get("policy_version")),
+        }
 
     def _outbox_transition(self, delivery_key: str, status: str, error: str | None) -> None:
         reference = self.outbox.document(delivery_key)

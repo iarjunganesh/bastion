@@ -21,7 +21,15 @@ def _envelope(
 
 def test_decoded_pubsub_event_preserves_context_and_delivery_identity():
     event = decode_pubsub_event(
-        _envelope({"event_id": "00000000-0000-0000-0000-000000000001", "context_id": "week-42"})
+        _envelope(
+            {
+                "event_id": "00000000-0000-0000-0000-000000000001",
+                "context_id": "week-42",
+                "schema_version": 1,
+                "classification": "internal",
+                "mock_data": False,
+            }
+        )
     )
     assert event.event_id == "00000000-0000-0000-0000-000000000001"
     assert event.context_id == "week-42"
@@ -50,10 +58,26 @@ def test_invalid_pubsub_encoding_and_context_are_rejected():
 
 
 def test_new_payload_has_separate_context_and_event_identities():
-    payload = new_investigation_payload(mock_data=True)
+    payload = new_investigation_payload()
     assert payload["event_id"] != payload["context_id"]
     assert payload["classification"] == "internal"
-    assert payload["mock_data"] is True
+    assert payload["mock_data"] is False
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        {"schema_version": 2},
+        {"classification": "public"},
+        {"mock_data": True},
+        {"mock_data": "false"},
+    ],
+)
+def test_event_contract_rejects_unapproved_schema_classification_or_data(override):
+    payload = new_investigation_payload()
+    payload.update(override)
+    with pytest.raises(ValueError):
+        decode_pubsub_event(_envelope(payload))
 
 
 def test_firestore_clock_is_timezone_aware():

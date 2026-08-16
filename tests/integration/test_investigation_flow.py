@@ -6,6 +6,7 @@ from hashlib import sha256
 from uuid import uuid4
 
 from agents.escalation_agent import agent as escalation
+from agents.orchestrator import agent as orchestrator
 from runtime.durable import DurableStore, InvestigationEvent
 
 
@@ -69,3 +70,64 @@ def test_duplicate_delivery_produces_one_durable_notification(tmp_path, monkeypa
             "summary": "Access-review findings require attention: overly_broad_role",
         }
     ]
+
+
+def test_restart_reclaims_work_and_preserves_cross_week_exception(tmp_path):
+    """A killed worker is recoverable without forgetting a prior approved exception."""
+    database = tmp_path / "investigations.db"
+    event = InvestigationEvent(str(uuid4()), "week-2-context")
+
+    first_process = DurableStore(database)
+    first_process.approve(
+        "opaque-finding-1",
+        "2099-01-01T00:00:00+00:00",
+        "reviewer-ticket-42",
+        "iam-policy-v3",
+    )
+    assert first_process.receive(event)
+    assert first_process.claim(event.event_id, lease_seconds=1)
+    assert first_process.enqueue(
+        "notice-security-engineering",
+        event.event_id,
+        {"department": "security-engineering"},
+    )
+    # Simulate abrupt process loss: no finish and no delivered transition.
+    first_process.connection.execute(
+        "UPDATE investigations SET lease_until=? WHERE event_id=?",
+        ("2000-01-01T00:00:00+00:00", event.event_id),
+    )
+    first_process.connection.commit()
+    first_process.close()
+
+    restarted = DurableStore(database)
+    assert restarted.claim(event.event_id)
+    assert restarted.approved_exception("opaque-finding-1", at="2098-01-01T00:00:00+00:00") == {
+        "approved_until": "2099-01-01T00:00:00+00:00",
+        "reviewer": "reviewer-ticket-42",
+        "policy_version": "iam-policy-v3",
+    }
+    suppressed = orchestrator.apply_policy_rules_with_memory(
+        [
+            {
+                "finding_id": "opaque-finding-1",
+                "department": "security-engineering",
+                "reason": "overly_broad_role",
+                "risk_score": 0.9,
+            }
+        ],
+        restarted,
+    )
+    assert suppressed["suppress_count"] == 1
+    assert suppressed["escalate_count"] == 0
+    assert [item["delivery_key"] for item in restarted.pending()] == ["notice-security-engineering"]
+    assert not restarted.enqueue("notice-security-engineering", event.event_id, {})
+    restarted.delivered("notice-security-engineering")
+    restarted.finish(event.event_id)
+    restarted.close()
+
+    final_process = DurableStore(database)
+    assert not final_process.receive(event)
+    assert not final_process.claim(event.event_id)
+    assert final_process.status(event.event_id) == "completed"
+    assert final_process.pending() == []
+    final_process.close()

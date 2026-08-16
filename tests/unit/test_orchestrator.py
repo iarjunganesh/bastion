@@ -11,8 +11,8 @@ from agents.orchestrator import agent as orchestrator
 
 def _finding(member: str, score: float) -> dict:
     return {
-        "member": member,
-        "role": "roles/editor",
+        "finding_id": f"opaque-{member}",
+        "department": "security-engineering",
         "reason": "overly_broad_role",
         "risk_score": score,
     }
@@ -58,14 +58,72 @@ def test_an_out_of_range_score_is_rejected_rather_than_coerced():
 
 def test_no_findings_is_not_an_error():
     result = orchestrator.apply_policy_rules([])
-    assert result == {"decisions": [], "escalate_count": 0, "clear_count": 0, "reject_count": 0}
+    assert result == {
+        "decisions": [],
+        "escalate_count": 0,
+        "clear_count": 0,
+        "reject_count": 0,
+        "suppress_count": 0,
+    }
 
 
 def test_the_original_finding_survives_the_decision():
     """The decision annotates the finding; it never replaces it."""
     (decision,) = orchestrator.apply_policy_rules([_finding("user:a@x.com", 0.9)])["decisions"]
-    assert decision["member"] == "user:a@x.com"
+    assert decision["finding_id"] == "opaque-user:a@x.com"
     assert decision["reason"] == "overly_broad_role"
+
+
+def test_current_approved_exception_is_suppressed_without_exposing_reviewer():
+    class Memory:
+        def approved_exception(self, finding_id: str, *, at: str | None = None):
+            assert finding_id == "opaque-user:a@x.com"
+            assert at is None
+            return {
+                "approved_until": "2099-01-01T00:00:00+00:00",
+                "reviewer": "sensitive-reviewer-reference",
+                "policy_version": "iam-policy-v3",
+            }
+
+    result = orchestrator.apply_policy_rules_with_memory([_finding("user:a@x.com", 0.9)], Memory())
+    (decision,) = result["decisions"]
+    assert decision["decision"] == "suppress"
+    assert result["suppress_count"] == 1
+    assert result["escalate_count"] == 0
+    assert "reviewer" not in decision
+
+
+def test_missing_exception_memory_never_suppresses_a_risky_finding():
+    result = orchestrator.apply_policy_rules_with_memory([_finding("user:a@x.com", 0.9)], None)
+    assert result["decisions"][0]["decision"] == "escalate"
+
+
+def test_exception_memory_supports_local_and_firestore_backends(monkeypatch):
+    orchestrator.exception_memory.cache_clear()
+    monkeypatch.setenv(orchestrator.MEMORY_BACKEND_VAR, "local")
+    assert orchestrator.exception_memory() is None
+
+    orchestrator.exception_memory.cache_clear()
+    monkeypatch.setenv(orchestrator.MEMORY_BACKEND_VAR, "firestore")
+    monkeypatch.setenv("GCP_PROJECT_ID", "bastion-test-project")
+    memory = object()
+    monkeypatch.setattr(orchestrator, "FirestoreDurableStore", lambda project: memory)
+    assert orchestrator.exception_memory() is memory
+    orchestrator.exception_memory.cache_clear()
+
+
+def test_exception_memory_rejects_unknown_or_incomplete_backends(monkeypatch):
+    orchestrator.exception_memory.cache_clear()
+    monkeypatch.setenv(orchestrator.MEMORY_BACKEND_VAR, "unknown")
+    with pytest.raises(RuntimeError, match="unsupported durable store backend"):
+        orchestrator.exception_memory()
+
+    orchestrator.exception_memory.cache_clear()
+    monkeypatch.setenv(orchestrator.MEMORY_BACKEND_VAR, "firestore")
+    monkeypatch.delenv("GCP_PROJECT_ID", raising=False)
+    with pytest.raises(RuntimeError, match="GCP_PROJECT_ID is required"):
+        orchestrator.exception_memory()
+    orchestrator.exception_memory.cache_clear()
 
 
 def test_the_root_agent_is_a_sequential_adk_agent():

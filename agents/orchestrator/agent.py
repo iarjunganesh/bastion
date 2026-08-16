@@ -15,7 +15,8 @@ guard — roughly 420 lines reimplementing what Agent Engine and ADK already pro
 from __future__ import annotations
 
 import os
-from typing import Any
+from functools import lru_cache
+from typing import Any, Protocol
 
 from google.adk.agents import LlmAgent, SequentialAgent
 from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
@@ -24,11 +25,79 @@ from gateway.cloud_run_auth import private_a2a_client
 from gateway.policy import admit
 from model_armor.guardrails import screen_after_model, screen_before_model
 from registry.departments import route_by_department
+from runtime.firestore import FirestoreDurableStore
 
 # A finding at or above this score goes to a human; below it, it is recorded and cleared.
 # A constant rather than a model judgement: "is 0.8 risky enough to page someone" is a policy
 # question, and a compliance product cannot answer it differently on two identical runs.
 ESCALATION_THRESHOLD = 0.7
+FIRESTORE_MEMORY_BACKEND = "firestore"
+MEMORY_BACKEND_VAR = "BASTION_DURABLE_STORE_BACKEND"
+
+
+class ExceptionMemory(Protocol):
+    def approved_exception(
+        self, finding_id: str, *, at: str | None = None
+    ) -> dict[str, str] | None: ...  # pragma: no cover - structural typing declaration
+
+
+@lru_cache(maxsize=1)
+def exception_memory() -> ExceptionMemory | None:
+    """Return the production exception ledger; ordinary local runs stay credential-free."""
+    backend = os.environ.get(MEMORY_BACKEND_VAR, "local")
+    if backend == "local":
+        return None
+    if backend != FIRESTORE_MEMORY_BACKEND:
+        raise RuntimeError(f"unsupported durable store backend: {backend}")
+    try:
+        project = os.environ["GCP_PROJECT_ID"]
+    except KeyError:
+        raise RuntimeError("GCP_PROJECT_ID is required for Firestore exception memory") from None
+    return FirestoreDurableStore(project)
+
+
+def apply_policy_rules_with_memory(
+    findings: list[dict[str, Any]], memory: ExceptionMemory | None
+) -> dict[str, Any]:
+    """Apply policy and suppress only a currently valid durable human exception."""
+    decisions: list[dict[str, Any]] = []
+    for finding in findings:
+        try:
+            risk_score = float(finding["risk_score"])
+        except (KeyError, TypeError, ValueError):
+            decisions.append({**finding, "decision": "reject", "rejection_reason": "invalid_risk"})
+            continue
+        if not 0 <= risk_score <= 1:
+            decisions.append({**finding, "decision": "reject", "rejection_reason": "invalid_risk"})
+            continue
+
+        approved = None
+        finding_id = finding.get("finding_id")
+        if memory is not None and isinstance(finding_id, str) and finding_id:
+            approved = memory.approved_exception(finding_id)
+        if approved is not None:
+            # Reviewer identity remains in the durable ledger and never enters model state.
+            decisions.append(
+                {
+                    **finding,
+                    "decision": "suppress",
+                    "suppression_reason": "approved_exception",
+                    "exception_policy_version": approved["policy_version"],
+                    "approved_until": approved["approved_until"],
+                }
+            )
+            continue
+        decisions.append(
+            {**finding, "decision": "escalate" if risk_score >= ESCALATION_THRESHOLD else "clear"}
+        )
+
+    return {
+        "decisions": decisions,
+        "escalate_count": sum(d["decision"] == "escalate" for d in decisions),
+        "clear_count": sum(d["decision"] == "clear" for d in decisions),
+        "reject_count": sum(d["decision"] == "reject" for d in decisions),
+        "suppress_count": sum(d["decision"] == "suppress" for d in decisions),
+    }
 
 
 def apply_policy_rules(findings: list[dict[str, Any]]) -> dict[str, Any]:
@@ -38,27 +107,7 @@ def apply_policy_rules(findings: list[dict[str, Any]]) -> dict[str, Any]:
     threshold cannot be argued with: a model asked to "apply a threshold of 0.7" can be talked
     out of it by the text it is reading, and this cannot.
     """
-    decisions: list[dict[str, Any]] = []
-    for finding in findings:
-        try:
-            risk_score = float(finding["risk_score"])
-        except KeyError, TypeError, ValueError:
-            decisions.append({**finding, "decision": "reject", "rejection_reason": "invalid_risk"})
-            continue
-        if not 0 <= risk_score <= 1:
-            decisions.append({**finding, "decision": "reject", "rejection_reason": "invalid_risk"})
-            continue
-        decisions.append(
-            {**finding, "decision": "escalate" if risk_score >= ESCALATION_THRESHOLD else "clear"}
-        )
-    escalating = [d for d in decisions if d["decision"] == "escalate"]
-    rejected = [d for d in decisions if d["decision"] == "reject"]
-    return {
-        "decisions": decisions,
-        "escalate_count": len(escalating),
-        "clear_count": len(decisions) - len(escalating),
-        "reject_count": len(rejected),
-    }
+    return apply_policy_rules_with_memory(findings, exception_memory())
 
 
 POLICY_INSTRUCTION = """You are Bastion's policy and routing step.

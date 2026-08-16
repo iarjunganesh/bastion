@@ -32,15 +32,19 @@ def decode_pubsub_event(envelope: dict[str, Any]) -> InvestigationEvent:
     context_id = payload.get("context_id")
     if not isinstance(event_id, str) or not isinstance(context_id, str) or not context_id:
         raise ValueError("event_id and context_id are required")
+    if payload.get("schema_version") != 1 or payload.get("classification") != "internal":
+        raise ValueError("unsupported schema version or data classification")
+    if payload.get("mock_data") is not False:
+        raise ValueError("production investigation events must explicitly use real data")
     return InvestigationEvent(event_id=event_id, context_id=context_id)
 
 
-def new_investigation_payload(*, mock_data: bool) -> dict[str, object]:
+def new_investigation_payload() -> dict[str, object]:
     """Create an explicit event identity; Pub/Sub publish acknowledgement is awaited by caller."""
     return {
         "event_id": str(uuid4()),
         "context_id": str(uuid4()),
         "schema_version": 1,
         "classification": "internal",
-        "mock_data": mock_data,
+        "mock_data": False,
     }
