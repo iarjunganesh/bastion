@@ -17,6 +17,9 @@ from __future__ import annotations
 import os
 from unittest.mock import MagicMock
 
+import google.auth
+from google.auth.credentials import AnonymousCredentials
+
 
 def lazy_client_mock() -> MagicMock:
     """A MagicMock that returns itself when called.
@@ -37,3 +40,21 @@ os.environ.setdefault("GOOGLE_CLOUD_LOCATION", "global")
 os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "TRUE")
 os.environ.setdefault("VERTEX_AI_MODEL", "gemini-3.5-flash")
 os.environ.setdefault("BASTION_FINDING_HMAC_KEY", "test-key-which-is-at-least-thirty-two-chars")
+
+
+def _anonymous_default(*args: object, **kwargs: object) -> tuple[AnonymousCredentials, str]:
+    """Return credentials that cannot authenticate, and the mock project."""
+    del args, kwargs
+    return AnonymousCredentials(), os.environ["GOOGLE_CLOUD_PROJECT"]
+
+
+# Application Default Credentials are neutralised for the whole suite, at conftest import time
+# for the same reason as the environment above: `AdkApp` resolves the ambient project through
+# `google.auth.default()` while the managed Agent Runtime entrypoint module is imported, and
+# that import happens during collection.
+#
+# Without this, the suite passes on a workstation that happens to hold ADC and fails only in
+# CI, which holds none deliberately — the result depends on whose machine it runs on rather
+# than on the code. Anonymous credentials make the contract explicit and enforce it: no test
+# can reach a real project, whatever the ambient gcloud configuration says.
+google.auth.default = _anonymous_default  # type: ignore[assignment]
