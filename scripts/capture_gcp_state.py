@@ -36,6 +36,7 @@ STATE_FILE = ROOT / "assets" / "architecture" / "gcp-state.json"
 
 PROJECT = "bastion-fleet-2026"
 REGION = "europe-north2"
+CONTROL_REGION = "europe-west4"
 
 # ADR-003's service surface. The key is the label used in the documentation; the value is
 # the API that must be enabled for that row to count as "enabled".
@@ -76,8 +77,18 @@ PROBES: dict[str, list[str]] = {
     "scheduler_jobs": ["scheduler", "jobs", "list", f"--location={REGION}"],
     "secrets": ["secrets", "list"],
     "artifact_repositories": ["artifacts", "repositories", "list"],
-    "agent_gateways": ["network-services", "agent-gateways", "list", f"--location={REGION}"],
-    "agent_registry_agents": ["alpha", "agent-registry", "agents", "list", f"--location={REGION}"],
+    "agent_gateways": [
+        "network-services",
+        "agent-gateways",
+        "list",
+        f"--location={CONTROL_REGION}",
+    ],
+    "agent_registry_services": [
+        "agent-registry",
+        "services",
+        "list",
+        f"--location={CONTROL_REGION}",
+    ],
 }
 
 # Service accounts Google creates for you, which are not evidence that anything was built.
@@ -171,7 +182,7 @@ def model_armor_templates() -> int:
     try:
         with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310
             payload = json.loads(response.read().decode("utf-8"))
-    except urllib.error.URLError, TimeoutError, json.JSONDecodeError:
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
         return 0
     return len(payload.get("templates", []))
 
@@ -197,7 +208,7 @@ def agent_engines() -> int:
     try:
         with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310
             payload = json.loads(response.read().decode("utf-8"))
-    except urllib.error.URLError, TimeoutError, json.JSONDecodeError:
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
         return 0
     return len(payload.get("reasoningEngines", []))
 

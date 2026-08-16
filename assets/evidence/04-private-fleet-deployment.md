@@ -1,35 +1,29 @@
 # Evidence 04 — measured private fleet deployment
 
-**Captured:** 2026-08-15 UTC by `scripts/capture_gcp_state.py` against
-`bastion-fleet-2026`. The committed state file contains counts only; it deliberately omits
-principal identifiers, service-account emails, policy bindings, URLs, and request payloads.
+**Captured:** 2026-08-16 UTC by `scripts/capture_gcp_state.py` against the Bastion project.
+The committed state contains counts only and omits principals, service-account addresses, policy
+bindings, URLs, request payloads, and secret metadata.
 
-## What was measured
+## Measured state
 
-- **21/21 named APIs enabled.**
-- **20 deployed resources:** four Cloud Run services, one Firestore database, one Pub/Sub topic,
-  one Secret Manager secret, one Artifact Registry repository, one Model Armor template, one
-  Agent Engine, six user-created service accounts, and four Agent Registry records.
-- **Three Bastion services were registered** as private JSON-RPC/A2A Registry services:
-  Access Auditor, Orchestrator, and Escalation Agent. The fourth record is Google's pre-existing
-  Workspace Agent and is not counted as a Bastion achievement.
-- **Ingress is internal and Cloud Run does not allow unauthenticated invocation.** Eventarc uses
-  its dedicated delivery identity; the Escalation Agent alone has invoker access to the private,
-  count-only findings API.
+- **21/21** named APIs enabled.
+- **33** resources: four Cloud Run services, one Firestore database, two Pub/Sub topics, zero
+  Scheduler jobs, two secrets, one Artifact Registry repository, one Agent Gateway, thirteen
+  Registry services, one Model Armor template, two Agent Engines, and six user-created service
+  accounts.
+- The thirteen Registry records comprise three Bastion agents and ten approved platform
+  destinations. Only two Bastion records are A2A worker cards; the Orchestrator is the managed
+  Runtime entry.
+- Cloud Run has one internal durable ingress, two origin-protected worker surfaces, and one
+  IAM-private findings endpoint.
 
-## Boundaries of this evidence
+## Proof boundary
 
-This is deployment evidence, not a retained successful multi-agent trace. It does **not** prove
-a cross-week memory replay, a managed Agent Gateway route, a production audit-log capture, or a
-full model-success trace; those remain explicitly tracked in
-[ADR-006](../../docs/adr/006-pillar-coverage.md).
-
-## Reproduce
+This proves resource existence and counts. Runtime traversal, findings behavior, and retained
+operations configuration are separate evidence 05–07. Current machine-readable measurement:
+[gcp-state.json](../architecture/gcp-state.json).
 
 ```powershell
 python scripts/capture_gcp_state.py
 python scripts/capture_gcp_state.py --check
 ```
-
-The resulting committed measurement is
-[`assets/architecture/gcp-state.json`](../architecture/gcp-state.json).

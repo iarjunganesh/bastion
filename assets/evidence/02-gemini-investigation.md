@@ -60,5 +60,5 @@ values only. This file therefore contains no principal from the audited project.
   guardrail correctly passed it through. The block itself is
   [evidence 01](01-model-armor-block.md).
 - **No cross-week replay in this historical run.** `InMemorySessionService` was used at capture
-  time, so no
-  prior-week exception was recalled. The deployed managed-memory replay remains the proof owed.
+  time. The current managed Memory endpoint is live, while restart and simulated prior-week
+  suppression/expiry are integration-tested separately; no wall-clock-week claim is made.

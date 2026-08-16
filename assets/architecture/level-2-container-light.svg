@@ -97,7 +97,7 @@ svg {
     <rect class="ghostbox" x="60" y="180" width="310" height="120"/>
     <text class="ghosttx"  x="215" y="228">Memory Bank</text>
     <text class="ghostsub" x="215" y="258">would suppress a re-raised finding</text>
-    <text class="ghostsub" x="215" y="284">◐ managed endpoint · replay evidence pending</text>
+    <text class="ghostsub" x="215" y="284">● managed endpoint · durable recall live</text>
   </g>
   <g>
     <rect class="box" x="60" y="350" width="310" height="126"/>
@@ -109,7 +109,7 @@ svg {
     <rect class="box" x="60" y="560" width="310" height="120"/>
     <text class="label" x="215" y="608">GEAP Agent Registry</text>
     <text class="sub"   x="215" y="638">the shared corporate catalog</text>
-    <text class="sub"   x="215" y="664">● 3 private services catalogued</text>
+    <text class="sub"   x="215" y="664">● 3 governed agents catalogued</text>
   </g>
   <g>
     <rect x="60" y="742" width="310" height="128" rx="14" fill="var(--amber)" stroke="var(--amber-d)" stroke-width="3"/>
@@ -215,9 +215,9 @@ svg {
        and labelled, so the still frame loses nothing (assets/README.md). -->
   <circle r="10" fill="var(--green)">
     <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0;1;1"
-                   keyTimes="0;0.08;0.42;1" calcMode="linear"
+                   keyTimes="0;0.04;0.735;1" calcMode="linear"
                    path="M557 380 C557 300, 1050 246, 1390 272"/>
-    <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.08;0.42;0.46;1" dur="6s"
+    <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.04;0.735;0.775;1" dur="6s"
              repeatCount="indefinite"/>
   </circle>
 
@@ -254,6 +254,6 @@ svg {
     <circle cx="680" cy="1046" r="9" fill="none" stroke="var(--ghost)" stroke-width="2"/>
     <text class="legend" x="698" y="1054">not started</text>
   </g>
-  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-15 · 21/21 APIs · private fleet live</text>
+  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-16 · 21/21 APIs · 33 resources measured</text>
   <text class="foot"  x="1860" y="1016" text-anchor="end">One process, one identity. Per-agent service accounts need three deployed apps — see ARCHITECTURE.md.</text>
 </svg>

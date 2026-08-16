@@ -1,72 +1,55 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="Bastion — the access review that reviews itself">
-  <title>Bastion — the access review that reviews itself</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="Bastion — a private enterprise agent fleet for access governance">
+  <title>Bastion — three ADK agents auditing a live GCP IAM policy, including their own</title>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#F8FAFC"/>
       <stop offset="1" stop-color="#E2E8F0"/>
     </linearGradient>
-    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3B82F6"/>
-      <stop offset="1" stop-color="#1D4ED8"/>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#06B6D4"/>
     </linearGradient>
-    <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#F59E0B" stop-opacity="0"/>
-      <stop offset="0.5" stop-color="#F59E0B" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#F59E0B" stop-opacity="0"/>
-    </linearGradient>
-    <clipPath id="shieldClip">
-      <path d="M128 16 L224 52 v72 c0 60-40 100-96 116 C72 224 32 184 32 124 V52 Z"/>
-    </clipPath>
   </defs>
 
   <rect width="1200" height="320" fill="url(#bg)"/>
   <rect x="0" y="316" width="1200" height="4" fill="#F59E0B"/>
 
-  <!--
-    The animated mark, inline rather than referenced: an SVG loaded through `<img>` cannot pull
-    in another file, so `<use href="logo-animated.svg#…">` and a nested `<image>` both render as
-    nothing on GitHub. SMIL is used for the same reason it is used in the standalone mark — CSS
-    animation is ignored inside an `<img>`-loaded SVG. The 6s timeline is shared with
-    `logo-animated.svg`; changing one means changing both.
-  -->
-  <g transform="translate(84,64) scale(0.75)">
-    <path d="M128 16 L224 52 v72 c0 60-40 100-96 116 C72 224 32 184 32 124 V52 Z" fill="url(#shield)"/>
-    <path d="M32 52 h32 v22 h-32 Z M96 52 h32 v22 h-32 Z M160 52 h32 v22 h-32 Z" fill="#0B1B2B" opacity="0.22"/>
+  <g font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif">
+    <text x="64" y="100" font-size="64" font-weight="700" letter-spacing="1" fill="#0B1B2B">BASTION</text>
+    <text x="66" y="136" font-size="21" fill="#334155">The access review that reviews itself.</text>
+    <text x="66" y="168" font-size="16" fill="#64748B">Three ADK agents audit a live GCP IAM policy, including their own.</text>
+    <text x="66" y="198" font-size="15" font-weight="600" fill="#1D4ED8">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</text>
 
-    <g clip-path="url(#shieldClip)">
-      <rect x="-140" y="16" width="120" height="240" fill="url(#sweep)">
-        <animate attributeName="x" values="-140;-140;260;260" keyTimes="0;0.45;0.78;1"
-                 dur="6s" repeatCount="indefinite"/>
-      </rect>
+    <g transform="translate(66 236)">
+      <rect width="152" height="34" rx="17" fill="#FFFFFF" stroke="#B8C9DC"/>
+      <circle cx="18" cy="17" r="7" fill="#16A34A">
+        <animate attributeName="opacity" values="1;.35;1" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <text x="34" y="23" font-size="14" font-weight="700" fill="#10233D">PRIVATE · LIVE</text>
     </g>
+    <text x="236" y="258" font-size="15" fill="#4B627E">21/21 APIs enabled · 33 deployed resources</text>
 
-    <g fill="none" stroke="#0B1B2B" stroke-width="13" stroke-linecap="round" opacity="0.92">
-      <path d="M104 116 v-16 a24 24 0 0 1 48 0 v16">
-        <animateTransform attributeName="transform" type="translate"
-                          values="0 0; 0 0; 0 -16; 0 -16; 0 0; 0 0"
-                          keyTimes="0;0.22;0.34;0.66;0.78;1"
-                          dur="6s" repeatCount="indefinite"/>
-      </path>
-    </g>
-
-    <rect x="86" y="116" width="84" height="66" rx="12" fill="#0B1B2B" opacity="0.92"/>
-
-    <g transform="translate(128 149)">
-      <circle r="11" fill="#F59E0B"/>
-      <rect x="-3.5" y="6" width="7" height="20" rx="3" fill="#F59E0B"/>
-      <g>
-        <rect x="-2.5" y="-30" width="5" height="19" rx="2.5" fill="#F59E0B" opacity="0.95"/>
-        <rect x="2" y="-26" width="8" height="4" rx="2" fill="#F59E0B" opacity="0.95"/>
-        <rect x="2" y="-19" width="6" height="4" rx="2" fill="#F59E0B" opacity="0.95"/>
-        <animateTransform attributeName="transform" type="rotate"
-                          values="0;0;90;90;0;0" keyTimes="0;0.18;0.32;0.68;0.8;1"
-                          dur="6s" repeatCount="indefinite"/>
+    <!-- The control-plane hub mirrors the diagrams and the 16x9 title card, rather than a
+         standalone padlock mark: one visual language for "what Bastion is" everywhere it
+         appears. Ring and halo durations are 6s/3s so they loop seamlessly if this file is
+         ever captured as a GIF (see scripts/render_diagrams.py). -->
+    <text x="880" y="52" text-anchor="middle" font-size="12" font-weight="800" letter-spacing="3" fill="#2563EB">GOVERNED CONTROL PLANE</text>
+    <g transform="translate(880 140)">
+      <circle r="70" fill="none" stroke="#2563EB" stroke-width="2" stroke-dasharray="6 13" opacity=".4">
+        <animateTransform attributeName="transform" type="rotate" values="0;22;0" keyTimes="0;0.5;1" dur="6s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="50" fill="#DBEAFE" opacity=".75">
+        <animate attributeName="r" values="46;53;46" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <g transform="scale(0.34)">
+        <path d="M0 -124 L102 -84 V-8 C102 80 44 127 0 146 C-44 127-102 80-102-8 V-84Z" fill="url(#core)"/>
+        <path d="M-42 4 L-9 37 L51 -31" fill="none" stroke="white" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
     </g>
-  </g>
 
-  <text x="320" y="132" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="76" font-weight="700" fill="#0B1B2B" letter-spacing="1">BASTION</text>
-  <text x="322" y="178" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="25" fill="#334155">The access review that reviews itself.</text>
-  <text x="322" y="222" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="19" fill="#64748B">Three agents auditing a live GCP IAM policy — including their own permissions.</text>
-  <text x="322" y="262" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#1D4ED8">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</text>
+    <!-- The three real, deployed agents: one managed Runtime plus two A2A workers. -->
+    <g transform="translate(706 234)"><rect width="138" height="44" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/><rect width="138" height="6" rx="3" fill="#2563EB"/><text x="69" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#10233D">ORCHESTRATOR</text></g>
+    <g transform="translate(856 234)"><rect width="138" height="44" rx="10" fill="#FFFFFF" stroke="#06B6D4" stroke-width="2"/><rect width="138" height="6" rx="3" fill="#06B6D4"/><text x="69" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#10233D">ACCESS AUDITOR</text></g>
+    <g transform="translate(1006 234)"><rect width="138" height="44" rx="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2"/><rect width="138" height="6" rx="3" fill="#F59E0B"/><text x="69" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#10233D">ESCALATION</text></g>
+  </g>
 </svg>

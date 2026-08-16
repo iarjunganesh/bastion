@@ -88,10 +88,10 @@ svg {
   <!-- BASTION, centre: a visible control plane rather than an anonymous blue box. -->
   <g>
     <circle cx="900" cy="545" r="254" fill="none" stroke="var(--blue)" stroke-width="2" stroke-dasharray="8 17" opacity=".35">
-      <animateTransform attributeName="transform" type="rotate" from="0 900 545" to="360 900 545" dur="24s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="rotate" values="0 900 545;22 900 545;0 900 545" keyTimes="0;0.5;1" dur="6s" repeatCount="indefinite"/>
     </circle>
     <circle cx="900" cy="545" r="222" fill="var(--blue)" opacity=".08">
-      <animate attributeName="r" values="210;230;210" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="210;230;210" dur="3s" repeatCount="indefinite"/>
     </circle>
     <rect x="610" y="396" width="580" height="296" rx="28" fill="var(--card)" stroke="var(--blue)" stroke-width="4" filter="url(#control-lift)"/>
     <rect x="610" y="396" width="580" height="14" rx="7" fill="url(#control-core)"/>
@@ -210,6 +210,6 @@ svg {
     <circle cx="720" cy="1046" r="9" fill="none" stroke="var(--edge)" stroke-width="2"/>
     <text class="legend" x="738" y="1054">not started</text>
   </g>
-  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-15 · 21/21 APIs · 20 deployed resources</text>
-  <text class="foot"  x="1860" y="1016" text-anchor="end">Private fleet + Eventarc live · Scheduler cadence and retained trace evidence pending.</text>
+  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-16 · 21/21 APIs · 33 deployed resources</text>
+  <text class="foot"  x="1860" y="1016" text-anchor="end">Managed Runtime + Gateway + durable Eventarc fleet live · Scheduler is outside this deployment.</text>
 </svg>

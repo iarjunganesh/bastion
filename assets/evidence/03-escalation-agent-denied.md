@@ -4,9 +4,9 @@
 **Project:** `bastion-fleet-2026`
 **Call:** `projects.getIamPolicy`, made twice — once as each agent's own service account
 
-This is the Agent Identity pillar's proof, and the one
-[`identity/identity_config.md`](../../identity/identity_config.md) has described as owed since
-the file was written. Separation of concerns here is **enforced in IAM, not by convention**:
+This is the Agent Identity pillar's negative proof, linked from
+[`identity/identity_config.md`](../../identity/identity_config.md). Separation of concerns here
+is **enforced in IAM, not by convention**:
 the Escalation Agent cannot read the policy it escalates findings about, even with a fully
 compromised prompt, because its service account holds no permission to.
 
@@ -79,10 +79,9 @@ emails are masked above. No principal from the audited project appears in this f
 ## What it does not close
 
 - **Historical capture condition.** These service accounts were created before the private Cloud
-  Run fleet existed. Current deployment state is measured in
+  Run fleet existed. The same identities now back deployed workloads; current state is measured in
   [`../architecture/gcp-state.json`](../architecture/gcp-state.json); this record remains the
   safe, redacted denial baseline. The denial was produced by workstation impersonation, not by
-  a deployed agent being refused mid-investigation. A retained service-originated denial is the
-  stronger remaining evidence.
-- The security suite now exercises the Cloud Run audience, identity-policy shape, and private
-  peer transport. A retained deployed denial is the remaining evidence artifact.
+  a deployed agent being refused mid-investigation.
+- The security suite separately exercises the Cloud Run audience, identity-policy shape, worker
+  origin authentication, and findings IAM boundary.

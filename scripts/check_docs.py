@@ -324,6 +324,7 @@ SKIP_DIRS = {
     ".venv",
     "venv",
     ".audit-venv",
+    ".tmp",
     "node_modules",
     ".git",
     ".mypy_cache",

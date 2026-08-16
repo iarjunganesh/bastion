@@ -24,9 +24,9 @@ the agent actually declares.
 The two controls compose rather than overlap, and this run is the measurement that shows it
 rather than the assertion that claims it.
 
-## Two things this does not prove
+## Proof boundary
 
-- The block has not yet been observed **through an agent**. `screen_prompt` was called
-  directly; wiring it as ADK's `before_model_callback` is tested offline but not yet run
-  end to end against a deployed agent.
+- This capture called `screen_prompt` directly. The same function is now deployed as ADK's
+  `before_model_callback`, and callback/refusal/error behavior is covered by the security and unit
+  suites; this historical file is not presented as an agent-mediated refusal trace.
 - No Gemini call has been made. Screening ran; the model behind it did not.

@@ -151,7 +151,7 @@ def run(argv: list[str], *, timeout: int) -> bool:
         completed = subprocess.run(  # noqa: S603 - fixed argv, no shell
             argv, capture_output=True, text=True, timeout=timeout, check=False
         )
-    except subprocess.TimeoutExpired, OSError:
+    except (subprocess.TimeoutExpired, OSError):
         return False
     return completed.returncode == 0
 
