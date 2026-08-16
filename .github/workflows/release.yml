@@ -101,8 +101,11 @@ jobs:
 
           version = sys.argv[1]
           text = open("CHANGELOG.md", encoding="utf-8").read()
+          # Stop at the next second-level heading of any form. Stopping only at "## ["
+          # swept every unversioned historical section into the release body, which
+          # published superseded "nothing is deployed yet" notes as current release notes.
           match = re.search(
-              rf"## \[{re.escape(version)}\][^\n]*\n(.*?)(?=\n## \[|\Z)",
+              rf"## \[{re.escape(version)}\][^\n]*\n(.*?)(?=\n## |\Z)",
               text,
               re.DOTALL,
           )

@@ -12,6 +12,13 @@ The current release process is in
 
 ## [Unreleased]
 
+## [0.1.0] — 2026-08-16
+
+First tagged release. The production path is deployed and verified; the remaining work before
+submission is observation and publication, not construction. What is deployed but **not yet
+captured as an observed artifact** is recorded in
+[`submission/SUBMISSION.md`](submission/SUBMISSION.md) rather than claimed here.
+
 ### Added — governed managed Runtime path
 
 - Deployed the Orchestrator to Python 3.12 managed Agent Runtime with Agent Identity and
@@ -40,6 +47,19 @@ The current release process is in
   and GIFs from their reviewed masters.
 - Updated banner and architecture facts for managed Runtime, Memory, Gateway, Registry, and the
   current count-only deployment measurement.
+
+### Fixed — documents that had fallen behind the deployment
+
+- Corrected the rubric self-assessment in [`submission/DEVPOST.md`](submission/DEVPOST.md), which
+  still recorded managed retry as needing "a deployment that does not exist" after that deployment
+  shipped. Retry is implemented and deployed; the timeout → retry → escalate sequence is marked
+  as not yet captured rather than silently upgraded to observed.
+- Pointed the `Makefile` `teardown` target at `infrastructure/teardown.py` instead of a TODO for a
+  script that already exists, retired the `run-orchestrator` claim that durable runtime setup was
+  pending, added `verify`/`smoke`/`rollback` targets, and made `install` interpreter-relative so it
+  works on the Windows authoring machine as well as Linux CI.
+- Dated ADR-003 in the decision index as verified against the deployed fleet on 2026-08-16, matching
+  the status line the record itself already carried.
 
 ## Pre-deployment baseline — 2026-08-15
 

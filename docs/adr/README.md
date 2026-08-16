@@ -11,7 +11,7 @@ Every record below traces to a line there.
 | --- | --- | --- |
 | [001](001-real-iam-not-mock-data.md) | Audit a real GCP IAM policy, not mock entitlement rows; detection stays deterministic | Accepted |
 | [002](002-three-agents.md) | Three agents; policy enforcement inside the Orchestrator | Accepted |
-| [003](003-pillars-on-geap.md) | All seven pillars run on their managed GEAP product; no reimplementation | Accepted; **amended 2026-08-15** |
+| [003](003-pillars-on-geap.md) | All seven pillars run on their managed GEAP product; no reimplementation | Accepted; amended 2026-08-15, **verified against the deployed fleet 2026-08-16** |
 | [004](004-flash-only-global-endpoint.md) | Gemini 3.5 Flash on `global`, no Pro tier; infrastructure in `europe-north2` | Accepted; **verified** against the live project |
 | [005](005-adk-as-the-agent-framework.md) | **Google ADK** as the agent framework; A2A as the inter-agent contract | Accepted; **amended 2026-08-15** |
 | [006](006-pillar-coverage.md) | One observable proof closes each of the seven pillars, and each submission artifact | Accepted |
