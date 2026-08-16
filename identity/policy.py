@@ -25,9 +25,7 @@ IDENTITIES = (
                 "roles/datastore.user",
                 "roles/cloudtrace.agent",
                 "roles/logging.logWriter",
-                "roles/modelarmor.user",
                 "roles/monitoring.metricWriter",
-                "roles/pubsub.publisher",
             }
         ),
     ),

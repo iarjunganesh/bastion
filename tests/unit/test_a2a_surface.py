@@ -17,6 +17,18 @@ def test_a2a_card_has_the_service_specific_jsonrpc_endpoint():
             "protocol_version": "1.0",
         }
     ]
+    assert card["version"] == "1.0.0"
+    assert card["provider"]["organization"] == "security-platform"
+    metadata = card["capabilities"]["extensions"][0]["params"]
+    assert metadata == {
+        "ownerDepartment": "security-engineering",
+        "owner": "security-platform",
+        "purpose": "Detect over-broad IAM access without exposing principal data.",
+        "dataClassification": "internal",
+        "policyVersion": "bastion-v1",
+        "approvalStatus": "approved",
+        "healthPath": "/healthz",
+    }
 
 
 def test_staged_agent_has_one_parseable_card(monkeypatch, tmp_path):

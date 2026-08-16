@@ -34,6 +34,7 @@ from google.cloud import modelarmor_v1 as modelarmor
 from google.genai import types
 
 from model_armor.redaction import contains_sensitive
+from observability.audit import _invocation, record
 
 # **Model Armor is not available in `europe-north2`.** Verified 2026-08-15 against the live
 # project: europe-north1 and europe-north2 both answer "Location ... is not found", while
@@ -140,6 +141,13 @@ def screen_before_model(
     project_id = os.environ.get("GCP_PROJECT_ID")
     template_id = _template()
     if not project_id or not template_id:
+        record(
+            "model_armor.input",
+            outcome="refused",
+            actor="model-armor",
+            invocation_id=_invocation(callback_context),
+            detail={"reason": "configuration_unavailable"},
+        )
         return _refusal()
 
     # `part.text` is `str | None`, and the `if` clause narrows nothing for a type checker,
@@ -157,9 +165,25 @@ def screen_before_model(
     try:
         blocked = screen_prompt(text, project_id=project_id, template_id=template_id)
     except Exception:  # noqa: BLE001 — a screening failure must not become an open door
+        record(
+            "model_armor.input",
+            outcome="refused",
+            actor="model-armor",
+            invocation_id=_invocation(callback_context),
+            detail={"reason": "screening_unavailable"},
+        )
         return _refusal()
 
-    return _refusal() if blocked else None
+    if blocked:
+        record(
+            "model_armor.input",
+            outcome="refused",
+            actor="model-armor",
+            invocation_id=_invocation(callback_context),
+            detail={"reason": "policy_match"},
+        )
+        return _refusal()
+    return None
 
 
 def screen_after_model(
@@ -167,7 +191,6 @@ def screen_after_model(
     llm_response: LlmResponse,
 ) -> LlmResponse | None:
     """Block a model response carrying protected data before it reaches state or delivery."""
-    del callback_context
     content = getattr(llm_response, "content", None)
     parts = content.parts if content is not None else []
     values = [candidate for part in parts if (candidate := getattr(part, "text", None))]
@@ -177,7 +200,16 @@ def screen_after_model(
         if (response := getattr(part, "function_response", None)) is not None
     )
     text = "\n".join(values)
-    return _output_refusal() if contains_sensitive(text) else None
+    if contains_sensitive(text):
+        record(
+            "model_armor.output",
+            outcome="refused",
+            actor="protected-data-filter",
+            invocation_id=_invocation(callback_context),
+            detail={"reason": "protected_data"},
+        )
+        return _output_refusal()
+    return None
 
 
 # The three cases to validate before the pillar may be called working (see ADR-003).

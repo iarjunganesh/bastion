@@ -44,8 +44,8 @@ def test_an_unrecognised_principal_still_gets_an_owner():
 
 def test_only_escalating_findings_are_routed():
     decisions = [
-        {"member": "serviceAccount:data-x@p.iam.gserviceaccount.com", "decision": "escalate"},
-        {"member": "serviceAccount:ml-y@p.iam.gserviceaccount.com", "decision": "clear"},
+        {"department": "data-platform", "decision": "escalate"},
+        {"department": "ml-engineering", "decision": "clear"},
     ]
     routed = departments.route_by_department(decisions)
     assert routed["escalated_total"] == 1
@@ -54,16 +54,18 @@ def test_only_escalating_findings_are_routed():
 
 def test_a_team_with_nothing_to_review_is_not_notified():
     """An access review that pages every team on every run is one every team mutes."""
-    routed = departments.route_by_department([{"member": COMPUTE_DEFAULT, "decision": "clear"}])
+    routed = departments.route_by_department(
+        [{"department": "platform-infra", "decision": "clear"}]
+    )
     assert routed["departments"] == []
     assert routed["department_count"] == 0
 
 
 def test_one_investigation_fans_out_to_several_departments():
     decisions = [
-        {"member": "serviceAccount:data-a@p.iam.gserviceaccount.com", "decision": "escalate"},
-        {"member": "serviceAccount:ml-b@p.iam.gserviceaccount.com", "decision": "escalate"},
-        {"member": COMPUTE_DEFAULT, "decision": "escalate"},
+        {"department": "data-platform", "decision": "escalate"},
+        {"department": "ml-engineering", "decision": "escalate"},
+        {"department": "platform-infra", "decision": "escalate"},
     ]
     routed = departments.route_by_department(decisions)
     assert routed["department_count"] == 3
@@ -72,8 +74,8 @@ def test_one_investigation_fans_out_to_several_departments():
 
 def test_findings_for_one_department_are_counted_together():
     decisions = [
-        {"member": "serviceAccount:data-a@p.iam.gserviceaccount.com", "decision": "escalate"},
-        {"member": "serviceAccount:dbt-b@p.iam.gserviceaccount.com", "decision": "escalate"},
+        {"department": "data-platform", "decision": "escalate"},
+        {"department": "data-platform", "decision": "escalate"},
     ]
     (bucket,) = departments.route_by_department(decisions)["departments"]
     assert bucket["department"] == "data-platform"
@@ -83,18 +85,25 @@ def test_findings_for_one_department_are_counted_together():
 def test_reasons_are_deduplicated_per_department():
     decisions = [
         {
-            "member": "serviceAccount:data-a@p.iam.gserviceaccount.com",
+            "department": "data-platform",
             "decision": "escalate",
             "reason": "overly_broad_role",
         },
         {
-            "member": "serviceAccount:data-b@p.iam.gserviceaccount.com",
+            "department": "data-platform",
             "decision": "escalate",
             "reason": "overly_broad_role",
         },
     ]
     (bucket,) = departments.route_by_department(decisions)["departments"]
     assert bucket["reasons"] == ["overly_broad_role"]
+
+
+def test_unknown_minimized_department_fails_closed():
+    with pytest.raises(ValueError, match="unknown owning department"):
+        departments.route_by_department(
+            [{"department": "invented-by-model", "decision": "escalate"}]
+        )
 
 
 def test_the_catalog_carries_no_endpoints():

@@ -95,6 +95,23 @@ def test_sensitive_structured_model_output_is_withheld():
     assert guardrails.screen_after_model(MagicMock(), response) is not None
 
 
+def test_refusals_emit_only_a_bounded_reason():
+    context = SimpleNamespace(invocation_id="inv-refusal")
+    with (
+        patch.object(guardrails, "screen_prompt", return_value=True),
+        patch.object(guardrails, "record") as record,
+    ):
+        guardrails.screen_before_model(context, _request("user:a@example.com"))
+    record.assert_called_once_with(
+        "model_armor.input",
+        outcome="refused",
+        actor="model-armor",
+        invocation_id="inv-refusal",
+        detail={"reason": "policy_match"},
+    )
+    assert "a@example.com" not in str(record.call_args)
+
+
 def test_screen_prompt_reports_blocked_not_safe():
     """The boolean is "blocked" deliberately: a falsy error default must not read as safe."""
     from google.cloud import modelarmor_v1 as modelarmor

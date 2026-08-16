@@ -118,6 +118,19 @@ def resolve_owning_department(member: str) -> dict[str, Any]:
     }
 
 
+def department_by_id(department_id: str) -> dict[str, str]:
+    """Resolve minimized ownership without reconstructing a discarded principal."""
+    for department in load_catalog():
+        if department["id"] == department_id:
+            return {
+                "department": department["id"],
+                "name": department["name"],
+                "owner": department["owner"],
+                "escalation_target": department["escalation_target"],
+            }
+    raise ValueError("finding names an unknown owning department")
+
+
 def route_by_department(decisions: list[dict[str, Any]]) -> dict[str, Any]:
     """Group escalating findings by the department that owns them.
 
@@ -129,7 +142,10 @@ def route_by_department(decisions: list[dict[str, Any]]) -> dict[str, Any]:
     for decision in decisions:
         if decision.get("decision") != "escalate":
             continue
-        routing = resolve_owning_department(str(decision.get("member", "")))
+        # The Auditor deliberately discards IAM principals before this boundary. Ownership is
+        # already a deterministic, minimized department ID; trying to rematch a missing member
+        # silently sent every finding to the catch-all team.
+        routing = department_by_id(str(decision.get("department", "")))
         bucket = buckets.setdefault(
             routing["department"],
             {**routing, "finding_count": 0, "reasons": []},
