@@ -67,7 +67,7 @@ def model_armor_template_accessible() -> bool:
     try:
         with urllib.request.urlopen(request, timeout=30):  # noqa: S310 - fixed URI above
             return True
-    except urllib.error.HTTPError, urllib.error.URLError, TimeoutError:
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError):
         return False
 
 
@@ -92,8 +92,18 @@ def ensure_service_account(name: str) -> str:
 
 
 def ensure_project_role(member: str, role: str) -> None:
-    policy = run("projects", "get-iam-policy", PROJECT, "--format=value(bindings)").stdout
-    if f"{member}" not in policy or role not in policy:
+    # Membership and role must occur in the same flattened binding. Searching the complete
+    # policy for each string independently falsely reports a grant when another identity has
+    # the role and this identity merely appears elsewhere in the policy.
+    granted = run(
+        "projects",
+        "get-iam-policy",
+        PROJECT,
+        "--flatten=bindings[].members",
+        f"--filter=bindings.role={role} AND bindings.members={member}",
+        "--format=value(bindings.role)",
+    ).stdout.strip()
+    if granted != role:
         run("projects", "add-iam-policy-binding", PROJECT, f"--member={member}", f"--role={role}")
 
 
@@ -117,6 +127,10 @@ def main() -> None:
         "secretmanager.googleapis.com",
         "modelarmor.googleapis.com",
         "agentregistry.googleapis.com",
+        "agentidentity.googleapis.com",
+        "iap.googleapis.com",
+        "networkservices.googleapis.com",
+        "networksecurity.googleapis.com",
     )
     if not args.apply:
         missing = [
