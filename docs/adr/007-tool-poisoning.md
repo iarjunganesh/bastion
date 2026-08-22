@@ -60,14 +60,20 @@ record nothing would say so.
 
 ## Consequences
 
-**This is testable without a deployment**, unlike the other two guardrail claims. Tests
-assert that each agent's tool set is fixed, that the Escalation Agent holds no
-policy-reading tool, and that no tool description is interpolated from external input. That
-belong in `tests/security/`. The populated security suite asserts the fixed tool surface,
-origin authentication, protected-output boundary, and IAM shape.
+**This is testable without a deployment**, unlike the other two guardrail claims.
+`tests/security/test_tool_surface.py` asserts that each agent's tool set is fixed at
+construction, that the Escalation Agent holds no policy-reading tool and no Asset client, and
+that every tool description is repository-owned static source rather than interpolated from
+external input. The security suite also covers origin authentication, the protected-output
+boundary, and IAM shape.
 
-The IAM runtime half is separately proven by the deployed Escalation denial capture. A passing
-test proves the tool set; the denial proves the workload boundary.
+Those assertions were confirmed to fail when the boundary is widened, rather than merely
+observed to pass: [evidence 08](../../assets/evidence/08-tool-poisoning.md) records the suite
+run against an escalation agent mutated in memory to hold `audit_iam_policy`.
+
+The IAM runtime half is separately proven by the deployed Escalation denial capture
+([evidence 03](../../assets/evidence/03-escalation-agent-denied.md)). A passing test proves the
+tool set; the denial proves the workload boundary.
 
 If a tool ever needs a dynamic description — for instance, a Registry-driven target list —
 this record is amended first, because that change reopens the threat this closes.

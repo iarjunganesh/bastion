@@ -66,6 +66,6 @@
 - [durable findings behavior](../../assets/evidence/06-durable-findings.md)
 - [retained observability](../../assets/evidence/07-observability.md)
 - `infrastructure/verify_fleet.py`, `smoke_test.py`, `rollback.py`, and `teardown.py`
-- Python 3.12 full gate: 161 tests, 100% statement and branch coverage
+- Python 3.12 full gate: 171 tests, 100% statement and branch coverage
 
 P2 media and Devpost publication are intentionally excluded from P0/P1 engineering closure.

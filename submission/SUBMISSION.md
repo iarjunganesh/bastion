@@ -52,13 +52,15 @@ or a media platform.
 
 - [x] Missing/invalid risk fails closed.
 - [x] Raw IAM member/binding data stops before the model; unsafe output stops before notification.
-- [x] Fixed tool declarations and allowlists defend the tool-metadata boundary.
+- [x] Fixed tool declarations and allowlists defend the tool-metadata boundary; the Escalation
+      Agent holds no policy tool at construction, asserted and shown to fail when widened
+      ([evidence 08](../assets/evidence/08-tool-poisoning.md)).
 - [x] Worker timeout/malformed response, hallucinated arguments, Model Armor/dependency outage,
       notification failure, duplicate event, expired lease, retry, dead letter, and stale memory
       are exercised across populated unit, integration, security, and load suites.
 - [x] Real findings endpoint denies anonymous traffic and collapses an authorized duplicate
       ([evidence 06](../assets/evidence/06-durable-findings.md)).
-- [x] 161 tests pass with 100% statement and branch coverage under Python 3.12.
+- [x] 171 tests pass with 100% statement and branch coverage under Python 3.12.
 - [x] Ruff, formatting, mypy, dependency audit, secret scan, docs/version checks, and diagram
       determinism are release gates.
 - [x] ADK deprecation/experimental risk consciously accepted and pinned in

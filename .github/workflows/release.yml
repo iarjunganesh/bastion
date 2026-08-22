@@ -1,6 +1,9 @@
 name: Release
 
-run-name: "${{ github.event.head_commit.message || format('Release {0}', github.ref_name) }}"
+# This workflow only ever runs on a tag push, where head_commit.message is the tagged
+# commit's full multi-paragraph body. Using it made the run name an unreadable blob, and
+# the ref_name fallback could never fire. Name the run after the release itself.
+run-name: "Release ${{ github.ref_name }}"
 
 on:
   push:

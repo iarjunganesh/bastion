@@ -17,6 +17,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# The documented test total is deliberately NOT checked here. This script runs on a bare
+# interpreter in CI's docs and diagrams jobs — no dependencies installed, so no pytest to
+# collect with — and forcing those jobs to install the full tree to count tests would trade a
+# fast standalone gate for a slow one. The count is asserted from inside the suite instead,
+# where it is free: tests/unit/test_documented_test_count.py.
+
 # Devpost accepts JPG, PNG and GIF — never SVG — and rejects a gallery image above this.
 DEVPOST_IMAGE_CAP_MB = 5
 

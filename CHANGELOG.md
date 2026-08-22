@@ -12,6 +12,38 @@ The current release process is in
 
 ## [Unreleased]
 
+### Added — the tool-declaration boundary is now asserted, not only documented
+
+- Added `tests/security/test_tool_surface.py`. ADR-007 claimed the security suite asserted the
+  fixed tool surface; it did not. The only tool-set assertion in the repository covered the
+  Orchestrator, sat in the unit suite, and never touched the Escalation Agent — so the control
+  ADR-007 exists to record was the one control with no test behind it.
+- The suite asserts each agent's tool set by equality at construction, that the Escalation Agent
+  holds neither a policy-reading tool nor an Asset client (differentially against the Auditor,
+  which must still hold one), and that every tool description is repository-owned static source.
+- Captured [evidence 08](assets/evidence/08-tool-poisoning.md), including confirmation that the
+  assertions **fail** when the escalation agent is mutated in memory to hold `audit_iam_policy`.
+  A guardrail test that has never been seen to fail is not evidence that the guardrail holds.
+- Suite is now 171 tests at 100% statement and branch coverage.
+
+### Fixed — the documented test total is now verified rather than asserted
+
+- `scripts/check_docs.py` verified pillar, ADR, agent, badge, and diagram counts but never the
+  test total, which is the number that changes most often and is quoted in six documents. It had
+  already gone stale twice.
+- The assertion lives in `tests/unit/test_documented_test_count.py` rather than in
+  `check_docs.py`, because CI's docs and diagrams jobs run that script on a bare interpreter with
+  no dependencies installed — there is no pytest there to collect with, and making those jobs
+  install the full tree to count tests would trade a fast standalone gate for a slow one. Inside
+  the suite the collected count is already known. It skips on a partial run, so narrowing to one
+  directory does not fire it. Released CHANGELOG sections are exempt: they record what was true
+  at their tag.
+
+### Fixed — release run naming
+
+- The Release workflow named its run after the tagged commit's full message, which for an
+  annotated release tag is several paragraphs. It is named after the release ref instead.
+
 ## [0.1.0] — 2026-08-16
 
 First tagged release. The production path is deployed and verified; the remaining work before
