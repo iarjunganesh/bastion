@@ -27,6 +27,19 @@ if [[ "$SESSION_URI" == "memory://" || "$MEMORY_URI" == "memory://" ]]; then
   exit 64
 fi
 
+# A short-form `agentengine://<id>` resolves against GOOGLE_CLOUD_LOCATION, which must stay
+# `global` for Gemini. The Agent Engine is regional, so the short form searches `global` and
+# every session create fails with "The ReasoningEngine does not exist" - a 404 that reads as
+# a missing engine when only the region is wrong. Refuse it here rather than ship a fleet
+# whose sessions cannot be created.
+for uri in "$SESSION_URI" "$MEMORY_URI"; do
+  if [[ "$uri" == agentengine://* && "$uri" != agentengine://projects/*/locations/*/reasoningEngines/* ]]; then
+    echo "Refusing short-form ${uri%%://*}:// URI: use the full resource name so the session" >&2
+    echo "service resolves in AGENT_RUNTIME_REGION rather than GOOGLE_CLOUD_LOCATION." >&2
+    exit 64
+  fi
+done
+
 sa() { echo "$1@${PROJECT_ID}.iam.gserviceaccount.com"; }
 PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
 # Cloud Run validates an ID token's audience against the service's canonical status URL. A

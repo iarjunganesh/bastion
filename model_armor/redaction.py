@@ -22,6 +22,17 @@ class SensitiveDataError(ValueError):
     """Raised when a payload would cross a boundary with protected data."""
 
 
+# Audit events record the exception *type* and never its message, so the type name is the only
+# bounded reason a refusal can carry. Distinct subclasses turn "something was rejected" into a
+# diagnosable event without putting a message - or a value - into the trail.
+class UnsafeRiskCategoryError(SensitiveDataError):
+    """A risk category outside the deterministic policy reason codes."""
+
+
+class OpaqueFindingIdError(SensitiveDataError):
+    """A finding identifier that is missing, excessive, or not the Auditor's opaque shape."""
+
+
 def contains_sensitive(text: str) -> bool:
     """Whether text contains a principal, government ID, or fully-qualified GCP resource."""
     return bool(EMAIL.search(text) or SSN.search(text) or GCP_RESOURCE.search(text))
@@ -48,7 +59,7 @@ def validate_risk_categories(categories: Iterable[str]) -> list[str]:
     values = sorted(set(categories))
     invalid = [value for value in values if value not in SAFE_RISK_CATEGORIES]
     if invalid:
-        raise SensitiveDataError("unknown or unsafe risk category")
+        raise UnsafeRiskCategoryError("unknown or unsafe risk category")
     return values
 
 
@@ -73,9 +84,9 @@ def validate_finding_ids(finding_ids: Iterable[str]) -> list[str]:
     """Accept only opaque Auditor finding identifiers, deduplicated and in stable order."""
     values = sorted(set(finding_ids))
     if not values:
-        raise SensitiveDataError("at least one opaque finding id is required")
+        raise OpaqueFindingIdError("at least one opaque finding id is required")
     if len(values) > MAX_FINDING_IDS:
-        raise SensitiveDataError(f"more than {MAX_FINDING_IDS} finding ids in one escalation")
+        raise OpaqueFindingIdError(f"more than {MAX_FINDING_IDS} finding ids in one escalation")
     if any(not OPAQUE_FINDING_ID.match(value) for value in values):
-        raise SensitiveDataError("finding id is not an opaque Auditor identifier")
+        raise OpaqueFindingIdError("finding id is not an opaque Auditor identifier")
     return values

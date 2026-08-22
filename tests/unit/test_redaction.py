@@ -59,3 +59,25 @@ def test_an_escalation_cannot_carry_an_unbounded_list_of_findings():
 def test_opaque_finding_ids_are_deduplicated_and_ordered():
     identifier = "a1b2c3d4e5f60718293a4b5c"
     assert redaction.validate_finding_ids([identifier, identifier]) == [identifier]
+
+
+def test_refusal_types_distinguish_why_without_a_message():
+    """Audit events carry the exception type and never its message.
+
+    That makes the type the only bounded reason a refusal can express. A single
+    SensitiveDataError for every rejection reduced a production failure to "something was
+    rejected", which is undiagnosable from the trail alone. These subclasses keep the trail
+    payload-free while making it answerable.
+    """
+    with pytest.raises(redaction.UnsafeRiskCategoryError):
+        redaction.validate_risk_categories(["privilege_escalation"])
+    with pytest.raises(redaction.OpaqueFindingIdError):
+        redaction.validate_finding_ids([])
+    with pytest.raises(redaction.OpaqueFindingIdError):
+        redaction.validate_finding_ids(["not-an-opaque-id"])
+    with pytest.raises(redaction.OpaqueFindingIdError):
+        redaction.validate_finding_ids([f"{n:024x}" for n in range(redaction.MAX_FINDING_IDS + 1)])
+
+    # Existing handlers catch the base class; narrowing must not change what they intercept.
+    for narrow in (redaction.UnsafeRiskCategoryError, redaction.OpaqueFindingIdError):
+        assert issubclass(narrow, redaction.SensitiveDataError)

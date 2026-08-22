@@ -6,8 +6,15 @@ from dataclasses import dataclass
 
 BROAD_ROLES = frozenset({"roles/owner", "roles/editor"})
 
-# The identities that run an ADK agent, and therefore screen every model call.
-SCREENING_IDENTITIES = ("orchestrator-sa", "access-auditor-sa", "escalation-agent-sa")
+# The workload identities that run an ADK agent, and therefore screen every model call.
+#
+# `orchestrator-sa` is deliberately absent. That Cloud Run service is durable ingress only --
+# it admits the Eventarc delivery and invokes the managed Runtime, and `build_app` never
+# constructs an agent under it -- so it calls no model and needs no Model Armor access. The
+# Orchestrator's policy step does screen, but it runs inside the managed Runtime under a GEAP
+# Agent Identity principal rather than this service account, and `deploy_agent_runtime.py`
+# authorizes that principal directly.
+SCREENING_IDENTITIES = ("access-auditor-sa", "escalation-agent-sa")
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,11 +35,6 @@ IDENTITIES = (
                 "roles/datastore.user",
                 "roles/cloudtrace.agent",
                 "roles/logging.logWriter",
-                # The Orchestrator screens its own policy step through the same fail-closed
-                # callback as the workers, so it needs the same Model Armor access. Omitting it
-                # did not disable screening - it made every screen raise, and a screen that
-                # raises refuses. The step failed closed on every investigation.
-                "roles/modelarmor.user",
                 "roles/monitoring.metricWriter",
             }
         ),

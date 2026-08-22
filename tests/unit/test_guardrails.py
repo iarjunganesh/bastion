@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from hashlib import sha256
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -111,7 +110,6 @@ def test_refusals_emit_only_a_bounded_reason():
         invocation_id="inv-refusal",
         detail={
             "reason": "policy_match",
-            "screened_digest": sha256(screened.encode()).hexdigest()[:16],
             "screened_chars": len(screened),
             "screened_parts": 1,
         },
@@ -135,10 +133,9 @@ def test_refusal_detail_carries_sizes_and_never_values():
     detail = record.call_args.kwargs["detail"]
     assert detail["screened_chars"] == len(secret)
     assert detail["screened_parts"] == 1
-    assert detail["screened_digest"] == sha256(secret.encode()).hexdigest()[:16]
-    # A digest identifies by comparison and does not carry the text; a length is a size.
+    # Sizes are not values. Nothing derived from the text itself may travel in an audit event.
     for key, value in detail.items():
-        assert isinstance(value, int) or key in {"reason", "screened_digest"}
+        assert isinstance(value, int) or key == "reason"
     assert "someone@example.com" not in str(record.call_args)
     assert "roles/owner" not in str(record.call_args)
 

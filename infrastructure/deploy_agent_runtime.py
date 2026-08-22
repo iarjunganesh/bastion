@@ -152,6 +152,61 @@ def ensure_runtime_secret_access() -> None:
         )
 
 
+def ensure_runtime_model_armor_access() -> None:
+    """Let the Runtime's Agent Identity screen its own model calls.
+
+    The managed Runtime does not run as `orchestrator-sa`; it runs as a GEAP Agent Identity
+    principal. Granting the workload service account was therefore not enough, and the policy
+    step reported `screening_unavailable` on every investigation: Model Armor fails closed, so a
+    screen that cannot authenticate refuses rather than skips, and the step produced no output
+    while the documentation still claimed it screened.
+    """
+    existing_id = os.environ.get("BASTION_RUNTIME_AGENT_ENGINE_ID")
+    if not existing_id:
+        return
+    gcloud = shutil.which("gcloud") or shutil.which("gcloud.cmd")
+    if not gcloud:
+        raise RuntimeError("gcloud is required to authorize Runtime model screening")
+    principal = (
+        f"principal://agents.global.proj-{PROJECT_NUMBER}.system.id.goog/resources/"
+        f"aiplatform/projects/{PROJECT_NUMBER}/locations/{REGION}/reasoningEngines/{existing_id}"
+    )
+    subprocess.run(  # noqa: S603 - constant executable, reviewed arguments
+        [
+            gcloud,
+            "projects",
+            "add-iam-policy-binding",
+            PROJECT,
+            f"--member={principal}",
+            "--role=roles/modelarmor.user",
+            "--quiet",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    # Agent-to-Anywhere authorizes egress through IAP, and the permission it checks -
+    # iap.webServiceVersions.egressViaIAP - lives in roles/iap.egressor. Registering a
+    # destination is necessary but not sufficient: without this role every call the Runtime
+    # makes is refused as "unregistered in the Agent Registry", which reads as a catalog gap
+    # and is actually a missing grant. Model Armor screening was the visible casualty, and
+    # because screening fails closed the policy step silently stopped enforcing.
+    subprocess.run(  # noqa: S603 - constant executable, reviewed arguments
+        [
+            gcloud,
+            "projects",
+            "add-iam-policy-binding",
+            PROJECT,
+            f"--member={principal}",
+            "--role=roles/iap.egressor",
+            "--quiet",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
 def gateway_config() -> dict[str, Any]:
     return {
         "agent_to_anywhere_config": {
@@ -221,6 +276,7 @@ def deploy() -> dict[str, Any]:
     if Path.cwd().resolve() != ROOT:
         raise RuntimeError(f"run this module from repository root: {ROOT}")
     ensure_runtime_secret_access()
+    ensure_runtime_model_armor_access()
     client = Client(project=PROJECT, location=REGION)
     config = {
         "display_name": "Bastion Governed Orchestrator",

@@ -79,6 +79,22 @@ PLATFORM_ENDPOINTS: dict[str, tuple[str, str]] = {
         "https://telemetry.googleapis.com",
         "OpenTelemetry trace and metric export.",
     ),
+    # Google API clients resolve to the mTLS host when a client certificate is available,
+    # and Agent-to-Anywhere treats that as a distinct endpoint. Registering only the plain
+    # host fails the Runtime closed with "unregistered in the Agent Registry" - the control
+    # behaving correctly against an incomplete catalog.
+    "google-cloud-telemetry-mtls": (
+        "https://telemetry.mtls.googleapis.com",
+        "mTLS variant of the OpenTelemetry export endpoint.",
+    ),
+    "google-iam-credentials": (
+        "https://iamcredentials.googleapis.com",
+        "Short-lived token minting for the Runtime's own identity.",
+    ),
+    "google-iam-credentials-mtls": (
+        "https://iamcredentials.mtls.googleapis.com",
+        "mTLS variant of the token-minting endpoint.",
+    ),
     "google-model-armor": (
         "https://modelarmor."
         f"{os.environ.get('MODEL_ARMOR_LOCATION', 'europe-west4')}.rep.googleapis.com",
@@ -90,6 +106,9 @@ GRPC_ENDPOINTS = {
     "google-cloud-firestore",
     "google-cloud-logging",
     "google-cloud-telemetry",
+    "google-cloud-telemetry-mtls",
+    "google-iam-credentials",
+    "google-iam-credentials-mtls",
     "google-model-armor",
     "google-cloud-resource-manager",
     "google-cloud-resource-manager-mtls",

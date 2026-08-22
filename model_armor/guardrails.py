@@ -26,7 +26,6 @@ from __future__ import annotations
 import json
 import os
 from functools import lru_cache
-from hashlib import sha256
 
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models.llm_request import LlmRequest
@@ -163,15 +162,14 @@ def screen_before_model(
     if not text.strip():
         return None
 
-    # Shape, never content. A refusal that says only "policy_match" cannot be diagnosed: the
-    # same agent screens clean locally and matches in the deployed A2A path, and the difference
-    # is *how much* reaches the screen, not what it says. Sizes are not values, so this stays
-    # inside the payload-free rule while making the discrepancy measurable.
+    # Shape, never content. A refusal that says only "policy_match" cannot be diagnosed, and
+    # this pair was enough to find the one that mattered: an oversized screen pointed at the
+    # dispatcher's own message. Sizes are not values, so they stay inside the payload-free rule.
+    #
+    # A digest of the screened text lived here briefly and did identify that message by exact
+    # comparison. It was removed once it had served: a fingerprint of a prompt is still derived
+    # from a prompt, and the payload-free audit claim is worth more than the convenience.
     shape = {
-        # A digest identifies the screened text by comparison against a candidate generated
-        # locally; it does not reveal it. Sizes alone proved too coarse - the deployed content
-        # is envelope-shaped but matches no envelope reproducible outside the A2A path.
-        "screened_digest": sha256(text.encode()).hexdigest()[:16],
         "screened_chars": len(text),
         "screened_parts": sum(
             1

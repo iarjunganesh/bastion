@@ -56,9 +56,10 @@ def test_approver_cannot_gain_a_standing_project_role():
 def test_every_agent_identity_can_reach_model_armor():
     """A screening callback that cannot call Model Armor refuses rather than skips.
 
-    This is the failure the Orchestrator actually had: the role was missing, every screen
-    raised, fail-closed turned that into a refusal, and the policy step produced no output on
-    any investigation while the documentation still claimed screening worked.
+    Scoped to the workload identities that actually run an agent. `orchestrator-sa` is not one
+    of them: its service is durable ingress and calls no model, so requiring the role there
+    would be an over-grant enforced by a gate -- which is worse than no gate. The Orchestrator's
+    policy step screens under the Runtime's Agent Identity, authorized in deployment instead.
     """
     from identity.policy import SCREENING_IDENTITIES
 
@@ -68,7 +69,7 @@ def test_every_agent_identity_can_reach_model_armor():
 
     stripped = tuple(
         WorkloadIdentity(item.name, item.roles - {"roles/modelarmor.user"})
-        if item.name == "orchestrator-sa"
+        if item.name == "access-auditor-sa"
         else item
         for item in IDENTITIES
     )
