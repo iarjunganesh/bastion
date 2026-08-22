@@ -29,7 +29,7 @@ Each needs live GCP credentials and an approved operator workstation. None is a 
 
 | # | Capture | Depends on | Note |
 |---|---|---|---|
-| 1 | An approved exception seeded, then a later matching finding suppressed after a real elapsed gap | Firestore seed, see correction above | The only item whose critical path is elapsed time rather than effort; it cannot be compressed by working harder |
+| 1 | ~~An approved exception seeded, then a later matching finding suppressed after a real elapsed gap~~ | — | **Closed 2026-08-22** — [evidence 10](../../assets/evidence/10-cross-week-suppression.md). Approved 08-19, suppressed 08-22; `notify_human` fired once and the owning department was not paged |
 | 2 | Model Armor refusing through an agent's `before_model_callback`, not the direct `screen_prompt` probe | Deployed Runtime, D2 | Achievable through the A2A body, which is a real untrusted surface — see the scope note below |
 | 3 | One investigation's reasoning chain in Cloud Trace | Deployed Runtime | `enable_tracing=True` is configured; configuration is not a capture |
 | 4 | Structured audit logs correlated by context ID for that same run, **including a refusal** | Capture 3 | A trail of successes proves nothing about the guardrails |
@@ -71,12 +71,12 @@ injection has been observed. Route 1 makes one obtainable; until it is captured,
 Found 2026-08-19/22 while attempting captures 1-4. Each was watched in the deployed system, not
 inferred from code. They are recorded here because all four open captures sit behind them.
 
-**Status at 2026-08-22:** D1, D3, D4, D5, D6 and D7 are fixed and shipped in 0.2.0. Only D2
-remains open, and it is no longer blocking. D1, D3 and D6 are additionally **observed**: a live
-investigation completed end to end at 16:49Z with 34 audit records under a single
-`investigation_id` across the Runtime and both workers, and `smoke_test` passes.
-What is still not observed is a **refusal** on that route, so capture 4 stays open — a trail of successes
-proves nothing about the guardrails.
+**Status at 2026-08-22:** D1, D3, D4, D5, D6, D7 and D8 are fixed. D1-D7 shipped in 0.2.0;
+D8 is fixed after it and ships in 0.2.1. Only D2 remains open, and it is no longer blocking.
+D1, D3 and D6 are **observed**, and capture 1 is now closed by
+[evidence 10](../../assets/evidence/10-cross-week-suppression.md). What is still not observed is
+a **refusal** on this route, so capture 4 stays open — a trail of successes proves nothing about
+the guardrails.
 
 ### D1. Deterministic policy enforcement does not run, and does not fail closed
 
@@ -102,6 +102,24 @@ This inverts the project's own rule that missing risk fails closed. Enforcement 
 closed; it disappears, and the finding escalates un-evaluated while the lifecycle reports success.
 `CLAUDE.md`'s "policy enforcement remains deterministic inside Orchestration" is true of the code
 and **not true of the deployed system**.
+
+### D8. A policy decision does not survive the escalation hop
+
+**Fixed and observed 2026-08-22.** A human-approved exception was scored as `suppress` and
+escalated anyway. Nothing was wrong with the policy: `apply_policy_rules_with_memory` marked it,
+and `route_by_department` excluded it. Both results were discarded one hop later.
+
+`PolicyStep` yielded an event carrying only `state_delta`, and ADK builds the outgoing A2A
+message from `event.content.parts` — so the most recent content the Escalation Agent saw was
+still the Auditor's report. `route_by_department` also returned no finding ids, so even reading
+the routing would not have given the Escalation Agent an id to copy. Both are fixed, and
+[evidence 10](../../assets/evidence/10-cross-week-suppression.md) records the run that honoured
+the exception.
+
+**This is a class, not an incident.** D6 was the Auditor's report failing to reach the policy
+step; D8 is the policy step's decision failing to reach escalation. Both are the same root
+cause — ADK session state does not cross an A2A boundary — and any future step that assumes it
+does will fail the same way, silently, in the deployed topology only.
 
 ### D2. Model Armor screening is unavailable inside the Runtime because its egress is denied
 

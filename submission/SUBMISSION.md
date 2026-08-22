@@ -36,8 +36,11 @@ or a media platform.
 - [x] **Registry:** three governed Bastion agent records and approved platform destinations.
 - [x] **Runtime:** identity-bearing Python 3.12 managed Runtime streamed live events through its
       Gateway-bound configuration ([evidence 05](../assets/evidence/05-runtime-gateway.md)).
-- [x] **Memory Bank:** managed endpoint live; restart, retrieval, suppression, expiry, stale-memory,
-      and failure branches covered by integration/unit tests.
+- [x] **Memory Bank:** managed endpoint live; restart, retrieval, expiry, stale-memory, and
+      failure branches covered by integration/unit tests. **Suppression is now observed on the
+      deployed path** — an exception approved 2026-08-19 suppressed its matching finding on
+      2026-08-22 ([evidence 10](../assets/evidence/10-cross-week-suppression.md)). Expiry firing
+      has not elapsed and stays test-only.
 - [x] **Identity:** deployed Escalation identity denied IAM read while Auditor was permitted
       ([evidence 03](../assets/evidence/03-escalation-agent-denied.md)).
 - [x] **Gateway:** IAP fail-closed policy and per-destination Runtime identity grants verified;

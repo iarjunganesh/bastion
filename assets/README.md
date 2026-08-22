@@ -19,6 +19,7 @@ Bastion's central claim is backed by redacted captures rather than architecture 
 | [07 — observability](evidence/07-observability.md) | Regional audit retention, sink, metrics, alerts, and dashboard exist | Configuration proof; not historical SLO attainment |
 | [08 — tool poisoning](evidence/08-tool-poisoning.md) | Fixed tool sets at construction; Escalation holds no policy tool or Asset client | Construction-time proof, verified to fail when widened; not a live refusal trace |
 | [09 — cross-department routing](evidence/09-cross-department-routing.md) | 52 live bindings produced 3 findings routed to 2 owning departments | Counts and department ids only; routing measurement, not a completed investigation |
+| [10 — cross-week suppression](evidence/10-cross-week-suppression.md) | A human exception approved 2026-08-19 suppressed its matching finding on 2026-08-22, on the deployed path | Three-day gap, not a calendar week; expiry firing is covered by tests only |
 
 ## Architecture and brand assets
 

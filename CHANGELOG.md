@@ -10,6 +10,50 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
+## [0.2.1] — 2026-08-22
+
+A patch release with one defect and one capture. 0.2.0 fixed session state failing to cross the
+A2A boundary in one direction; this fixes the other direction, which turned out to be the reason a
+human-approved exception had never once been honoured in production.
+
+### Fixed — a policy decision now survives the escalation hop
+
+- An approved exception was scored as `suppress` and escalated anyway. Nothing was wrong with the
+  policy: `apply_policy_rules_with_memory` marked it and `route_by_department` excluded it. Both
+  results were discarded one hop later.
+- `PolicyStep` yielded an event carrying only `state_delta`, and ADK builds the outgoing A2A
+  message from `event.content.parts` — so a state-only event contributes nothing to it, and the
+  most recent content the Escalation Agent saw was still the Auditor's report. The routing now
+  travels as event content as well as state: state is what the gate reads in-process, content is
+  the only thing that crosses.
+- Sending the routing was necessary but not sufficient. `route_by_department` returned counts and
+  reasons but **no finding ids**, so the Escalation Agent had to take ids from the raw report even
+  when it read the routing. Each bucket now carries its own `finding_ids` — the only
+  decision-filtered list of ids in the system. A finding without an id is counted and no id is
+  invented for it, because a fabricated id matches no finding and can key no exception.
+- **This is a class, not an incident.** 0.2.0 fixed the Auditor's report failing to reach the
+  policy step; this fixes the policy step's decision failing to reach escalation. Same root cause,
+  opposite direction, and any future step that assumes session state crosses A2A will fail the
+  same way — silently, and only in the deployed topology.
+
+### Observed — the track's cross-week obligation, with a real elapsed gap
+
+- [Evidence 10](assets/evidence/10-cross-week-suppression.md): an exception approved **2026-08-19**
+  suppressed its matching finding on **2026-08-22**, through the deployed Runtime and both
+  workers. `notify_human` fired **once**; the department owning the suppressed finding received no
+  notification at all rather than an empty one.
+- The immediately preceding runs that day delivered the same finding to that department while the
+  same exception was already live. That is the before-and-after this fix is measured by.
+- This was the one open claim whose critical path was elapsed time rather than effort, and the
+  repository deliberately did not claim it until now. The gap is three days, not a calendar week,
+  and the write-up says so. Expiry firing has not elapsed and remains covered by tests only.
+
+### Changed — the suite is 251 tests
+
+- Up from 247, at 100% statement and branch coverage. The new tests pin both halves of the defect:
+  that the routing leaves `policy_step` as content, and that a suppressed finding is absent from
+  what crosses to escalation.
+
 ## [0.2.0] — 2026-08-22
 
 The fleet was deployed at 0.1.0 and then watched. This release is what watching produced: seven

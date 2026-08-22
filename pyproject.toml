@@ -1,6 +1,6 @@
 [project]
 name = "bastion"
-version = "0.2.0"
+version = "0.2.1"
 description = "A fleet of governance agents auditing a live GCP IAM policy — including their own permissions"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }
