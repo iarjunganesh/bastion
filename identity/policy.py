@@ -58,6 +58,13 @@ IDENTITIES = (
         ),
     ),
     WorkloadIdentity("findings-api-sa", frozenset({"roles/datastore.user"})),
+    # The break-glass identity a human approves through. Cloud Run only accepts an ID token
+    # whose audience is the service, and no user credential can mint one, so a human reaches
+    # the approval endpoint by impersonating this identity. It holds no project role at all:
+    # its sole capability is run.invoker on the findings API, granted per-service in deploy.sh,
+    # and only the configured approver may impersonate it. Impersonation is itself an
+    # authenticated act, so the human stays named in the IAM audit log.
+    WorkloadIdentity("approver-sa", frozenset()),
     # Eventarc's delivery identity is not an agent and never receives production-data access.
     # It can receive the Pub/Sub event; its only Cloud Run permission is granted per-service in
     # deploy.sh, so it cannot invoke a peer or the findings inbox.
@@ -73,6 +80,7 @@ def validate_identities(identities: tuple[WorkloadIdentity, ...] = IDENTITIES) -
         "escalation-agent-sa",
         "findings-api-sa",
         "eventarc-invoker-sa",
+        "approver-sa",
     }:
         raise ValueError("exactly the declared Bastion identities are required")
     for identity in identities:
@@ -81,3 +89,8 @@ def validate_identities(identities: tuple[WorkloadIdentity, ...] = IDENTITIES) -
     escalation = next(identity for identity in identities if identity.name == "escalation-agent-sa")
     if any("securityReviewer" in role or "cloudasset" in role for role in escalation.roles):
         raise ValueError("escalation workload may not read IAM")
+    # The approver exists only to carry a human through Cloud Run's audience requirement.
+    # Any project role on it would turn a break-glass credential into a standing one.
+    approver = next(identity for identity in identities if identity.name == "approver-sa")
+    if approver.roles:
+        raise ValueError("approver identity may hold no project role")

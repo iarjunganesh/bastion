@@ -12,6 +12,17 @@ The current release process is in
 
 ## [Unreleased]
 
+### Changed — the reviewer grant is applied by deployment
+
+- `deploy.sh` applies `roles/run.invoker` on the findings API from `BASTION_APPROVER_PRINCIPAL`,
+  and warns when it is unset. `gcloud run deploy` re-establishes the service IAM policy, so a
+  grant made by hand does not survive the next deploy — and the only path that can create an
+  exception would stop working with nothing reporting it.
+- ADR-008 records how a human reaches an IAM-private service: `gcloud run services proxy`. A user
+  credential cannot mint an audience-scoped identity token, and impersonating a service account
+  would replace the human in the ledger with the identity the record exists to distinguish them
+  from.
+
 ### Added — the secret scan covers principal inventories, not only credentials
 
 - The scan now fails on any real service-account principal in a tracked file outside `tests/`,

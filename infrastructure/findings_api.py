@@ -13,6 +13,11 @@ was unreachable in the deployed fleet.
 The reviewer is taken from the **verified caller identity**, never from the request body.  A
 self-asserted reviewer field is an attestation that whoever can reach the endpoint can forge,
 which is not an audit trail.
+
+Verifying the token is necessary but not sufficient.  Every fleet identity that posts a review
+record already holds ``run.invoker`` here, so authorizing on reachability would let the agent
+that raises an escalation approve its own suppression.  Approval is therefore restricted to one
+deployment-configured approver identity, and the service fails closed when none is set.
 """
 
 from __future__ import annotations
@@ -46,6 +51,13 @@ EXCEPTIONS = "bastion_exceptions"
 # raised. An unbounded one is a permanent hole in the audit that nobody is reminded of, so the
 # horizon is capped here rather than trusted to the caller.
 MAX_APPROVAL_DAYS = 90
+
+# Who may approve is deployment-owned configuration, never a claim the caller makes about
+# itself. ``BASTION_APPROVER_IDENTITY`` is the identity that reaches the endpoint;
+# ``BASTION_APPROVER_PRINCIPAL`` is the human permitted to wield it, recorded so the ledger
+# names a person rather than only the credential they authenticated through.
+APPROVER_IDENTITY_VAR = "BASTION_APPROVER_IDENTITY"
+APPROVER_PRINCIPAL_VAR = "BASTION_APPROVER_PRINCIPAL"
 
 
 class Escalation(BaseModel):
@@ -105,6 +117,30 @@ def caller_identity(authorization: str | None) -> str:
             status_code=status.HTTP_403_FORBIDDEN, detail="caller carries no principal claim"
         )
     return str(principal)
+
+
+def authorize_approver(authorization: str | None) -> tuple[str, str]:
+    """Return the approver identity and the human it acts for, or refuse.
+
+    Cloud Run IAM answers "may this principal reach the service", which every worker identity
+    that posts a review record must be able to do. Approving a finding is a different authority,
+    so it is checked against configuration here rather than inferred from reachability. An
+    unconfigured approver is a refusal, not an open door.
+    """
+    identity = os.environ.get(APPROVER_IDENTITY_VAR, "").strip()
+    principal = os.environ.get(APPROVER_PRINCIPAL_VAR, "").strip()
+    if not identity or not principal:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="no exception approver is configured",
+        )
+    caller = caller_identity(authorization)
+    if caller != identity:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="caller is not the configured exception approver",
+        )
+    return caller, principal
 
 
 def _validate(payload: Escalation) -> None:
@@ -184,7 +220,11 @@ def accept_escalation(
 
 
 def record_approval(
-    finding_id: str, approved_until: datetime, reviewer: str, policy_version: str
+    finding_id: str,
+    approved_until: datetime,
+    reviewer: str,
+    policy_version: str,
+    on_behalf_of: str,
 ) -> None:
     """Write the exception the Orchestrator's suppression path reads.
 
@@ -196,6 +236,7 @@ def record_approval(
         {
             "approved_until": approved_until.isoformat(),
             "reviewer": reviewer,
+            "on_behalf_of": on_behalf_of,
             "policy_version": policy_version,
         }
     )
@@ -205,17 +246,19 @@ def record_approval(
 def approve_exception(
     payload: ExceptionApproval, authorization: str | None = Header(default=None)
 ) -> dict[str, object]:
-    """Approve one opaque finding for a bounded period, as a named human.
+    """Approve one opaque finding for a bounded period, as the one configured approver.
 
     This is the write side of the cross-week story. The Orchestrator already reads this ledger on
     every finding; until this endpoint existed, nothing in production wrote to it.
     """
-    reviewer = caller_identity(authorization)
+    reviewer, on_behalf_of = authorize_approver(authorization)
     try:
         approved_until = _validate_approval(payload)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    record_approval(payload.finding_id, approved_until, reviewer, payload.policy_version)
+    record_approval(
+        payload.finding_id, approved_until, reviewer, payload.policy_version, on_behalf_of
+    )
     return {
         "finding_id": payload.finding_id,
         "approved_until": approved_until.isoformat(),

@@ -106,7 +106,7 @@ deploy_findings_api() {
     --service-account "$(sa findings-api-sa)" --no-allow-unauthenticated --ingress all \
     --min-instances 0 --max-instances "$MAX_INSTANCES" \
     --command python --args=-m,infrastructure.findings_api \
-    --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID" \
+    --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,BASTION_APPROVER_IDENTITY=$(sa approver-sa),BASTION_APPROVER_PRINCIPAL=${BASTION_APPROVER_PRINCIPAL:-}" \
     --labels "app=bastion,component=findings-inbox,classification=internal"
 }
 
@@ -116,6 +116,24 @@ deploy_findings_api
 FINDINGS_ENDPOINT="$(uri bastion-findings-api)/v1/escalations"
 gcloud run services add-iam-policy-binding bastion-findings-api --project "$PROJECT_ID" --region "$REGION" \
   --member="serviceAccount:$(sa escalation-agent-sa)" --role=roles/run.invoker
+
+# `gcloud run deploy` re-establishes the service IAM policy, so an approval grant made by
+# hand is removed by the next deploy and the ADR-008 path silently stops working. The grant
+# is therefore part of deployment.
+#
+# The human does NOT receive run.invoker directly: Cloud Run accepts only an ID token whose
+# audience is the service, and no user credential can mint one, so such a grant is unusable.
+# Instead the approver identity holds the invoker role, and the human is granted the ability
+# to impersonate exactly that identity and nothing else. Impersonation is an authenticated
+# act in its own right, so the human stays named in the IAM audit log.
+gcloud run services add-iam-policy-binding bastion-findings-api --project "$PROJECT_ID" --region "$REGION" \
+  --member="serviceAccount:$(sa approver-sa)" --role=roles/run.invoker
+if [[ -n "${BASTION_APPROVER_PRINCIPAL:-}" ]]; then
+  gcloud iam service-accounts add-iam-policy-binding "$(sa approver-sa)" --project "$PROJECT_ID" \
+    --member="$BASTION_APPROVER_PRINCIPAL" --role=roles/iam.serviceAccountTokenCreator
+else
+  echo "BASTION_APPROVER_PRINCIPAL unset: no human can approve an exception here." >&2
+fi
 
 # Peers first: their URIs are inputs to the Orchestrator, never manually copied into .env.
 deploy_agent bastion-access-auditor access_auditor "$(sa access-auditor-sa)"

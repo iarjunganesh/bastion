@@ -81,3 +81,21 @@ def test_no_secret_value_is_committed_in_the_example():
     for line in text.splitlines():
         if line.startswith(("BASTION_FINDING_HMAC_KEY", "BASTION_A2A_SHARED_SECRET=")):
             assert line.split("=", 1)[1] == "", f"{line.split('=')[0]} carries a value"
+
+
+def test_the_example_sources_cleanly_in_a_posix_shell():
+    """`deploy.sh` is bash, so an unquoted value with shell syntax silently changes meaning.
+
+    Firestore's default database is literally named `(default)`. Unquoted, bash reads `=(...)`
+    as an array assignment and yields `default` — a different database, with no error anywhere.
+    """
+    for line in (ROOT / ".env.example").read_text(encoding="utf-8").splitlines():
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, _, value = line.partition("=")
+        if not name.isupper():
+            continue
+        unquoted = not (value.startswith('"') and value.endswith('"'))
+        assert not (unquoted and any(c in value for c in "()$`&|;<>*?")), (
+            f"{name} carries shell-significant characters and must be quoted"
+        )

@@ -31,6 +31,10 @@ reading the code.
 - **A model must not be able to suppress a finding.** `SECURITY.md` already stated that the
   model cannot create an exception. Making approval an agent tool would have reversed that for
   convenience, so the write lives on the human surface behind Cloud Run IAM instead.
+- **Separation of duties must be enforced, not merely intended.** The agent that raises an
+  escalation and the party that approves suppressing it cannot be the same principal. Because
+  the Escalation Agent must reach this service to write a review record, that separation has to
+  be an explicit check inside the endpoint rather than a property of who holds `run.invoker`.
 - **Self-asserted identity is not an audit trail.** `approve()` accepts `reviewer` as a string.
   Reached over HTTP that is an attestation the caller forges about itself. Deriving the reviewer
   from the verified ID token is what makes the ledger evidence of *who* accepted the risk.
@@ -48,8 +52,31 @@ reading the code.
   parameter set by equality, so a future widening fails loudly.
 - That same test fails if any agent ever declares an approval tool, which is the enforcement
   behind this record rather than a convention.
-- A human operator needs `roles/run.invoker` on the findings API to approve. This is a
-  deliberate, separate grant from the Escalation Agent's write access.
+- **Reaching the endpoint is not permission to approve.** Every worker identity that posts a
+  review record already holds `roles/run.invoker` here, so authorizing on reachability would
+  have let the Escalation Agent approve the suppression of a finding it raised itself. The
+  service therefore checks the verified caller against one deployment-configured approver
+  identity and refuses everything else, including an unset configuration.
+- A human cannot call an IAM-private Cloud Run service directly. The invoker check accepts only
+  a Google-signed ID token whose audience is the service, `--audiences` requires a service
+  account, and Cloud Run rejects OAuth access tokens — so `gcloud run services proxy`, which
+  forwards the same user credential, does not help either. Granting the human `run.invoker` is
+  necessary-looking and useless; this ADR previously recorded that unusable path.
+- The reviewer therefore approves through `approver-sa`, a break-glass identity holding no
+  project role at all and exactly one capability: `run.invoker` on the findings API.
+  `BASTION_APPROVER_PRINCIPAL` is granted `roles/iam.serviceAccountTokenCreator` on that
+  identity alone, so only that human can wield it.
+- **Attribution survives the indirection.** Impersonation is itself an authenticated act, so
+  Cloud Audit Logs record `GenerateIdToken` with the human as the actor and the approver as the
+  target. The ledger stores the verified calling identity as `reviewer` and the configured human
+  as `on_behalf_of` — deployment-owned configuration, never a value the caller asserts. Naming
+  the person is thus a two-record chain, and this ADR states that rather than implying the
+  token itself carried a human identity.
+- All of this is applied by `deploy.sh`, not by hand: `gcloud run deploy` re-establishes the
+  service IAM policy, so a hand-made grant is removed by the next deploy and the approval path
+  stops working with nothing reporting it. `tests/security/test_identity_policy.py` fails if the
+  approver ever gains a project role, and `tests/unit/test_findings_api.py` fails if a reachable
+  non-approver is admitted or an unconfigured service opens the door.
 - The cross-week claim can now be demonstrated end to end through deployed surfaces instead of
   seeded by an unaudited console edit. A console-authored Firestore document would have bypassed
   the very audit trail this project argues for.
