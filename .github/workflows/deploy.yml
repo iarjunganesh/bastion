@@ -67,6 +67,57 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Fail here, with the list, rather than four steps later inside the auth action with a
+      # message that says only that federation did not work. Only names are printed, never
+      # values, so a misconfiguration is reported without publishing what is configured.
+      - name: Check the deploy configuration is complete
+        env:
+          GCP_WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          GCP_DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA }}
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}
+          AGENT_RUNTIME_REGION: ${{ vars.AGENT_RUNTIME_REGION }}
+          VERTEX_AI_MODEL: ${{ vars.VERTEX_AI_MODEL }}
+          MODEL_ARMOR_LOCATION: ${{ vars.MODEL_ARMOR_LOCATION }}
+          MODEL_ARMOR_TEMPLATE_ID: ${{ vars.MODEL_ARMOR_TEMPLATE_ID }}
+          BASTION_RUNTIME_AGENT_ENGINE_ID: ${{ vars.BASTION_RUNTIME_AGENT_ENGINE_ID }}
+          BASTION_MEMORY_AGENT_ENGINE_ID: ${{ vars.BASTION_MEMORY_AGENT_ENGINE_ID }}
+          BASTION_SESSION_SERVICE_URI: ${{ vars.BASTION_SESSION_SERVICE_URI }}
+          BASTION_MEMORY_SERVICE_URI: ${{ vars.BASTION_MEMORY_SERVICE_URI }}
+          BASTION_FINDING_HMAC_SECRET: ${{ vars.BASTION_FINDING_HMAC_SECRET }}
+          BASTION_A2A_SHARED_SECRET_ID: ${{ vars.BASTION_A2A_SHARED_SECRET_ID }}
+          PUBSUB_TOPIC: ${{ vars.PUBSUB_TOPIC }}
+          BASTION_APPROVER_PRINCIPAL: ${{ vars.BASTION_APPROVER_PRINCIPAL }}
+        run: |
+          set -euo pipefail
+          missing=""
+          for name in GCP_WIF_PROVIDER GCP_DEPLOY_SA GCP_PROJECT_ID GCP_REGION \
+                      AGENT_RUNTIME_REGION VERTEX_AI_MODEL MODEL_ARMOR_LOCATION \
+                      MODEL_ARMOR_TEMPLATE_ID BASTION_RUNTIME_AGENT_ENGINE_ID \
+                      BASTION_MEMORY_AGENT_ENGINE_ID BASTION_SESSION_SERVICE_URI \
+                      BASTION_MEMORY_SERVICE_URI BASTION_FINDING_HMAC_SECRET \
+                      BASTION_A2A_SHARED_SECRET_ID PUBSUB_TOPIC; do
+            if [ -z "${!name:-}" ]; then
+              missing="$missing $name"
+            fi
+          done
+          # Optional by design. deploy.sh already reports that without it no human can approve
+          # an exception; that is a degraded deploy, not a broken one, and the platform owner
+          # may reasonably decline to put a named human into repository variables.
+          if [ -z "${BASTION_APPROVER_PRINCIPAL:-}" ]; then
+            echo "::warning::BASTION_APPROVER_PRINCIPAL is unset - the deployed fleet will have no human able to approve an exception."
+          fi
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository variables:$missing"
+            echo "Settings -> Secrets and variables -> Actions -> Variables."
+            echo "infrastructure/provision_wif.sh prints the two federation values; the rest are"
+            echo "the same ids and regions a local deploy reads from .env. None is a secret:"
+            echo "the two BASTION_*_SECRET* variables are Secret Manager resource ids, and the"
+            echo "secret material itself is mounted by Cloud Run, never handled here."
+            exit 78
+          fi
+          echo "All required deploy variables are present."
+
       - name: Authenticate by federation
         uses: google-github-actions/auth@v2
         with:
@@ -105,12 +156,26 @@ jobs:
           PUBSUB_TOPIC: ${{ vars.PUBSUB_TOPIC }}
         run: |
           set -euo pipefail
-          case "${{ inputs.target }}" in
-            workers|both) bash infrastructure/deploy.sh ;;
-          esac
-          case "${{ inputs.target }}" in
-            runtime|both) python -m infrastructure.deploy_agent_runtime ;;
-          esac
+          # This repository is public, so this log is world-readable. `deploy.sh` silences the
+          # IAM policy dumps itself, but `gcloud run deploy` reports each Service URL on stderr
+          # and those origins are the private A2A peer endpoints - the same values the
+          # dispatcher is deliberately not allowed to hold. Redact on the way to the log rather
+          # than in the script: an operator running `deploy.sh` by hand needs to read them.
+          # This filter rewrites text, it does not drop it, so a failure still reports in full.
+          redact() {
+            sed -E \
+              -e 's#https://[A-Za-z0-9._-]+\.run\.app#https://REDACTED.run.app#g' \
+              -e 's#[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.iam\.gserviceaccount\.com#REDACTED-SERVICE-ACCOUNT#g' \
+              -e 's#(user|group|domain|serviceAccount|principalSet|principal):[^ ",]+#\1:REDACTED#g'
+          }
+          {
+            case "${{ inputs.target }}" in
+              workers|both) bash infrastructure/deploy.sh ;;
+            esac
+            case "${{ inputs.target }}" in
+              runtime|both) python -m infrastructure.deploy_agent_runtime ;;
+            esac
+          } 2>&1 | redact
 
       # Read-only. Deploying without checking the result is how a fleet reports success while
       # serving a revision that cannot complete an investigation.
