@@ -39,7 +39,7 @@ categories, never bindings.
 The committed [GCP measurement](assets/architecture/gcp-state.json) was generated from the live
 project and contains counts only:
 
-- 21/21 named Google Cloud APIs enabled and 38 deployed resources measured;
+- 21/21 named Google Cloud APIs enabled and 39 deployed resources measured;
 - four Cloud Run services in `europe-north2`;
 - a managed Agent Runtime and a separate durable Memory Bank in `europe-west4`;
 - one Agent-to-Anywhere Gateway, IAP authorization extension, and fail-closed auth policy;
@@ -312,6 +312,13 @@ Agent Registry, Firestore, Secret Manager, or the audit bucket. It may act as th
 identities and not as the approver identity, so a pipeline cannot approve the suppression of a
 finding. The Deploy workflow is `workflow_dispatch` only, because deploying a live
 access-governance fleet is a decision someone should make rather than a consequence of merging.
+
+**Configured 2026-08-22, not yet exercised.** The pool, provider and grants exist, and the
+boundary is verified twice over: the provider admits only `assertion.repository ==` this
+repository, and impersonation is bound to that same repository's `principalSet` rather than
+to the pool, so an error in either is caught by the other. The deployer holds the five roles
+above and cannot act as the approver identity. No deploy has run through this path yet, so
+nothing here is claimed as observed.
 
 GitHub Actions otherwise runs deterministic unit, integration, security, load, type, dependency,
 secret, documentation, and diagram gates. The current local Python 3.12 result is **251 passed
