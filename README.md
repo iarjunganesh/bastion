@@ -313,6 +313,13 @@ identities and not as the approver identity, so a pipeline cannot approve the su
 finding. The Deploy workflow is `workflow_dispatch` only, because deploying a live
 access-governance fleet is a decision someone should make rather than a consequence of merging.
 
+**Configured 2026-08-22, not yet exercised.** The pool, provider and grants exist, and the
+boundary is verified twice over: the provider admits only `assertion.repository ==` this
+repository, and impersonation is bound to that same repository's `principalSet` rather than
+to the pool, so an error in either is caught by the other. The deployer holds the five roles
+above and cannot act as the approver identity. No deploy has run through this path yet, so
+nothing here is claimed as observed.
+
 GitHub Actions otherwise runs deterministic unit, integration, security, load, type, dependency,
 secret, documentation, and diagram gates. The current local Python 3.12 result is **251 passed
 and 100.00% coverage**.
