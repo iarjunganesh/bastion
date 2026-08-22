@@ -404,6 +404,53 @@ def check_internal_links() -> None:
                     fail(f"{rel}:{number} names `{quoted}`, which does not exist")
 
 
+def check_diagram_footers_match_state() -> None:
+    """A rendered diagram may not quote a resource count the live capture disagrees with.
+
+    This gate exists because the opposite happened, and nothing caught it for six days. Every
+    check in this file reads Markdown; the architecture SVGs are embedded in README.md and are
+    the first thing a judge looks at, and they were never scanned. Level 2 carried
+    *"One process, one identity. Per-agent service accounts need three deployed apps"* —
+    the pre-deployment claim, contradicting the three deployed services described three
+    sections above it in the same README — while both footers and the banner pair quoted 33
+    resources against a live capture of 39.
+
+    A number is checked rather than a phrase because a phrase list only catches the mistakes
+    already made once. The footers are required to agree with `gcp-state.json`, which is
+    generated from the live project, so the diagram cannot drift from the fleet silently.
+    """
+    state = json.loads(read("assets/architecture/gcp-state.json"))
+    measured = sum(v for v in state["resources"].values() if isinstance(v, int))
+
+    quoted = re.compile(r"(\d+)\s+(?:deployed\s+)?resources?(?:\s+measured)?", re.IGNORECASE)
+    for svg in sorted((ROOT / "assets").rglob("*.svg")):
+        text = svg.read_text(encoding="utf-8")
+        for match in quoted.finditer(text):
+            if int(match.group(1)) != measured:
+                fail(
+                    f"{svg.relative_to(ROOT).as_posix()} quotes {match.group(1)} resources, "
+                    f"but gcp-state.json measures {measured} — re-render from the master"
+                )
+
+
+def check_diagrams_do_not_contradict_the_fleet() -> None:
+    """Phrases a rendered diagram may not carry, because the deployment retired them.
+
+    Companion to check_retired_deployment_claims(), which scans only Markdown. Kept as a
+    separate list because a diagram states things a document never would — a footer is written
+    to be read at a glance and is exactly where an obsolete simplification survives longest.
+    """
+    retired = (
+        "One process, one identity",
+        "Per-agent service accounts need three deployed apps",
+    )
+    for svg in sorted((ROOT / "assets").rglob("*.svg")):
+        text = svg.read_text(encoding="utf-8")
+        for phrase in retired:
+            if phrase in text:
+                fail(f"{svg.relative_to(ROOT).as_posix()} retains a retired claim: '{phrase}'")
+
+
 def main() -> int:
     check_internal_links()
     check_source_path_references()
@@ -416,6 +463,8 @@ def main() -> int:
     check_unverified_claims()
     check_retired_deployment_claims()
     check_diagrams_are_grounded()
+    check_diagram_footers_match_state()
+    check_diagrams_do_not_contradict_the_fleet()
 
     if failures:
         print("Documentation disagrees with the repository:\n")

@@ -210,6 +210,6 @@ svg {
     <circle cx="720" cy="1046" r="9" fill="none" stroke="var(--edge)" stroke-width="2"/>
     <text class="legend" x="738" y="1054">not started</text>
   </g>
-  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-16 · 21/21 APIs · 33 deployed resources</text>
+  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-22 · 21/21 APIs · 39 deployed resources</text>
   <text class="foot"  x="1860" y="1016" text-anchor="end">Managed Runtime + Gateway + durable Eventarc fleet live · Scheduler is outside this deployment.</text>
 </svg>
