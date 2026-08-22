@@ -381,17 +381,25 @@ def build_sub_agents() -> list[Any]:
     return [access_auditor, policy_step, policy_gate, escalation_agent]
 
 
-# Audit -> apply policy -> gate -> escalate. Each step reads the previous one's `output_key`
-# from session state, which is what makes the chain reconstructable in a trace afterwards.
+# Audit -> apply policy -> gate -> escalate.
+#
+# **How a step reads its predecessor depends on the transport, and assuming otherwise cost two
+# production defects.** In-process, `output_key` puts the previous step's result in the shared
+# session state and the next step simply reads it. Over A2A each agent has its own session, so
+# that state does not cross in either direction: the Auditor's report never arrived in the
+# Orchestrator's state (D6), and the policy decision never arrived at the Escalation Agent (D8).
+# What crosses is event *content*, so each hand-off that spans a hop travels as content and is
+# read back deterministically. `policy_gate` is the exception that proves the rule — it reads
+# state directly because it and `policy_step` are both in-process here, and nothing about it
+# crosses a boundary.
 #
 # The gate is a step rather than a check inside the Escalation Agent because the Escalation
 # Agent is remote: a guard that travels over A2A is a guard the caller has to trust the callee
 # to run. Keeping it in the Orchestrator keeps policy enforcement where ADR-002 put it.
 #
-# The composition is the same either way; only the transport changes. That is the point of
-# doing this with `RemoteA2aAgent` rather than two code paths — the sequence a judge sees in a
-# trace is the sequence the local run produces, so the demo and the development loop cannot
-# drift apart.
+# The *sequence* is the same either way, which is the point of using `RemoteA2aAgent` rather
+# than two code paths: the order a judge sees in a trace is the order a local run produces.
+# The hand-offs are not the same either way, and this file no longer pretends they are.
 root_agent = SequentialAgent(
     name="orchestrator",
     description=(

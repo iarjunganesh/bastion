@@ -1,0 +1,127 @@
+name: Deploy
+
+# Manual only, and deliberately so. A deploy to a live access-governance fleet is a decision, not
+# a consequence of merging. Triggering on push would also mean any change to a document redeploys
+# production, which is how a fleet ends up running a revision nobody chose.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "What to deploy"
+        required: true
+        default: runtime
+        type: choice
+        options:
+          - runtime
+          - workers
+          - both
+
+run-name: "Deploy ${{ inputs.target }} (${{ github.actor }})"
+
+# No service-account key exists. `id-token: write` lets GitHub mint a short-lived OIDC token that
+# the pool exchanges for a short-lived Google token, scoped by the provider's attribute condition
+# to this repository alone.
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  gate:
+    name: Offline gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GOOGLE_CLOUD_PROJECT: "bastion-ci-mock"
+      GOOGLE_CLOUD_LOCATION: "global"
+      GOOGLE_GENAI_USE_VERTEXAI: "TRUE"
+      GCP_PROJECT_ID: "bastion-ci-mock"
+      GCP_REGION: "europe-north2"
+      VERTEX_AI_MODEL: "gemini-3.5-flash"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      # The same gate a tag has to pass. Deploying code that could not be released is how a fleet
+      # and its repository drift apart, which is the failure this project argues against.
+      - run: ruff check . && ruff format --check .
+      - run: mypy agents gateway identity registry runtime model_armor observability infrastructure
+      - run: pytest tests --cov --cov-fail-under=100
+      - run: python scripts/check_docs.py
+      - run: python scripts/check_versions.py
+
+  deploy:
+    name: Deploy to bastion-fleet-2026
+    needs: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # A GitHub environment gives this a second, human-owned approval gate if one is configured on
+    # it. Without a configured reviewer the job still runs, so the environment is a place to add
+    # that control rather than a claim that it is already enforced.
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate by federation
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      # Every value the deploy scripts read, declared here rather than sourced from a .env that
+      # does not exist on a runner. `.env.example` is the contract these must satisfy, and
+      # tests/unit/test_environment_contract.py fails when the two drift.
+      - name: Deploy
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GOOGLE_CLOUD_PROJECT: ${{ vars.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}
+          GOOGLE_CLOUD_LOCATION: global
+          GOOGLE_GENAI_USE_VERTEXAI: "TRUE"
+          VERTEX_AI_MODEL: ${{ vars.VERTEX_AI_MODEL }}
+          AGENT_RUNTIME_REGION: ${{ vars.AGENT_RUNTIME_REGION }}
+          MODEL_ARMOR_LOCATION: ${{ vars.MODEL_ARMOR_LOCATION }}
+          MODEL_ARMOR_TEMPLATE_ID: ${{ vars.MODEL_ARMOR_TEMPLATE_ID }}
+          BASTION_RUNTIME_AGENT_ENGINE_ID: ${{ vars.BASTION_RUNTIME_AGENT_ENGINE_ID }}
+          BASTION_MEMORY_AGENT_ENGINE_ID: ${{ vars.BASTION_MEMORY_AGENT_ENGINE_ID }}
+          BASTION_SESSION_SERVICE_URI: ${{ vars.BASTION_SESSION_SERVICE_URI }}
+          BASTION_MEMORY_SERVICE_URI: ${{ vars.BASTION_MEMORY_SERVICE_URI }}
+          BASTION_FINDING_HMAC_SECRET: ${{ vars.BASTION_FINDING_HMAC_SECRET }}
+          BASTION_A2A_SHARED_SECRET_ID: ${{ vars.BASTION_A2A_SHARED_SECRET_ID }}
+          BASTION_APPROVER_PRINCIPAL: ${{ vars.BASTION_APPROVER_PRINCIPAL }}
+          PUBSUB_TOPIC: ${{ vars.PUBSUB_TOPIC }}
+        run: |
+          set -euo pipefail
+          case "${{ inputs.target }}" in
+            workers|both) bash infrastructure/deploy.sh ;;
+          esac
+          case "${{ inputs.target }}" in
+            runtime|both) python -m infrastructure.deploy_agent_runtime ;;
+          esac
+
+      # Read-only. Deploying without checking the result is how a fleet reports success while
+      # serving a revision that cannot complete an investigation.
+      - name: Verify the deployed fleet
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GOOGLE_CLOUD_PROJECT: ${{ vars.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}
+          GOOGLE_CLOUD_LOCATION: global
+          AGENT_RUNTIME_REGION: ${{ vars.AGENT_RUNTIME_REGION }}
+          MODEL_ARMOR_LOCATION: ${{ vars.MODEL_ARMOR_LOCATION }}
+          MODEL_ARMOR_TEMPLATE_ID: ${{ vars.MODEL_ARMOR_TEMPLATE_ID }}
+          BASTION_RUNTIME_AGENT_ENGINE_ID: ${{ vars.BASTION_RUNTIME_AGENT_ENGINE_ID }}
+        run: python -m infrastructure.verify_fleet

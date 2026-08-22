@@ -300,10 +300,22 @@ python scripts/check_versions.py
 python scripts/render_diagrams.py --check
 ```
 
-CI holds no GCP credential. Live deployment checks run from an approved operator workstation;
-GitHub Actions runs deterministic unit, integration, security, load, type, dependency, secret,
-documentation, and diagram gates. The current local Python 3.12 result is **251 passed and
-100.00% coverage**.
+CI holds no GCP **key**, and never will: `infrastructure/provision_wif.sh` federates GitHub
+Actions through Workload Identity so a short-lived OIDC token is exchanged for a short-lived
+Google one. There is nothing to leak and nothing to rotate. The provider pins
+`assertion.repository` to one repository — Google accepts any token GitHub's issuer signs, and
+GitHub signs one for every repository on the platform, so that condition is the entire boundary.
+
+The federated identity may deploy **code** and may not change **authority**: `run.developer`
+rather than `run.admin`, and no role that can create a binding or alter Eventarc, Pub/Sub, the
+Agent Registry, Firestore, Secret Manager, or the audit bucket. It may act as the three workload
+identities and not as the approver identity, so a pipeline cannot approve the suppression of a
+finding. The Deploy workflow is `workflow_dispatch` only, because deploying a live
+access-governance fleet is a decision someone should make rather than a consequence of merging.
+
+GitHub Actions otherwise runs deterministic unit, integration, security, load, type, dependency,
+secret, documentation, and diagram gates. The current local Python 3.12 result is **251 passed
+and 100.00% coverage**.
 
 ## Repository map
 
