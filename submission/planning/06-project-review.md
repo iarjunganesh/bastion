@@ -8,7 +8,7 @@
 - Durable Eventarc/Firestore lifecycle, leases, retry, DLQ, deduplication, and idempotent findings.
 - PII/protected-data boundary, payload-free full audit lifecycle, and explicit sovereignty limits.
 - Reproducible Python 3.12 Windows deployment, smoke, rollback, teardown, and CI gates.
-- 206 tests with 100% statement and branch coverage.
+- 207 tests with 100% statement and branch coverage.
 
 ## Residual submission work
 

@@ -17,6 +17,7 @@ Every record below traces to a line there.
 | [006](006-pillar-coverage.md) | One observable proof closes each of the seven pillars, and each submission artifact | Accepted |
 | [007](007-tool-poisoning.md) | Tool poisoning defended at the tool-declaration boundary, not the prompt | Accepted |
 | [008](008-human-approval-loop.md) | Exception approval is a human act on the private findings API, with the reviewer taken from the verified caller | Accepted |
+| [009](009-model-armor-threshold.md) | The Model Armor threshold stays `MEDIUM_AND_ABOVE`; raising it does not clear the fleet's own traffic, so the threshold is not the lever | Accepted |
 
 ## Why the numbering looks the way it does
 

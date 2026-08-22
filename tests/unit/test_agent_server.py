@@ -6,6 +6,7 @@ import asyncio
 import base64
 import json
 from concurrent.futures import CancelledError
+from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
 import pytest
@@ -175,3 +176,50 @@ def test_managed_runtime_keeps_client_for_async_session_and_stream(monkeypatch):
     )
     assert calls[2] == ("session", "week-42")
     assert calls[3][0] == "stream"
+
+
+def test_the_runtime_dispatch_message_is_data_not_an_instruction(monkeypatch):
+    """Prose addressed to an agent is indistinguishable from a prompt injection.
+
+    The dispatcher once sent "Run the scheduled governed IAM investigation. Use only registered
+    agents and correlate the result to opaque investigation <id>." Model Armor scored that at
+    HIGH confidence -- the same as a real attack -- and since screening fails closed it refused
+    every investigation the fleet ran. Neither raising nor lowering the threshold separated the
+    two, because what differs is provenance and a content classifier cannot see provenance.
+
+    So the message must stay structured data. This asserts the shape rather than the wording:
+    valid JSON carrying the correlation id, with no imperative prose for a classifier to read.
+    """
+    import json as _json
+
+    captured: dict[str, object] = {}
+
+    class _Engine:
+        async def async_create_session(self, user_id):
+            return {"id": "session-1"}
+
+        async def async_stream_query(self, *, user_id, session_id, message):
+            captured["message"] = message
+            return
+            yield  # pragma: no cover - generator protocol only
+
+    class _Client:
+        def __init__(self, **_kwargs):
+            self.agent_engines = SimpleNamespace(get=lambda name: _Engine())
+
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "p")
+    monkeypatch.setenv("GCP_PROJECT_NUMBER", "1234567890")
+    monkeypatch.setenv("BASTION_RUNTIME_AGENT_ENGINE_ID", "engine-1")
+    monkeypatch.setattr(agent_server, "Client", _Client)
+
+    event_id = "3f2504e0-4f89-11d3-9a0c-0305e82c3301"
+    event = InvestigationEvent(event_id=event_id, context_id="8e4767d4-8801-44ea-a050-26fb4bb1867a")
+    asyncio.run(agent_server.run_managed_runtime(event))
+
+    message = captured["message"]
+    assert isinstance(message, str)
+    payload = _json.loads(message)  # prose would raise here
+    assert payload["investigation_id"] == event_id
+    lowered = message.lower()
+    for imperative in ("run the", "use only", "you must", "please ", "ignore "):
+        assert imperative not in lowered, f"dispatch message reads as an instruction: {imperative}"

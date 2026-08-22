@@ -171,9 +171,21 @@ async def run_managed_runtime(event: InvestigationEvent) -> None:
     async for _event in engine.async_stream_query(
         user_id=event.context_id,
         session_id=session["id"],
-        message=(
-            "Run the scheduled governed IAM investigation. Use only registered agents and "
-            f"correlate the result to opaque investigation {event.event_id}."
+        # Structured data, not an imperative sentence. The previous wording -- "Run the
+        # scheduled governed IAM investigation. Use only registered agents and correlate..." --
+        # is, to a prompt-injection classifier, exactly what an injection looks like: an
+        # instruction telling an agent what to do. Model Armor scored it at HIGH confidence,
+        # the same as a real attack, and because screening fails closed it refused every
+        # investigation the fleet ever ran. Provenance is what distinguishes the two, and a
+        # content classifier cannot see provenance.
+        #
+        # Restating the constraint as data also matches where it is actually enforced. "Use
+        # only registered agents" was never a request the model could honour or ignore --
+        # Registry and IAP authorize egress deterministically -- so asking for it in prose
+        # bought nothing and cost the whole pipeline.
+        message=json.dumps(
+            {"task": "scheduled_iam_access_review", "investigation_id": event.event_id},
+            sort_keys=True,
         ),
     ):
         pass

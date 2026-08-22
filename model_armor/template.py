@@ -5,26 +5,20 @@ nobody notices when it drifts. Holding the filter configuration here makes the s
 part of the repository: provisioning applies it, and `verify_fleet` fails when the deployed
 template stops matching.
 
-**Why `MEDIUM_AND_ABOVE` and not the stricter `LOW_AND_ABOVE`.** The stricter setting was
-deployed and measured against the live template on 2026-08-19. It refused the fleet's own
-repository-owned prompts, and because Model Armor fails closed, every agent stopped producing
-output at all: no tool calls, no findings, no escalation. A control that blocks 100% of
-legitimate traffic supplies an outage, not security. The measurement separates the two cases
-cleanly:
+**Why `MEDIUM_AND_ABOVE`.** Measured against the live template on 2026-08-19 rather than
+reasoned about. The evidence 01 injection probe scores `HIGH`; the `access_auditor` instruction
+scores `LOW`; the investigation envelope and a benign control do not match at all. `LOW` refused
+the agents' own instructions, and Model Armor fails closed, so that refusal stopped every model
+call in the fleet.
 
-| Prompt screened | Match | Confidence |
-|---|---|---|
-| The injection probe from evidence 01 | yes | `HIGH` |
-| `access_auditor` instruction (legitimate) | yes | `LOW` |
-| `escalation_agent` instruction (legitimate) | no | -- |
-| Benign control | no | -- |
+`HIGH` was tried and reverted. It did not clear the remaining false positive -- the fleet's
+internal A2A hand-off scores at the same confidence as a real injection, because structurally a
+message instructing an agent *is* an injection and only its provenance differs. So the threshold
+is not the lever, and `HIGH` would have traded sensitivity for nothing. The real fix is to narrow
+what gets screened; see [ADR-009](../docs/adr/009-model-armor-threshold.md).
 
-`MEDIUM_AND_ABOVE` therefore still refuses the real injection while clearing the false positive.
-Enforcement stays `ENABLED`: the threshold moves, the filter is not turned off, and nothing here
-weakens the separate deterministic controls -- the fixed tool allowlist defends tool poisoning
-([ADR-007](../docs/adr/007-tool-poisoning.md)) and post-model screening defends protected data.
-Raising the threshold further, or disabling enforcement, is a deliberate security change and
-should be argued for in an ADR rather than made here.
+Enforcement stays `ENABLED`: the threshold moves, the filter is not switched off. Changing either
+is a security decision and belongs in an ADR.
 """
 
 from __future__ import annotations

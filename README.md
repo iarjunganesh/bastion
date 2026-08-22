@@ -59,7 +59,7 @@ Observed production checks include:
   idempotency key being accepted without creating a duplicate;
 - a Vertex quota failure recorded as a payload-free `model.request=failed`, with the
   investigation left reclaimable rather than cleared;
-- 206 tests at 100% statement and branch coverage under Python 3.12.
+- 207 tests at 100% statement and branch coverage under Python 3.12.
 
 The retained evidence is indexed in [assets/README.md](assets/README.md). The exact distinction
 between deployed, observed, and still-to-capture claims lives in
@@ -291,7 +291,7 @@ python scripts/render_diagrams.py --check
 
 CI holds no GCP credential. Live deployment checks run from an approved operator workstation;
 GitHub Actions runs deterministic unit, integration, security, load, type, dependency, secret,
-documentation, and diagram gates. The current local Python 3.12 result is **206 passed and
+documentation, and diagram gates. The current local Python 3.12 result is **207 passed and
 100.00% coverage**.
 
 ## Repository map
@@ -326,6 +326,7 @@ submission/                 Devpost copy, checklist, and planning ledger
 - [ADR-006 — observable pillar proof](docs/adr/006-pillar-coverage.md)
 - [ADR-007 — tool poisoning](docs/adr/007-tool-poisoning.md)
 - [ADR-008 — human approval loop](docs/adr/008-human-approval-loop.md)
+- [ADR-009 — Model Armor threshold](docs/adr/009-model-armor-threshold.md)
 - [Evidence index](assets/README.md)
 - [Submission readiness](submission/SUBMISSION.md)
 - [Audit remediation ledger](submission/planning/08-audit-remediation-plan.md)
