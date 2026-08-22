@@ -15,37 +15,44 @@
 
 <p align="center">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</p>
 
-<!-- Row 1 — repository state. Nothing here asserts a measured number by hand: CI and Codecov
-     report their own, and scripts/check_docs.py fails the build if a static badge tries to. -->
+<!-- Row 1 — repository state. Same five as the sibling repositories, same order.
+     Publishing the demo: wrap the last line as
+     [![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)](https://youtu.be/YOUR_ID)
+     Four minutes is the brief's ceiling — see submission/SUBMISSION.md.
+     Nothing may be inserted between these badge lines: a comment breaks the paragraph and
+     drops the badge after it onto a row of its own. -->
 [![CI](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml)
 [![Codecov](https://codecov.io/gh/iarjunganesh/bastion/graph/badge.svg)](https://codecov.io/gh/iarjunganesh/bastion)
-[![Release](https://img.shields.io/badge/release-v0.2.1-2ea44f?logo=github&logoColor=white)](https://github.com/iarjunganesh/bastion/releases)
+[![Release](https://img.shields.io/badge/release-latest-2ea44f?logo=github&logoColor=white)](https://github.com/iarjunganesh/bastion/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)
+
+<!-- Row 2 — what Bastion is actually built on, plus the program badge earned before it. -->
+[![Google ADK 2.7.1](https://img.shields.io/badge/Google_ADK-2.7.1-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
+[![A2A SDK](https://img.shields.io/badge/A2A_SDK-1.1.2-1A73E8)](https://github.com/a2aproject/a2a-python)
 [![Gemini Enterprise Agent Ready](https://img.shields.io/badge/GEAR-Gemini_Enterprise_Agent_Ready-4285F4?logo=google&logoColor=white)](https://developers.google.com/profile/badges/community/gear?u=iarjunganesh)
 
-<!-- Row 2 — the seven GEAP pillars, six of them managed products rather than modules here. -->
-[![Agent Runtime](https://img.shields.io/badge/Agent_Runtime-managed_·_europe--west4-4285F4?logo=googlecloud&logoColor=white)](docs/adr/003-pillars-on-geap.md)
-[![Agent Identity](https://img.shields.io/badge/Agent_Identity-per--agent_service_accounts-4285F4?logo=googlecloud&logoColor=white)](identity/identity_config.md)
-[![Agent Gateway](https://img.shields.io/badge/Agent_Gateway-IAP_·_default_deny-4285F4?logo=googlecloud&logoColor=white)](gateway/policy.py)
-[![Agent Registry](https://img.shields.io/badge/Agent_Registry-governed_catalog-4285F4?logo=googlecloud&logoColor=white)](registry/departments.py)
-[![Memory Bank](https://img.shields.io/badge/Memory_Bank-durable_exceptions-4285F4?logo=googlecloud&logoColor=white)](docs/adr/008-human-approval-loop.md)
-[![Model Armor](https://img.shields.io/badge/Model_Armor-fails_closed-EA4335?logo=googlecloud&logoColor=white)](model_armor/guardrails.py)
-[![Observability](https://img.shields.io/badge/Observability-payload--free_audit-4285F4?logo=googlecloud&logoColor=white)](observability/audit.py)
+<!-- Row 3 — the seven GEAP pillars, six of them managed products rather than modules here. -->
+[![Agent Runtime](https://img.shields.io/badge/Agent_Runtime-managed-4285F4?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale)
+[![Agent Identity](https://img.shields.io/badge/Agent_Identity-least_privilege-4285F4?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity)
+[![Agent Gateway](https://img.shields.io/badge/Agent_Gateway-default_deny-4285F4?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/gateways/agent-gateway-overview)
+[![Agent Registry](https://img.shields.io/badge/Agent_Registry-governed_catalog-4285F4?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/agent-registry)
+[![Memory Bank](https://img.shields.io/badge/Memory_Bank-durable_exceptions-4285F4?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank)
+[![Model Armor](https://img.shields.io/badge/Model_Armor-fails_closed-EA4335?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/model-armor/model-armor-vertex-integration)
+[![Observability](https://img.shields.io/badge/Observability-payload--free-4285F4?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/gemini-enterprise-agent-platform/optimize/observability/overview)
 
-<!-- Row 3 — the rest of the deployed surface. -->
-[![Cloud Run](https://img.shields.io/badge/Cloud_Run-4_private_services-4285F4?logo=googlecloud&logoColor=white)](infrastructure/deploy.sh)
-[![Eventarc](https://img.shields.io/badge/Eventarc-durable_·_5--attempt_DLQ-4285F4?logo=googlecloud&logoColor=white)](runtime/durable.py)
-[![Firestore](https://img.shields.io/badge/Firestore-inbox_·_lease_·_dedup-FFA000?logo=firebase&logoColor=white)](runtime/firestore.py)
-[![Cloud Asset Inventory](https://img.shields.io/badge/Asset_Inventory-read--only_IAM-34A853?logo=googlecloud&logoColor=white)](docs/adr/001-real-iam-not-mock-data.md)
-[![Gemini 3.5 Flash](https://img.shields.io/badge/Gemini_3.5_Flash-rationale_only-8E75B2?logo=googlegemini&logoColor=white)](docs/adr/004-flash-only-global-endpoint.md)
+<!-- Row 4 — the rest of the deployed surface. -->
+[![Cloud Run](https://img.shields.io/badge/Cloud_Run-private_services-4285F4?logo=googlecloud&logoColor=white)](https://cloud.google.com/run)
+[![Eventarc](https://img.shields.io/badge/Eventarc-durable_delivery-4285F4?logo=googlecloud&logoColor=white)](https://cloud.google.com/eventarc)
+[![Firestore](https://img.shields.io/badge/Firestore-durable_state-FFA000?logo=firebase&logoColor=white)](https://cloud.google.com/firestore)
+[![Cloud Asset Inventory](https://img.shields.io/badge/Asset_Inventory-read--only-34A853?logo=googlecloud&logoColor=white)](https://cloud.google.com/asset-inventory/docs)
+[![Gemini 3.5 Flash](https://img.shields.io/badge/Gemini_3.5_Flash-rationale_only-8E75B2?logo=googlegemini&logoColor=white)](https://cloud.google.com/vertex-ai)
 
-<!-- Row 4 — language and toolchain. check_badge_versions() asserts these against the pins. -->
+<!-- Row 5 — language and toolchain. check_badge_versions() asserts these against the pins. -->
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Google ADK 2.7.1](https://img.shields.io/badge/Google_ADK-2.7.1-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
-[![A2A SDK](https://img.shields.io/badge/A2A_SDK-1.1.2-1A73E8)](https://a2aproject.github.io/A2A/)
 [![Ruff](https://img.shields.io/badge/Ruff-lint%20%2B%20format-D7FF64?logo=ruff&logoColor=111827)](https://docs.astral.sh/ruff/)
 [![Mypy](https://img.shields.io/badge/Mypy-strict-2A6DB2?logo=python&logoColor=white)](https://mypy-lang.org/)
-[![pytest](https://img.shields.io/badge/pytest-unit_·_integration_·_security_·_load-0A9EDC?logo=pytest&logoColor=white)](tests/)
+[![pytest](https://img.shields.io/badge/pytest-9.1.1-0A9EDC?logo=pytest&logoColor=white)](https://docs.pytest.org/)
 
 ---
 
@@ -86,43 +93,6 @@ There is no production in-process fallback. The Cloud Run Orchestrator is only t
 Eventarc admission and dispatch boundary; it invokes the identity-bearing managed Runtime and
 **never invokes a worker**. The Runtime discovers two worker agents through reviewed Agent Cards
 and its Gateway-bound Registry allowlist.
-
-## What happened when we pointed it at itself
-
-This is the part of the project worth reading. Bastion audits the project it runs in, so the
-fleet is inside its own blast radius — and running it against real infrastructure found **eight
-defects that a green test suite could not**.
-
-The suite was at 100% statement and branch coverage the entire time. It still is.
-
-| | Defect found in the deployed fleet | Why tests could not see it |
-|---|---|---|
-| **D1** | Deterministic policy enforcement did not run, and did not fail closed | The step existed and was unit-tested; nothing asserted it had *executed* before escalation |
-| **D3** | An audit trail could not be reassembled into one investigation | `invocation_id` is minted per agent run, so it stops at the A2A boundary |
-| **D4** | Inbound screening skipped tool output | Screening read prompts; a tool result is also untrusted input |
-| **D5** | The deployed Runtime was six days stale | Nothing compares the running revision to the repository |
-| **D6** | Investigations silently truncated after the Auditor | See below |
-| **D7** | A declared-but-empty environment variable was not treated as absent | `os.environ.get(k, default)` returns `""`, not the default |
-| **D8** | A human-approved exception was honoured, then paged the team anyway | See below |
-| **D2** | IAP-mediated egress cannot resolve a non-standard Google host | Platform behaviour; reclassified, [not fixable from this repository](submission/planning/09-capture-backlog.md) |
-
-D6 and D8 are the same root cause, and it is worth stating plainly:
-
-> **ADK session state does not cross an A2A boundary, in either direction, and nothing warns you.**
-> `output_key` writes into the session of the agent that *declares* it. In-process, the declaring
-> and reading agents share one session and everything works. Over A2A each has its own session.
-> Every local run, every test, and every CI job exercises the working topology, so this class of
-> defect is invisible to an offline gate **by construction**.
-
-Reported upstream as [google/adk-python#6854](https://github.com/google/adk-python/issues/6854),
-with the fix recorded in [ADR-012](docs/adr/012-structured-findings-across-a2a.md). The remedy is
-structural: hand-offs cross as validated event content, and a
-[policy enforcement gate](docs/adr/010-policy-enforcement-gate.md) refuses to escalate anything
-the deterministic step did not score.
-
-The full ledger, including what remains open, is the
-[observation backlog](submission/planning/09-capture-backlog.md). Nothing in it is hidden;
-[SECURITY.md](SECURITY.md) and the ADRs record accepted risks as accepted, not as solved.
 
 ## Run one investigation in 60 seconds
 
@@ -193,6 +163,16 @@ between deployed, observed, configured, and still-to-capture lives in
 [submission/SUBMISSION.md](submission/SUBMISSION.md) — those words are used precisely and are not
 interchangeable in this repository.
 
+Running against a live fleet rather than a mock is also what surfaced the defects this
+project is most proud of catching. The sharpest: **ADK session state does not cross an A2A
+boundary, in either direction, and nothing warns you** — `output_key` writes into the session
+of the agent that *declares* it, which is shared in-process and separate over A2A. Every local
+run and every CI job exercises the working topology, so the failure is invisible to an offline
+gate by construction, at 100% coverage. Reported upstream as
+[google/adk-python#6854](https://github.com/google/adk-python/issues/6854) and fixed
+structurally in [ADR-012](docs/adr/012-structured-findings-across-a2a.md); the full ledger is
+the [observation backlog](submission/planning/09-capture-backlog.md).
+
 ## The fleet
 
 | Agent | Institutional responsibility | Enforced capability |
@@ -203,7 +183,8 @@ interchangeable in this repository.
 
 The Cloud Run services expose two security shapes deliberately:
 
-- worker A2A origins are network-reachable because the cross-region managed Gateway is not
+- worker [A2A origins on Cloud Run](https://docs.cloud.google.com/run/docs/ai/a2a-agents) are
+  network-reachable because the cross-region managed Gateway is not
   classified as Cloud Run internal traffic; every non-health request still requires a
   Secret-Manager-backed origin credential, while Agent Identity is admitted per destination by
   IAP at the Gateway;
