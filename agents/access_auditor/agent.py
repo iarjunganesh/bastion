@@ -144,8 +144,10 @@ def fetch_iam_policy() -> IamPolicy:
 def find_anomalies(policy: IamPolicy) -> list[Finding]:
     """Deterministic pre-pass: cheap, explainable findings.
 
-    TODO(week1): flag bindings carrying neither a condition nor an expiry, and cross-reference
-    service-account last-auth time via the IAM activity API -> "stale_service_account".
+    Two checks are absent for different reasons. Unconditional and non-expiring bindings
+    are not flagged because `audit_iam_policy` above discards `binding.condition`, so the
+    evidence never reaches this function - a change to the tool, not to permissions. Stale
+    service accounts would additionally need activity data this role does not grant.
     """
     findings: list[Finding] = []
     for binding in policy.get("bindings", []):
