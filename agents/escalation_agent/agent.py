@@ -52,6 +52,12 @@ NOTIFY_RETRIES = 2
 # The payload is structured rather than a sentence for a second reason: a `text` field invites
 # writing identifiers into prose, and a typed body with a `finding_count` gives an injected
 # instruction nothing to narrate into.
+# Read from the environment rather than Secret Manager, deliberately. The value is the
+# findings API's canonical origin, not secret material: the service is IAM-private, so
+# knowing the URL grants nothing without an ID token minted for that audience, and this
+# agent's service account is the only identity holding `run.invoker` on it. `deploy.sh`
+# injects the origin at deploy time from the live service, which also keeps it from being
+# copied by hand into a config file and drifting from the service it names.
 NOTIFY_ENDPOINT_VAR = "BASTION_FINDINGS_ENDPOINT"
 
 
@@ -77,8 +83,6 @@ def notify_human(
     ledger - which is keyed by finding id - is unreachable from the surface a human actually
     reads. They are validated to the exact opaque shape, so a fabricated id is inert: it grants
     nothing and can only key an exception no real finding will ever match.
-
-    TODO(week2): read the endpoint from Secret Manager rather than the environment.
     """
     if not investigation_id:
         raise ValueError("investigation_id is required")
@@ -157,7 +161,12 @@ escalation_agent = LlmAgent(
     tools=[notify_human],
     before_model_callback=screen_before_model,
     after_model_callback=screen_after_model,
-    output_key="escalation_result",
+    # No `output_key`. This agent runs behind A2A, and `output_key` writes into the session
+    # of the agent that declares it - the worker's own - which never returns to the caller.
+    # A key here would read as a result the Orchestrator can consume and would always be
+    # absent; that is exactly D6 and D8, and the shape reported upstream as
+    # https://github.com/google/adk-python/issues/6854. The escalation outcome reaches the
+    # caller as event content, like every other hand-off in this fleet.
 )
 
 # `adk deploy cloud_run` looks for a module-level `root_agent`. This package deploys on its own
