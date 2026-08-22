@@ -121,31 +121,53 @@ step; D8 is the policy step's decision failing to reach escalation. Both are the
 cause — ADK session state does not cross an A2A boundary — and any future step that assumes it
 does will fail the same way, silently, in the deployed topology only.
 
-### D2. Model Armor screening is unavailable inside the Runtime because its egress is denied
+### D2. IAP-mediated egress cannot resolve a non-standard Google host
 
-**Still open at 2026-08-22.** No longer blocking: the only Runtime-side step that depended on
-screening was `policy_step`, which now reaches no model at all (D1). Screening remains live on
-both Cloud Run workers, which is where the untrusted input actually arrives. What is lost while
-this is open is defence in depth on the Runtime, not an enforced control — and nothing in the
-0.2.0 release notes claims otherwise.
+**Reclassified 2026-08-22 from blocking defect to residual platform behaviour, with no
+observed consequence.** The original title — *Model Armor screening is unavailable inside the
+Runtime* — describes something that can no longer happen, and saying so is more useful than
+leaving it open as though it still threatens the fleet.
 
-Every `screening_unavailable` originates from the Agent Runtime; every successful `policy_match`
-originates from a Cloud Run worker. The cause is direct rather than a chain: the exact call
-`screen_prompt` makes —
-`modelarmor.<region>.rep.googleapis.com/google.cloud.modelarmor.v1.ModelArmor/SanitizeUserPrompt`
-— is refused at IAP egress, 16ms before each refusal is recorded.
+Three measurements settle it.
 
-IAP resolves the destination to `unregisteredEndpoint` and denies
-`iap.webServiceVersions.egressViaIAP`, **despite** the endpoint being registered in the Gateway's
-bound registry with that exact URL, and despite the Runtime's Agent Identity holding
-`roles/iap.egressor` at project level. Of every IAP authorization event in a seven-day window,
-none was granted. Only non-standard hostnames (mTLS and regional `.rep`) are IAP-mediated at all;
-plain `*.googleapis.com` hosts are never checked.
+1. **No model call happens inside the Agent Runtime at all.** The Orchestrator is a
+   `SequentialAgent`; `policy_step` and `policy_gate` are model-free `BaseAgent`s; the two
+   `LlmAgent`s run in Cloud Run workers. There is nothing left in the Runtime for Model Armor
+   to screen, so `screening_unavailable` is not merely absent — it is unreachable. The last
+   Model Armor event of any kind from the Runtime was 2026-08-22T08:16Z, before the policy
+   step stopped calling a model.
+2. **The workers screen successfully against the same host.** Cloud Run egress does not
+   traverse Agent Gateway or IAP, and `modelarmor.europe-west4.rep.googleapis.com` answers
+   them normally. The host is fine; the path through IAP is not.
+3. **The denials no longer correlate with investigations.** They cluster at Runtime deploy and
+   startup (18:31:29-18:32:04 around a deploy whose `updateTime` is 18:31:37), not at
+   investigation time. Investigations complete, `verify_fleet` passes, and the production
+   smoke passes with these denials still being emitted.
 
-Ruled out by experiment: registering the endpoints in the `global` Registry location (the Gateway
-binds only to its regional registry — reverted), and rebinding the interfaces from `GRPC` to
-`HTTP_JSON`. The denial log carries **no `authenticationInfo`**, which is consistent with the
-workload's Agent Identity not being attached to the outbound call.
+**What is actually happening.** Six registered destinations use non-standard Google hostnames
+(`*.rep.googleapis.com`, `*.mtls.googleapis.com`); eight use plain `*.googleapis.com`. Every
+IAP authorization event resolves to
+`projects/.../locations/global/iap_web/agentRegistry/endpoints/unregisteredEndpoint` and denies
+`iap.webServiceVersions.egressViaIAP`, with an **empty `authenticationInfo`**. Plain hosts are
+never IAP-checked at all, so they cannot be denied. **[inferred]** IAP's endpoint resolution
+does not match a non-standard host to its Agent Registry entry, however correctly that entry is
+registered — which is consistent with every observation and with the fact that the resolution
+namespace is `locations/global` while the Registry is regional.
+
+Eliminated by experiment across two sessions: registering in the `global` Registry location
+(the Gateway binds only to its regional registry — reverted), rebinding interfaces from `GRPC`
+to `HTTP_JSON`, redeploying the Runtime, Registry `bindings` (`auth_provider is required`; that
+field is for OAuth connectors, not Google-API egress), and IAM (the Agent Identity holds
+`roles/iap.egressor` at project level, and no IAP authorization has ever been granted).
+
+**Not fixable from this repository.** The remaining action is a Google Cloud support question,
+and it should be asked precisely: *why does Agent-to-Anywhere IAP resolve a registered
+`*.rep.googleapis.com` destination to `unregisteredEndpoint`, when a plain `*.googleapis.com`
+destination in the same regional registry is admitted without an IAP check at all?*
+
+**Consequence to watch, not yet measured.** If IAP-mediated egress to non-standard hosts fails,
+the Runtime's OTel export (`telemetry.mtls.googleapis.com`) may be impaired, which would affect
+capture 3's Cloud Trace chain. **[unknown]** whether it is; the trace capture will show it.
 
 ### D3. An audit trail cannot be assembled into one investigation
 
