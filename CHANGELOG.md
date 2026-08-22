@@ -17,6 +17,36 @@ defects that no offline gate could have found, four new decision records, and a 
 whose cause was the fleet's own dispatch message. Two defects remain open; they are named here
 rather than left for a reader to discover.
 
+### Observed — one investigation, end to end, under a single correlation id
+
+- 2026-08-22 16:49Z, against the live project: **34 audit records sharing one `investigation_id`**,
+  spanning the managed Runtime and both Cloud Run workers. `investigation.run started` →
+  Auditor (two model calls, `audit_iam_policy`, completion) → **`policy_step` ran and completed** →
+  **`policy_gate` ran and completed** → Escalation Agent → `notify_human` **twice, to two
+  departments** → `investigation.run completed`. No refusal, no error, no truncation.
+- This is the first trail in the project's history that can be assembled across the A2A boundary,
+  and it retires D6. D1's fix is observed rather than only tested: the deterministic step and its
+  gate both executed inside the deployed Runtime.
+- `python -m infrastructure.smoke_test` passes end to end — fleet, findings IAM and idempotency,
+  durable async state, and Runtime.
+- Not claimed: a refusal has not been captured on this route, so capture 4 in the observation
+  backlog remains open. A trail of successes proves nothing about the guardrails.
+
+### Fixed — the production smoke test exercises the path production actually uses
+
+- `verify_runtime` let its client become a temporary. `Client(...).agent_engines.get(...)` leaves
+  the client unreferenced, so garbage collection could close its aiohttp session mid-stream and
+  surface as `assert self._connector is not None` deep inside aiohttp — an error naming nothing
+  about ownership, which reads like a fleet fault during a release gate. `agent_server` had
+  already learned this; the smoke path never had the lesson applied.
+- It also sent an imperative sentence, which is the shape the dispatcher stopped sending because
+  Model Armor scores an instruction addressed to an agent like a real injection. A smoke test
+  that sends what production is forbidden to send is exercising a path no deployment uses. It now
+  sends the same structured payload and run-config metadata as dispatch.
+- Not unit-tested, and deliberately so: `infrastructure/smoke_test.py` requires `gcloud` at import
+  and is outside the coverage source, so a test for it would be skipped on CI rather than run. It
+  is verified by the gate itself passing.
+
 ### Fixed — the Auditor's report reaches the policy step over A2A
 
 - Found by deploying, not by testing, and it is the defect this release exists to catch.
@@ -168,9 +198,8 @@ rather than left for a reader to discover.
   `bindings`, and IAM. The Agent Identity holds `roles/iap.egressor` at project level and there are
   no IAP grants in the denial window. The deterministic policy step no longer depends on this path,
   so it is not blocking, but it is not solved.
-- **Investigations truncating after the Auditor (D6) is resolved**, and its cause is recorded
-  above. It is listed here rather than deleted because the fix is shipped, not yet observed
-  completing an investigation end to end.
+- **Investigations truncating after the Auditor (D6) is closed** — fixed and observed
+  completing end to end on 2026-08-22. Its cause is recorded above.
 - Both are tracked in
   [09-capture-backlog.md](submission/planning/09-capture-backlog.md) alongside the observation
   backlog. Nothing in this release claims either is fixed.

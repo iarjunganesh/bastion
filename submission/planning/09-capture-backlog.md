@@ -71,10 +71,12 @@ injection has been observed. Route 1 makes one obtainable; until it is captured,
 Found 2026-08-19/22 while attempting captures 1-4. Each was watched in the deployed system, not
 inferred from code. They are recorded here because all four open captures sit behind them.
 
-**Status at 2026-08-22:** D1, D3, D4, D5 and D7 are fixed and shipped in 0.2.0. D2 and D6 remain
-open and are named in the release notes rather than deferred quietly. None of the five fixes is
-claimed as *observed* here — the fix and the capture are different artifacts, which is the whole
-premise of this file.
+**Status at 2026-08-22:** D1, D3, D4, D5, D6 and D7 are fixed and shipped in 0.2.0. Only D2
+remains open, and it is no longer blocking. D1, D3 and D6 are additionally **observed**: a live
+investigation completed end to end at 16:49Z with 34 audit records under a single
+`investigation_id` across the Runtime and both workers, and `smoke_test` passes.
+What is still not observed is a **refusal** on that route, so capture 4 stays open — a trail of successes
+proves nothing about the guardrails.
 
 ### D1. Deterministic policy enforcement does not run, and does not fail closed
 
@@ -168,8 +170,14 @@ taken before a redeploy would have described code that is not in the repository.
 
 ### D6. Investigations sometimes truncate after the Auditor
 
-Observed 2026-08-21T16:36Z: `access_auditor` completed and the graph advanced no further — no
-`policy_step`, no escalation, no error. Cause not established.
+**Fixed and observed 2026-08-22.** Cause: `output_key` writes into the session of the agent
+that declares it, so the Auditor's `audit_findings` landed in the *worker's* session and never
+crossed back. Every local run and every test saw a populated key, because in-process the
+declaring and reading agents share one session. `policy_step` now reads the Auditor's
+validated A2A
+reply when the state key is absent; a live investigation then completed end to end.
+
+Observed 2026-08-21T16:36Z:
 
 ### D7. A declared-but-empty environment variable is not treated as absent
 

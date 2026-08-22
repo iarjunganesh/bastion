@@ -18,6 +18,7 @@ from agentplatform import Client
 from google.cloud import firestore
 
 from infrastructure.verify_fleet import main as verify_fleet
+from observability.audit import INVESTIGATION_METADATA_KEY
 from runtime.events import new_investigation_payload
 
 PROJECT = os.environ["GCP_PROJECT_ID"]
@@ -110,18 +111,40 @@ def verify_async_event(timeout_seconds: int) -> None:
 
 
 async def verify_runtime() -> None:
+    """Exercise the Runtime exactly as production dispatch does.
+
+    This sent an imperative sentence — "Perform a read-only governed IAM review..." — which is
+    the shape the dispatcher stopped sending, because Model Armor scores an instruction addressed
+    to an agent at the same confidence as a real injection and screening fails closed
+    ([ADR-009](../docs/adr/009-model-armor-threshold.md)). A smoke test that sends what production
+    is forbidden to send is not smoking production; it exercises a path no deployment uses, and
+    its failure says nothing about whether the fleet works.
+
+    The correlation id is a fresh UUID rather than a durable event id because no Firestore record
+    backs this probe. It travels as run-config metadata for the same reason it does in dispatch:
+    the audit trail must be able to name this run without a model reading the id.
+    """
     name = f"projects/{PROJECT_NUMBER}/locations/{RUNTIME_REGION}/reasoningEngines/{RUNTIME_ID}"
-    engine = Client(project=PROJECT, location=RUNTIME_REGION).agent_engines.get(name=name)
+    # The client must outlive the engine handle. `Client(...).agent_engines.get(...)` leaves the
+    # client unreferenced, so it can be collected mid-stream; its aiohttp session closes with it
+    # and the next request trips `assert self._connector is not None` deep inside aiohttp — an
+    # error that names nothing about ownership and reads like a fleet fault. `agent_server` learned
+    # this already, which is what `test_managed_runtime_keeps_client_for_async_session_and_stream`
+    # pins; the smoke path simply never had the lesson applied to it.
+    client = Client(project=PROJECT, location=RUNTIME_REGION)
+    engine = client.agent_engines.get(name=name)
     user = f"bastion-smoke-{uuid4()}"
+    investigation_id = str(uuid4())
     session = await engine.async_create_session(user_id=user)
     count = 0
     async for _event in engine.async_stream_query(
         user_id=user,
         session_id=session["id"],
-        message=(
-            "Perform a read-only governed IAM review. Return only aggregate risk categories "
-            "and whether human review is required."
+        message=json.dumps(
+            {"task": "scheduled_iam_access_review", "investigation_id": investigation_id},
+            sort_keys=True,
         ),
+        run_config={"custom_metadata": {INVESTIGATION_METADATA_KEY: investigation_id}},
     ):
         count += 1
     if count == 0:
