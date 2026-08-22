@@ -17,6 +17,27 @@ defects that no offline gate could have found, four new decision records, and a 
 whose cause was the fleet's own dispatch message. Two defects remain open; they are named here
 rather than left for a reader to discover.
 
+### Fixed — the Auditor's report reaches the policy step over A2A
+
+- Found by deploying, not by testing, and it is the defect this release exists to catch.
+  `output_key` writes into the session of the agent that *declares* it. In-process that is the
+  Orchestrator's own session, so `audit_findings` was simply there — for every local run, every
+  integration test, and every CI job. Over A2A it is the **worker's** session, which never crosses
+  back, so the deployed Orchestrator read an empty key.
+- Observed 2026-08-22 on the live fleet: the Auditor produced a complete sub-trail — two model
+  calls, `audit_iam_policy`, a clean completion — and `policy_step` then refused with *"the Access
+  Auditor returned no structured report; refusing to score nothing"*. No test could have reached
+  this, because the state key is populated in exactly the topology tests run in.
+- This is the true cause of D6, and it reframes D1. The old model-driven policy step read the same
+  empty key and escalated anyway, which is why humans were paged about findings no threshold had
+  scored: the model was not merely retyping findings, it was inventing them from nothing. The
+  deterministic step turned a silent fabrication into a visible refusal, which is precisely what
+  [ADR-010](docs/adr/010-policy-enforcement-gate.md) promised it would do.
+- `policy_step` now falls back to the Auditor's A2A reply when the state key is absent. Reading
+  that reply is sound rather than a workaround **because** of `output_schema`: the content is
+  validated `AuditReport` JSON, not prose to be interpreted. A reply that fails to parse is
+  skipped rather than guessed at, and skipping everything still fails closed.
+
 ### Fixed — one investigation can be assembled into one trail
 
 - ADK mints a fresh `invocation_id` per agent run, and a worker reached over A2A is a separate run
@@ -147,7 +168,9 @@ rather than left for a reader to discover.
   `bindings`, and IAM. The Agent Identity holds `roles/iap.egressor` at project level and there are
   no IAP grants in the denial window. The deterministic policy step no longer depends on this path,
   so it is not blocking, but it is not solved.
-- **Investigations sometimes truncate after the Auditor**, with no cause yet established.
+- **Investigations truncating after the Auditor (D6) is resolved**, and its cause is recorded
+  above. It is listed here rather than deleted because the fix is shipped, not yet observed
+  completing an investigation end to end.
 - Both are tracked in
   [09-capture-backlog.md](submission/planning/09-capture-backlog.md) alongside the observation
   backlog. Nothing in this release claims either is fixed.
@@ -160,12 +183,12 @@ rather than left for a reader to discover.
   pins move before the tag rather than after it.
 - ADR-005's installation claim was **re-run** against 2.7.1 rather than re-dated. A verification
   line edited to match a new pin has stopped being a verification.
-- No behavioural change surfaced: 240 tests at 100% statement and branch coverage, mypy, and every
+- No behavioural change surfaced: 247 tests at 100% statement and branch coverage, mypy, and every
   documentation gate pass identically on 2.7.1. `SequentialAgent` remains deprecated-but-required
   in 2.7.1, so ADR-005's migration trigger — `Workflow` becoming usable as an `LlmAgent` sub-agent
   — has still not fired.
 
-### Changed — the suite is 240 tests
+### Changed — the suite is 247 tests
 
 - Up from 208, at 100% statement and branch coverage under Python 3.12. Every new boundary added in
   this release carries tests at the layer it changed.

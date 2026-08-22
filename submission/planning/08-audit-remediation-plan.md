@@ -72,6 +72,6 @@ different kinds of proof.
 - [retained observability](../../assets/evidence/07-observability.md)
 - [tool-declaration boundary](../../assets/evidence/08-tool-poisoning.md)
 - `infrastructure/verify_fleet.py`, `smoke_test.py`, `rollback.py`, and `teardown.py`
-- Python 3.12 full gate: 240 tests, 100% statement and branch coverage
+- Python 3.12 full gate: 247 tests, 100% statement and branch coverage
 
 P2 media and Devpost publication are intentionally excluded from P0/P1 engineering closure.

@@ -76,3 +76,18 @@ catch. A genuinely clean run returns an empty `findings` list and is scored norm
 That no model touches finding data anywhere — the Auditor's model still emits the structured
 report, and the Escalation Agent's still fills in tool arguments. That suppression has been
 observed working; the defect that made it unreliable is fixed, and the capture is still open.
+
+## Amendment 2026-08-22 — the schema is also what makes the A2A reply readable
+
+Deploying this exposed a second defect the schema turned out to solve. `output_key` writes into
+the session of the agent that declares it, so the Auditor's `audit_findings` landed in the
+*worker's* session and never crossed back. Every local run and every test saw a populated key,
+because in-process the declaring agent and the reading agent share one session; the deployed
+Orchestrator saw nothing and refused.
+
+`policy_step` now reads the Auditor's A2A reply when the state key is absent. That is only
+defensible because of the decision recorded above: with `output_schema` the reply is validated
+`AuditReport` JSON, so reading it is parsing, not interpreting. Without the schema this fallback
+would have meant a deterministic step scraping findings out of prose — which is the exact failure
+this record exists to prevent, reintroduced at a different layer. A reply that does not parse is
+skipped, and skipping everything fails closed.

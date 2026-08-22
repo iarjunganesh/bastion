@@ -14,6 +14,7 @@ guard — roughly 420 lines reimplementing what Agent Engine and ADK already pro
 
 from __future__ import annotations
 
+import json
 import os
 from collections.abc import AsyncGenerator
 from functools import lru_cache
@@ -42,6 +43,7 @@ POLICY_ENFORCEMENT_KEY = "policy_enforcement"
 POLICY_DECISIONS_KEY = "policy_decisions"
 POLICY_ROUTING_KEY = "policy_routing"
 AUDIT_FINDINGS_KEY = "audit_findings"
+AUDITOR_AGENT_NAME = "access_auditor"
 FIRESTORE_MEMORY_BACKEND = "firestore"
 MEMORY_BACKEND_VAR = "BASTION_DURABLE_STORE_BACKEND"
 
@@ -187,8 +189,7 @@ class PolicyStep(BaseAgent):
     """
 
     async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
-        report = ctx.session.state.get(AUDIT_FINDINGS_KEY)
-        findings = _findings_of(report)
+        findings = _findings_of(_audit_report(ctx))
         decisions = apply_policy_rules_with_memory(findings, exception_memory())
         routing = route_by_department(decisions["decisions"])
         yield Event(
@@ -202,6 +203,38 @@ class PolicyStep(BaseAgent):
                 }
             ),
         )
+
+
+def _audit_report(ctx: InvocationContext) -> Any:
+    """The Auditor's report, from session state locally or from its A2A reply when deployed.
+
+    `output_key` writes into the session of the agent that declares it. In-process that is the
+    Orchestrator's own session, so `audit_findings` is simply there. Over A2A it is the *worker's*
+    session, which never crosses back — so the deployed Orchestrator saw an empty state key while
+    every local run and every test saw a populated one. That gap is what made this reachable only
+    from the deployed fleet: observed 2026-08-22, the Auditor completed a full sub-trail and
+    `policy_step` then refused with "returned no structured report".
+
+    The reply itself does arrive, as an event authored by the Auditor. Reading it is sound rather
+    than a workaround **because** of `output_schema`: the Auditor's final content is validated
+    `AuditReport` JSON, not prose this step would have to interpret. Anything that fails to parse
+    is skipped rather than guessed at, and an empty result still fails closed downstream.
+    """
+    report = ctx.session.state.get(AUDIT_FINDINGS_KEY)
+    if report is not None:
+        return report
+    for event in reversed(list(getattr(ctx.session, "events", None) or [])):
+        if getattr(event, "author", None) != AUDITOR_AGENT_NAME:
+            continue
+        for part in getattr(getattr(event, "content", None), "parts", None) or []:
+            text = getattr(part, "text", None)
+            if not text:
+                continue
+            try:
+                return json.loads(text)
+            except ValueError:
+                continue
+    return None
 
 
 def _findings_of(report: Any) -> list[dict[str, Any]]:

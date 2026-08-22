@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from types import SimpleNamespace
 
 import pytest
@@ -386,3 +387,83 @@ def test_the_gate_passes_once_the_rules_have_actually_run():
     orchestrator.apply_policy_rules([_finding("user:a@x.com", 0.9)], context)
     events = asyncio.run(_drain(orchestrator.policy_gate, _gate_ctx(dict(context.state))))
     assert events and events[0].actions.state_delta == {"policy_enforced": True}
+
+
+def _a2a_ctx(events: list[object], state: dict[str, object] | None = None) -> SimpleNamespace:
+    """A caller session as it looks over A2A: the worker's `output_key` never arrived."""
+    return SimpleNamespace(
+        session=SimpleNamespace(state=state or {}, events=events),
+        invocation_id="inv-a2a",
+    )
+
+
+def _reply(author: str, *texts: str | None) -> SimpleNamespace:
+    parts = [SimpleNamespace(text=t) for t in texts]
+    return SimpleNamespace(author=author, content=SimpleNamespace(parts=parts))
+
+
+def test_the_auditors_report_is_read_from_its_a2a_reply_when_state_is_empty():
+    """`output_key` writes into the session of the agent that declares it.
+
+    In-process that is the Orchestrator's own session. Over A2A it is the *worker's* session,
+    which never crosses back — so every local run and every test saw `audit_findings` populated
+    while the deployed Orchestrator saw nothing, and the policy step refused a report the Auditor
+    had in fact produced. Observed in the deployed fleet on 2026-08-22.
+    """
+    import asyncio
+
+    report = {"count": 1, "findings": [_finding("user:a@x.com", 0.9)]}
+    ctx = _a2a_ctx([_reply("access_auditor", json.dumps(report))])
+    events = asyncio.run(_drain(orchestrator.policy_step, ctx))
+    assert events[0].actions.state_delta[orchestrator.POLICY_DECISIONS_KEY]["escalate_count"] == 1
+
+
+def test_session_state_still_wins_when_it_is_present():
+    """The in-process path must not regress: state is authoritative when it exists."""
+    import asyncio
+
+    state_report = {"count": 0, "findings": []}
+    ctx = _a2a_ctx(
+        [
+            _reply(
+                "access_auditor",
+                json.dumps({"count": 1, "findings": [_finding("user:a@x.com", 0.9)]}),
+            )
+        ],
+        state={"audit_findings": state_report},
+    )
+    events = asyncio.run(_drain(orchestrator.policy_step, ctx))
+    assert events[0].actions.state_delta[orchestrator.POLICY_DECISIONS_KEY]["escalate_count"] == 0
+
+
+@pytest.mark.parametrize(
+    "events",
+    [
+        [],
+        [_reply("escalation_agent", '{"count": 0, "findings": []}')],
+        [_reply("access_auditor", None)],
+        [_reply("access_auditor", "The auditor found two overly broad roles.")],
+    ],
+    ids=["no-events", "another-author", "no-text", "prose-not-json"],
+)
+def test_an_unreadable_a2a_reply_fails_closed_rather_than_being_guessed_at(events):
+    """Nothing here is interpreted. A reply that is not the Auditor's validated JSON is skipped,
+    and skipping everything leaves no report — which fails closed exactly as an absent one does.
+    Guessing a finding out of prose is the retyping ADR-012 exists to stop."""
+    import asyncio
+
+    with pytest.raises(orchestrator.PolicyNotEnforcedError):
+        asyncio.run(_drain(orchestrator.policy_step, _a2a_ctx(events)))
+
+
+def test_the_most_recent_auditor_reply_is_the_one_read():
+    """A retried hop can leave more than one reply in the session; the last is the live one."""
+    import asyncio
+
+    stale = {"count": 1, "findings": [_finding("user:a@x.com", 0.9)]}
+    fresh = {"count": 0, "findings": []}
+    ctx = _a2a_ctx(
+        [_reply("access_auditor", json.dumps(stale)), _reply("access_auditor", json.dumps(fresh))]
+    )
+    events = asyncio.run(_drain(orchestrator.policy_step, ctx))
+    assert events[0].actions.state_delta[orchestrator.POLICY_DECISIONS_KEY]["escalate_count"] == 0
