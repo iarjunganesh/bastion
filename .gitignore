@@ -58,3 +58,8 @@ Thumbs.db
 *.gcloud.log
 manual-run-*.txt
 console-*.txt
+# Local Claude Code permission grants. These authorize an agent to run deploys against the live
+# project, so they are machine-local by definition and must never travel with a public clone.
+# This was ignored only by a personal ~/.config/git/ignore rule, which does not exist on CI or
+# on anyone else's checkout - so the protection held only where it was least needed.
+.claude/settings.local.json

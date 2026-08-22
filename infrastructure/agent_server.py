@@ -214,12 +214,7 @@ def install_durable_eventarc_route(
         # A duplicate completed or in-flight delivery is acknowledged. A previous failed
         # execution is reclaimed so Eventarc's retry policy can safely resume it.
         store.receive(event)
-        lease_seconds = int(
-            os.environ.get(
-                "BASTION_INVESTIGATION_LEASE_SECONDS",
-                str(DEFAULT_INVESTIGATION_LEASE_SECONDS),
-            )
-        )
+        lease_seconds = _lease_seconds()
         if not store.claim(event.event_id, lease_seconds=lease_seconds):
             if store.status(event.event_id) == "completed":
                 return TriggerResponse(status="success")
@@ -257,6 +252,18 @@ def install_durable_eventarc_route(
             raise HTTPException(status_code=503, detail="managed runtime unavailable") from None
         store.finish(event.event_id)
         return TriggerResponse(status="success")
+
+
+def _lease_seconds() -> int:
+    """The investigation lease, treating a set-but-empty variable as absent.
+
+    `os.environ.get(key, default)` returns `""` when the key is present and empty, not the
+    default -- so a deployment that declares the variable without a value reaches `int("")` and
+    the service fails on its first delivery rather than at startup. Placeholder-shaped `.env`
+    files are exactly that shape, which is how this was found.
+    """
+    raw = os.environ.get("BASTION_INVESTIGATION_LEASE_SECONDS", "").strip()
+    return int(raw) if raw else DEFAULT_INVESTIGATION_LEASE_SECONDS
 
 
 def install_peer_origin_auth(app: FastAPI, secret: str) -> None:

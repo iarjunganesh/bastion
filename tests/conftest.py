@@ -33,13 +33,29 @@ def lazy_client_mock() -> MagicMock:
     return mock
 
 
-os.environ.setdefault("GCP_PROJECT_ID", "bastion-test-project")
-os.environ.setdefault("GCP_REGION", "europe-north2")
-os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "bastion-test-project")
-os.environ.setdefault("GOOGLE_CLOUD_LOCATION", "global")
-os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "TRUE")
-os.environ.setdefault("VERTEX_AI_MODEL", "gemini-3.5-flash")
-os.environ.setdefault("BASTION_FINDING_HMAC_KEY", "test-key-which-is-at-least-thirty-two-chars")
+def _default(key: str, value: str) -> None:
+    """Set a test default when the variable is missing **or set to an empty string**.
+
+    `os.environ.setdefault` only fills a missing key, so a `.env` that declares a placeholder
+    with no value — `BASTION_FINDING_HMAC_KEY=` — silently defeats it, and the suite then fails
+    only for contributors who export their environment before running it. CI, which exports
+    nothing, stayed green throughout. Nine tests failed this way before it was noticed.
+
+    Treating empty as unset here matches what the production code now does for the same reason;
+    it does not weaken any assertion, because every value below is a test fixture rather than a
+    credential the suite is allowed to reach a real project with.
+    """
+    if not os.environ.get(key, "").strip():
+        os.environ[key] = value
+
+
+_default("GCP_PROJECT_ID", "bastion-test-project")
+_default("GCP_REGION", "europe-north2")
+_default("GOOGLE_CLOUD_PROJECT", "bastion-test-project")
+_default("GOOGLE_CLOUD_LOCATION", "global")
+_default("GOOGLE_GENAI_USE_VERTEXAI", "TRUE")
+_default("VERTEX_AI_MODEL", "gemini-3.5-flash")
+_default("BASTION_FINDING_HMAC_KEY", "test-key-which-is-at-least-thirty-two-chars")
 
 
 def _anonymous_default(*args: object, **kwargs: object) -> tuple[AnonymousCredentials, str]:

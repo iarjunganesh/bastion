@@ -223,3 +223,22 @@ def test_the_runtime_dispatch_message_is_data_not_an_instruction(monkeypatch):
     lowered = message.lower()
     for imperative in ("run the", "use only", "you must", "please ", "ignore "):
         assert imperative not in lowered, f"dispatch message reads as an instruction: {imperative}"
+
+
+def test_an_empty_lease_variable_falls_back_rather_than_crashing(monkeypatch):
+    """`os.environ.get(key, default)` returns "" for a declared-but-empty variable, not the
+    default, so `int("")` took the service down on its first delivery. A deployment that
+    declares the variable without a value is a realistic mistake, and a placeholder-shaped
+    `.env` is exactly that shape."""
+    monkeypatch.setenv("BASTION_INVESTIGATION_LEASE_SECONDS", "")
+    assert agent_server._lease_seconds() == agent_server.DEFAULT_INVESTIGATION_LEASE_SECONDS
+
+
+def test_a_configured_lease_is_honoured(monkeypatch):
+    monkeypatch.setenv("BASTION_INVESTIGATION_LEASE_SECONDS", "900")
+    assert agent_server._lease_seconds() == 900
+
+
+def test_an_absent_lease_variable_uses_the_default(monkeypatch):
+    monkeypatch.delenv("BASTION_INVESTIGATION_LEASE_SECONDS", raising=False)
+    assert agent_server._lease_seconds() == agent_server.DEFAULT_INVESTIGATION_LEASE_SECONDS
