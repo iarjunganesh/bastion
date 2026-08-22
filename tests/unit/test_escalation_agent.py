@@ -21,10 +21,21 @@ def _endpoint():
         yield
 
 
+FINDING_IDS = [
+    "a1b2c3d4e5f60718293a4b5c",
+    "b1b2c3d4e5f60718293a4b5c",
+    "c1b2c3d4e5f60718293a4b5c",
+]
+
+
 def test_posts_when_something_needs_review(_endpoint):
     with patch.object(escalation.httpx, "Client") as client:
         result = escalation.notify_human(
-            "investigation-1", 3, ["overly_broad_role"], "data-platform"
+            "investigation-1",
+            3,
+            ["overly_broad_role"],
+            "data-platform",
+            ["a1b2c3d4e5f60718293a4b5c", "b1b2c3d4e5f60718293a4b5c", "c1b2c3d4e5f60718293a4b5c"],
         )
 
     assert result == {"delivered": True, "department": "data-platform", "count": 3}
@@ -36,6 +47,11 @@ def test_posts_when_something_needs_review(_endpoint):
         "investigation_id": "investigation-1",
         "department": "data-platform",
         "finding_count": 3,
+        "finding_ids": [
+            "a1b2c3d4e5f60718293a4b5c",
+            "b1b2c3d4e5f60718293a4b5c",
+            "c1b2c3d4e5f60718293a4b5c",
+        ],
         "risk_categories": ["overly_broad_role"],
         "summary": "Access-review findings require attention: overly_broad_role",
     }
@@ -47,7 +63,7 @@ def test_posts_when_something_needs_review(_endpoint):
 def test_silent_when_nothing_is_escalated(_endpoint):
     """An access review that pages a human on a clean run is one people turn off."""
     with patch.object(escalation.httpx, "Client") as client:
-        result = escalation.notify_human("investigation-1", 0, [], "data-platform")
+        result = escalation.notify_human("investigation-1", 0, [], "data-platform", [])
 
     assert result["delivered"] is False
     client.assert_not_called()
@@ -60,13 +76,25 @@ def test_missing_endpoint_fails_closed_for_the_outbox():
         patch.object(escalation.httpx, "Client") as c,
         pytest.raises(RuntimeError, match="BASTION_FINDINGS_ENDPOINT"),
     ):
-        escalation.notify_human("investigation-1", 2, ["overly_broad_role"], "platform-infra")
+        escalation.notify_human(
+            "investigation-1",
+            2,
+            ["overly_broad_role"],
+            "platform-infra",
+            ["a1b2c3d4e5f60718293a4b5c", "b1b2c3d4e5f60718293a4b5c"],
+        )
     c.assert_not_called()
 
 
 def test_the_client_carries_an_explicit_timeout(_endpoint):
     with patch.object(escalation.httpx, "Client") as client:
-        escalation.notify_human("investigation-1", 1, ["overly_broad_role"], "security-engineering")
+        escalation.notify_human(
+            "investigation-1",
+            1,
+            ["overly_broad_role"],
+            "security-engineering",
+            ["a1b2c3d4e5f60718293a4b5c"],
+        )
 
     timeout = client.call_args.kwargs["timeout"]
     assert isinstance(timeout, httpx.Timeout)
@@ -82,7 +110,13 @@ def test_retries_cover_connection_failures_only(_endpoint):
         patch.object(escalation.httpx, "Client"),
         patch.object(escalation.httpx, "HTTPTransport") as transport,
     ):
-        escalation.notify_human("investigation-1", 1, ["overly_broad_role"], "security-engineering")
+        escalation.notify_human(
+            "investigation-1",
+            1,
+            ["overly_broad_role"],
+            "security-engineering",
+            ["a1b2c3d4e5f60718293a4b5c"],
+        )
 
     assert transport.call_args.kwargs["retries"] == escalation.NOTIFY_RETRIES
 
@@ -99,6 +133,7 @@ def test_the_tool_cannot_be_handed_bindings():
         "finding_count",
         "risk_categories",
         "department",
+        "finding_ids",
     ]
     # A string, not the type: `from __future__ import annotations` defers evaluation, so the
     # module's own annotations arrive here unresolved.
@@ -107,9 +142,17 @@ def test_the_tool_cannot_be_handed_bindings():
 
 def test_notification_rejects_model_supplied_text_and_unknown_categories(_endpoint):
     with pytest.raises(ValueError, match="investigation_id"):
-        escalation.notify_human("", 1, ["overly_broad_role"], "security-engineering")
+        escalation.notify_human(
+            "", 1, ["overly_broad_role"], "security-engineering", ["a1b2c3d4e5f60718293a4b5c"]
+        )
     with pytest.raises(ValueError, match="unknown or unsafe"):
-        escalation.notify_human("investigation-1", 1, ["free text"], "security-engineering")
+        escalation.notify_human(
+            "investigation-1",
+            1,
+            ["free text"],
+            "security-engineering",
+            ["a1b2c3d4e5f60718293a4b5c"],
+        )
 
 
 def test_the_module_holds_no_policy_client():
@@ -135,3 +178,15 @@ def test_the_agent_is_an_adk_agent_with_the_guardrail_attached():
 def test_the_instruction_forbids_naming_principals():
     instruction = escalation.INSTRUCTION.lower()
     assert "never include email addresses" in instruction
+
+
+def test_a_count_that_disagrees_with_its_finding_ids_is_refused(_endpoint):
+    """Inflating the count past the ids it claims to summarise never reaches a human."""
+    with (
+        patch.object(escalation.httpx, "Client") as client,
+        pytest.raises(ValueError, match="finding_count does not match"),
+    ):
+        escalation.notify_human(
+            "investigation-1", 5, ["overly_broad_role"], "data-platform", [FINDING_IDS[0]]
+        )
+    client.assert_not_called()

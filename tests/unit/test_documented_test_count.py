@@ -56,7 +56,12 @@ def test_documented_test_totals_match_the_collected_suite(request):
         pytest.skip(f"partial run: {len(collected_files)} of {len(on_disk)} test files collected")
 
     total = len(items)
-    wrong = [claim for claim in documented_counts() if claim[2] != total]
+    claims = documented_counts()
+    # A gate that passes because the claim vanished is not a gate. Blanking the number out of
+    # every document would otherwise satisfy this test vacuously - which is exactly what a
+    # careless bulk edit does.
+    assert claims, "no document states the suite total; the claim was removed, not satisfied"
+    wrong = [claim for claim in claims if claim[2] != total]
     assert not wrong, "documented test totals disagree with the collected suite: " + "; ".join(
         f"{path}:{line} claims {claimed}, collected {total}" for path, line, claimed in wrong
     )

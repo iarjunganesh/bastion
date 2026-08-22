@@ -56,3 +56,26 @@ def notification_summary(categories: Iterable[str]) -> str:
     """Build notification text from allowlisted reason codes, never model output."""
     values = validate_risk_categories(categories)
     return "Access-review findings require attention: " + ", ".join(values)
+
+
+# The Access Auditor emits `hmac_sha256(...).hexdigest()[:24]`. Validating the exact shape means
+# a model that fabricates an identifier produces something inert rather than something stored:
+# an opaque ID grants nothing, reveals nothing, and can only ever key an exception that no real
+# finding will match.
+OPAQUE_FINDING_ID = re.compile(r"\A[0-9a-f]{24}\Z")
+
+# One investigation escalating more findings than this is a policy failure worth seeing, not a
+# payload worth storing.
+MAX_FINDING_IDS = 100
+
+
+def validate_finding_ids(finding_ids: Iterable[str]) -> list[str]:
+    """Accept only opaque Auditor finding identifiers, deduplicated and in stable order."""
+    values = sorted(set(finding_ids))
+    if not values:
+        raise SensitiveDataError("at least one opaque finding id is required")
+    if len(values) > MAX_FINDING_IDS:
+        raise SensitiveDataError(f"more than {MAX_FINDING_IDS} finding ids in one escalation")
+    if any(not OPAQUE_FINDING_ID.match(value) for value in values):
+        raise SensitiveDataError("finding id is not an opaque Auditor identifier")
+    return values

@@ -215,7 +215,16 @@ jobs:
             echo "::error::An API key or private key appears to be committed."
             exit 1
           fi
-          echo "No credentials or raw policy dumps in tracked files."
+          # A redirected console log is the shape that actually slipped through: `gcloud
+          # add-iam-policy-binding` prints the resulting policy, so an innocuous-looking .txt
+          # becomes a principal inventory. Filename and key-material checks both miss it.
+          # Tests carry service accounts for a mock project by design; a real one must not
+          # appear outside them.
+          if git grep -nIE '[a-z0-9-]+@[a-z0-9-]+\.iam\.gserviceaccount\.com'                -- . ':!tests/**' ':!*.lock' | grep -v 'bastion-ci-mock'; then
+            echo "::error::A real service-account principal appears in a tracked file."
+            exit 1
+          fi
+          echo "No credentials, principal inventories, or raw policy dumps in tracked files."
 
   diagrams:
     name: Architecture claims are grounded

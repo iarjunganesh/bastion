@@ -16,8 +16,9 @@ Every record below traces to a line there.
 | [005](005-adk-as-the-agent-framework.md) | **Google ADK** as the agent framework; A2A as the inter-agent contract | Accepted; **amended 2026-08-15** |
 | [006](006-pillar-coverage.md) | One observable proof closes each of the seven pillars, and each submission artifact | Accepted |
 | [007](007-tool-poisoning.md) | Tool poisoning defended at the tool-declaration boundary, not the prompt | Accepted |
+| [008](008-human-approval-loop.md) | Exception approval is a human act on the private findings API, with the reviewer taken from the verified caller | Accepted |
 
-## Why there are seven
+## Why the numbering looks the way it does
 
 **Thirteen records were cut to seven on 2026-08-15**, and the survivors renumbered `001`–`007`.
 Six described a premise that had stopped existing: Model Armor's fallback (the service
@@ -29,6 +30,10 @@ This repository is days old and has no external citations, so contiguous numberi
 nothing and reads as a considered set rather than the residue of one. **The reversal that is
 worth reading is preserved in place**: [ADR-003](003-pillars-on-geap.md) records its own scope
 error and corrects it, which is the point of keeping decision records at all.
+
+[ADR-008](008-human-approval-loop.md) was appended on 2026-08-18, after an evidence-capture
+attempt found that the exception ledger had no production writer. It is a new decision rather
+than an amendment, so it takes the next number rather than disturbing the set.
 
 ## The pass/fail gates
 

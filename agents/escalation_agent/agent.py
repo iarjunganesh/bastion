@@ -25,7 +25,11 @@ from google.adk.agents import LlmAgent
 
 from gateway.cloud_run_auth import CloudRunIdTokenAuth
 from model_armor.guardrails import screen_after_model, screen_before_model
-from model_armor.redaction import notification_summary, validate_risk_categories
+from model_armor.redaction import (
+    notification_summary,
+    validate_finding_ids,
+    validate_risk_categories,
+)
 
 # A timeout is not optional. Without one a hung notification surface blocks the escalation path
 # indefinitely. Separate connect and read budgets: a refused connection should fail fast, while
@@ -56,6 +60,7 @@ def notify_human(
     finding_count: int,
     risk_categories: list[str],
     department: str,
+    finding_ids: list[str],
 ) -> dict[str, Any]:
     """Post a count and a summary to one department's notification surface.
 
@@ -63,9 +68,15 @@ def notify_human(
     central-inbox failure this design exists to avoid, and a default would make that the
     quiet outcome of forgetting an argument.
 
-    Takes a **count**, not the findings. The signature is the control: this tool cannot leak
-    bindings because it is never given them, so there is nothing for a compromised prompt to
-    talk it into forwarding.
+    Takes a **count and opaque ids**, never the findings. The signature is still the control:
+    this tool cannot leak bindings because it is never given them, so there is nothing for a
+    compromised prompt to talk it into forwarding.
+
+    `finding_ids` carries the Auditor's opaque HMAC identifiers so a human reviewer can approve
+    a specific finding later. Without them the review record names no finding, and the exception
+    ledger - which is keyed by finding id - is unreachable from the surface a human actually
+    reads. They are validated to the exact opaque shape, so a fabricated id is inert: it grants
+    nothing and can only key an exception no real finding will ever match.
 
     TODO(week2): read the endpoint from Secret Manager rather than the environment.
     """
@@ -76,6 +87,11 @@ def notify_human(
         return {"delivered": False, "department": department, "reason": "nothing to escalate"}
 
     categories = validate_risk_categories(risk_categories)
+    identifiers = validate_finding_ids(finding_ids)
+    if len(identifiers) != finding_count:
+        # A count that disagrees with the ids it claims to summarise is either a model error or
+        # an attempt to inflate urgency; either way the human review record must not carry it.
+        raise ValueError("finding_count does not match the number of distinct finding ids")
     endpoint = os.environ.get(NOTIFY_ENDPOINT_VAR)
     if not endpoint:
         raise RuntimeError("BASTION_FINDINGS_ENDPOINT is not configured")
@@ -97,6 +113,7 @@ def notify_human(
                 "investigation_id": investigation_id,
                 "department": department,
                 "finding_count": finding_count,
+                "finding_ids": identifiers,
                 "risk_categories": categories,
                 "summary": notification_summary(categories),
             },
@@ -109,8 +126,10 @@ INSTRUCTION = """You are Bastion's Escalation Agent.
 
 You receive findings that have already been reviewed, scored, and **routed to the department
 that owns them**. For each department in the routing result, call `notify_human` with the
-supplied investigation id, its department id, finding count, and only allowlisted risk
-categories. The tool derives its idempotency key; never invent one.
+supplied investigation id, its department id, finding count, only allowlisted risk
+categories, and the opaque finding ids for that department exactly as they were given to you.
+The tool derives its idempotency key; never invent one, and never invent a finding id - copy
+them, because a human uses them to approve an exception later.
 
 Notify each department separately. Never merge departments into one message — a finding that
 lands on the wrong team's desk is a finding nobody acts on.

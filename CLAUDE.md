@@ -12,7 +12,7 @@ As of 2026-08-16 the production path is deployed and verified: Pub/Sub/Eventarc 
 Firestore lifecycle, Agent Runtime/Identity, Memory Bank, Agent Gateway/IAP, Agent Registry, two
 protected Cloud Run A2A workers, Model Armor, an IAM-private findings API, and retained operations
 controls. The count-only capture records 21/21 APIs and 33 resources. The Python 3.12 suite has
-171 tests at 100% statement and branch coverage.
+193 tests at 100% statement and branch coverage.
 
 Read these before changing architecture or claims:
 
@@ -25,6 +25,7 @@ Read these before changing architecture or claims:
 | [Official brief](submission/DEVPOST.md) | Captured source requirements; do not paraphrase over it |
 | [Submission ledger](submission/SUBMISSION.md) | Engineering proof versus human publication tasks |
 | [P0/P1 ledger](submission/planning/08-audit-remediation-plan.md) | Remediation closure |
+| [Observation backlog](submission/planning/09-capture-backlog.md) | Deployed but not yet observed |
 | [Evidence](assets/README.md) | Redacted observations and their proof boundaries |
 
 ## Non-negotiable architecture

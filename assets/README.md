@@ -18,6 +18,7 @@ Bastion's central claim is backed by redacted captures rather than architecture 
 | [06 — durable findings](evidence/06-durable-findings.md) | Eventarc/Firestore completion plus findings IAM and idempotency | Live production smoke; payload intentionally omitted |
 | [07 — observability](evidence/07-observability.md) | Regional audit retention, sink, metrics, alerts, and dashboard exist | Configuration proof; not historical SLO attainment |
 | [08 — tool poisoning](evidence/08-tool-poisoning.md) | Fixed tool sets at construction; Escalation holds no policy tool or Asset client | Construction-time proof, verified to fail when widened; not a live refusal trace |
+| [09 — cross-department routing](evidence/09-cross-department-routing.md) | 52 live bindings produced 3 findings routed to 2 owning departments | Counts and department ids only; routing measurement, not a completed investigation |
 
 ## Architecture and brand assets
 

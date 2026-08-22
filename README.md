@@ -59,7 +59,7 @@ Observed production checks include:
   idempotency key being accepted without creating a duplicate;
 - a Vertex quota failure recorded as a payload-free `model.request=failed`, with the
   investigation left reclaimable rather than cleared;
-- 171 tests at 100% statement and branch coverage under Python 3.12.
+- 193 tests at 100% statement and branch coverage under Python 3.12.
 
 The retained evidence is indexed in [assets/README.md](assets/README.md). The exact distinction
 between deployed, observed, and still-to-capture claims lives in
@@ -109,13 +109,34 @@ The Cloud Run services expose two security shapes deliberately:
 - the findings endpoint is network-reachable but IAM-private. Only
   `escalation-agent-sa` has `roles/run.invoker`; anonymous traffic is rejected by Cloud Run.
 
+## What "scalable network" means here
+
+The track asks for a *scalable network of institutional agents*. Bastion's scaling axis is
+deliberately **not** more agents — [ADR-002](docs/adr/002-three-agents.md) fixes the fleet at
+three, because a fourth agent with the same data access proves nothing that a third does not.
+The network scales on two axes that actually matter in an institution:
+
+| Axis | How it grows | Cost of growth |
+|---|---|---|
+| **Owning departments** | A row in the catalog with its principal patterns; routing picks it up with no code change | One catalog entry |
+| **Catalogued agents** | An Agent Card registered in the managed Registry and an approved Gateway destination | One registration; no orchestrator change |
+| **Throughput** | Bounded Cloud Run autoscaling behind durable Eventarc delivery, with leases, retry, and a five-attempt dead letter | Configuration |
+
+The measured proof that the first axis is real rather than decorative is
+[evidence 09](assets/evidence/09-cross-department-routing.md): 52 live IAM bindings produced 3
+findings that routed to **2 different owning departments**, deterministically and without a
+model deciding who owns what.
+
+Instance caps are deliberate. `BASTION_MAX_INSTANCES=3` follows the organizers' own
+cost guidance; it is a budget ceiling, not an architectural one.
+
 ## How the track requirements are answered
 
 | Track requirement | Bastion evidence |
 |---|---|
 | Agents cataloged for cross-department use | Versioned Agent Cards publish owner, department, purpose, skill, classification, policy version, approval state, and health metadata. `route_by_department()` turns ownership into an enforced routing decision. |
 | Context maintained across weeks of asynchronous work | Stable event/context IDs, Firestore inbox and leases, managed sessions and Memory Bank, expiring human-approved exceptions, retry/dead-letter handling, and idempotent notification keys. Restart and prior-week suppression are integration-tested. |
-| Production data without violating compliance, sovereignty, or security policy | Cloud Asset Inventory is read-only; raw members and bindings are minimized before Gemini; Model Armor fails closed; output is screened; logs carry no payload values; service identities are separated; state remains in an EU region. |
+| Production data without violating compliance, sovereignty, or security policy | Read-only Cloud Asset Inventory. **No raw member, role, resource, or binding ever crosses the model boundary** — only opaque IDs, categories, departments, and bounded scores — so sovereign data is not merely kept in-region, it never leaves the process. Model Armor fails closed, output is screened before notification, logs carry no payload values, identities are separated, and state stays in the EU. |
 
 ## Deterministic safety boundary
 
@@ -151,14 +172,26 @@ Operational objectives and alert mappings are in [docs/OPERATIONS.md](docs/OPERA
 
 ## Data sovereignty
 
+**Sovereign data never reaches the model at all.** Residency keeps regulated data inside a
+region; Bastion does something stronger with the part that matters — raw IAM members, roles,
+resources, and bindings stop inside the deterministic Auditor tool and are discarded there. What
+crosses the model boundary is an opaque HMAC identifier, a risk category, an owning department,
+and a bounded score. There is no prompt from which a principal could be recovered, because no
+principal was ever in one.
+
+That is why the deterministic pre-pass exists. `find_anomalies()` decides what is a finding;
+Gemini only writes the sentence explaining one. A compliance product cannot answer *"why was this
+flagged?"* with *"the model thought so"*, and it cannot leak a binding it was never given.
+
+Where the infrastructure runs:
+
 - Cloud Run, Firestore, Pub/Sub, and Eventarc run in `europe-north2`.
 - Agent Runtime, Memory Bank, Gateway, Registry, Model Armor, and the retained audit bucket run
   in `europe-west4`.
-- Gemini 3.5 Flash uses Vertex AI `global`. **Global is not a regional-residency claim.**
+- Gemini 3.5 Flash uses Vertex AI `global`. **Global is not a regional-residency claim**, and
+  Bastion does not make one. The minimisation above is the control; the region is not asked to be.
 
-Only minimized categories, counts, departments, opaque IDs, and bounded scores cross the model
-boundary. Raw IAM members, roles, resources, and bindings do not. The field-level inventory,
-retention, deletion, and processor boundaries are documented in
+The field-level inventory, retention, deletion, and processor boundaries are in
 [docs/DATA_GOVERNANCE.md](docs/DATA_GOVERNANCE.md).
 
 ## Architecture
@@ -258,7 +291,7 @@ python scripts/render_diagrams.py --check
 
 CI holds no GCP credential. Live deployment checks run from an approved operator workstation;
 GitHub Actions runs deterministic unit, integration, security, load, type, dependency, secret,
-documentation, and diagram gates. The current local Python 3.12 result is **171 passed and
+documentation, and diagram gates. The current local Python 3.12 result is **193 passed and
 100.00% coverage**.
 
 ## Repository map
@@ -292,6 +325,7 @@ submission/                 Devpost copy, checklist, and planning ledger
 - [ADR-005 — Google ADK and A2A](docs/adr/005-adk-as-the-agent-framework.md)
 - [ADR-006 — observable pillar proof](docs/adr/006-pillar-coverage.md)
 - [ADR-007 — tool poisoning](docs/adr/007-tool-poisoning.md)
+- [ADR-008 — human approval loop](docs/adr/008-human-approval-loop.md)
 - [Evidence index](assets/README.md)
 - [Submission readiness](submission/SUBMISSION.md)
 - [Audit remediation ledger](submission/planning/08-audit-remediation-plan.md)

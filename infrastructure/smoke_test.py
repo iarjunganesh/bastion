@@ -74,6 +74,9 @@ def verify_findings_boundary() -> None:
         "investigation_id": investigation_id,
         "department": "security-engineering",
         "finding_count": 1,
+        # A smoke-shaped opaque id: the exact 24-hex shape the Auditor emits, so the receiver's
+        # validation is exercised without deriving a real finding from the live policy.
+        "finding_ids": [sha256(investigation_id.encode()).hexdigest()[:24]],
         "risk_categories": ["overly_broad_role"],
         "summary": "Access-review findings require attention: overly_broad_role",
     }

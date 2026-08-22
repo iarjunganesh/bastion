@@ -49,3 +49,12 @@ desktop.ini
 Thumbs.db
 .vscode/
 .idea/
+
+# Captured terminal output. `gcloud ... add-iam-policy-binding` prints the resulting policy, so
+# a redirected console log is a raw principal inventory - exactly what SECURITY.md forbids
+# committing, and `git add -A` will happily stage it. One of these reached the index once.
+*-output.txt
+*-output.log
+*.gcloud.log
+manual-run-*.txt
+console-*.txt

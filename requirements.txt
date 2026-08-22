@@ -28,6 +28,12 @@ google-cloud-asset==4.4.0
 google-cloud-recommender==2.22.0
 google-cloud-modelarmor==0.7.1
 
+# ID-token minting for private Cloud Run peers, and ID-token *verification* on the findings
+# API's approval endpoint. Imported directly by `gateway/cloud_run_auth.py` and
+# `infrastructure/findings_api.py`, so it is a direct pin rather than something inherited from
+# whatever constraint google-cloud-firestore happens to carry this month.
+google-auth==2.56.3
+
 # Findings history and scheduling.
 google-cloud-firestore==2.28.1
 google-cloud-scheduler==2.20.0

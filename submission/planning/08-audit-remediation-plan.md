@@ -3,6 +3,11 @@
 **Status:** engineering remediation complete on 2026-08-16; publication tasks remain in
 [SUBMISSION.md](../SUBMISSION.md).
 
+Closure here means the deterministic engineering is done. Capabilities that are deployed and
+tested but have not yet been *observed* working are tracked separately in
+[09-capture-backlog.md](09-capture-backlog.md), because a passing test and a capture are
+different kinds of proof.
+
 ## P0 — deterministic safety
 
 - [x] Missing/invalid risk fails closed.
@@ -65,7 +70,8 @@
 - [managed Runtime/Gateway](../../assets/evidence/05-runtime-gateway.md)
 - [durable findings behavior](../../assets/evidence/06-durable-findings.md)
 - [retained observability](../../assets/evidence/07-observability.md)
+- [tool-declaration boundary](../../assets/evidence/08-tool-poisoning.md)
 - `infrastructure/verify_fleet.py`, `smoke_test.py`, `rollback.py`, and `teardown.py`
-- Python 3.12 full gate: 171 tests, 100% statement and branch coverage
+- Python 3.12 full gate: 193 tests, 100% statement and branch coverage
 
 P2 media and Devpost publication are intentionally excluded from P0/P1 engineering closure.

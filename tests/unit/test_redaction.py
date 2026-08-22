@@ -47,3 +47,15 @@ def test_notification_summary_is_deterministic_and_safe():
     assert redaction.notification_summary(["missing_condition", "overly_broad_role"]) == (
         "Access-review findings require attention: missing_condition, overly_broad_role"
     )
+
+
+def test_an_escalation_cannot_carry_an_unbounded_list_of_findings():
+    """A ceiling on ids is a ceiling on what one review record can quietly accumulate."""
+    too_many = [f"{index:024x}" for index in range(redaction.MAX_FINDING_IDS + 1)]
+    with pytest.raises(redaction.SensitiveDataError, match="more than"):
+        redaction.validate_finding_ids(too_many)
+
+
+def test_opaque_finding_ids_are_deduplicated_and_ordered():
+    identifier = "a1b2c3d4e5f60718293a4b5c"
+    assert redaction.validate_finding_ids([identifier, identifier]) == [identifier]

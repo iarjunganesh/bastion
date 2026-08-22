@@ -10,10 +10,13 @@ that owns the principal it concerns, not to one central inbox — which is the a
 enterprise access review. Security engineering does not own the data platform's service
 accounts, and an alert that lands on the wrong desk is an alert that gets ignored.
 
-The catalog below is the shape GEAP's Agent Registry stores
-([ADR-003](../docs/adr/003-pillars-on-geap.md)); this module is what *reads* it and acts on it.
-Until the registry is provisioned the catalog is declared here, and the seam is
-`load_catalog()` — one function to repoint at the managed surface, rather than a rewrite.
+Departments are deliberately **not** stored in the managed Agent Registry, which catalogs
+*agents* ([ADR-003](../docs/adr/003-pillars-on-geap.md)). An org chart is not an agent, and a
+routing table that any registered agent could write to would let a compromised one redirect
+its own findings away from the team that owns them. The catalog is repository-owned static
+source for the same reason tool descriptions are ([ADR-007](../docs/adr/007-tool-poisoning.md)).
+
+`load_catalog()` remains the single seam if that reasoning ever changes.
 """
 
 from __future__ import annotations
@@ -84,8 +87,8 @@ UNASSIGNED = "security-engineering"
 def load_catalog() -> list[Department]:
     """The department catalog.
 
-    The seam for GEAP's Agent Registry: when the managed catalog is provisioned this reads from
-    it, and nothing else in the module changes.
+    One function, so that the decision recorded in this module's docstring is enforced in one
+    place: nothing else here knows where departments come from.
     """
     return _CATALOG
 

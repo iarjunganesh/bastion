@@ -29,7 +29,7 @@ or a media platform.
 |---|---|
 | Catalog agents for cross-department use | Managed Registry has the Runtime and two worker cards; cards contain owner/department/purpose/skill/classification/version/approval metadata; deterministic routing rejects unknown departments. |
 | Safely maintain context across weeks of asynchronous operations | Firestore IDs/leases/retry/dedup, managed sessions and Memory Bank, expiring approved exceptions, five-attempt DLQ, and idempotent notification. Restart and simulated prior-week suppression are integration-tested; no wall-clock-week claim is made. |
-| Use production data without violating policy | Read-only live IAM/Asset access; deterministic minimisation; opaque IDs; fail-closed Model Armor; post-model protected-data screen; separated identities; count-only private findings record; explicit regional/global disclosure. |
+| Use production data without violating policy | Read-only live IAM/Asset access. Raw members, roles, resources and bindings never cross the model boundary at all — minimisation is the sovereignty control, not residency. Opaque IDs, fail-closed Model Armor, post-model protected-data screen, separated identities, count-only private findings record, and explicit regional/global disclosure. |
 
 ## Seven-pillar proof
 
@@ -60,7 +60,7 @@ or a media platform.
       are exercised across populated unit, integration, security, and load suites.
 - [x] Real findings endpoint denies anonymous traffic and collapses an authorized duplicate
       ([evidence 06](../assets/evidence/06-durable-findings.md)).
-- [x] 171 tests pass with 100% statement and branch coverage under Python 3.12.
+- [x] 193 tests pass with 100% statement and branch coverage under Python 3.12.
 - [x] Ruff, formatting, mypy, dependency audit, secret scan, docs/version checks, and diagram
       determinism are release gates.
 - [x] ADK deprecation/experimental risk consciously accepted and pinned in

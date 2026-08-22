@@ -80,7 +80,16 @@ def test_the_escalation_module_imports_no_iam_or_asset_client():
 def test_the_notification_tool_is_never_handed_a_binding():
     """The signature is the control: a tool given only a count cannot forward a principal."""
     parameters = set(inspect.signature(escalation.notify_human).parameters)
-    assert parameters == {"investigation_id", "finding_count", "risk_categories", "department"}
+    assert parameters == {
+        "investigation_id",
+        "finding_count",
+        "risk_categories",
+        "department",
+        # Opaque HMAC identifiers, never bindings. They exist so a human can approve a specific
+        # finding later; the exception ledger is keyed by finding id and is otherwise unreachable
+        # from the surface a reviewer actually reads.
+        "finding_ids",
+    }
 
 
 @pytest.mark.parametrize("agent_name", sorted(EXPECTED_TOOLS))

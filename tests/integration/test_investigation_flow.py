@@ -51,6 +51,7 @@ def test_duplicate_delivery_produces_one_durable_notification(tmp_path, monkeypa
         finding_count=1,
         risk_categories=["overly_broad_role"],
         department="security-engineering",
+        finding_ids=["a1b2c3d4e5f60718293a4b5c"],
     )
     store.delivered("notice-security-engineering")
     store.finish(event.event_id)
@@ -66,6 +67,7 @@ def test_duplicate_delivery_produces_one_durable_notification(tmp_path, monkeypa
             "investigation_id": event.event_id,
             "department": "security-engineering",
             "finding_count": 1,
+            "finding_ids": ["a1b2c3d4e5f60718293a4b5c"],
             "risk_categories": ["overly_broad_role"],
             "summary": "Access-review findings require attention: overly_broad_role",
         }

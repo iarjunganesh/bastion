@@ -9,7 +9,8 @@ deterministic code and is neither persisted by Bastion nor sent to Gemini.
 | Opaque finding ID, category, score, department | Policy, orchestration, routing | Firestore investigation record; exceptions expire at `approved_until` | `europe-north2` |
 | Session and durable memory | Managed Agent Runtime and Memory Bank | Managed sessions/memory; deletion follows platform-owner lifecycle | `europe-west4` |
 | Minimized prompt/response | Model Armor, Gemini, deterministic output screen | Bastion does not persist content; provider telemetry follows project settings | Armor `europe-west4`; Gemini `global` |
-| Human-review request | Private findings API | Count, department, categories, deterministic summary, idempotency key | Firestore `europe-north2` |
+| Human-review request | Private findings API | Count, department, categories, deterministic summary, opaque finding IDs, idempotency key | Firestore `europe-north2` |
+| Exception approval | Private findings API, human caller | Opaque finding ID, bounded expiry, policy version, and the **verified** reviewer principal | Firestore `europe-north2` |
 | Audit event | Cloud Logging | Payload-free event metadata, 365-day log-bucket retention | `europe-west4` |
 | Dead letter | Pub/Sub review subscription | Failed event envelope until operator acknowledgement/retention expiry | `europe-north2` |
 
@@ -19,7 +20,11 @@ deterministic code and is neither persisted by Bastion nor sent to Gemini.
 - No principal, resource, prompt, response, tool value, or exception message enters audit logs.
 - Model output is untrusted until the deterministic protected-data screen passes.
 - Notification fields and categories are allowlisted; free-form destinations and binding data
-  are not part of the tool contract.
+  are not part of the tool contract. Opaque finding IDs are carried so a human can approve a
+  specific finding; they are validated to the Auditor's exact HMAC shape and reveal nothing.
+- The reviewer on an approved exception is the verified caller identity, never a request field.
+  It is deliberately retained in the durable ledger for accountability and never enters model
+  state, audit logs, or committed evidence.
 - The HMAC key and A2A origin credential remain in Secret Manager and are never printed.
 - `global` model processing is disclosed explicitly and is not described as EU residency.
 
