@@ -34,7 +34,7 @@ Each needs live GCP credentials and an approved operator workstation. None is a 
 | 3 | One investigation's reasoning chain in Cloud Trace | Deployed Runtime | `enable_tracing=True` is configured; configuration is not a capture |
 | 4 | Structured audit logs correlated by context ID for that same run, **including a refusal** | Capture 3 | A trail of successes proves nothing about the guardrails |
 | 5 | The redacted real-IAM basis for the findings, from the current route | — | [Evidence 02](../../assets/evidence/02-gemini-investigation.md) is labelled historical and pre-Gateway |
-| 6 | Gateway refusals: unregistered caller, undeclared skill, rate limit | Decision below | Two are asserted offline in `tests/security/test_gateway_policy.py`; the third has no implementation |
+| 6 | Gateway refusals: unregistered caller, undeclared skill | — | **Two**, not three. The rate-limit refusal was removed by decision below, not deferred; both remaining refusals are asserted offline in `tests/security/test_gateway_policy.py` |
 | 7 | A worker timing out, retrying, then escalating | Deployed Runtime | Retry is deployed and suite-tested; the sequence has not been watched end to end |
 
 ## Scope note on capture 2
@@ -230,19 +230,42 @@ suite while CI — which exports nothing — stayed green.
 **Fixed 2026-08-22.** The lease parse and the test bootstrap both treat empty as absent, and the
 suite now passes identically with and without `.env` exported.
 
-## Open decision
+## Decision taken 2026-08-22 — rate limiting stays unimplemented, and is not claimed
 
-**Rate limiting does not exist anywhere in the codebase.** It is absent, not stale — no
-`gateway/`, `registry/`, or agent module implements it. Three ways forward, and the choice
-belongs to the platform owner:
+**Rate limiting does not exist anywhere in the codebase.** It was absent, not stale. Three
+ways forward were recorded and the choice belonged to the platform owner; it has now been
+made, on evidence rather than preference.
 
-1. Rely on the managed Gateway/IAP quota surface and capture whatever it actually enforces.
-2. Drop the third refusal and claim two, which the deterministic policy already supports.
-3. Implement it locally — but weigh this against ADR-003's no-reimplementation rule before
-   hand-rolling a limiter that a managed product may already provide.
+**Option 1 — rely on the managed Gateway's quota surface — is not available.** Measured
+against the live `bastion-egress` gateway: its entire configuration surface is
+`agentGatewayCard`, `googleManaged.governedAccessPath`, `labels`, `protocols` and
+`registries`. There is no rate or quota field, and `gcloud network-services agent-gateways
+update` exposes no such flag. The managed product does not offer this control, so there is
+nothing to configure and nothing to capture.
 
-Deciding after the capture attempt rather than before is how a claim ends up written to fit
-whatever happened to be observable.
+**Option 3 — implement it locally — is rejected, and the reason is specific rather than
+doctrinal.** `gateway/policy.py` exists to mirror what the deployed Gateway enforces; its own
+docstring says so, and the security suite asserts against it. Every refusal it evaluates is
+also applied in production. A local limiter would be the one rule in that file the managed
+control does not apply, so the suite would assert a refusal production does not make.
+
+That is not hypothetical. This repository has now shipped **three** defects of exactly that
+shape — the model-gated policy step, the Auditor hand-off, the escalation hand-off — each one
+true of the code and false of the deployed system, and each found by watching the fleet rather
+than by running the tests. Adding a fourth deliberately, in the file whose purpose is to agree
+with production, would be the least defensible version of that mistake.
+
+**Option 2 is taken: two refusals are claimed, because two are enforced.** No document claims
+a rate limit, and none will.
+
+**What does bound throughput, described as what it is.** `BASTION_MAX_INSTANCES` caps Cloud
+Run concurrency and Eventarc delivery is bounded to five attempts before a message reaches the
+dead-letter subscription. Those are real, deployed and observable — and they are a concurrency
+cap and a delivery bound, not a per-caller rate limit. Calling them one would be the same
+category error in prose that option 3 would be in code.
+
+Recorded as an amendment to [ADR-003](../../docs/adr/003-pillars-on-geap.md), which is the
+record this reasoning applies.
 
 ## Closing rule
 

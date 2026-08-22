@@ -57,3 +57,29 @@ Registry, Model Armor, and the audit bucket use `europe-west4`. Gemini 3.5 Flash
 
 The live measured state is [gcp-state.json](../../assets/architecture/gcp-state.json); observable
 closure for each pillar is [ADR-006](006-pillar-coverage.md).
+
+## Amendment 2026-08-22 — the rule also decides what *not* to build
+
+This record's rule is usually applied to something already built: use the managed product rather
+than the hand-rolled substitute. It applies equally to a control the managed product does not
+offer at all, and the first such case is **rate limiting**.
+
+The Agent Gateway exposes no rate or quota surface. Measured against the live `bastion-egress`
+gateway, its configuration is `agentGatewayCard`, `googleManaged.governedAccessPath`, `labels`,
+`protocols` and `registries`; `gcloud network-services agent-gateways update` has no
+corresponding flag.
+
+The tempting move is to add a limiter to `gateway/policy.py`, which already evaluates four
+refusals and is asserted by the security suite. That is rejected, and for a reason narrower than
+"do not reimplement": **that file exists to mirror what the deployed Gateway enforces.** Every
+rule in it is also applied in production. A local limiter would be the one rule that is not, so
+the suite would assert a refusal production does not make — and this project has already shipped
+three defects of precisely that shape, each true of the code and false of the deployed system,
+each found by watching the fleet rather than by running the tests.
+
+So the pillar claims two Gateway refusals rather than three, because two are enforced. Throughput
+is bounded by `BASTION_MAX_INSTANCES` and by Eventarc's five-attempt dead-letter policy; both are
+real and observable, and both are described as a concurrency cap and a delivery bound rather than
+as rate limiting, because that is what they are.
+
+If the managed Gateway later gains the control, it is configuration and a capture, not code.
