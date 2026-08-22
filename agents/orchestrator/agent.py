@@ -28,6 +28,7 @@ from pydantic import BaseModel
 
 from gateway.cloud_run_auth import private_a2a_client
 from gateway.policy import admit
+from observability.audit import INVESTIGATION_METADATA_KEY
 from registry.departments import route_by_department
 from runtime.firestore import FirestoreDurableStore
 
@@ -252,6 +253,22 @@ def card_url(value: str, agent_name: str) -> str:
     )
 
 
+def _forward_investigation(ctx: Any, _message: Any) -> dict[str, Any]:
+    """Carry the investigation id to a worker as A2A request metadata.
+
+    ADK gives each agent run its own `invocation_id`, and a worker is a separate run in a
+    separate process -- so without this, an investigation's audit records land under three
+    unrelated ids and cannot be assembled into one trail at all.
+
+    Metadata rather than message content on purpose: the id must reach the worker's audit
+    records without becoming something a model reads, restates, or can be talked into changing.
+    ADK files it under `RunConfig.custom_metadata["a2a_metadata"]` on the far side, which is
+    where `observability.audit` looks for it.
+    """
+    metadata = getattr(getattr(ctx, "run_config", None), "custom_metadata", None) or {}
+    return {INVESTIGATION_METADATA_KEY: metadata.get(INVESTIGATION_METADATA_KEY, "")}
+
+
 def build_sub_agents() -> list[Any]:
     """The two peers, in-process for local runs and over A2A once deployed.
 
@@ -291,6 +308,7 @@ def build_sub_agents() -> list[Any]:
                 agent_card=card_url(auditor, "access_auditor"),
                 description="Reads the live IAM policy and flags anomalies. Read-only.",
                 httpx_client=private_a2a_client(auditor),
+                a2a_request_meta_provider=_forward_investigation,
             ),
             policy_step,
             policy_gate,
@@ -299,6 +317,7 @@ def build_sub_agents() -> list[Any]:
                 agent_card=card_url(escalation, "escalation_agent"),
                 description="Packages high-risk findings for the owning department.",
                 httpx_client=private_a2a_client(escalation),
+                a2a_request_meta_provider=_forward_investigation,
             ),
         ]
 

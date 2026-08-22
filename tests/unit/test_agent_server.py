@@ -198,8 +198,9 @@ def test_the_runtime_dispatch_message_is_data_not_an_instruction(monkeypatch):
         async def async_create_session(self, user_id):
             return {"id": "session-1"}
 
-        async def async_stream_query(self, *, user_id, session_id, message):
+        async def async_stream_query(self, *, user_id, session_id, message, run_config=None):
             captured["message"] = message
+            captured["run_config"] = run_config
             return
             yield  # pragma: no cover - generator protocol only
 
@@ -223,6 +224,13 @@ def test_the_runtime_dispatch_message_is_data_not_an_instruction(monkeypatch):
     lowered = message.lower()
     for imperative in ("run the", "use only", "you must", "please ", "ignore "):
         assert imperative not in lowered, f"dispatch message reads as an instruction: {imperative}"
+
+    # The id the audit trail correlates on travels as run-config metadata, not as message
+    # content. The message copy is for the model; this copy is the one nothing can retype.
+    run_config = captured["run_config"]
+    assert isinstance(run_config, dict)
+    metadata = run_config["custom_metadata"]
+    assert metadata[agent_server.INVESTIGATION_METADATA_KEY] == event_id
 
 
 def test_an_empty_lease_variable_falls_back_rather_than_crashing(monkeypatch):

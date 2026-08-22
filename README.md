@@ -59,7 +59,7 @@ Observed production checks include:
   idempotency key being accepted without creating a duplicate;
 - a Vertex quota failure recorded as a payload-free `model.request=failed`, with the
   investigation left reclaimable rather than cleared;
-- 224 tests at 100% statement and branch coverage under Python 3.12.
+- 240 tests at 100% statement and branch coverage under Python 3.12.
 
 The retained evidence is indexed in [assets/README.md](assets/README.md). The exact distinction
 between deployed, observed, and still-to-capture claims lives in
@@ -291,7 +291,7 @@ python scripts/render_diagrams.py --check
 
 CI holds no GCP credential. Live deployment checks run from an approved operator workstation;
 GitHub Actions runs deterministic unit, integration, security, load, type, dependency, secret,
-documentation, and diagram gates. The current local Python 3.12 result is **224 passed and
+documentation, and diagram gates. The current local Python 3.12 result is **240 passed and
 100.00% coverage**.
 
 ## Repository map

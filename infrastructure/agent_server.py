@@ -26,7 +26,7 @@ from google.adk.cli.fast_api import get_fast_api_app
 from google.adk.cli.trigger_routes import TriggerResponse
 
 from gateway.cloud_run_auth import PEER_SECRET_ENV, PEER_SECRET_HEADER
-from observability.audit import record
+from observability.audit import INVESTIGATION_METADATA_KEY, record
 from runtime.durable import InvestigationEvent
 from runtime.events import decode_pubsub_event
 from runtime.firestore import FirestoreDurableStore
@@ -187,6 +187,13 @@ async def run_managed_runtime(event: InvestigationEvent) -> None:
             {"task": "scheduled_iam_access_review", "investigation_id": event.event_id},
             sort_keys=True,
         ),
+        # Seed the durable investigation id into run-config metadata, which is the one channel
+        # that reaches every audit record without becoming model-visible content. ADK mints a
+        # fresh `invocation_id` per agent run, so it cannot correlate an investigation that
+        # crosses the A2A boundary -- one run produced three of them. The id in the message
+        # above is for the model to echo; this one is for the audit trail, and only this one is
+        # trustworthy because nothing can retype it.
+        run_config={"custom_metadata": {INVESTIGATION_METADATA_KEY: event.event_id}},
     ):
         pass
 
@@ -237,6 +244,7 @@ def install_durable_eventarc_route(
                 outcome="failed",
                 actor="durable_ingress",
                 invocation_id=event.event_id,
+                investigation_id=event.event_id,
                 detail={"error_type": "CancelledError"},
             )
             raise
@@ -247,6 +255,7 @@ def install_durable_eventarc_route(
                 outcome="failed",
                 actor="durable_ingress",
                 invocation_id=event.event_id,
+                investigation_id=event.event_id,
                 detail={"error_type": type(exc).__name__},
             )
             raise HTTPException(status_code=503, detail="managed runtime unavailable") from None
