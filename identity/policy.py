@@ -6,6 +6,9 @@ from dataclasses import dataclass
 
 BROAD_ROLES = frozenset({"roles/owner", "roles/editor"})
 
+# The identities that run an ADK agent, and therefore screen every model call.
+SCREENING_IDENTITIES = ("orchestrator-sa", "access-auditor-sa", "escalation-agent-sa")
+
 
 @dataclass(frozen=True, slots=True)
 class WorkloadIdentity:
@@ -25,6 +28,11 @@ IDENTITIES = (
                 "roles/datastore.user",
                 "roles/cloudtrace.agent",
                 "roles/logging.logWriter",
+                # The Orchestrator screens its own policy step through the same fail-closed
+                # callback as the workers, so it needs the same Model Armor access. Omitting it
+                # did not disable screening - it made every screen raise, and a screen that
+                # raises refuses. The step failed closed on every investigation.
+                "roles/modelarmor.user",
                 "roles/monitoring.metricWriter",
             }
         ),
@@ -94,3 +102,10 @@ def validate_identities(identities: tuple[WorkloadIdentity, ...] = IDENTITIES) -
     approver = next(identity for identity in identities if identity.name == "approver-sa")
     if approver.roles:
         raise ValueError("approver identity may hold no project role")
+    # Every identity that runs an agent screens through the fail-closed Model Armor callback.
+    # Without this role the screen raises rather than returns, and a raising screen refuses, so
+    # the agent stops producing output entirely while every document still claims it screens.
+    for name in SCREENING_IDENTITIES:
+        identity = next(item for item in identities if item.name == name)
+        if "roles/modelarmor.user" not in identity.roles:
+            raise ValueError(f"{name} runs an agent and must hold roles/modelarmor.user")

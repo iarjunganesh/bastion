@@ -8,7 +8,8 @@ import shutil
 import subprocess
 from typing import Any, cast
 
-from infrastructure import provision_gateway
+from infrastructure import provision, provision_gateway
+from model_armor.template import template_drift
 
 PROJECT = os.environ["GCP_PROJECT_ID"]
 REGION = os.environ["GCP_REGION"]
@@ -27,6 +28,7 @@ REQUIRED_REGISTRY_SERVICES = {
     "google-cloud-firestore",
     "google-cloud-logging",
     "google-cloud-resource-manager",
+    "google-cloud-resource-manager-mtls",
     "google-cloud-telemetry",
     "google-model-armor",
     "google-vertex-ai-global",
@@ -149,6 +151,10 @@ def main() -> None:
     missing_registry = REQUIRED_REGISTRY_SERVICES - registered
     if missing_registry:
         errors.append(f"Agent Registry is missing: {', '.join(sorted(missing_registry))}")
+    # A guardrail that has drifted looser still answers, so nothing else here would notice.
+    # Screening that is merely unavailable is equally fatal: Model Armor fails closed, so an
+    # unreadable template stops every model call in the fleet rather than degrading quietly.
+    errors.extend(template_drift(provision.model_armor_template()))
     errors.extend(
         provision_gateway.validate(
             provision_gateway.describe(),

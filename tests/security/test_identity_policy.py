@@ -51,3 +51,26 @@ def test_approver_cannot_gain_a_standing_project_role():
     )
     with pytest.raises(ValueError, match="no project role"):
         validate_identities(changed)
+
+
+def test_every_agent_identity_can_reach_model_armor():
+    """A screening callback that cannot call Model Armor refuses rather than skips.
+
+    This is the failure the Orchestrator actually had: the role was missing, every screen
+    raised, fail-closed turned that into a refusal, and the policy step produced no output on
+    any investigation while the documentation still claimed screening worked.
+    """
+    from identity.policy import SCREENING_IDENTITIES
+
+    for name in SCREENING_IDENTITIES:
+        identity = next(item for item in IDENTITIES if item.name == name)
+        assert "roles/modelarmor.user" in identity.roles, name
+
+    stripped = tuple(
+        WorkloadIdentity(item.name, item.roles - {"roles/modelarmor.user"})
+        if item.name == "orchestrator-sa"
+        else item
+        for item in IDENTITIES
+    )
+    with pytest.raises(ValueError, match="modelarmor.user"):
+        validate_identities(stripped)

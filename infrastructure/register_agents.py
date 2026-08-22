@@ -59,6 +59,14 @@ PLATFORM_ENDPOINTS: dict[str, tuple[str, str]] = {
         "https://cloudresourcemanager.googleapis.com",
         "Resolve the Runtime project number to its configured project ID.",
     ),
+    # The Vertex AI client resolves the project number through the mTLS host, which is a
+    # distinct endpoint as far as Agent-to-Anywhere is concerned. Registering only the plain
+    # host fails the Runtime closed during initialization with "unregistered in the Agent
+    # Registry" - the control behaving correctly against an incomplete catalog.
+    "google-cloud-resource-manager-mtls": (
+        "https://cloudresourcemanager.mtls.googleapis.com",
+        "mTLS variant of the project-number resolution endpoint.",
+    ),
     "google-cloud-firestore": (
         "https://firestore.googleapis.com",
         "Durable investigation leases and approved exception memory.",
@@ -84,6 +92,7 @@ GRPC_ENDPOINTS = {
     "google-cloud-telemetry",
     "google-model-armor",
     "google-cloud-resource-manager",
+    "google-cloud-resource-manager-mtls",
 }
 
 

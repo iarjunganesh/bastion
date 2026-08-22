@@ -12,7 +12,7 @@ As of 2026-08-16 the production path is deployed and verified: Pub/Sub/Eventarc 
 Firestore lifecycle, Agent Runtime/Identity, Memory Bank, Agent Gateway/IAP, Agent Registry, two
 protected Cloud Run A2A workers, Model Armor, an IAM-private findings API, and retained operations
 controls. The count-only capture records 21/21 APIs and 33 resources. The Python 3.12 suite has
-198 tests at 100% statement and branch coverage.
+206 tests at 100% statement and branch coverage.
 
 Read these before changing architecture or claims:
 

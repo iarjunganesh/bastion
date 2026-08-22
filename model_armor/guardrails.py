@@ -26,6 +26,7 @@ from __future__ import annotations
 import json
 import os
 from functools import lru_cache
+from hashlib import sha256
 
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models.llm_request import LlmRequest
@@ -162,6 +163,24 @@ def screen_before_model(
     if not text.strip():
         return None
 
+    # Shape, never content. A refusal that says only "policy_match" cannot be diagnosed: the
+    # same agent screens clean locally and matches in the deployed A2A path, and the difference
+    # is *how much* reaches the screen, not what it says. Sizes are not values, so this stays
+    # inside the payload-free rule while making the discrepancy measurable.
+    shape = {
+        # A digest identifies the screened text by comparison against a candidate generated
+        # locally; it does not reveal it. Sizes alone proved too coarse - the deployed content
+        # is envelope-shaped but matches no envelope reproducible outside the A2A path.
+        "screened_digest": sha256(text.encode()).hexdigest()[:16],
+        "screened_chars": len(text),
+        "screened_parts": sum(
+            1
+            for content in (llm_request.contents or [])
+            for part in (content.parts or [])
+            if getattr(part, "text", None)
+        ),
+    }
+
     try:
         blocked = screen_prompt(text, project_id=project_id, template_id=template_id)
     except Exception:  # noqa: BLE001 — a screening failure must not become an open door
@@ -170,7 +189,7 @@ def screen_before_model(
             outcome="refused",
             actor="model-armor",
             invocation_id=_invocation(callback_context),
-            detail={"reason": "screening_unavailable"},
+            detail={"reason": "screening_unavailable", **shape},
         )
         return _refusal()
 
@@ -180,7 +199,7 @@ def screen_before_model(
             outcome="refused",
             actor="model-armor",
             invocation_id=_invocation(callback_context),
-            detail={"reason": "policy_match"},
+            detail={"reason": "policy_match", **shape},
         )
         return _refusal()
     return None

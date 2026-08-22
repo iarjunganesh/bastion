@@ -60,7 +60,7 @@ or a media platform.
       are exercised across populated unit, integration, security, and load suites.
 - [x] Real findings endpoint denies anonymous traffic and collapses an authorized duplicate
       ([evidence 06](../assets/evidence/06-durable-findings.md)).
-- [x] 198 tests pass with 100% statement and branch coverage under Python 3.12.
+- [x] 206 tests pass with 100% statement and branch coverage under Python 3.12.
 - [x] Ruff, formatting, mypy, dependency audit, secret scan, docs/version checks, and diagram
       determinism are release gates.
 - [x] ADK deprecation/experimental risk consciously accepted and pinned in

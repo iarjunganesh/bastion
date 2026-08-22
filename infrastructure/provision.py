@@ -8,14 +8,17 @@ Armor template required for fail-closed model screening.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import subprocess
 import urllib.error
 import urllib.request
 from collections.abc import Sequence
+from typing import Any
 
 from identity.policy import IDENTITIES, validate_identities
+from model_armor.template import FILTER_CONFIG, template_drift
 
 PROJECT = os.environ["GCP_PROJECT_ID"]
 REGION = os.environ.get("GCP_REGION", "europe-north2")
@@ -42,6 +45,27 @@ def exists(args: Sequence[str]) -> bool:
     return result.returncode == 0
 
 
+def _access_token() -> str:
+    token = subprocess.run(  # noqa: S603 - fixed gcloud executable and arguments
+        [GCLOUD, "auth", "print-access-token"],
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+    return token.stdout.strip() if token.returncode == 0 else ""
+
+
+def _templates_uri() -> str:
+    return (
+        f"https://modelarmor.{MODEL_ARMOR_LOCATION}.rep.googleapis.com/v1/projects/{PROJECT}"
+        f"/locations/{MODEL_ARMOR_LOCATION}/templates"
+    )
+
+
+def _template_uri() -> str:
+    return f"{_templates_uri()}/{MODEL_ARMOR_TEMPLATE}"
+
+
 def model_armor_template_accessible() -> bool:
     """Check the regional REST endpoint, not gcloud's unreliable Model Armor command.
 
@@ -49,26 +73,71 @@ def model_armor_template_accessible() -> bool:
     documented Viewer and User roles. The direct regional endpoint is the same control-plane API
     used by the Python client and is the path the runtime actually relies on.
     """
-    token = subprocess.run(  # noqa: S603 - fixed gcloud executable and arguments
-        [GCLOUD, "auth", "print-access-token"],
-        check=False,
-        text=True,
-        capture_output=True,
-    )
-    if token.returncode != 0 or not token.stdout.strip():
+    token = _access_token()
+    if not token:
         return False
-    uri = (
-        f"https://modelarmor.{MODEL_ARMOR_LOCATION}.rep.googleapis.com/v1/projects/{PROJECT}"
-        f"/locations/{MODEL_ARMOR_LOCATION}/templates/{MODEL_ARMOR_TEMPLATE}"
-    )
     request = urllib.request.Request(  # noqa: S310 - fixed regional Google API endpoint
-        uri, headers={"Authorization": f"Bearer {token.stdout.strip()}"}
+        _template_uri(), headers={"Authorization": f"Bearer {token}"}
     )
     try:
         with urllib.request.urlopen(request, timeout=30):  # noqa: S310 - fixed URI above
             return True
     except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError):
         return False
+
+
+def model_armor_template() -> dict[str, Any] | None:
+    """Return the deployed template, or None when it is absent or unreadable."""
+    token = _access_token()
+    if not token:
+        return None
+    request = urllib.request.Request(  # noqa: S310 - fixed regional Google API endpoint
+        _template_uri(), headers={"Authorization": f"Bearer {token}"}
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310 - fixed URI
+            body = json.load(response)
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError):
+        return None
+    filter_config = body.get("filterConfig")
+    return filter_config if isinstance(filter_config, dict) else {}
+
+
+def ensure_model_armor_template() -> None:
+    """Apply the repository's filter configuration to the deployed template.
+
+    The guardrail is configuration, not a console artifact: applying it here means the posture
+    is reviewable in Git and restorable, and `verify_fleet` can fail when it drifts. Creation
+    still needs a caller holding Model Armor administrative access; this refuses loudly rather
+    than deploying a fleet whose screening would fail every model call closed.
+    """
+    if not template_drift(model_armor_template()):
+        return
+    token = _access_token()
+    if not token:
+        raise SystemExit("Model Armor template requires credentials to reconcile")
+    payload = json.dumps({"filterConfig": FILTER_CONFIG}).encode()
+    for method, uri in (
+        ("PATCH", f"{_template_uri()}?updateMask=filterConfig"),
+        ("POST", f"{_templates_uri()}?templateId={MODEL_ARMOR_TEMPLATE}"),
+    ):
+        request = urllib.request.Request(  # noqa: S310 - fixed regional Google API endpoint
+            uri,
+            data=payload,
+            method=method,
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=30):  # noqa: S310 - fixed URI
+                pass
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError):
+            continue
+        if not template_drift(model_armor_template()):
+            return
+    raise SystemExit(
+        "Model Armor template could not be reconciled to the required filter configuration; "
+        "a caller with Model Armor administrative access must apply it"
+    )
 
 
 def ensure_api(service: str) -> None:
@@ -165,11 +234,7 @@ def main() -> None:
         run("firestore", "databases", "create", f"--database={DATABASE}", f"--location={REGION}")
     if not exists(("pubsub", "topics", "describe", TOPIC)):
         run("pubsub", "topics", "create", TOPIC)
-    if not model_armor_template_accessible():
-        raise SystemExit(
-            "Model Armor template must be created by an approved Model Armor administrator "
-            "before deployment"
-        )
+    ensure_model_armor_template()
 
     for identity in IDENTITIES:
         email = ensure_service_account(identity.name)

@@ -8,6 +8,7 @@ os.environ.setdefault("GCP_PROJECT_ID", "bastion-test-project")
 os.environ.setdefault("GCP_REGION", "europe-north2")
 
 from infrastructure import verify_fleet
+from model_armor.template import FILTER_CONFIG
 
 
 def test_verifier_reads_ingress_from_service_metadata(monkeypatch):
@@ -53,4 +54,7 @@ def test_verifier_reads_ingress_from_service_metadata(monkeypatch):
     monkeypatch.setattr(verify_fleet.provision_gateway, "describe_auth_extension", lambda: {})
     monkeypatch.setattr(verify_fleet.provision_gateway, "describe_auth_policy", lambda: {})
     monkeypatch.setattr(verify_fleet.provision_gateway, "validate", lambda *args: [])
+    # The guardrail check reaches the regional Model Armor endpoint; the drift logic itself is
+    # covered in tests/security/test_model_armor_template.py.
+    monkeypatch.setattr(verify_fleet.provision, "model_armor_template", lambda: dict(FILTER_CONFIG))
     verify_fleet.main()

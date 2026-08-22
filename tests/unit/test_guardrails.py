@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from hashlib import sha256
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -96,20 +97,50 @@ def test_sensitive_structured_model_output_is_withheld():
 
 
 def test_refusals_emit_only_a_bounded_reason():
+    screened = "user:a@example.com"
     context = SimpleNamespace(invocation_id="inv-refusal")
     with (
         patch.object(guardrails, "screen_prompt", return_value=True),
         patch.object(guardrails, "record") as record,
     ):
-        guardrails.screen_before_model(context, _request("user:a@example.com"))
+        guardrails.screen_before_model(context, _request(screened))
     record.assert_called_once_with(
         "model_armor.input",
         outcome="refused",
         actor="model-armor",
         invocation_id="inv-refusal",
-        detail={"reason": "policy_match"},
+        detail={
+            "reason": "policy_match",
+            "screened_digest": sha256(screened.encode()).hexdigest()[:16],
+            "screened_chars": len(screened),
+            "screened_parts": 1,
+        },
     )
     assert "a@example.com" not in str(record.call_args)
+
+
+def test_refusal_detail_carries_sizes_and_never_values():
+    """The shape probe exists to diagnose a refusal; it must not smuggle the text out.
+
+    Sizes are not values, so a length may travel where a principal may not. This pins that
+    distinction rather than trusting it: every emitted detail is a reason string or an integer.
+    """
+    secret = "user:someone@example.com and roles/owner on the production project"
+    context = SimpleNamespace(invocation_id="inv-shape")
+    with (
+        patch.object(guardrails, "screen_prompt", return_value=True),
+        patch.object(guardrails, "record") as record,
+    ):
+        guardrails.screen_before_model(context, _request(secret))
+    detail = record.call_args.kwargs["detail"]
+    assert detail["screened_chars"] == len(secret)
+    assert detail["screened_parts"] == 1
+    assert detail["screened_digest"] == sha256(secret.encode()).hexdigest()[:16]
+    # A digest identifies by comparison and does not carry the text; a length is a size.
+    for key, value in detail.items():
+        assert isinstance(value, int) or key in {"reason", "screened_digest"}
+    assert "someone@example.com" not in str(record.call_args)
+    assert "roles/owner" not in str(record.call_args)
 
 
 def test_screen_prompt_reports_blocked_not_safe():
