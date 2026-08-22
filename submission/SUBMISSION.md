@@ -102,7 +102,9 @@ The following claims are deliberately not made:
 - [ ] Verify every Devpost number against `gcp-state.json` immediately before submission.
 - [ ] Keep private services running through judging; do not expose an agent merely to create a
       public hosted-project URL.
-- [ ] Run the complete local and live release gates, push `main`, and confirm GitHub Actions green.
+- [x] Run the complete local and live release gates, push `main`, and confirm GitHub Actions
+      green. Done for `v0.2.1`; repeat before the final submission commit, because this one
+      is satisfied per-push rather than once.
 - [x] Create a release tag only if explicitly desired after the submission commit; no tag is
       required for engineering closure. `v0.2.0` was explicitly requested by the platform owner on
       2026-08-22 and carries the seven deployed-fleet defects found after `v0.1.0`.
