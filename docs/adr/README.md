@@ -46,7 +46,7 @@ The overview names three mandatory technologies:
 | Gate | Record | State |
 |---|---|---|
 | Gemini 3.5+ via Gemini API or Vertex AI | [001](001-real-iam-not-mock-data.md) | ✅ **Met.** 5 model calls in one investigation, 2026-08-15 ([evidence 02](../../assets/evidence/02-gemini-investigation.md)) |
-| One Google Agent Framework | [005](005-adk-as-the-agent-framework.md) | ✅ **Met.** ADK 2.7.0 — three `LlmAgent`s under a `SequentialAgent`, executed |
+| One Google Agent Framework | [005](005-adk-as-the-agent-framework.md) | ✅ **Met.** ADK 2.7.1 — three `LlmAgent`s and two model-free `BaseAgent` steps under a `SequentialAgent`, executed |
 | One Google Cloud infrastructure service | [003](003-pillars-on-geap.md) | ✅ **Met.** Cloud Run, Firestore, Pub/Sub, Eventarc, Agent Engine, and Model Armor are deployed; live-policy and Armor evidence are retained |
 
 **All three are met in code and live infrastructure.** The 2026-08-16 fleet adds an

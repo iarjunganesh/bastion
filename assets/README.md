@@ -13,7 +13,7 @@ Bastion's central claim is backed by redacted captures rather than architecture 
 | [01 — Model Armor block](evidence/01-model-armor-block.md) | The live regional template refused a prompt-injection sample | Direct managed-service probe; callback wiring is additionally tested |
 | [02 — Gemini investigation](evidence/02-gemini-investigation.md) | Gemini 3.5 Flash processed minimized state from a real IAM review | Historical pre-Gateway run; not proof of the current route |
 | [03 — identity denial](evidence/03-escalation-agent-denied.md) | Escalation was denied IAM read while Auditor was permitted | Workstation impersonation of deployed identities |
-| [04 — private fleet](evidence/04-private-fleet-deployment.md) | 21 APIs and 33 deployed resources measured without principals | Count-only inventory, not a request trace |
+| [04 — private fleet](evidence/04-private-fleet-deployment.md) | 21 APIs and 38 deployed resources measured without principals | Count-only inventory, not a request trace |
 | [05 — Runtime and Gateway](evidence/05-runtime-gateway.md) | Managed Runtime session streamed events; Gateway/Registry/IAP configuration verified | Status and count proof; no private URLs or identities retained |
 | [06 — durable findings](evidence/06-durable-findings.md) | Eventarc/Firestore completion plus findings IAM and idempotency | Live production smoke; payload intentionally omitted |
 | [07 — observability](evidence/07-observability.md) | Regional audit retention, sink, metrics, alerts, and dashboard exist | Configuration proof; not historical SLO attainment |

@@ -11,7 +11,7 @@ or a media platform.
 
 - [x] Gemini 3.5 Flash through Vertex AI `global`; live calls captured in
       [evidence 02](../assets/evidence/02-gemini-investigation.md).
-- [x] Google ADK 2.7.0; three ADK agents, A2A workers, plugins, tools, and managed Runtime.
+- [x] Google ADK 2.7.1; three ADK agents, A2A workers, plugins, tools, and managed Runtime.
 - [x] Google Cloud infrastructure; measured deployment in
       [evidence 04](../assets/evidence/04-private-fleet-deployment.md).
 - [x] Fortified Enterprise Fleet brief addressed across Registry, Runtime, Memory, Identity,
@@ -41,7 +41,11 @@ or a media platform.
 - [x] **Identity:** deployed Escalation identity denied IAM read while Auditor was permitted
       ([evidence 03](../assets/evidence/03-escalation-agent-denied.md)).
 - [x] **Gateway:** IAP fail-closed policy and per-destination Runtime identity grants verified;
-      dispatcher direct-peer credential and invoker grants removed.
+      dispatcher direct-peer credential and invoker grants removed. **Caveat:** IAP currently also
+      denies a *legitimate* destination — Model Armor's regional endpoint, called from inside the
+      Runtime — with the endpoint registered and the role held. Fail-closed is observed; correctly
+      admitting a catalogued destination from the Runtime is not. Tracked as D2 in
+      [09-capture-backlog.md](planning/09-capture-backlog.md).
 - [x] **Model Armor:** managed template refused injection
       ([evidence 01](../assets/evidence/01-model-armor-block.md)); callback fail-closed behavior and
       protected-output screening tested.
@@ -96,5 +100,6 @@ The following claims are deliberately not made:
 - [ ] Keep private services running through judging; do not expose an agent merely to create a
       public hosted-project URL.
 - [ ] Run the complete local and live release gates, push `main`, and confirm GitHub Actions green.
-- [ ] Create a release tag only if explicitly desired after the submission commit; no tag is
-      required for engineering closure.
+- [x] Create a release tag only if explicitly desired after the submission commit; no tag is
+      required for engineering closure. `v0.2.0` was explicitly requested by the platform owner on
+      2026-08-22 and carries the seven deployed-fleet defects found after `v0.1.0`.

@@ -14,12 +14,12 @@
 # NOT installed, deliberately: the `antigravity` extra. `google-antigravity` ships protobuf 7
 # gencode while a2a-sdk and google-cloud-aiplatform both pin protobuf<7, so it cannot coexist
 # with the Gateway and Runtime pillars. See docs/adr/007-adk-as-the-agent-framework.md.
-google-adk[a2a,agent-identity,gcp,otel-gcp,mcp,tools,eval]==2.7.0
+google-adk[a2a,agent-identity,gcp,otel-gcp,mcp,tools,eval]==2.7.1
 
 # Pinned explicitly because the ADK extras above do not carry them, and the versions a
 # document may name must resolve to something.
 a2a-sdk==1.1.2
-google-cloud-aiplatform==1.164.0
+google-cloud-aiplatform==1.165.1
 
 # The governance data sources — see docs/adr/006-gcp-service-surface.md.
 # Cloud Asset Inventory is how the Access Auditor reads the live IAM policy: `gcloud` is not

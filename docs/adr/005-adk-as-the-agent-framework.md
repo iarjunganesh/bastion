@@ -2,16 +2,23 @@
 
 **Status:** Accepted 2026-08-13. **Amended 2026-08-15** — version raised to 2.7.0, and the
 rejection of the Antigravity SDK now rests on a measured incompatibility rather than a
-judgement about documentation quality.
-**Date:** 2026-08-15
+judgement about documentation quality. **Amended 2026-08-22** — version raised to 2.7.1 for the
+`v0.2.0` tag, and the composition below corrected: not every step is an `LlmAgent` any more.
+**Date:** 2026-08-22
 
 ## Decision
 
-Bastion's three agents are **ADK agents** (`google-adk==2.7.0`). ADK owns the agent
+Bastion's three agents are **ADK agents** (`google-adk==2.7.1`). ADK owns the agent
 definition, the tool-calling loop, and the session and memory service interfaces
 ([ADR-003](003-pillars-on-geap.md)). The GenAI SDK, Antigravity SDK, and Genkit are not used.
 
-Concretely: each agent is an `LlmAgent` with explicitly declared tools; the Orchestrator
+Concretely: each of the three *agents* is an `LlmAgent` with explicitly declared tools. The
+Orchestrator's internal sequence also contains two `BaseAgent` steps that hold no model at all —
+`policy_step` and `policy_gate` — because applying a constant threshold and refusing to continue
+without a recorded result are not decisions a model should be in a position to make
+([ADR-010](010-policy-enforcement-gate.md)). ADK supports this directly: `BaseAgent` is a
+first-class member of a `SequentialAgent`, so removing the model cost no framework support. The
+Orchestrator
 composes the Access Auditor and the Escalation Agent through ADK's orchestration agents
 (`SequentialAgent`, `ParallelAgent`, `LoopAgent`) rather than a hand-rolled `asyncio.gather`;
 and inter-agent traffic crosses the **managed Agent Gateway**, which is what the observability
@@ -48,9 +55,10 @@ any code.
   one choice. `adk deploy` offers `agent_engine`, `cloud_run`, and `gke`; the Cloud Run form
   carries `--trace_to_cloud`, `--a2a`, `--session_service_uri` and `--memory_service_uri`, so
   four pillars are flags rather than modules.
-- **Zero installation risk.** Verified 2026-08-15 against `google-adk==2.7.0`:
-  `google.adk.agents`, `.tools`, `.memory`, `.sessions`, `.a2a`, `.plugins` and
-  `vertexai.agent_engines.AdkApp` all import cleanly.
+- **Zero installation risk.** Re-verified 2026-08-22 against `google-adk==2.7.1`, as it was on
+  2026-08-15 against 2.7.0: `google.adk.agents`, `.tools`, `.memory`, `.sessions`, `.a2a`,
+  `.plugins` and `vertexai.agent_engines.AdkApp` all import cleanly. Re-run rather than
+  re-dated — a verification claim that is edited to match a new pin is no longer a verification.
 
 **The Antigravity SDK is not merely undocumented — it cannot be installed alongside this
 stack.** `google-antigravity` 0.1.12 ships protobuf **7** gencode:
@@ -98,8 +106,8 @@ DeprecationWarning: SequentialAgent is deprecated in favor of Workflow and will 
 a future version. Workflow cannot yet be used as an LlmAgent sub-agent.
 ```
 
-**The warning names its own blocker in its second sentence.** Bastion composes three
-`LlmAgent`s under one parent, which is precisely the arrangement `Workflow` cannot yet serve,
+**The warning names its own blocker in its second sentence.** Bastion composes `LlmAgent`s
+under one parent, which is precisely the arrangement `Workflow` cannot yet serve,
 so the deprecated class is not a shortcut here — it is the only construct that expresses the
 design. Migrating early would mean either flattening the fleet to a single agent, which
 [ADR-002](002-three-agents.md) rules out, or hand-rolling the sequencing, which is the mistake
@@ -111,9 +119,9 @@ migration trigger is explicit: **when `Workflow` can be an `LlmAgent` sub-agent,
 `scripts/check_versions.py --check-upstream` runs before every tag, so a release that changes
 this will not pass unnoticed.
 
-This also bounds the blast radius. The composition is four lines in one module; nothing else
-in the repository names `SequentialAgent`, because the pillars are managed products and the
-agents are plain `LlmAgent`s.
+This also bounds the blast radius. The composition is a handful of lines in one module; nothing
+else in the repository names `SequentialAgent`, because the pillars are managed products, the
+three agents are plain `LlmAgent`s, and the two deterministic steps are plain `BaseAgent`s.
 
 ## Absorbed record: A2A as the inter-agent contract (was ADR-013)
 
@@ -128,7 +136,18 @@ deleted.
 
 What survives is the **obligation the envelope existed to serve**: every hop carries an id that
 lets the audit trail be reassembled into one reasoning chain rather than inferred from
-interleaved logs. That is `invocation_id` in `observability/audit.py`, recorded by the
-`BasePlugin` on every agent, model, and tool event.
+interleaved logs.
+
+This record originally named `invocation_id` as that id. **Amended 2026-08-22: it is not, and
+deleting the hand-written envelope did drop something after all.** ADK mints `invocation_id` per
+agent run, and a worker reached over A2A is a separate run in a separate process, so one
+investigation produced three unrelated ids and its records could not be assembled at all — the
+exact obligation this section claimed was satisfied. The dependency supplies the transport, not
+the correlation.
+
+The id that now carries across every hop is `investigation_id`, seeded from the durable event at
+dispatch and forwarded as A2A request metadata rather than as message content, so no model ever
+reads or restates it. `invocation_id` is still recorded, and still groups one agent run — which
+is all it ever did.
 
 `adk deploy cloud_run --a2a` exposes the endpoint; Agent Gateway routes to it.

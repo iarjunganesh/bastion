@@ -12,10 +12,10 @@ instead of allowing it to escalate.
 
 ## Context
 
-`policy_step` is an `LlmAgent` whose `apply_policy_rules` and `route_by_department` tools are
-reachable **only through a model call**. When `before_model_callback` refuses — which
+`policy_step` **was** an `LlmAgent` whose `apply_policy_rules` and `route_by_department` tools
+were reachable **only through a model call**. When `before_model_callback` refused — which
 [ADR-009](009-model-armor-threshold.md) records as the fleet's standing condition inside the
-Agent Runtime — the model never runs, so neither tool ever executes.
+Agent Runtime — the model never ran, so neither tool ever executed.
 
 Nothing noticed. The `SequentialAgent` moved on to the Escalation Agent, which read the
 Auditor's output independently, and humans were paged about findings that no threshold had ever

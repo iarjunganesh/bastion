@@ -10,7 +10,165 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
-## [Unreleased]
+## [0.2.0] — 2026-08-22
+
+The fleet was deployed at 0.1.0 and then watched. This release is what watching produced: seven
+defects that no offline gate could have found, four new decision records, and a screening outage
+whose cause was the fleet's own dispatch message. Two defects remain open; they are named here
+rather than left for a reader to discover.
+
+### Fixed — one investigation can be assembled into one trail
+
+- ADK mints a fresh `invocation_id` per agent run, and a worker reached over A2A is a separate run
+  in a separate process, so a single investigation scattered its audit records across three
+  unrelated ids. The audit docstring claimed `invocation_id` grouped an investigation; it groups
+  one agent run, and only inside that run.
+- The durable event id is seeded into `RunConfig.custom_metadata` at dispatch and forwarded to each
+  worker as A2A request metadata, so every record carries the same `investigation_id`. Metadata
+  rather than message content: the id must reach the far side without becoming something a model
+  reads, restates, or can be talked into changing.
+- `event_id` is the correlation key rather than `context_id` because `InvestigationEvent` validates
+  it as a UUID while `context_id` is only checked non-empty. The value crosses A2A from a peer and
+  lands in a 365-day retained bucket, so an unvalidated field would be a channel for arbitrary text
+  into the compliance log. The audit boundary re-validates the shape regardless of what upstream
+  sent, and records `unknown` rather than writing through.
+
+### Fixed — the deterministic threshold cannot be skipped, and findings are not retyped
+
+- On 2026-08-21 two investigations escalated to humans with no threshold ever applied, and the
+  lifecycle recorded `completed` with no error anywhere. Enforcement did not fail closed; it
+  disappeared. `policy_step` was an `LlmAgent` whose deterministic tools a model chose to call, so
+  a Model Armor refusal of that model call meant the tools never ran and the sequence continued.
+- Even when the call succeeded the model was **retyping** the findings — reconstructing opaque ids,
+  categories and scores from the Auditor's prose. A fabricated category is why `notify_human` failed
+  intermittently; a mistyped 24-hex id is why an approved exception would never have matched.
+- `policy_step` is now a `BaseAgent` calling the threshold and the routing catalog directly. There
+  was never a decision here for a model to make. Because it reaches no model it declares no tools
+  and needs no screening. [ADR-010](docs/adr/010-policy-enforcement-gate.md).
+- The Auditor answers in a validated `AuditReport` schema, so findings cross A2A as data rather than
+  prose, and a missing or misshapen report fails closed instead of scoring an empty list.
+  [ADR-012](docs/adr/012-structured-findings-across-a2a.md). Whether the deployed Gemini call
+  honours `output_schema` is enforced at the model layer and is **not** proven by the offline suite.
+- `PolicyEnforcementGate` refuses to escalate unless the deterministic path left its own result in
+  state. An `output_key` is not proof: ADK stores a screening refusal under that key too.
+
+### Fixed — inbound screening covers tool results, not only the prompt
+
+- `before_model_callback` read only text parts, so everything a tool returned reached the model
+  unscreened, leaving the shorter and likelier path as the one neither callback looked at.
+- Not theoretical: `apply_policy_rules` returns `exception_policy_version`, an operator-supplied
+  string the findings API writes and the policy step hands straight to a model — free text crossing
+  a trust boundary inside exactly the part type the screen skipped.
+  [ADR-011](docs/adr/011-inbound-screening-covers-tool-results.md).
+
+### Fixed — a declared-but-empty environment variable is treated as absent
+
+- `os.environ.get(key, default)` returns an empty string for a key that is present and empty, so
+  `BASTION_INVESTIGATION_LEASE_SECONDS` reached `int("")` and durable ingress died on its first
+  delivery — at request time rather than startup, so the service reported healthy and failed only
+  under traffic.
+- The suite had the same defect from the other side via `os.environ.setdefault`: nine tests failed
+  for contributors who export their environment, while CI — which exports nothing — stayed green. A
+  gate that only passes on machines with an empty environment is not verifying what it appears to.
+
+### Fixed — the Runtime screens and egresses under its own identity
+
+- Agent-to-Anywhere refused every Runtime call as incorrect or unregistered. Three separate causes
+  wore one error message.
+- The managed Runtime does not run as `orchestrator-sa`; it runs as a GEAP Agent Identity
+  principal, so granting the workload account `roles/modelarmor.user` changed nothing and the
+  policy step reported `screening_unavailable` on every investigation. Deployment now grants the
+  Agent Identity directly. The `orchestrator-sa` grant is reverted — durable ingress constructs no
+  agent, so it calls no model — along with the test that required it, since an over-grant enforced
+  by a gate is harder to remove than one nobody checks.
+- `roles/iap.egressor` carries the permission the denial names, and nobody held it. Registering a
+  destination is necessary but not sufficient. The catalog was also genuinely incomplete: Google API
+  clients resolve to mTLS hosts when a client certificate is available, and each is a distinct
+  endpoint. Both the role and the endpoints are applied by deployment and required by
+  `verify_fleet`.
+- Refusals inside the notification boundary all raised one `SensitiveDataError`, so the trail said
+  only that something was rejected. `UnsafeRiskCategoryError` and `OpaqueFindingIdError` make the
+  exception type the bounded reason, keeping events payload-free while making them answerable.
+
+### Fixed — the dispatcher sends data, not an instruction
+
+- Model Armor scored the dispatcher's own repository-owned sentence at HIGH confidence — the same
+  as a genuine injection probe — and since screening fails closed it refused **every investigation
+  the fleet had ever run**.
+- Neither threshold separated them. To a prompt-injection classifier an imperative addressed to an
+  agent is what an injection is; the difference is provenance, which content classification cannot
+  see. `HIGH` was tried and reverted: it fixed nothing and detected less.
+  [ADR-009](docs/adr/009-model-armor-threshold.md) records that the threshold is not the lever.
+- The message is now a JSON object carrying the correlation id, with a test pinning the shape so the
+  outage cannot return as a well-meaning rewording. Instructing the model to use only registered
+  agents was never something it could honour or ignore — Registry and IAP authorize egress
+  deterministically — so asking for it in prose bought nothing and cost the entire pipeline.
+
+### Changed — the Model Armor template is configuration, not console state
+
+- The deployed template enforced prompt-injection detection at `LOW_AND_ABOVE`, which matched the
+  fleet's own prompts. Investigations completed in forty seconds having done nothing. A control
+  that blocks all legitimate traffic supplies an outage, not security.
+- The threshold was measured against the live template rather than guessed, and the configuration
+  now lives in `model_armor/template.py` so the posture is diffable and restorable. `verify_fleet`
+  fails when the deployed template drifts, including when it is merely unreadable — equally fatal
+  under fail-closed screening.
+- Refusals carry screened character and part counts. Sizes are not values: a length may travel where
+  a principal may not, which keeps this inside the payload-free rule. A digest used during diagnosis
+  was removed once it had served, because a fingerprint of a prompt is still derived from a prompt.
+
+### Fixed — approval cannot be granted by an agent that can reach the endpoint
+
+- `caller_identity` accepted any principal with a verifiable ID token carrying an email claim, and
+  every worker identity that posts a review record necessarily holds `run.invoker` on the findings
+  API. The Escalation Agent could approve the suppression of a finding it had just raised.
+  Confirmed against the deployed service.
+- ADR-008 had named `gcloud run services proxy` as the reviewer's path, and that path cannot work:
+  Cloud Run accepts only a Google-signed ID token whose audience is the service, and no user
+  credential can mint one. The record stated the constraint and then contradicted it.
+- Approval now checks one deployment-configured approver identity and fails closed when unset. The
+  human reaches it through a break-glass identity holding no project role and exactly one
+  capability, which only the configured principal may impersonate — so the human stays named in the
+  IAM audit log.
+- Firestore's default database is literally named `(default)`; sourced unquoted into a POSIX shell
+  that is array-assignment syntax yielding a different database name, with no error at any layer.
+
+### Changed — the local permission grant is ignored by the repository
+
+- `.claude/settings.local.json` authorizes an agent to deploy against the live project. It was
+  untracked only because a personal `~/.config/git/ignore` rule matched it — a rule absent on CI, in
+  a fresh clone, and on every other checkout. The protection held precisely where it was least
+  needed.
+
+### Known — two defects remain open
+
+- **Model Armor egress from inside the Runtime is denied by IAP.** Five hypotheses were eliminated:
+  global Registry registration, GRPC to HTTP_JSON rebinding, a Runtime redeploy, Registry
+  `bindings`, and IAM. The Agent Identity holds `roles/iap.egressor` at project level and there are
+  no IAP grants in the denial window. The deterministic policy step no longer depends on this path,
+  so it is not blocking, but it is not solved.
+- **Investigations sometimes truncate after the Auditor**, with no cause yet established.
+- Both are tracked in
+  [09-capture-backlog.md](submission/planning/09-capture-backlog.md) alongside the observation
+  backlog. Nothing in this release claims either is fixed.
+
+### Changed — dependency pins raised for the tag
+
+- `google-adk` 2.7.0 → **2.7.1** and `google-cloud-aiplatform` 1.164.0 → **1.165.1**, with
+  `requirements.lock` regenerated. `scripts/check_versions.py --check-upstream` is the documented
+  pre-tag gate and it failed on both; a tag is a claim that the pinned stack is current, so the
+  pins move before the tag rather than after it.
+- ADR-005's installation claim was **re-run** against 2.7.1 rather than re-dated. A verification
+  line edited to match a new pin has stopped being a verification.
+- No behavioural change surfaced: 240 tests at 100% statement and branch coverage, mypy, and every
+  documentation gate pass identically on 2.7.1. `SequentialAgent` remains deprecated-but-required
+  in 2.7.1, so ADR-005's migration trigger — `Workflow` becoming usable as an `LlmAgent` sub-agent
+  — has still not fired.
+
+### Changed — the suite is 240 tests
+
+- Up from 208, at 100% statement and branch coverage under Python 3.12. Every new boundary added in
+  this release carries tests at the layer it changed.
 
 ### Changed — the reviewer grant is applied by deployment
 

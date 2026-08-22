@@ -8,10 +8,10 @@ Bastion is a Fortified Enterprise Fleet submission for the All Things Agentic Ha
 Google ADK agents continuously review a real GCP IAM policy: a managed Runtime Orchestrator, a
 read-only Access Auditor, and a no-IAM-read Escalation Agent.
 
-As of 2026-08-16 the production path is deployed and verified: Pub/Sub/Eventarc durable ingress,
+As of 2026-08-22 the production path is deployed and verified: Pub/Sub/Eventarc durable ingress,
 Firestore lifecycle, Agent Runtime/Identity, Memory Bank, Agent Gateway/IAP, Agent Registry, two
 protected Cloud Run A2A workers, Model Armor, an IAM-private findings API, and retained operations
-controls. The count-only capture records 21/21 APIs and 33 resources. The Python 3.12 suite has
+controls. The count-only capture records 21/21 APIs and 38 resources. The Python 3.12 suite has
 240 tests at 100% statement and branch coverage.
 
 Read these before changing architecture or claims:
@@ -47,7 +47,7 @@ Read these before changing architecture or claims:
 ## Regions and versions
 
 - Python 3.12 everywhere: CI, release, Docker, Runtime, commands, and docs.
-- Google ADK 2.7.0 and A2A SDK 1.1.2 are pinned.
+- Google ADK 2.7.1 and A2A SDK 1.1.2 are pinned.
 - `GCP_REGION=europe-north2` for Cloud Run/data transport.
 - `AGENT_RUNTIME_REGION=europe-west4` for Runtime, Memory, Gateway, Registry, Armor, audit.
 - `GOOGLE_CLOUD_LOCATION=global` for Gemini 3.5 Flash. Never replace it with the compute region;

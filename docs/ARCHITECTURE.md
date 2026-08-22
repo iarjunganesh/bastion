@@ -48,6 +48,20 @@ The Orchestrator is deployed to managed Agent Runtime with an Agent Identity. A 
 sequential workflow owns policy validation and transfers already-minimized state between the two
 workers. It can use only destinations catalogued in Agent Registry and admitted by Gateway IAP.
 
+The sequence is `access_auditor -> policy_step -> policy_gate -> escalation_agent`. Two of those
+four steps hold no model. `policy_step` applies the risk threshold and the department catalog by
+calling them directly, so a language model never sits between the Auditor's deterministic output
+and the deterministic decision made from it — it cannot skip the threshold, and it cannot retype
+a finding's opaque id, category, or score on the way past
+([ADR-010](adr/010-policy-enforcement-gate.md),
+[ADR-012](adr/012-structured-findings-across-a2a.md)). `policy_gate` then refuses to continue
+unless `policy_step` left its own result in session state, so an investigation that failed to
+score its findings fails visibly instead of escalating them un-evaluated.
+
+The gate lives here rather than inside the Escalation Agent because the Escalation Agent is
+remote. A guard that travels over A2A is a guard the caller must trust the callee to run, which
+is not a trust boundary this design has anywhere else.
+
 ### Access Auditor
 
 The Auditor reads the live project policy under read-only roles. Deterministic code—not Gemini—

@@ -23,7 +23,7 @@
 
 ## Fixed versions and regions
 
-- Python 3.12; Google ADK 2.7.0; A2A SDK 1.1.2.
+- Python 3.12; Google ADK 2.7.1; A2A SDK 1.1.2.
 - Cloud Run/data transport: `europe-north2`.
 - managed agent controls/audit: `europe-west4`.
 - Gemini 3.5 Flash: Vertex AI `global`.

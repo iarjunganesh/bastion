@@ -69,9 +69,12 @@ deploy_agent() {
   local timeout=300
   local service_url=https://placeholder.invalid
   # Agent Gateway is a managed egress proxy in europe-west4; Cloud Run does not classify its
-  # cross-region traffic as "internal" ingress. Peers therefore expose an IAM-protected
-  # network endpoint, but remain non-public: no unauthenticated principal is granted and the
-  # Agent Identity is authorized per destination at Gateway and Cloud Run layers.
+  # cross-region traffic as "internal" ingress. These two peers therefore carry an `allUsers`
+  # invoker binding -- they ARE reachable unauthenticated at the network layer, and saying
+  # otherwise here would contradict both the live IAM policy and SECURITY.md. The control that
+  # actually holds is the origin secret checked before any A2A processing, plus Gateway IAP
+  # constraining the Runtime's destinations. One credential, not a network boundary: treat the
+  # A2A body as an untrusted input surface accordingly.
   if [[ "$agent_dir" == "access_auditor" || "$agent_dir" == "escalation_agent" ]]; then
     ingress=all
     access_args=(--allow-unauthenticated)

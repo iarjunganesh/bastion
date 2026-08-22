@@ -18,7 +18,7 @@
 [![CI](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml)
 [![Codecov](https://codecov.io/gh/iarjunganesh/bastion/graph/badge.svg)](https://codecov.io/gh/iarjunganesh/bastion)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Google ADK 2.7](https://img.shields.io/badge/Google_ADK-2.7.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
+[![Google ADK 2.7](https://img.shields.io/badge/Google_ADK-2.7.1-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Gemini Enterprise Agent Ready](https://img.shields.io/badge/GEAR-Gemini_Enterprise_Agent_Ready-4285F4?logo=google&logoColor=white)](https://developers.google.com/profile/badges/community/gear?u=iarjunganesh)
 
@@ -30,15 +30,16 @@ asynchronous retries, prove why it acted, and remain unable to turn suspicious i
 privileged write.
 
 Bastion performs read-only IAM review against the GCP project that runs it—including its own
-service identities. Deterministic code detects and scores findings. Gemini explains and routes
-already-minimized risk. Humans receive counts and allowlisted categories, never bindings.
+service identities. Deterministic code detects, scores, and routes findings. Gemini explains
+already-minimized risk and never decides any part of it. Humans receive counts and allowlisted
+categories, never bindings.
 
 ## What is live
 
 The committed [GCP measurement](assets/architecture/gcp-state.json) was generated from the live
 project and contains counts only:
 
-- 21/21 named Google Cloud APIs enabled and 33 deployed resources measured;
+- 21/21 named Google Cloud APIs enabled and 38 deployed resources measured;
 - four Cloud Run services in `europe-north2`;
 - a managed Agent Runtime and a separate durable Memory Bank in `europe-west4`;
 - one Agent-to-Anywhere Gateway, IAP authorization extension, and fail-closed auth policy;
@@ -144,17 +145,27 @@ Bastion does not ask a model to decide whether a permission is safe.
 
 1. The Auditor reads production IAM under a read-only identity.
 2. Deterministic rules produce an opaque finding ID, category, department, and bounded score.
-3. Missing or invalid risk is rejected; it can never become a quiet clear.
-4. A current, human-approved exception may suppress the same opaque finding until expiry.
-5. Model Armor screens input and fails closed when unavailable.
-6. A deterministic post-model screen blocks principal, role, resource, and PII shapes.
-7. The receiver accepts only an allowlisted department, categories, deterministic summary, and
+3. Those findings cross the A2A boundary as a validated schema, not as prose a model retypes.
+4. The threshold and the department catalog are applied by a step that holds no model at all, and
+   a gate refuses to escalate anything that step did not score.
+5. Missing or invalid risk is rejected; it can never become a quiet clear.
+6. A current, human-approved exception may suppress the same opaque finding until expiry.
+7. Model Armor screens input — including tool results, not only prompts — and fails closed when
+   unavailable.
+8. A deterministic post-model screen blocks principal, role, resource, and PII shapes.
+9. The receiver accepts only an allowlisted department, categories, deterministic summary, and
    SHA-256 idempotency key.
 
 `AuditPlugin` is registered at every supported Runner seam. It records run, agent, model, and
 tool starts/completions/failures plus Model Armor refusals. Records contain event type, outcome,
-actor, invocation ID, argument **names**, model name, and exception **class**—never argument
-values, prompts, responses, principal IDs, or exception messages.
+actor, investigation ID, invocation ID, argument **names**, model name, and exception
+**class**—never argument values, prompts, responses, principal IDs, or exception messages.
+
+The two ids answer different questions. `invocation_id` groups one agent run; ADK mints a fresh
+one per run, so it stops at the A2A boundary. `investigation_id` is the durable event id, carried
+to each worker as request metadata rather than as message content, so no model reads or restates
+it — it is what makes a single investigation reconstructable across all three hops. It is
+re-validated as a UUID where it is recorded, because it arrives from a peer.
 
 ## Durability and failure tolerance
 

@@ -9,7 +9,7 @@ attainment claims.
 |---|---|---|
 | Investigation completion | 99% of admitted events finish within 10 minutes | Stuck-delivery alert; inspect Firestore status/lease and Eventarc delivery |
 | Duplicate effects | Zero duplicate review records | Deterministic idempotency key and create-once receiver; replay returns `accepted=false` |
-| Audit failures | Every supported run/agent/model/tool action has a terminal audit event | Audit-failure metric and alert; correlate by invocation ID |
+| Audit failures | Every supported run/agent/model/tool action has a terminal audit event | Audit-failure metric and alert; correlate by investigation ID across hops, invocation ID within one agent run |
 | Policy refusals | Refusal rate remains explainable by bounded reason | Refusal-spike alert; never bypass policy to restore throughput |
 | Model Armor | Unavailable or matched screening always fails closed | Dedicated failure/refusal metric and alert |
 | Dead letters | Zero unresolved review messages | Backlog alert on `bastion-dead-letter-review`; investigate before replay |

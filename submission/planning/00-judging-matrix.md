@@ -6,7 +6,7 @@ preserved in [DEVPOST.md](../DEVPOST.md); this file maps that wording to reposit
 | Gate / criterion | Bastion answer | Proof |
 |---|---|---|
 | Gemini 3.5+ | Gemini 3.5 Flash through Vertex AI `global` | [evidence 02](../../assets/evidence/02-gemini-investigation.md), pinned config |
-| Google agent framework | Google ADK 2.7.0 and official A2A SDK | Runtime/agent code, version gate |
+| Google agent framework | Google ADK 2.7.1 and official A2A SDK | Runtime/agent code, version gate |
 | GCP infrastructure | Managed Runtime/Memory/Gateway/Registry plus Cloud Run, Firestore, Eventarc, Model Armor, Logging/Monitoring | [evidence 04–07](../../assets/README.md) |
 | Innovation and utility | Read-only IAM review of the same project that runs the agents; deterministic self-audit and human exception memory | [ADR-001](../../docs/adr/001-real-iam-not-mock-data.md) |
 | Technical implementation | Durable admission/leases/retry/DLQ, no direct production bypass, fixed schemas, Model Armor, separated identities | [architecture](../../docs/ARCHITECTURE.md), [P0/P1 ledger](08-audit-remediation-plan.md) |

@@ -1,6 +1,7 @@
 # Evidence 08 — the tool-declaration boundary, observed at construction
 
-**Captured:** 2026-08-16 by `pytest tests/security/test_tool_surface.py` under Python 3.12.
+**Captured:** 2026-08-16, re-measured 2026-08-22, by `pytest tests/security/test_tool_surface.py`
+under Python 3.12.
 **Requires no deployment.** This is the one guardrail claim provable entirely offline, because
 it is about what an agent *can* reach before any model runs.
 
@@ -14,11 +15,19 @@ its measurement.
 | Agent | Tools declared at construction |
 |---|---|
 | `access_auditor` | `audit_iam_policy` |
-| `policy_step` | `apply_policy_rules`, `route_by_department` |
 | `escalation_agent` | `notify_human` |
 
 The Escalation Agent holds **no policy-reading tool at all** — not a tool it is instructed not
 to call. An injected instruction cannot reach a capability that was never declared.
+
+`policy_step` was listed here on 2026-08-16 holding `apply_policy_rules` and
+`route_by_department`. It no longer appears, because it is no longer an `LlmAgent`: it calls the
+threshold and the routing catalog directly and reaches no model at all
+([ADR-010](../../docs/adr/010-policy-enforcement-gate.md)). An agent with no model has no
+thought loop for a poisoned description to act on, so the strongest available form of this
+boundary is the one where the tool declaration does not exist. The re-measured suite asserts that
+absence rather than skipping it: `test_the_policy_step_reaches_no_model_and_so_declares_no_tools`
+fails if `policy_step` ever regains a model, a tool list, or a model callback.
 
 ## Capability separation, stated differentially
 
