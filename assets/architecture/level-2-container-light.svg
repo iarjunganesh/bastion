@@ -128,7 +128,7 @@ svg {
     <rect x="1400" y="380" width="460" height="150" rx="14" fill="var(--red)" stroke="var(--red-d)" stroke-width="4"/>
     <text class="label on" x="1630" y="436">LIVE GCP IAM POLICY</text>
     <text class="on-sub"   x="1630" y="470">real principals · never written back</text>
-    <text class="on-sub"   x="1630" y="502">● 2 findings, 2 owning teams</text>
+    <text class="on-sub"   x="1630" y="502">● 3 findings, 2 owning teams</text>
     <animate attributeName="opacity" values="1;0.82;1" dur="3s" repeatCount="indefinite"/>
   </g>
   <g>
@@ -167,7 +167,7 @@ svg {
   <g>
     <rect class="box" x="700" y="880" width="560" height="106"/>
     <text class="label" x="980" y="924">Audit trail — AuditPlugin</text>
-    <text class="sub"   x="980" y="954">● stdout JSON, no call site in any agent · ◐ Cloud Logging</text>
+    <text class="sub"   x="980" y="954">● no call site in any agent · ● retained bucket, metrics, alerts</text>
   </g>
 
   <!-- Edges.
@@ -254,6 +254,6 @@ svg {
     <circle cx="680" cy="1046" r="9" fill="none" stroke="var(--ghost)" stroke-width="2"/>
     <text class="legend" x="698" y="1054">not started</text>
   </g>
-  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-16 · 21/21 APIs · 33 resources measured</text>
-  <text class="foot"  x="1860" y="1016" text-anchor="end">One process, one identity. Per-agent service accounts need three deployed apps — see ARCHITECTURE.md.</text>
+  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-22 · 21/21 APIs · 39 resources measured</text>
+  <text class="foot"  x="1860" y="1016" text-anchor="end">Three deployed services, three identities. The Escalation Agent holds no IAM read role at all — see ARCHITECTURE.md.</text>
 </svg>

@@ -404,6 +404,159 @@ def check_internal_links() -> None:
                     fail(f"{rel}:{number} names `{quoted}`, which does not exist")
 
 
+def check_diagram_footers_match_state() -> None:
+    """A rendered diagram may not quote a resource count the live capture disagrees with.
+
+    This gate exists because the opposite happened, and nothing caught it for six days. Every
+    check in this file reads Markdown; the architecture SVGs are embedded in README.md and are
+    the first thing a judge looks at, and they were never scanned. Level 2 carried
+    *"One process, one identity. Per-agent service accounts need three deployed apps"* —
+    the pre-deployment claim, contradicting the three deployed services described three
+    sections above it in the same README — while both footers and the banner pair quoted 33
+    resources against a live capture of 39.
+
+    A number is checked rather than a phrase because a phrase list only catches the mistakes
+    already made once. The footers are required to agree with `gcp-state.json`, which is
+    generated from the live project, so the diagram cannot drift from the fleet silently.
+    """
+    state = json.loads(read("assets/architecture/gcp-state.json"))
+    measured = sum(v for v in state["resources"].values() if isinstance(v, int))
+
+    quoted = re.compile(r"(\d+)\s+(?:deployed\s+)?resources?(?:\s+measured)?", re.IGNORECASE)
+    for svg in sorted((ROOT / "assets").rglob("*.svg")):
+        text = svg.read_text(encoding="utf-8")
+        for match in quoted.finditer(text):
+            if int(match.group(1)) != measured:
+                fail(
+                    f"{svg.relative_to(ROOT).as_posix()} quotes {match.group(1)} resources, "
+                    f"but gcp-state.json measures {measured} — re-render from the master"
+                )
+
+
+def check_diagrams_do_not_contradict_the_fleet() -> None:
+    """Phrases a rendered diagram may not carry, because the deployment retired them.
+
+    Companion to check_retired_deployment_claims(), which scans only Markdown. Kept as a
+    separate list because a diagram states things a document never would — a footer is written
+    to be read at a glance and is exactly where an obsolete simplification survives longest.
+    """
+    retired = (
+        "One process, one identity",
+        "Per-agent service accounts need three deployed apps",
+    )
+    for svg in sorted((ROOT / "assets").rglob("*.svg")):
+        text = svg.read_text(encoding="utf-8")
+        for phrase in retired:
+            if phrase in text:
+                fail(f"{svg.relative_to(ROOT).as_posix()} retains a retired claim: '{phrase}'")
+
+
+def _sample_motion_path(spec: str) -> list[tuple[float, float]]:
+    """Points along an animateMotion path. Supports the M/L/H/V/C/Q subset the masters use.
+
+    Curves are sampled rather than solved: a packet only has to be shown not to enter a box,
+    and 24 samples per segment resolves that far below the radius of the dot itself.
+    """
+    tokens = re.findall(r"([MLHVCQ])([^MLHVCQ]*)", spec.upper())
+    points: list[tuple[float, float]] = []
+    x = y = 0.0
+    for command, raw in tokens:
+        numbers = [float(n) for n in re.findall(r"-?\d+(?:\.\d+)?", raw)]
+        if command == "M" and len(numbers) >= 2:
+            x, y = numbers[0], numbers[1]
+            points.append((x, y))
+        elif command == "L" and len(numbers) >= 2:
+            for step in range(1, 25):
+                points.append((x + (numbers[0] - x) * step / 24, y + (numbers[1] - y) * step / 24))
+            x, y = numbers[0], numbers[1]
+        elif command == "H" and numbers:
+            for step in range(1, 25):
+                points.append((x + (numbers[0] - x) * step / 24, y))
+            x = numbers[0]
+        elif command == "V" and numbers:
+            for step in range(1, 25):
+                points.append((x, y + (numbers[0] - y) * step / 24))
+            y = numbers[0]
+        elif command == "Q" and len(numbers) >= 4:
+            x1, y1, x2, y2 = numbers[:4]
+            for step in range(1, 25):
+                t = step / 24
+                points.append(
+                    (
+                        (1 - t) ** 2 * x + 2 * (1 - t) * t * x1 + t**2 * x2,
+                        (1 - t) ** 2 * y + 2 * (1 - t) * t * y1 + t**2 * y2,
+                    )
+                )
+            x, y = x2, y2
+        elif command == "C" and len(numbers) >= 6:
+            x1, y1, x2, y2, x3, y3 = numbers[:6]
+            for step in range(1, 25):
+                t = step / 24
+                points.append(
+                    (
+                        (1 - t) ** 3 * x
+                        + 3 * (1 - t) ** 2 * t * x1
+                        + 3 * (1 - t) * t**2 * x2
+                        + t**3 * x3,
+                        (1 - t) ** 3 * y
+                        + 3 * (1 - t) ** 2 * t * y1
+                        + 3 * (1 - t) * t**2 * y2
+                        + t**3 * y3,
+                    )
+                )
+            x, y = x3, y3
+    return points
+
+
+def check_packets_never_cross_a_component() -> None:
+    """No animated packet may travel through a box it is not entering or leaving.
+
+    The rule is older than this gate — `level-1-context.svg` carries it as a comment reading
+    *"Never animate a packet through a component"* — and it was still broken twice, because a
+    comment in one master cannot govern the next one somebody writes. A packet crossing a box
+    asserts the request passed through that component. On the Level 0 path that would be false
+    in precisely the place the architecture is most often misread: the dispatcher hands off to
+    the managed Runtime and never invokes a worker.
+
+    Boxes are inset before testing. Every legitimate packet starts or ends *on* a component's
+    edge, so an exact-boundary test would reject the correct drawing along with the wrong one.
+    """
+    inset = 6.0
+    for svg in sorted((ROOT / "assets" / "architecture").glob("*.svg")):
+        if svg.stem.endswith(("-light", "-dark")):
+            continue  # emitted variants carry identical geometry
+        text = svg.read_text(encoding="utf-8")
+
+        boxes: list[tuple[float, float, float, float]] = []
+        for rect in re.finditer(r"<rect\b[^>]*>", text):
+            attrs = dict(re.findall(r'(\w+)="([^"]*)"', rect.group(0)))
+            try:
+                bx, by = float(attrs["x"]), float(attrs["y"])
+                bw, bh = float(attrs["width"]), float(attrs["height"])
+            except (KeyError, ValueError):
+                continue
+            if bw >= 1900 and bh >= 1000:
+                continue  # the background plate is not a component
+            boxes.append((bx, by, bw, bh))
+
+        for motion in re.finditer(r"<animateMotion\b[^>]*>", text):
+            spec = re.search(r'path="([^"]*)"', motion.group(0))
+            if spec is None:
+                continue
+            for px, py in _sample_motion_path(spec.group(1)):
+                for bx, by, bw, bh in boxes:
+                    if bx + inset < px < bx + bw - inset and by + inset < py < by + bh - inset:
+                        fail(
+                            f"{svg.relative_to(ROOT).as_posix()}: animated packet "
+                            f"'{spec.group(1)}' crosses the component at "
+                            f"({bx:g},{by:g},{bw:g}x{bh:g}) — packets stay on edges"
+                        )
+                        break
+                else:
+                    continue
+                break
+
+
 def main() -> int:
     check_internal_links()
     check_source_path_references()
@@ -416,6 +569,9 @@ def main() -> int:
     check_unverified_claims()
     check_retired_deployment_claims()
     check_diagrams_are_grounded()
+    check_diagram_footers_match_state()
+    check_diagrams_do_not_contradict_the_fleet()
+    check_packets_never_cross_a_component()
 
     if failures:
         print("Documentation disagrees with the repository:\n")

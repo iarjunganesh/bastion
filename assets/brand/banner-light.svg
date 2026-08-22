@@ -27,7 +27,7 @@
       </circle>
       <text x="34" y="23" font-size="14" font-weight="700" fill="#10233D">PRIVATE · LIVE</text>
     </g>
-    <text x="236" y="258" font-size="15" fill="#4B627E">21/21 APIs enabled · 33 deployed resources</text>
+    <text x="236" y="258" font-size="15" fill="#4B627E">21/21 APIs enabled · 39 deployed resources</text>
 
     <!-- The control-plane hub mirrors the diagrams and the 16x9 title card, rather than a
          standalone padlock mark: one visual language for "what Bastion is" everywhere it
