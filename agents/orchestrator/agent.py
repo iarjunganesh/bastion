@@ -25,6 +25,7 @@ from google.adk.agents.invocation_context import InvocationContext
 from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
 from google.adk.events import Event, EventActions
 from google.adk.tools.tool_context import ToolContext
+from google.genai import types
 from pydantic import BaseModel
 
 from gateway.cloud_run_auth import private_a2a_client
@@ -195,6 +196,16 @@ class PolicyStep(BaseAgent):
         yield Event(
             author=self.name,
             invocation_id=ctx.invocation_id,
+            # The routing travels as event **content**, not only as state. State is what the gate
+            # reads in-process; content is the only thing that crosses A2A. ADK builds the
+            # outgoing A2A message from `event.content.parts`, so a state-only event contributes
+            # nothing to it — the Escalation Agent then saw the Auditor's report as the most
+            # recent content and escalated straight from it, including a finding this step had
+            # just suppressed. Observed 2026-08-22 against a live approved exception.
+            content=types.Content(
+                role="model",
+                parts=[types.Part(text=json.dumps(routing, sort_keys=True))],
+            ),
             actions=EventActions(
                 state_delta={
                     POLICY_ENFORCEMENT_KEY: decisions,

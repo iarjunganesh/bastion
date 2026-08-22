@@ -140,6 +140,12 @@ def route_by_department(decisions: list[dict[str, Any]]) -> dict[str, Any]:
     Returns one bucket per department **that has something to escalate** — a team with nothing
     to review is not notified, because an access review that pages every team on every run is
     one every team mutes.
+
+    Each bucket carries its own `finding_ids`. That is not convenience: it is the only
+    decision-filtered list of ids in the system. Without it the Escalation Agent had to copy ids
+    from the Auditor's raw report, which still contains findings this function deliberately
+    dropped — so a suppressed finding was scored as suppressed and then escalated anyway.
+    Observed 2026-08-22 against an approved exception that was live at the time.
     """
     buckets: dict[str, dict[str, Any]] = {}
     for decision in decisions:
@@ -151,9 +157,12 @@ def route_by_department(decisions: list[dict[str, Any]]) -> dict[str, Any]:
         routing = department_by_id(str(decision.get("department", "")))
         bucket = buckets.setdefault(
             routing["department"],
-            {**routing, "finding_count": 0, "reasons": []},
+            {**routing, "finding_count": 0, "reasons": [], "finding_ids": []},
         )
         bucket["finding_count"] += 1
+        finding_id = decision.get("finding_id")
+        if isinstance(finding_id, str) and finding_id:
+            bucket["finding_ids"].append(finding_id)
         reason = str(decision.get("reason", "unspecified"))
         if reason not in bucket["reasons"]:
             bucket["reasons"].append(reason)

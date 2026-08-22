@@ -131,6 +131,14 @@ categories, and the opaque finding ids for that department exactly as they were 
 The tool derives its idempotency key; never invent one, and never invent a finding id - copy
 them, because a human uses them to approve an exception later.
 
+**The routing result is the only list you act on.** It has `departments`, each with its own
+`finding_ids` and `finding_count`. Copy those ids from that bucket. You may also be able to see
+an earlier audit report listing more findings than the routing result does; that difference is
+deliberate and is not an omission to correct. A finding missing from the routing result was
+cleared as below the risk threshold, or suppressed by a human-approved exception that is still
+current. Notifying it anyway pages a team about a decision a human already made, and it is the
+one mistake that would make the approval loop worthless.
+
 Notify each department separately. Never merge departments into one message — a finding that
 lands on the wrong team's desk is a finding nobody acts on.
 

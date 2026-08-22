@@ -136,3 +136,39 @@ def test_a_catalog_without_a_catch_all_still_routes(monkeypatch):
 
     routed = departments.resolve_owning_department("user:nobody-owns-me@example.com")
     assert routed["department"] == departments.UNASSIGNED
+
+
+def test_each_bucket_carries_its_own_decision_filtered_finding_ids():
+    """The only decision-filtered list of ids in the system.
+
+    Without it the Escalation Agent had to copy ids from the Auditor's raw report, which still
+    contains the findings this function deliberately dropped — so a finding scored as suppressed
+    was escalated anyway. Observed 2026-08-22 against a live approved exception.
+    """
+    decisions = [
+        {"department": "data-platform", "decision": "escalate", "finding_id": "a" * 24},
+        {"department": "data-platform", "decision": "escalate", "finding_id": "b" * 24},
+        {"department": "data-platform", "decision": "suppress", "finding_id": "c" * 24},
+        {"department": "data-platform", "decision": "clear", "finding_id": "d" * 24},
+    ]
+    (bucket,) = departments.route_by_department(decisions)["departments"]
+    assert bucket["finding_ids"] == ["a" * 24, "b" * 24]
+    assert bucket["finding_count"] == 2
+    assert "c" * 24 not in bucket["finding_ids"], "a suppressed finding must not be notified"
+    assert "d" * 24 not in bucket["finding_ids"], "a cleared finding must not be notified"
+
+
+def test_a_finding_without_an_id_is_counted_but_never_invents_one():
+    """The count and the id list answer different questions, so they may legitimately differ.
+
+    Fabricating an id to keep them equal would hand a human a reference that matches no finding
+    and can key no exception.
+    """
+    decisions = [
+        {"department": "data-platform", "decision": "escalate", "finding_id": "a" * 24},
+        {"department": "data-platform", "decision": "escalate"},
+        {"department": "data-platform", "decision": "escalate", "finding_id": ""},
+    ]
+    (bucket,) = departments.route_by_department(decisions)["departments"]
+    assert bucket["finding_ids"] == ["a" * 24]
+    assert bucket["finding_count"] == 3

@@ -467,3 +467,50 @@ def test_the_most_recent_auditor_reply_is_the_one_read():
     )
     events = asyncio.run(_drain(orchestrator.policy_step, ctx))
     assert events[0].actions.state_delta[orchestrator.POLICY_DECISIONS_KEY]["escalate_count"] == 0
+
+
+def test_the_routing_travels_as_event_content_so_it_survives_the_a2a_hop():
+    """State is what the gate reads in-process; content is what crosses A2A.
+
+    ADK builds the outgoing A2A message from `event.content.parts`, so a state-only event
+    contributes nothing to it. The Escalation Agent then saw the Auditor's report as the most
+    recent content and escalated straight from it — including a finding this step had just
+    suppressed. Observed 2026-08-22 against a live approved exception.
+    """
+    import asyncio
+
+    report = {"count": 1, "findings": [_finding("user:a@x.com", 0.9)]}
+    (event,) = asyncio.run(_drain(orchestrator.policy_step, _gate_ctx({"audit_findings": report})))
+    assert event.content is not None, "a state-only event contributes nothing to the A2A message"
+    (part,) = event.content.parts
+    carried = json.loads(part.text)
+    assert carried["escalated_total"] == 1
+    assert carried["departments"][0]["finding_ids"] == ["opaque-user:a@x.com"]
+
+
+def test_a_suppressed_finding_is_absent_from_what_crosses_to_escalation(monkeypatch):
+    """The whole point of the approval loop: a human decision must survive the hop.
+
+    Before this, suppression was computed correctly and then discarded — the id still reached
+    `notify_human` because the Escalation Agent was reading the Auditor's raw report.
+    """
+    import asyncio
+
+    class _Approved:
+        def approved_exception(self, finding_id, *, at=None):
+            return {
+                "approved_until": "2099-01-01T00:00:00+00:00",
+                "reviewer": "sensitive-reviewer-reference",
+                "policy_version": "iam-policy-v3",
+            }
+
+    monkeypatch.setattr(orchestrator, "exception_memory", lambda: _Approved())
+    report = {"count": 1, "findings": [_finding("user:a@x.com", 0.9)]}
+    (event,) = asyncio.run(_drain(orchestrator.policy_step, _gate_ctx({"audit_findings": report})))
+
+    carried = json.loads(event.content.parts[0].text)
+    assert carried["escalated_total"] == 0
+    assert carried["departments"] == []
+    assert "opaque-user:a@x.com" not in json.dumps(carried)
+    delta = event.actions.state_delta[orchestrator.POLICY_DECISIONS_KEY]
+    assert delta["suppress_count"] == 1
