@@ -19,5 +19,8 @@
 4. Confirm the repository and services remain available through judging.
 5. Submit before Aug 31, 2026, 5:00 PM PT.
 
-Do not create or move a tag as part of the current engineering push. A release tag is a separate,
-explicit decision after the final submission commit and changelog are verified.
+A release tag is a separate, explicit decision after the submission commit and changelog are
+verified - never a side effect of an engineering push. That decision has now been taken three
+times: `v0.1.0`, then `v0.2.0` carrying the seven deployed-fleet defects found after it, then
+`v0.2.1` carrying the escalation hand-off fix. Changes since `v0.2.1` alter documentation, CI
+and comments only, so the tag still describes the running fleet accurately and none was cut.
