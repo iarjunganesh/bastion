@@ -116,6 +116,8 @@ the routing would not have given the Escalation Agent an id to copy. Both are fi
 [evidence 10](../../assets/evidence/10-cross-week-suppression.md) records the run that honoured
 the exception.
 
+**Reported upstream 2026-08-22** as [google/adk-python#6854](https://github.com/google/adk-python/issues/6854), covering both directions and asking for a construction-time warning rather than only a documentation note. Bastion needs no fix from it — both hand-offs are already corrected here — but the next team to compose a `SequentialAgent` with a `RemoteA2aAgent` should not have to find this by deploying.
+
 **This is a class, not an incident.** D6 was the Auditor's report failing to reach the policy
 step; D8 is the policy step's decision failing to reach escalation. Both are the same root
 cause — ADK session state does not cross an A2A boundary — and any future step that assumes it
