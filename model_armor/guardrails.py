@@ -25,7 +25,9 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Iterable
 from functools import lru_cache
+from typing import Any
 
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models.llm_request import LlmRequest
@@ -125,6 +127,22 @@ def _output_refusal() -> LlmResponse:
     )
 
 
+def _screenable(contents: Iterable[Any]) -> list[str]:
+    """Every piece of model-bound text in a request: prompt text and tool results alike.
+
+    Returns a list rather than a generator so the caller can both join and count it without
+    walking twice, which keeps the two numbers in the audit shape describing the same screen.
+    """
+    values: list[str] = []
+    for content in contents:
+        for part in content.parts or []:
+            if candidate := getattr(part, "text", None):
+                values.append(candidate)
+            elif (response := getattr(part, "function_response", None)) is not None:
+                values.append(json.dumps(response.response, sort_keys=True, default=str))
+    return values
+
+
 def screen_before_model(
     callback_context: CallbackContext,
     llm_request: LlmRequest,
@@ -153,12 +171,14 @@ def screen_before_model(
     # `part.text` is `str | None`, and the `if` clause narrows nothing for a type checker,
     # so the value is bound and tested rather than filtered. An empty part must not become
     # the string "None" in the text handed to the screen.
-    text = "\n".join(
-        candidate
-        for content in (llm_request.contents or [])
-        for part in (content.parts or [])
-        if (candidate := getattr(part, "text", None))
-    )
+    #
+    # **Tool results are screened too.** They were not, and that asymmetry was the gap: a
+    # tool result re-enters the model as a `function_response` part, so text that had never
+    # passed an inbound screen still reached the model. `apply_policy_rules` returns
+    # `exception_policy_version` -- an operator-supplied string from the findings API --
+    # inside its result, which is the exact shape a poisoned tool would use.
+    # `screen_after_model` already read these parts; only the inbound direction was blind.
+    text = "\n".join(_screenable(llm_request.contents or []))
     if not text.strip():
         return None
 
@@ -171,12 +191,7 @@ def screen_before_model(
     # from a prompt, and the payload-free audit claim is worth more than the convenience.
     shape = {
         "screened_chars": len(text),
-        "screened_parts": sum(
-            1
-            for content in (llm_request.contents or [])
-            for part in (content.parts or [])
-            if getattr(part, "text", None)
-        ),
+        "screened_parts": sum(1 for _ in _screenable(llm_request.contents or [])),
     }
 
     try:

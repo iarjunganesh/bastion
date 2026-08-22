@@ -18,6 +18,9 @@ Every record below traces to a line there.
 | [007](007-tool-poisoning.md) | Tool poisoning defended at the tool-declaration boundary, not the prompt | Accepted |
 | [008](008-human-approval-loop.md) | Exception approval is a human act on the private findings API, with the reviewer taken from the verified caller | Accepted |
 | [009](009-model-armor-threshold.md) | The Model Armor threshold stays `MEDIUM_AND_ABOVE`; raising it does not clear the fleet's own traffic, so the threshold is not the lever | Accepted |
+| [010](010-policy-enforcement-gate.md) | Deterministic policy enforcement records its own result and is gated, so a screening refusal fails the investigation closed instead of escalating un-scored findings | Accepted |
+| [011](011-inbound-screening-covers-tool-results.md) | Inbound Model Armor screening covers tool results, closing the direction that outbound screening already read | Accepted |
+| [012](012-structured-findings-across-a2a.md) | The Auditor answers in a validated schema and the policy step holds no model, so deterministic findings stop being retyped by one | Accepted |
 
 ## Why the numbering looks the way it does
 

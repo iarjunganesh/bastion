@@ -18,6 +18,7 @@ import inspect
 from pathlib import Path
 
 import pytest
+from google.adk.agents import LlmAgent
 
 from agents.access_auditor import agent as auditor
 from agents.escalation_agent import agent as escalation
@@ -27,13 +28,15 @@ from agents.orchestrator import agent as orchestrator
 # set in the agent module fails this test instead of silently redefining its own expectation.
 EXPECTED_TOOLS = {
     "access_auditor": {"audit_iam_policy"},
-    "policy_step": {"apply_policy_rules", "route_by_department"},
     "escalation_agent": {"notify_human"},
 }
 
+# `policy_step` is deliberately absent: it declares no tools because it reaches no model. Scoring
+# and routing are called directly as Python, so there is no tool surface for a poisoned
+# instruction to talk it into widening — the strongest version of this control, not an exemption
+# from it. `test_the_policy_step_reaches_no_model` pins that.
 AGENTS = {
     "access_auditor": auditor.access_auditor,
-    "policy_step": orchestrator.policy_step,
     "escalation_agent": escalation.escalation_agent,
 }
 
@@ -114,3 +117,15 @@ def test_tool_descriptions_are_repository_owned(agent_name):
         docstring = inspect.getdoc(tool)
         assert docstring, f"{tool.__name__} has no repository-owned description"
         assert docstring.splitlines()[0] in inspect.getsource(tool)
+
+
+def test_the_policy_step_reaches_no_model_and_so_declares_no_tools():
+    """The strongest form of the tool boundary is having no tools to poison.
+
+    `policy_step` was an `LlmAgent` with two tools; a model chose whether to call them, and a
+    screening refusal meant it never did. It is now plain Python, so scoring and routing cannot
+    be skipped, argued with, or redirected.
+    """
+    assert not isinstance(orchestrator.policy_step, LlmAgent)
+    assert not hasattr(orchestrator.policy_step, "tools")
+    assert not hasattr(orchestrator.policy_step, "before_model_callback")
