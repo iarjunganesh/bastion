@@ -131,7 +131,7 @@ deploy_findings_api() {
 deploy_findings_api
 FINDINGS_ENDPOINT="$(uri bastion-findings-api)/v1/escalations"
 gcloud run services add-iam-policy-binding bastion-findings-api --project "$PROJECT_ID" --region "$REGION" \
-  --member="serviceAccount:$(sa escalation-agent-sa)" --role=roles/run.invoker
+  --member="serviceAccount:$(sa escalation-agent-sa)" --role=roles/run.invoker --quiet >/dev/null
 
 # `gcloud run deploy` re-establishes the service IAM policy, so an approval grant made by
 # hand is removed by the next deploy and the ADR-008 path silently stops working. The grant
@@ -143,10 +143,11 @@ gcloud run services add-iam-policy-binding bastion-findings-api --project "$PROJ
 # to impersonate exactly that identity and nothing else. Impersonation is an authenticated
 # act in its own right, so the human stays named in the IAM audit log.
 gcloud run services add-iam-policy-binding bastion-findings-api --project "$PROJECT_ID" --region "$REGION" \
-  --member="serviceAccount:$(sa approver-sa)" --role=roles/run.invoker
+  --member="serviceAccount:$(sa approver-sa)" --role=roles/run.invoker --quiet >/dev/null
 if [[ -n "${BASTION_APPROVER_PRINCIPAL:-}" ]]; then
   gcloud iam service-accounts add-iam-policy-binding "$(sa approver-sa)" --project "$PROJECT_ID" \
-    --member="$BASTION_APPROVER_PRINCIPAL" --role=roles/iam.serviceAccountTokenCreator
+    --member="$BASTION_APPROVER_PRINCIPAL" --role=roles/iam.serviceAccountTokenCreator \
+    --quiet >/dev/null
 else
   echo "BASTION_APPROVER_PRINCIPAL unset: no human can approve an exception here." >&2
 fi
@@ -183,7 +184,7 @@ EVENTARC_SA="$(sa eventarc-invoker-sa)"
 PUBSUB_SERVICE_AGENT="service-${PROJECT_NUMBER}@gcp-sa-pubsub.iam.gserviceaccount.com"
 EVENTARC_SERVICE_AGENT="service-${PROJECT_NUMBER}@gcp-sa-eventarc.iam.gserviceaccount.com"
 gcloud run services add-iam-policy-binding bastion-orchestrator --project "$PROJECT_ID" --region "$REGION" \
-  --member="serviceAccount:${EVENTARC_SA}" --role=roles/run.invoker
+  --member="serviceAccount:${EVENTARC_SA}" --role=roles/run.invoker --quiet >/dev/null
 # Older deployments granted the Eventarc service agent directly. Delivery now uses the dedicated
 # identity below, so remove that broader leftover binding when it is present.
 gcloud run services remove-iam-policy-binding bastion-orchestrator --project "$PROJECT_ID" --region "$REGION" \
@@ -191,7 +192,8 @@ gcloud run services remove-iam-policy-binding bastion-orchestrator --project "$P
 # The Pub/Sub service agent mints the OIDC delivery token. Scope this permission to the one
 # delivery identity rather than granting it project-wide.
 gcloud iam service-accounts add-iam-policy-binding "$EVENTARC_SA" --project "$PROJECT_ID" \
-  --member="serviceAccount:${PUBSUB_SERVICE_AGENT}" --role=roles/iam.serviceAccountTokenCreator
+  --member="serviceAccount:${PUBSUB_SERVICE_AGENT}" --role=roles/iam.serviceAccountTokenCreator \
+  --quiet >/dev/null
 if ! gcloud eventarc triggers describe bastion-investigations-to-orchestrator \
   --project "$PROJECT_ID" --location "$REGION" >/dev/null 2>&1; then
   gcloud eventarc triggers create bastion-investigations-to-orchestrator \

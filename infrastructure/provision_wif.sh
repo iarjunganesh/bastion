@@ -115,6 +115,11 @@ ${REPOSITORY} specifically.
   GCP_WIF_PROVIDER = ${POOL_RESOURCE}/providers/${PROVIDER}
   GCP_DEPLOY_SA    = ${DEPLOYER}
 
+These two authorize the pipeline. They do not configure it: the workflow also reads the
+project, regions, engine ids and Secret Manager ids that a local deploy reads from .env. Its
+first step names any that are missing and stops before authenticating, so run the workflow
+once and let it tell you the list rather than transcribing it from here and missing one.
+
 Then run the "Deploy" workflow manually. It is deliberately not triggered by push:
 a deploy to a live access-governance fleet is a decision, and someone should make it.
 SUMMARY
