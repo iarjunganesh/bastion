@@ -39,7 +39,7 @@ categories, never bindings.
 The committed [GCP measurement](assets/architecture/gcp-state.json) was generated from the live
 project and contains counts only:
 
-- 21/21 named Google Cloud APIs enabled and 38 deployed resources measured;
+- 21/21 named Google Cloud APIs enabled and 39 deployed resources measured;
 - four Cloud Run services in `europe-north2`;
 - a managed Agent Runtime and a separate durable Memory Bank in `europe-west4`;
 - one Agent-to-Anywhere Gateway, IAP authorization extension, and fail-closed auth policy;
