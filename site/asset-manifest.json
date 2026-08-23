@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "source": "../assets/brand/banner-16x9-dark.gif",
+      "output": "assets/brand/banner-16x9-dark.gif"
+    },
+    {
+      "source": "../assets/brand/banner-16x9-dark.svg",
+      "output": "assets/brand/banner-16x9-dark.svg"
+    },
+    {
+      "source": "../assets/brand/banner-16x9-light.gif",
+      "output": "assets/brand/banner-16x9-light.gif"
+    },
+    {
+      "source": "../assets/brand/banner-16x9-light.svg",
+      "output": "assets/brand/banner-16x9-light.svg"
+    },
+    {
+      "source": "../assets/architecture/level-0-request-path-dark.gif",
+      "output": "assets/architecture/level-0-request-path-dark.gif"
+    },
+    {
+      "source": "../assets/architecture/level-0-request-path-dark.svg",
+      "output": "assets/architecture/level-0-request-path-dark.svg"
+    },
+    {
+      "source": "../assets/architecture/level-0-request-path-light.gif",
+      "output": "assets/architecture/level-0-request-path-light.gif"
+    },
+    {
+      "source": "../assets/architecture/level-0-request-path-light.svg",
+      "output": "assets/architecture/level-0-request-path-light.svg"
+    }
+  ]
+}

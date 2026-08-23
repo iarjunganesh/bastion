@@ -1,4 +1,4 @@
-# Evidence 10 — a prior week's approved exception suppresses a later matching finding
+# Evidence 10 — an approved exception survives deployments and suppresses a later finding
 
 **Observed:** 2026-08-22 against the live `bastion-fleet-2026` project, through the deployed
 managed Runtime and both Cloud Run workers. The exception was created on **2026-08-19**, so a

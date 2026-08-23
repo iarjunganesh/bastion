@@ -81,7 +81,7 @@ svg {
   <g>
     <rect class="box" x="70" y="470" width="290" height="150"/>
     <text class="label" x="215" y="530">Cloud Scheduler</text>
-    <text class="sub"   x="215" y="566">makes “continuous” literal</text>
+    <text class="sub"   x="215" y="566">durable event-driven admission</text>
     <text class="sub"   x="215" y="596">◐ enabled, no job</text>
   </g>
 

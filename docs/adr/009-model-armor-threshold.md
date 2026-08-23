@@ -64,10 +64,11 @@ done.
   argument for it once the fleet is refused either way.
 - **Enforcement stays on.** The threshold moves; the filter is not disabled.
 
-## Consequences
+## Consequences at acceptance
 
-- **The Access Auditor is still refused, and the fleet still cannot complete an investigation.**
-  This ADR does not claim to have fixed that. The remaining fix is to narrow *what* is screened
+- **At acceptance, the Access Auditor was still refused and the fleet could not complete an
+  investigation.** This ADR did not claim to fix that. The remaining fix was to narrow *what* was
+  screened
   — internal orchestration between repository-owned agents is not the untrusted surface the
   control exists for — rather than to keep moving a threshold.
 - Narrowing the screening surface is a security change in its own right and needs its own record,
@@ -79,8 +80,21 @@ done.
   fails when the deployed template drifts, including when it becomes unreadable, which under
   fail-closed screening is equally fatal.
 
-## Not claimed
+## Not claimed at acceptance
 
-That the guardrail is correctly tuned — it refuses legitimate traffic today. That Model Armor
-prevents tool poisoning; [ADR-007](007-tool-poisoning.md) is explicit that the fixed tool
+That the guardrail was correctly tuned—it refused legitimate traffic at acceptance. That Model
+Armor prevents tool poisoning; [ADR-007](007-tool-poisoning.md) is explicit that the fixed tool
 boundary does that. That raising or lowering this threshold would make the fleet work.
+
+## Amendment 2026-08-22 — the false positive no longer blocks production
+
+The threshold remains `MEDIUM_AND_ABOVE`; the decision above was not reversed. The dispatcher now
+sends a structured event rather than an instruction, and the Orchestrator's policy step is a
+model-free `BaseAgent`, so it no longer requires Model Armor egress from inside the managed
+Runtime. Both Cloud Run workers screen successfully against the same regional template. Live
+investigations now complete, and a later run observed an approved exception being honoured
+([evidence 10](../../assets/evidence/10-cross-week-suppression.md)).
+
+IAP still fails to resolve some registered non-standard Google hosts from the Runtime. That is
+retained as residual platform behaviour in the
+[observation backlog](../../submission/planning/09-capture-backlog.md), not described as fixed.

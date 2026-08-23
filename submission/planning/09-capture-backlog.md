@@ -50,7 +50,7 @@ by anyone able to create the binding, is never read. The Auditor's tool emits an
 a closed-set department, a fixed reason code and a fixed score. That is data minimisation working,
 and it is the honest version of the original claim.
 
-But two free-text routes to a model do exist:
+Two free-text routes were identified. The first still exists; the second is historical:
 
 1. **The A2A message body.** Both worker services carry an `allUsers` Cloud Run invoker binding
    (documented in [SECURITY.md](../../SECURITY.md)); the only gate is the origin secret checked by
@@ -58,8 +58,9 @@ But two free-text routes to a model do exist:
    screened by `screen_before_model`. This is a genuine deployed surface, so capture 2 needs no
    decoy input field. It demonstrates a **compromised authorized caller**, not an anonymous
    attacker, and the write-up must say so.
-2. **`exception_policy_version`.** An operator-supplied 1-64 character string reaches the policy
-   model inside a tool result — and is *not* screened on the way in. See D4.
+2. **Historical `exception_policy_version` route.** An operator-supplied 1-64 character string
+   reached the former policy model inside a tool result. D4 added inbound tool-result screening,
+   and the current policy step is model-free, so this route no longer reaches a model. See D4.
 
 **What must be said plainly when capture 2 is written up:** every refusal observed in the deployed
 fleet so far has been a false positive on the fleet's own traffic (`policy_match` on internal

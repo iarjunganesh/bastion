@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#08111f">
+    <meta
+      name="description"
+      content="Bastion is a governed institutional-agent fleet that reviews the live GCP IAM policy of the production project that runs it."
+    >
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Bastion — The access review that reviews itself">
+    <meta
+      property="og:description"
+      content="A public evidence console for a private, production GCP institutional-agent fleet."
+    >
+    <meta property="og:url" content="https://bastion.arjunganesh.dev">
+    <meta
+      property="og:image"
+      content="https://bastion.arjunganesh.dev/assets/brand/banner-16x9-dark.gif"
+    >
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://bastion.arjunganesh.dev">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+    <title>Bastion — The access review that reviews itself</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header" data-header>
+      <a class="brand" href="#top" aria-label="Bastion home">
+        <svg class="brand-mark" viewBox="0 0 40 44" role="img" aria-hidden="true">
+          <path d="M20 1 38 8v13c0 13-9 20-18 23C11 41 2 34 2 21V8Z" />
+          <path d="m12 21 5 5 11-12" />
+        </svg>
+        <span>BASTION</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="sr-only">Toggle navigation</span>
+        <span></span><span></span>
+      </button>
+      <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+        <a href="#system">System</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#limits">Limits</a>
+        <button class="theme-toggle" type="button" data-theme-toggle>
+          Theme · <span data-theme-label>system</span>
+        </button>
+        <a class="nav-cta" href="https://github.com/iarjunganesh/bastion">View repository</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section id="top" class="hero section-shell" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot"></span> Fortified Enterprise Fleet</p>
+          <h1 id="hero-title">The access review that <em>reviews itself.</em></h1>
+          <p class="hero-lede">
+            Bastion audits the live permissions of the production GCP project that runs it,
+            turns minimized findings into department-owned human action, and remembers approved
+            exceptions across asynchronous investigations.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#evidence">Explore the proof</a>
+            <a class="button button-secondary" href="#system">See the governed path</a>
+          </div>
+          <div class="evidence-stamp" role="note" aria-label="Evidence plane notice">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2 4 5v6c0 5.4 3.4 9.4 8 11 4.6-1.6 8-5.6 8-11V5Z" />
+              <path d="m8.5 12 2.2 2.2 4.8-5" />
+            </svg>
+            <p>
+              <strong>Public evidence console.</strong> The operational fleet and enterprise data
+              plane remain IAM-private on Google Cloud.
+            </p>
+          </div>
+        </div>
+
+        <figure class="hero-asset-card">
+          <img
+            data-theme-asset
+            data-light-gif="/assets/brand/banner-16x9-light.gif"
+            data-dark-gif="/assets/brand/banner-16x9-dark.gif"
+            data-light-static="/assets/brand/banner-16x9-light.svg"
+            data-dark-static="/assets/brand/banner-16x9-dark.svg"
+            src="/assets/brand/banner-16x9-dark.svg"
+            alt="Bastion's reviewed brand overview showing the private live fleet, its three agents, and managed controls."
+            width="1920"
+            height="1080"
+          >
+          <figcaption>
+            Reviewed brand master · animated route effects · static SVG when reduced motion is set
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="proof-strip" aria-label="Measured proof points">
+        <div class="proof-item">
+          <strong>3</strong>
+          <span>institutional agents</span>
+        </div>
+        <div class="proof-item">
+          <strong>52</strong>
+          <span>live bindings measured</span>
+        </div>
+        <div class="proof-item">
+          <strong>3 → 2</strong>
+          <span>findings to departments</span>
+        </div>
+        <div class="proof-item">
+          <strong>3 days</strong>
+          <span>observed decision continuity</span>
+        </div>
+        <div class="proof-meta">
+          <span>Last evidence verification</span>
+          <time data-verified-at datetime="2026-08-23T17:22:39Z">23 Aug 2026 · 17:22 UTC</time>
+        </div>
+      </section>
+
+      <section id="system" class="section section-shell" aria-labelledby="system-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">Three agents, three responsibilities</p>
+            <h2 id="system-title">Institutional ownership is the architecture.</h2>
+          </div>
+          <p>
+            Each agent has a named department, fixed tools, and a distinct workload identity.
+            Catalog metadata describes responsibility; IAM and deterministic code enforce it.
+          </p>
+        </div>
+
+        <div class="agent-grid">
+          <article class="agent-card agent-card-primary">
+            <div class="agent-card-top"><span>01</span><span class="agent-state">MANAGED RUNTIME</span></div>
+            <h3>Orchestrator</h3>
+            <p>Owns the durable investigation lifecycle, policy threshold, routing, and completion.</p>
+            <ul class="capability-list">
+              <li>Firestore leases and retries</li>
+              <li>Registry + Gateway egress</li>
+              <li>Deterministic policy gate</li>
+            </ul>
+          </article>
+          <article class="agent-card agent-card-cyan">
+            <div class="agent-card-top"><span>02</span><span class="agent-state">READ-ONLY IAM</span></div>
+            <h3>Access Auditor</h3>
+            <p>Reads the production policy and minimizes it before any model boundary is crossed.</p>
+            <ul class="capability-list">
+              <li>Real Cloud Asset Inventory</li>
+              <li>Opaque finding identifiers</li>
+              <li>Bounded Gemini rationale</li>
+            </ul>
+          </article>
+          <article class="agent-card agent-card-amber">
+            <div class="agent-card-top"><span>03</span><span class="agent-state">NO IAM READ</span></div>
+            <h3>Escalation</h3>
+            <p>Receives only minimized routed findings and creates private human-review records.</p>
+            <ul class="capability-list">
+              <li>Department allowlist</li>
+              <li>Idempotent review key</li>
+              <li>IAM denial observed</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section path-section" aria-labelledby="path-title">
+        <div class="section-shell">
+          <div class="section-heading">
+            <p class="eyebrow">Governed production-data path</p>
+            <h2 id="path-title">Raw IAM stops here. Context continues.</h2>
+            <p class="heading-lede">
+              Principals, roles, resources, and policy bindings exist only inside the Auditor's
+              deterministic tool. The model and notification boundary receive opaque, bounded data.
+            </p>
+          </div>
+
+          <figure class="architecture-figure">
+            <img
+              data-theme-asset
+              data-light-gif="/assets/architecture/level-0-request-path-light.gif"
+              data-dark-gif="/assets/architecture/level-0-request-path-dark.gif"
+              data-light-static="/assets/architecture/level-0-request-path-light.svg"
+              data-dark-static="/assets/architecture/level-0-request-path-dark.svg"
+              src="/assets/architecture/level-0-request-path-dark.svg"
+              alt="The reviewed production request path from Pub/Sub and Eventarc through durable ingress, managed Runtime and Gateway to the read-only Auditor and no-IAM-read Escalation agent."
+              width="1920"
+              height="1080"
+            >
+            <figcaption>
+              Level 0 production request path · generated from the reviewed repository master
+            </figcaption>
+          </figure>
+
+          <div class="data-contract">
+            <div>
+              <span class="contract-label contract-denied">STOPS BEFORE GEMINI</span>
+              <p>principal · role · resource · binding</p>
+            </div>
+            <svg viewBox="0 0 64 24" aria-hidden="true"><path d="M2 12h52M45 4l9 8-9 8" /></svg>
+            <div>
+              <span class="contract-label contract-allowed">CROSSES THE BOUNDARY</span>
+              <p>opaque ID · category · department · score</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-shell memory-section" aria-labelledby="memory-title">
+        <div class="memory-copy">
+          <p class="eyebrow">Durable asynchronous context</p>
+          <h2 id="memory-title">A human decision outlives the process that received it.</h2>
+          <p>
+            An approved exception is keyed by an opaque finding ID and expires explicitly. A later
+            investigation retrieves that decision, suppresses the matching work, and continues
+            routing unrelated findings.
+          </p>
+          <div class="honesty-note">
+            <strong>Observed boundary</strong>
+            <span>Approval on 19 Aug → deployed-path suppression on 22 Aug. Three days, not a literal week.</span>
+          </div>
+        </div>
+        <div class="timeline-card" role="group" aria-label="Exception continuity timeline">
+          <div class="timeline-row timeline-approved">
+            <time datetime="2026-08-19">19 AUG</time>
+            <span class="timeline-node"></span>
+            <div><strong>Human approves exception</strong><small>Bounded expiry + verified reviewer</small></div>
+          </div>
+          <div class="timeline-line"><span>deployments + restarts</span></div>
+          <div class="timeline-row timeline-suppressed">
+            <time datetime="2026-08-22">22 AUG</time>
+            <span class="timeline-node"></span>
+            <div><strong>Matching work suppressed</strong><small>Other departments still route</small></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section controls-section" aria-labelledby="controls-title">
+        <div class="section-shell">
+          <div class="section-heading split-heading">
+            <div>
+              <p class="eyebrow">Seven managed pillars</p>
+              <h2 id="controls-title">Controls outside the prompt.</h2>
+            </div>
+            <p>
+              The strongest boundary is one the model cannot negotiate. Managed infrastructure,
+              separate identities, and fixed contracts remain authoritative.
+            </p>
+          </div>
+          <div class="pillar-grid">
+            <article><span>01</span><h3>Registry</h3><p>Governed catalog and approved destinations.</p></article>
+            <article><span>02</span><h3>Runtime</h3><p>Identity-bearing managed orchestration.</p></article>
+            <article><span>03</span><h3>Memory Bank</h3><p>Context outside process memory.</p></article>
+            <article><span>04</span><h3>Identity</h3><p>Least privilege by institutional role.</p></article>
+            <article><span>05</span><h3>Gateway</h3><p>Default-deny governed egress.</p></article>
+            <article><span>06</span><h3>Model Armor</h3><p>Fail-closed input screening.</p></article>
+            <article><span>07</span><h3>Observability</h3><p>Payload-free audit and operations.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="evidence" class="section section-shell" aria-labelledby="evidence-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">Evidence, not architecture theatre</p>
+            <h2 id="evidence-title">One claim per frame.</h2>
+          </div>
+          <p>
+            Final gallery captures are being prepared from redacted, current-route observations.
+            The underlying proof records are already public in the repository.
+          </p>
+        </div>
+
+        <div id="evidence-gallery" class="evidence-grid" aria-live="polite" aria-busy="true">
+          <article class="evidence-card evidence-loading" aria-label="Loading evidence">
+            <div class="skeleton skeleton-image"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line skeleton-short"></div>
+          </article>
+          <article class="evidence-card evidence-loading" aria-hidden="true">
+            <div class="skeleton skeleton-image"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line skeleton-short"></div>
+          </article>
+          <article class="evidence-card evidence-loading" aria-hidden="true">
+            <div class="skeleton skeleton-image"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line skeleton-short"></div>
+          </article>
+        </div>
+
+        <div id="video" class="video-panel" role="region" aria-labelledby="video-title">
+          <div class="video-placeholder" data-video-container>
+            <svg viewBox="0 0 80 80" aria-hidden="true">
+              <circle cx="40" cy="40" r="37" />
+              <path d="m34 27 20 13-20 13Z" />
+            </svg>
+          </div>
+          <div class="video-copy">
+            <span class="status-label">DEMO VIDEO · RECORDING PENDING</span>
+            <h3 id="video-title">Four minutes. One investigation. No hidden reset.</h3>
+            <p>
+              The final signed-out video will connect catalog, live IAM counts, department action,
+              remembered exception, enforced denial, and correlated operations.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="limits" class="section limits-section" aria-labelledby="limits-title">
+        <div class="section-shell limits-layout">
+          <div>
+            <p class="eyebrow">Known boundaries</p>
+            <h2 id="limits-title">What Bastion does not claim.</h2>
+            <p>
+              Production readiness includes saying where the proof ends. These are intentional
+              constraints or open evidence items, not footnotes hidden from a judge.
+            </p>
+          </div>
+          <ul class="limits-list">
+            <li><strong>Read-only operation</strong><span>Bastion requests human review; it never modifies IAM.</span></li>
+            <li><strong>Global model endpoint</strong><span>Compute and state are regional; Gemini processing is global.</span></li>
+            <li><strong>Retention, not immutability</strong><span>Audit records are retained; the bucket is not locked.</span></li>
+            <li><strong>Event-driven today</strong><span>No deployed recurring Scheduler job is claimed by this snapshot.</span></li>
+            <li><strong>Three-day observation</strong><span>Tests cover longer timing logic; live proof spans three days.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="testing" class="section section-shell testing-section" aria-labelledby="testing-title">
+        <div>
+          <p class="eyebrow">Reproduce the engineering proof</p>
+          <h2 id="testing-title">The public site is the map. The repository is the record.</h2>
+        </div>
+        <div class="testing-actions">
+          <p>
+            Read the architecture, inspect redacted evidence boundaries, and run the documented
+            Python 3.12 offline gate from a clean clone.
+          </p>
+          <div>
+            <a class="button button-primary" href="https://github.com/iarjunganesh/bastion#readme">Setup and testing</a>
+            <a class="text-link" href="https://github.com/iarjunganesh/bastion/tree/main/assets/evidence">Evidence ledger <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="section-shell footer-layout">
+        <div>
+          <a class="brand footer-brand" href="#top">
+            <svg class="brand-mark" viewBox="0 0 40 44" aria-hidden="true">
+              <path d="M20 1 38 8v13c0 13-9 20-18 23C11 41 2 34 2 21V8Z" />
+              <path d="m12 21 5 5 11-12" />
+            </svg>
+            <span>BASTION</span>
+          </a>
+          <p>Real data. Remembered decisions. Structurally bounded agents.</p>
+        </div>
+        <div class="footer-links">
+          <a href="#system">System</a>
+          <a href="#evidence">Evidence</a>
+          <a href="#limits">Limitations</a>
+          <a href="https://github.com/iarjunganesh/bastion">GitHub</a>
+        </div>
+        <p class="footer-note">Built for the All Things Agentic Hackathon · Fortified Enterprise Fleet</p>
+      </div>
+    </footer>
+  </body>
+</html>

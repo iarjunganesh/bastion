@@ -245,6 +245,13 @@ jobs:
       - name: Documentation build state is derived, not typed
         run: python scripts/check_docs.py
 
+      # The judge-facing Vercel project is static by design. Scan every deployable text byte and
+      # keep its displayed verification time aligned with the committed count-only GCP snapshot.
+      - name: Public evidence site contains no private fleet data
+        run: |
+          node site/build.mjs
+          python scripts/check_site.py
+
       # The light/dark variants are emitted from one master, because an SVG loaded via <img>
       # does not inherit the page's colour scheme and GitHub renders README images that way.
       # Rasterising needs a browser/ffmpeg the runner does not have; SVG is the deterministic

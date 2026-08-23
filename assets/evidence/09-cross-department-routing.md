@@ -41,7 +41,7 @@ unmodified production data is the obligation demonstrated rather than asserted.
 - This measures routing on live data. It is not a claim about a completed end-to-end
   investigation; that is [evidence 06](06-durable-findings.md).
 - The finding count reflects the policy on the observation date. It changes as the project's IAM
-  changes, which is the point of a continuous review rather than a quarterly one.
+  changes, which is the point of event-driven review rather than a quarterly snapshot.
 - Department definitions are repository-owned static source in `registry/departments.py`.
   Agent Registry catalogs *agents*; departments are org-chart facts and deliberately do not
   come from a catalog any agent can write to.

@@ -36,7 +36,8 @@ npx markdownlint-cli2 "**/*.md"
 ```
 
 CI also runs dependency audit and secret scanning. Coverage remains 100% for statements and
-branches. Add unit, integration, security, or load coverage at the boundary you change.
+branches in the configured core scope from `pyproject.toml`. Add unit, integration, security, or
+load coverage at the boundary you change.
 
 ## Safety and evidence
 

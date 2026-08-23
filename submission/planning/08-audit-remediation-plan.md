@@ -53,7 +53,8 @@ different kinds of proof.
 - [x] Operational objectives and alert mappings documented without claiming historical SLOs.
 - [x] ADK `SequentialAgent` deprecation and experimental Remote A2A accepted with pinned version,
       tests, and migration trigger.
-- [x] Locked dependencies, dependency audit, secret scan, type checks, and 100% coverage gate.
+- [x] Locked dependencies, dependency audit, secret scan, type checks, and 100% configured core
+      coverage gate.
 
 ## P1 — sovereignty, compliance, and observability
 
@@ -72,6 +73,6 @@ different kinds of proof.
 - [retained observability](../../assets/evidence/07-observability.md)
 - [tool-declaration boundary](../../assets/evidence/08-tool-poisoning.md)
 - `infrastructure/verify_fleet.py`, `smoke_test.py`, `rollback.py`, and `teardown.py`
-- Python 3.12 full gate: 251 tests, 100% statement and branch coverage
+- Python 3.12 full gate: 251 tests, 100% configured core statement and branch coverage
 
 P2 media and Devpost publication are intentionally excluded from P0/P1 engineering closure.

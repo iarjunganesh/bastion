@@ -5,7 +5,7 @@
     <source media="(prefers-color-scheme: dark)" srcset="assets/brand/banner-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="assets/brand/banner-light.svg">
     <img width="900" src="assets/brand/banner-light.svg"
-         alt="Bastion — a governed institutional-agent fleet for continuous access review."/>
+         alt="Bastion — a governed institutional-agent fleet for event-driven access review."/>
   </picture>
 </p>
 
@@ -96,9 +96,12 @@ and its Gateway-bound Registry allowlist.
 
 ## Run one investigation in 60 seconds
 
-There is deliberately **no public demo endpoint**. Every service is IAM-private, and exposing an
-agent purely to produce a shareable URL would contradict the entire submission. The fleet is
-reproducible instead:
+There is deliberately **no public agent endpoint**. Every operational service is IAM-private, and
+exposing an agent purely to produce a shareable URL would contradict the submission. A separate
+dependency-free evidence console is live at
+[`bastion.arjunganesh.dev`](https://bastion.arjunganesh.dev/) from the source under
+[`site/`](site/README.md). It serves only sanitized committed artifacts and makes no request to the
+private fleet. The fleet itself remains reproducible:
 
 ```powershell
 git clone https://github.com/iarjunganesh/bastion.git
@@ -168,7 +171,8 @@ project is most proud of catching. The sharpest: **ADK session state does not cr
 boundary, in either direction, and nothing warns you** — `output_key` writes into the session
 of the agent that *declares* it, which is shared in-process and separate over A2A. Every local
 run and every CI job exercises the working topology, so the failure is invisible to an offline
-gate by construction, at 100% coverage. Reported upstream as
+gate by construction, even at 100% configured core statement and branch coverage. Reported
+upstream as
 [google/adk-python#6854](https://github.com/google/adk-python/issues/6854) and fixed
 structurally in [ADR-012](docs/adr/012-structured-findings-across-a2a.md); the full ledger is
 the [observation backlog](submission/planning/09-capture-backlog.md).
@@ -367,6 +371,8 @@ pytest tests --cov --cov-report=term-missing --cov-fail-under=100
 python scripts/check_docs.py
 python scripts/check_versions.py
 python scripts/render_diagrams.py --check
+node site/build.mjs
+python scripts/check_site.py
 ```
 
 `check_docs.py` is not a linter. It fails the build when a document disagrees with the
@@ -408,6 +414,7 @@ registry/                   department routing policy
 runtime/                    durable SQLite contract and Firestore production adapter
 infrastructure/             bootstrap, deploy, Gateway, Runtime, smoke, rollback, teardown
 scripts/                    live-state capture, docs/version gates, diagram renderer
+site/                       static public evidence console; no operational backend or GCP calls
 tests/                      unit, integration, security, and load suites
 assets/                     brand, architecture, and redacted evidence
 docs/                       architecture, governance, operations, and ADRs

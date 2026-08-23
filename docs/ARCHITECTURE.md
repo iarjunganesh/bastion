@@ -1,6 +1,6 @@
 # Bastion architecture
 
-Bastion is a governed institutional-agent fleet for continuous GCP IAM review. It separates
+Bastion is a governed institutional-agent fleet for event-driven GCP IAM review. It separates
 durable delivery, agent reasoning, production reads, and human-review writes so no single model
 or workload can silently widen access.
 
@@ -129,8 +129,9 @@ Managed sessions and Memory Bank preserve conversational context outside process
 Firestore preserves the operational state required for replay and crash recovery. A human-
 approved exception is keyed by opaque finding ID and has an explicit `approved_until` expiry;
 the deterministic policy suppresses the same finding while the exception is current and restores
-it after expiry. Integration tests exercise restart recovery and prior-week suppression without
-claiming that a wall-clock week elapsed during the test.
+it after expiry. A live exception approved on 2026-08-19 suppressed its matching finding on
+2026-08-22 across deployments and restarts ([evidence 10](../assets/evidence/10-cross-week-suppression.md)).
+The observed gap is three days, not a literal week; expiry firing remains test-only.
 
 ## Model and data boundary
 

@@ -50,23 +50,33 @@ it — in-process, in the agent that owns the decision.
 The gate is **not a fourth agent**. It has no model, no instruction and no tools; it is a
 deterministic step in the Orchestrator's own sequence. The fleet is still three agents.
 
-## Consequences
+## Consequences at acceptance
 
 - An investigation whose policy step was screened out now **fails** rather than escalating. That
   is louder and correct: a failed investigation is visible and retryable.
-- **This does not fix the underlying screening outage.** The Runtime's Model Armor egress is
-  still denied (see the observation backlog, D2). The gate converts a silent wrong answer into
-  a visible failure; it does not make the fleet work.
-- Cross-week suppression still cannot be demonstrated while the policy step cannot run, because
-  suppression is a decision that step makes.
-- The Auditor's findings still cross the A2A boundary as **model prose**, so the policy tool
-  reconstructs risk scores and opaque ids from a sentence. The gate proves the tool ran; it
-  cannot prove the tool was given faithful input. That is a separate defect and needs its own
+- **This did not fix the underlying screening outage.** The Runtime's Model Armor egress was
+  still denied (see the observation backlog, D2). The gate converted a silent wrong answer into
+  a visible failure; it did not make the fleet work.
+- Cross-week suppression could not yet be demonstrated while the policy step could not run,
+  because suppression is a decision that step makes.
+- The Auditor's findings still crossed the A2A boundary as **model prose**, so the policy tool
+  reconstructed risk scores and opaque ids from a sentence. The gate proved the tool ran; it
+  could not prove the tool was given faithful input. That was a separate defect and needed its own
   record.
 
-## Not claimed
+## Not claimed at acceptance
 
-That policy enforcement now runs in production — it does not, because screening still refuses.
+That policy enforcement then ran in production — it did not, because screening still refused.
 That the gate validates the *content* of a decision; it validates that the deterministic path
 produced one. That a failed investigation is retried automatically beyond the Eventarc policy
 already in place.
+
+## Amendment 2026-08-22 — deterministic enforcement now runs and is observed
+
+[ADR-012](012-structured-findings-across-a2a.md) removed the policy model and made the Auditor's
+A2A reply a validated `AuditReport`. The policy step now calls scoring and routing directly, so
+the Runtime's residual Model Armor egress denial is no longer on this path. A deployed
+investigation subsequently ran `policy_step` and `policy_gate` and completed across both workers;
+[evidence 10](../../assets/evidence/10-cross-week-suppression.md) also records the later policy
+decision suppressing its matching finding. The gate remains necessary: model-free does not mean
+infallible, and an absent or malformed deterministic result must still fail closed.

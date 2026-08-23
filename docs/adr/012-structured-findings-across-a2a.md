@@ -75,7 +75,8 @@ catch. A genuinely clean run returns an empty `findings` list and is scored norm
 
 That no model touches finding data anywhere — the Auditor's model still emits the structured
 report, and the Escalation Agent's still fills in tool arguments. That suppression has been
-observed working; the defect that made it unreliable is fixed, and the capture is still open.
+observed working; the defect that made it unreliable is fixed, and the retained observation is
+[evidence 10](../../assets/evidence/10-cross-week-suppression.md).
 
 ## Amendment 2026-08-22 — the schema is also what makes the A2A reply readable
 

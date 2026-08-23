@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-08-23T17:22:39Z",
+  "snapshotSource": "assets/architecture/gcp-state.json",
+  "evidence": [
+    {
+      "title": "Governed request path",
+      "summary": "Managed Runtime, Gateway, Registry, and IAP are deployed; the retained record contains status and counts, never private origins or identities.",
+      "state": "RECORD VERIFIED",
+      "accent": "#5b8cff",
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/05-runtime-gateway.md"
+    },
+    {
+      "title": "Real cross-department routing",
+      "summary": "A count-only observation of 52 live IAM bindings produced three findings routed to two owning departments.",
+      "state": "COUNTS ONLY",
+      "accent": "#45d3d0",
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/09-cross-department-routing.md"
+    },
+    {
+      "title": "Identity-enforced separation",
+      "summary": "The deployed Escalation identity was denied the same IAM read that the Access Auditor identity was permitted to perform.",
+      "state": "DENIAL OBSERVED",
+      "accent": "#f5ad42",
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/03-escalation-agent-denied.md"
+    },
+    {
+      "title": "Durable human exception",
+      "summary": "A human-approved exception suppressed its matching finding three days later on the deployed path without becoming a multi-week claim.",
+      "state": "3-DAY OBSERVATION",
+      "accent": "#60d394",
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/10-cross-week-suppression.md"
+    },
+    {
+      "title": "Payload-free operations",
+      "summary": "Regional audit retention, metrics, alerts, and dashboard configuration are retained without prompts, responses, principals, or finding payloads.",
+      "state": "CONFIG VERIFIED",
+      "accent": "#a98bff",
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/07-observability.md"
+    }
+  ],
+  "video": {
+    "status": "pending",
+    "title": "Bastion demo video",
+    "embedUrl": ""
+  }
+}

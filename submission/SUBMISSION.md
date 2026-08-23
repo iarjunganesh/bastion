@@ -18,6 +18,9 @@ or a media platform.
       Gateway, Model Armor, and Observability.
 - [x] Public MIT-licensed repository with history inside the submission period.
 - [x] Python 3.12 spin-up, bootstrap, verifier, smoke, rollback, and teardown instructions.
+- [x] Signed-out public evidence console verified at
+      [`bastion.arjunganesh.dev`](https://bastion.arjunganesh.dev/); this is a presentation plane
+      only, not a public agent endpoint.
 - [ ] Devpost category selected and all required fields saved.
 - [ ] Public English demo video under four minutes.
 - [ ] Architecture GIF/image uploaded to Devpost.
@@ -28,7 +31,7 @@ or a media platform.
 | Requirement | Closed by |
 |---|---|
 | Catalog agents for cross-department use | Managed Registry has the Runtime and two worker cards; cards contain owner/department/purpose/skill/classification/version/approval metadata; deterministic routing rejects unknown departments. |
-| Safely maintain context across weeks of asynchronous operations | Firestore IDs/leases/retry/dedup, managed sessions and Memory Bank, expiring approved exceptions, five-attempt DLQ, and idempotent notification. Restart and simulated prior-week suppression are integration-tested; no wall-clock-week claim is made. |
+| Safely maintain context across weeks of asynchronous operations | Firestore IDs/leases/retry/dedup, managed sessions and Memory Bank, expiring approved exceptions, five-attempt DLQ, and idempotent notification. A human exception was observed suppressing its matching finding after a real three-day gap across deployments and restarts ([evidence 10](../assets/evidence/10-cross-week-suppression.md)); expiry firing remains test-only and no literal-week claim is made. |
 | Use production data without violating policy | Read-only live IAM/Asset access. Raw members, roles, resources and bindings never cross the model boundary at all — minimisation is the sovereignty control, not residency. Opaque IDs, fail-closed Model Armor, post-model protected-data screen, separated identities, count-only private findings record, and explicit regional/global disclosure. |
 
 ## Seven-pillar proof
@@ -67,7 +70,7 @@ or a media platform.
       are exercised across populated unit, integration, security, and load suites.
 - [x] Real findings endpoint denies anonymous traffic and collapses an authorized duplicate
       ([evidence 06](../assets/evidence/06-durable-findings.md)).
-- [x] 251 tests pass with 100% statement and branch coverage under Python 3.12.
+- [x] 251 tests pass with 100% configured core statement and branch coverage under Python 3.12.
 - [x] Ruff, formatting, mypy, dependency audit, secret scan, docs/version checks, and diagram
       determinism are release gates.
 - [x] ADK deprecation/experimental risk consciously accepted and pinned in
@@ -92,7 +95,8 @@ The following claims are deliberately not made:
 - no end-to-end EU residency—Gemini uses Vertex AI `global`;
 - no legal compliance certification;
 - no historical 99% availability, latency, cost, or accuracy figure;
-- no claim that a wall-clock week elapsed during the deterministic prior-week simulation;
+- no claim that a wall-clock week elapsed—the observed gap is three days and expiry firing is
+  covered by tests only;
 - no claim that Model Armor alone prevents tool poisoning—the fixed tool and IAM boundaries do.
 
 ## Final publication pass
@@ -100,11 +104,15 @@ The following claims are deliberately not made:
 - [ ] Record the catalog → event → Runtime/Gateway → IAM denial → Armor refusal → idempotent review
       → audit dashboard story without exposing a principal or endpoint.
 - [ ] Verify every Devpost number against `gcp-state.json` immediately before submission.
+- [x] Verify the static evidence console and custom domain while signed out; its observed browser
+      network log contains no private GCP request.
 - [ ] Keep private services running through judging; do not expose an agent merely to create a
       public hosted-project URL.
 - [x] Run the complete local and live release gates, push `main`, and confirm GitHub Actions
       green. Done for `v0.2.1`; repeat before the final submission commit, because this one
       is satisfied per-push rather than once.
-- [x] Create a release tag only if explicitly desired after the submission commit; no tag is
-      required for engineering closure. `v0.2.0` was explicitly requested by the platform owner on
-      2026-08-22 and carries the seven deployed-fleet defects found after `v0.1.0`.
+- [x] Release tags are explicit release decisions rather than engineering side effects:
+      `v0.2.0` carries the seven deployed-fleet defects found after `v0.1.0`, and `v0.2.1` carries
+      the escalation hand-off fix. `v0.3.0` is the hosted-evidence release; its annotated tag is
+      created only after the hosted gate, release metadata, full gates, pushed commit, and green
+      `main` CI all agree.

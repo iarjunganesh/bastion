@@ -17,7 +17,7 @@ preserved in [DEVPOST.md](../DEVPOST.md); this file maps that wording to reposit
 | Requirement | Evidence-backed response |
 |---|---|
 | Cataloged for cross-department use | Three governed agent entries, institutional Agent Card metadata, deterministic department ownership, unknown-route refusal |
-| Context across weeks of asynchronous operations | Managed session/memory plus Firestore lifecycle and expiring approved exceptions; restart and simulated prior-week suppression tests |
+| Context across weeks of asynchronous operations | Managed session/memory plus Firestore lifecycle and expiring approved exceptions; suppression observed after a real three-day gap across deployments/restarts, with expiry firing test-only ([evidence 10](../../assets/evidence/10-cross-week-suppression.md)) |
 | Production data and compliance/security | Read-only live IAM, pre-model minimisation, `global` disclosure, protected output screen, IAM-private count-only findings, payload-free audit |
 | Separation of concerns | Runtime Orchestrator, IAM-read Auditor, no-IAM-read Escalation; negative permission proof |
 | Failure-tolerant routing | Lease/reclaim, duplicate collapse, retry/DLQ, malformed response and dependency-outage tests |

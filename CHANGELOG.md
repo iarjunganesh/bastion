@@ -10,6 +10,63 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
+## [0.3.0] — 2026-08-23
+
+The public evidence plane is live at
+[`bastion.arjunganesh.dev`](https://bastion.arjunganesh.dev/). Its signed-out production behavior,
+custom domain, HTTPS redirect, security headers, desktop/mobile layouts, theme variants, reduced
+motion, navigation, 404 response, and browser network isolation were observed before release.
+
+### Added — a public evidence plane without a public agent
+
+- Added a dependency-free static evidence console under [`site/`](site/README.md). It reuses the
+  reviewed brand and architecture light/dark SVG and GIF variants, follows the system theme,
+  supports a local theme override, and replaces animation with matching SVGs under reduced motion.
+- The browser receives only sanitized committed content. It has no server runtime, environment
+  variable, GCP credential, private service origin, or production API fallback. Vercel is the
+  presentation plane; the operational fleet remains IAM-private on Google Cloud. Railway is not
+  part of the path.
+- Added `scripts/check_site.py` and a CI build gate that scan the deployable bundle for private
+  origins, credentials, raw principals/bindings, and snapshot drift before publication.
+
+### Added — keyless, authority-bounded deployment
+
+- Added a manual GitHub Actions deployment workflow backed by Workload Identity Federation. The
+  short-lived deploy identity can update code and act as the three workload identities, but it
+  cannot change IAM authority or impersonate the break-glass approver.
+- Public workflow output redacts Cloud Run origins, service-account addresses, and IAM principals;
+  `deploy.sh` suppresses commands that would otherwise print the resulting IAM policy.
+
+### Changed — judge-facing proof follows the measured fleet
+
+- Added a reviewed Level 0 request-path master and regenerated theme/GIF variants from existing
+  visual assets. Diagram gates now bind displayed resource totals to the count-only live snapshot
+  and reject retired topology claims or animation paths that cross a component.
+- Recaptured 21/21 named APIs and 39 enumerated resources after adding the federated deploy
+  identity. The Workload Identity pool and provider remain explicitly outside that counter.
+- Reworked the README presentation and badge targets while retaining its earned architecture,
+  evidence, limitations, and reproducible setup. Release documentation now distinguishes the
+  static public evidence plane from the private GCP runtime.
+
+### Fixed — release claims that had outlived their evidence
+
+- Removed present-tense ADR and backlog statements that still described the pre-`v0.2.0` screening
+  outage and unobserved suppression. Their historical diagnoses remain, with amendments pointing
+  to the deployed successful run and evidence 10.
+- Removed unsupported continuous-cadence wording while the measured fleet has zero Scheduler jobs;
+  current behavior is described as event-driven.
+- Qualified current 100% claims as configured core statement and branch coverage rather than an
+  assertion about excluded infrastructure adapters or every repository line.
+
+### Verified — hosted release boundary
+
+- The canonical custom domain returns the static evidence console without Vercel authentication;
+  generated project and branch aliases are not published as judge-facing URLs.
+- Browser inspection observed only same-origin site assets and data. No request reached a private
+  Cloud Run, Agent Runtime, Google Cloud API, Railway service, or other operational backend.
+- Light and dark modes select their reviewed GIF variants; reduced motion selects matching static
+  SVGs and runs no animation.
+
 ## [0.2.1] — 2026-08-22
 
 A patch release with one defect and one capture. 0.2.0 fixed session state failing to cross the
