@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080"
      role="img" aria-labelledby="t0 d0">
-  <title id="t0">Bastion — Level 0: the production request path</title>
+  <title id="t0">Bastion — governed investigation flow</title>
   <desc id="d0">One investigation, end to end. A Pub/Sub event reaches Eventarc, which invokes the
   Cloud Run durable ingress over OIDC; that boundary owns the inbox, lease, retry and dedup and
   invokes the managed Agent Runtime, which carries Agent Identity. All egress leaves through the
@@ -67,7 +67,7 @@ svg {
   <line class="grid" x1="60" y1="150" x2="1860" y2="150"/>
   <line class="grid" x1="60" y1="1000" x2="1860" y2="1000"/>
 
-  <text class="h1" x="60" y="86">Bastion — Level 0 · The production request path</text>
+  <text class="h1" x="60" y="86">Bastion — Governed investigation flow</text>
   <text class="h2" x="60" y="126">One investigation, end to end. There is no in-process fallback anywhere on this path.</text>
 
   <!-- ============ Row A: durable ingress ============ -->

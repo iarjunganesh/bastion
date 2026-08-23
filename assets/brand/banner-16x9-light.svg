@@ -16,7 +16,7 @@ svg { --bg:#F6F8FC; --grid:#DCE5F2; --ink:#10233D; --sub:#4B627E; --muted:#71839
   </defs>
   <rect width="1920" height="1080" fill="url(#background)"/><rect width="1920" height="1080" fill="url(#grid)" opacity=".72"/><rect width="1920" height="9" fill="var(--amber)"/>
   <g font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif">
-    <text x="96" y="110" font-size="34" font-weight="700" letter-spacing="8" fill="var(--blue)">BASTION</text><text x="96" y="158" font-size="25" fill="var(--sub)">PRIVATE ENTERPRISE AGENT FLEET · ACCESS GOVERNANCE</text>
+    <text x="96" y="110" font-size="34" font-weight="700" letter-spacing="8" fill="var(--blue)">BASTION</text><text x="96" y="158" font-size="25" fill="var(--sub)">CATALOGUED AGENTS · DURABLE CONTEXT · GOVERNED PRODUCTION ACCESS</text>
     <g transform="translate(1468 79)"><rect width="356" height="54" rx="27" fill="var(--card)" stroke="var(--stroke)"/><circle cx="30" cy="27" r="8" fill="var(--green)"><animate attributeName="opacity" values="1;.35;1" dur="1.5s" repeatCount="indefinite"/></circle><text x="52" y="34" font-size="21" font-weight="700" fill="var(--ink)">PRIVATE FLEET · LIVE</text></g>
     <!-- The moving evidence packets make the trusted path legible at a glance. -->
     <g fill="none" stroke="var(--blue)" stroke-width="3" opacity=".62"><use href="#p-registry"/><use href="#p-eventarc"/><use href="#p-armor"/><use href="#p-firestore"/><use href="#p-engine"/></g>

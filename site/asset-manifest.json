@@ -18,20 +18,20 @@
       "output": "assets/brand/banner-16x9-light.svg"
     },
     {
-      "source": "../assets/architecture/level-0-request-path-dark.gif",
-      "output": "assets/architecture/level-0-request-path-dark.gif"
+      "source": "../assets/architecture/governed-investigation-flow-dark.gif",
+      "output": "assets/architecture/governed-investigation-flow-dark.gif"
     },
     {
-      "source": "../assets/architecture/level-0-request-path-dark.svg",
-      "output": "assets/architecture/level-0-request-path-dark.svg"
+      "source": "../assets/architecture/governed-investigation-flow-dark.svg",
+      "output": "assets/architecture/governed-investigation-flow-dark.svg"
     },
     {
-      "source": "../assets/architecture/level-0-request-path-light.gif",
-      "output": "assets/architecture/level-0-request-path-light.gif"
+      "source": "../assets/architecture/governed-investigation-flow-light.gif",
+      "output": "assets/architecture/governed-investigation-flow-light.gif"
     },
     {
-      "source": "../assets/architecture/level-0-request-path-light.svg",
-      "output": "assets/architecture/level-0-request-path-light.svg"
+      "source": "../assets/architecture/governed-investigation-flow-light.svg",
+      "output": "assets/architecture/governed-investigation-flow-light.svg"
     }
   ]
 }

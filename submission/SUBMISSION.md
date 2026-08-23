@@ -88,7 +88,8 @@ or a media platform.
 - [x] Hackathon credits/project available; sensitive account details omitted.
 - [x] [Gemini Enterprise Agent Ready badge](https://developers.google.com/profile/badges/community/gear?u=iarjunganesh)
       claimed and linked from README.
-- [ ] Devpost registration/submission ownership reconfirmed.
+- [x] Devpost registration and submission ownership reconfirmed on 2026-08-24; live project
+      `1398552` remains an unsubmitted pre-draft.
 - [ ] Billing budget/anomaly notification reconfirmed in the console before final recording.
 - [ ] Optional launch blog published with the hackathon disclosure.
 - [ ] Optional social post published with `#AllThingsAgenticHackathon`.
@@ -107,6 +108,10 @@ The following claims are deliberately not made:
 - no claim that Model Armor alone prevents tool poisoning—the fixed tool and IAM boundaries do.
 
 ## Final publication pass
+
+- [x] Prepare the field-by-field local Devpost worksheet, judge-facing write-up, architecture PNG,
+      3:2 thumbnail, capture runbook, demo script, and bonus-copy drafts. Nothing has been uploaded
+      or published; see [`../devpost-submission.md`](../devpost-submission.md).
 
 - [ ] Record the catalog → event → Runtime/Gateway → IAM denial → Armor refusal → idempotent review
       → audit dashboard story without exposing a principal or endpoint.

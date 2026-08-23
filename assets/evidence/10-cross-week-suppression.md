@@ -49,7 +49,22 @@ paged, which is the behaviour `route_by_department` was written for.
 | 1 | `security-engineering` | 2 |
 | — | `platform-infra` | **0 — suppressed** |
 
-The immediately preceding runs, at 16:59 the same day, wrote **two** records and delivered
+## Re-verification after the deterministic-delivery rewrite
+
+The same still-valid exception was checked again on **2026-08-23** after P0.1-P0.3 had been
+deployed to both execution surfaces: the Cloud Run services and the separate managed Agent
+Runtime graph. One approved Pub/Sub event traversed Eventarc, Runtime, the Auditor, deterministic
+policy, deterministic Escalation worker, and the new completion gate. The investigation reached
+`completed`, `escalation_gate` passed, and Firestore contained exactly one human-review record:
+`security-engineering` with two findings. `platform-infra` again received no record because its
+one matching finding was suppressed.
+
+This is a post-change functional re-verification, not a second elapsed-time claim. It confirms
+that the deterministic fidelity, delivery, and receipt gates did not break the remembered human
+decision; the historical boundary remains the original three-day gap from August 19 to August 22.
+Only counts, department identifiers, dates, and bounded outcomes are retained here.
+
+The earlier runs at 16:59 on **2026-08-22** wrote **two** records and delivered
 `4c546546a073060ab61a2e18` to `platform-infra` while the same exception was already live and
 current. The difference between those runs and this one is the fix in
 [ADR-012](../../docs/adr/012-structured-findings-across-a2a.md)'s amendment: session state does

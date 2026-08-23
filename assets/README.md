@@ -23,9 +23,11 @@ Bastion's central claim is backed by redacted captures rather than architecture 
 
 ## Architecture and brand assets
 
-`architecture/level-1-context.svg` and `level-2-container.svg` are the reviewed 1920×1080
-masters. `scripts/render_diagrams.py` emits light/dark variants and animated GIFs. The README
-banner uses hand-reviewed light/dark SVGs; the 16:9 Devpost banner is another generated master.
+`architecture/enterprise-fleet-architecture.svg`, `enterprise-fleet-overview.svg`, and
+`governed-investigation-flow.svg` are the reviewed 1920×1080 masters.
+`scripts/render_diagrams.py` emits light/dark variants and animated GIFs. The judge-facing names
+describe the story directly; internal level numbers are deliberately absent. The README banner
+uses hand-reviewed light/dark SVGs; the 16:9 Devpost banner is another generated master.
 
 The diagrams are checked against [gcp-state.json](architecture/gcp-state.json), which is generated
 from the live project and contains counts only. No image names a principal, secret, private URL,
@@ -40,7 +42,12 @@ python scripts/render_diagrams.py --check
 
 The committed visuals preserve motion as decoration: every first frame communicates the full
 architecture, while arrows, route pulses, and status dots improve scanning. SVG is used on GitHub;
-GIF stays under Devpost's 5 MB gallery limit.
+GIF stays under Devpost's 5 MB gallery limit. `enterprise-fleet-architecture-light.png` is the
+static 1920×1080 upload for Devpost's required architecture field.
+`brand/devpost-thumbnail-3x2.svg` is the editable source for the 1200×800
+`brand/devpost-thumbnail-3x2.png` project thumbnail. The final five-image packet belongs under
+`screenshots/` and is governed by
+[`submission/CAPTURE_RUNBOOK.md`](../submission/CAPTURE_RUNBOOK.md).
 
 ## Evidence rules
 

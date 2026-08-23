@@ -111,7 +111,10 @@ def reviewed_asset_sources() -> tuple[list[Path], list[str]]:
 
     expected = {
         f"assets/{group}/{name}-{theme}.{suffix}"
-        for group, name in (("brand", "banner-16x9"), ("architecture", "level-0-request-path"))
+        for group, name in (
+            ("brand", "banner-16x9"),
+            ("architecture", "governed-investigation-flow"),
+        )
         for theme in ("dark", "light")
         for suffix in ("gif", "svg")
     }

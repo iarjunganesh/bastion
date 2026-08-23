@@ -409,7 +409,7 @@ def check_diagram_footers_match_state() -> None:
 
     This gate exists because the opposite happened, and nothing caught it for six days. Every
     check in this file reads Markdown; the architecture SVGs are embedded in README.md and are
-    the first thing a judge looks at, and they were never scanned. Level 2 carried
+    the first thing a judge looks at, and they were never scanned. The fleet architecture carried
     *"One process, one identity. Per-agent service accounts need three deployed apps"* —
     the pre-deployment claim, contradicting the three deployed services described three
     sections above it in the same README — while both footers and the banner pair quoted 33
@@ -511,12 +511,12 @@ def _sample_motion_path(spec: str) -> list[tuple[float, float]]:
 def check_packets_never_cross_a_component() -> None:
     """No animated packet may travel through a box it is not entering or leaving.
 
-    The rule is older than this gate — `level-1-context.svg` carries it as a comment reading
-    *"Never animate a packet through a component"* — and it was still broken twice, because a
-    comment in one master cannot govern the next one somebody writes. A packet crossing a box
-    asserts the request passed through that component. On the Level 0 path that would be false
-    in precisely the place the architecture is most often misread: the dispatcher hands off to
-    the managed Runtime and never invokes a worker.
+    The rule is older than this gate — `enterprise-fleet-overview.svg` carries it as a comment
+    reading *"Never animate a packet through a component"* — and it was still broken twice,
+    because a comment in one master cannot govern the next one somebody writes. A packet crossing
+    a box asserts the request passed through that component. On the governed investigation path
+    that would be false in precisely the place the architecture is most often misread: the
+    dispatcher hands off to the managed Runtime and never invokes a worker.
 
     Boxes are inset before testing. Every legitimate packet starts or ends *on* a component's
     edge, so an exact-boundary test would reject the correct drawing along with the wrong one.

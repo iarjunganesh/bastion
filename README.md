@@ -53,6 +53,11 @@
 [![Ruff](https://img.shields.io/badge/Ruff-lint%20%2B%20format-D7FF64?logo=ruff&logoColor=111827)](https://docs.astral.sh/ruff/)
 [![Mypy](https://img.shields.io/badge/Mypy-strict-2A6DB2?logo=python&logoColor=white)](https://mypy-lang.org/)
 [![pytest](https://img.shields.io/badge/pytest-9.1.1-0A9EDC?logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![Vercel Hobby](https://img.shields.io/badge/Vercel-Hobby-000000?logo=vercel&logoColor=white)](https://vercel.com)
+
+<!-- Row 6 — the public evidence console's own live hosting. The operational fleet stays on GCP;
+     this is the presentation plane only, per the "public evidence console" note below. -->
+[![Vercel live frontend](https://img.shields.io/badge/Vercel-live_frontend-000000?logo=vercel&logoColor=white)](https://bastion.arjunganesh.dev)
 
 ---
 
@@ -82,9 +87,9 @@ ever in one.
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/architecture/level-0-request-path-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="assets/architecture/level-0-request-path-light.svg">
-    <img width="1000" src="assets/architecture/level-0-request-path-light.svg"
+    <source media="(prefers-color-scheme: dark)" srcset="assets/architecture/governed-investigation-flow-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/architecture/governed-investigation-flow-light.svg">
+    <img width="1000" src="assets/architecture/governed-investigation-flow-light.svg"
          alt="Bastion's production request path: Pub/Sub to Eventarc to a Cloud Run durable ingress, which invokes the managed Agent Runtime; all egress leaves through the Agent Gateway under IAP and a Registry allowlist to two protected A2A workers."/>
   </picture>
 </p>
@@ -114,6 +119,13 @@ python -m pip install -r requirements-dev.txt
 # The offline gate — no cloud credentials, no network, no project required.
 pytest tests --cov --cov-report=term-missing --cov-fail-under=100
 ```
+
+`py -3.12` resolves only a CPython registered with the Windows launcher, which the python.org
+installer does and uv, pyenv-win, conda and the Microsoft Store do not. If `py -0p` does not list
+3.12, call that interpreter by its own path instead — `& "C:\path\to\python3.12.exe" -m venv .venv`
+— or on macOS and Linux use `python3.12 -m venv .venv`. Any CPython 3.12 works; the launcher is a
+convenience, not a requirement. The gate above is verified from a fresh public clone in
+[10-reproducibility.md](submission/planning/10-reproducibility.md).
 
 That runs the unit, integration, security and load suites against the real agent graph with the
 cloud seams faked at their boundaries. To point it at a live project instead:
@@ -280,23 +292,23 @@ reasoning is recorded in [ADR-003](docs/adr/003-pillars-on-geap.md) rather than 
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/architecture/level-1-context-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="assets/architecture/level-1-context-light.svg">
-    <img width="1000" src="assets/architecture/level-1-context-light.svg"
-         alt="Bastion context architecture: durable event ingress invokes a managed governed agent fleet that reads live IAM and creates minimized human review records."/>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/architecture/enterprise-fleet-overview-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/architecture/enterprise-fleet-overview-light.svg">
+    <img width="1000" src="assets/architecture/enterprise-fleet-overview-light.svg"
+         alt="Bastion enterprise fleet overview: catalogued agents maintain durable context, inspect governed production data, and route minimized findings across departments."/>
   </picture>
 </p>
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/architecture/level-2-container-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="assets/architecture/level-2-container-light.svg">
-    <img width="1000" src="assets/architecture/level-2-container-light.svg"
-         alt="Bastion container architecture: Agent Runtime and Agent Identity traverse Agent Gateway and Registry to two protected A2A worker services."/>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/architecture/enterprise-fleet-architecture-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/architecture/enterprise-fleet-architecture-light.svg">
+    <img width="1000" src="assets/architecture/enterprise-fleet-architecture-light.svg"
+         alt="Bastion enterprise fleet architecture: three catalogued agents use durable context, authenticated A2A routing, isolated identities, Model Armor, and payload-free audit to inspect production IAM safely."/>
   </picture>
 </p>
 
-All three levels are generated from one reviewed master each by `scripts/render_diagrams.py`,
+All three diagrams are generated from one reviewed master each by `scripts/render_diagrams.py`,
 which emits the light and dark variants and an animated GIF. The masters are gated: every
 resource count in every diagram must equal the live capture, retired deployment claims are
 blocked, and no animated packet may cross a component it is not entering or leaving. A diagram

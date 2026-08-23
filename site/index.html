@@ -30,7 +30,7 @@
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header" data-header>
-      <a class="brand" href="#top" aria-label="Bastion home">
+      <a class="brand" href="/" aria-label="Bastion home">
         <svg class="brand-mark" viewBox="0 0 40 44" role="img" aria-hidden="true">
           <path d="M20 1 38 8v13c0 13-9 20-18 23C11 41 2 34 2 21V8Z" />
           <path d="m12 21 5 5 11-12" />
@@ -139,7 +139,7 @@
             <ul class="capability-list">
               <li>Firestore leases and retries</li>
               <li>Registry + Gateway egress</li>
-              <li>Deterministic policy gate</li>
+              <li>Deterministic policy and completion gates</li>
             </ul>
           </article>
           <article class="agent-card agent-card-cyan">
@@ -155,7 +155,7 @@
           <article class="agent-card agent-card-amber">
             <div class="agent-card-top"><span>03</span><span class="agent-state">NO IAM READ</span></div>
             <h3>Escalation</h3>
-            <p>Receives only minimized routed findings and creates private human-review records.</p>
+            <p>A deterministic worker, not a model: delivers minimized routed findings to private human-review records with no model in the path.</p>
             <ul class="capability-list">
               <li>Department allowlist</li>
               <li>Idempotent review key</li>
@@ -179,17 +179,17 @@
           <figure class="architecture-figure">
             <img
               data-theme-asset
-              data-light-gif="/assets/architecture/level-0-request-path-light.gif"
-              data-dark-gif="/assets/architecture/level-0-request-path-dark.gif"
-              data-light-static="/assets/architecture/level-0-request-path-light.svg"
-              data-dark-static="/assets/architecture/level-0-request-path-dark.svg"
-              src="/assets/architecture/level-0-request-path-dark.svg"
+              data-light-gif="/assets/architecture/governed-investigation-flow-light.gif"
+              data-dark-gif="/assets/architecture/governed-investigation-flow-dark.gif"
+              data-light-static="/assets/architecture/governed-investigation-flow-light.svg"
+              data-dark-static="/assets/architecture/governed-investigation-flow-dark.svg"
+              src="/assets/architecture/governed-investigation-flow-dark.svg"
               alt="The reviewed production request path from Pub/Sub and Eventarc through durable ingress, managed Runtime and Gateway to the read-only Auditor and no-IAM-read Escalation agent."
               width="1920"
               height="1080"
             >
             <figcaption>
-              Level 0 production request path · generated from the reviewed repository master
+              Governed investigation flow · generated from the reviewed repository master
             </figcaption>
           </figure>
 
@@ -349,7 +349,7 @@
     <footer class="site-footer">
       <div class="section-shell footer-layout">
         <div>
-          <a class="brand footer-brand" href="#top">
+          <a class="brand footer-brand" href="/">
             <svg class="brand-mark" viewBox="0 0 40 44" aria-hidden="true">
               <path d="M20 1 38 8v13c0 13-9 20-18 23C11 41 2 34 2 21V8Z" />
               <path d="m12 21 5 5 11-12" />

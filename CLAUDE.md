@@ -127,7 +127,17 @@ irreversible.
 ## Documentation and visuals
 
 Claims must distinguish implemented, deployed, observed, configured, and not claimed. Update every
-affected Markdown file, evidence record, diagram text, and count in the same change.
+affected Markdown file, evidence record, diagram text, and count in the same change — **and
+`site/`**. The public evidence console at
+[bastion.arjunganesh.dev](https://bastion.arjunganesh.dev/) makes the same architecture and fleet
+claims in `site/index.html` and `site/data/site-content.json` as the Markdown does, and it is easy
+to forget precisely because it deploys separately (Vercel, not this repository's own CI/CD).
+Observed 2026-08-23: a full doc sweep after the P0.1–P0.3 rewrite caught two stale site claims
+(the Escalation card still read as model-driven; the Orchestrator card named only one gate) that
+would otherwise have shipped unnoticed. Before any tag that changes agent count, agent
+determinism, the request-path sequence, or a pillar's status, check `site/index.html` and
+`site/data/site-content.json` against the same claim, then run `node site/build.mjs` and
+`python scripts/check_site.py`.
 
 `assets/architecture/gcp-state.json` is generated from live GCP and contains counts only. Never
 hand-edit it. Architecture/16:9 SVG masters generate theme variants and GIFs with

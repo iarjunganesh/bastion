@@ -8,9 +8,9 @@ or workload can silently widen access.
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture/level-0-request-path-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="../assets/architecture/level-0-request-path-light.svg">
-    <img width="1000" src="../assets/architecture/level-0-request-path-light.svg"
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture/governed-investigation-flow-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../assets/architecture/governed-investigation-flow-light.svg">
+    <img width="1000" src="../assets/architecture/governed-investigation-flow-light.svg"
          alt="Bastion's production request path: Pub/Sub to Eventarc to a Cloud Run durable ingress, which invokes the managed Agent Runtime; all egress leaves through the Agent Gateway under IAP and a Registry allowlist to two protected A2A workers."/>
   </picture>
 </p>
@@ -35,9 +35,9 @@ agent action is invoking the managed Runtime identified in deployment configurat
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture/level-1-context-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="../assets/architecture/level-1-context-light.svg">
-    <img width="1000" src="../assets/architecture/level-1-context-light.svg" alt="Bastion governed agent fleet system context."/>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture/enterprise-fleet-overview-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../assets/architecture/enterprise-fleet-overview-light.svg">
+    <img width="1000" src="../assets/architecture/enterprise-fleet-overview-light.svg" alt="Bastion enterprise fleet overview: catalogued agents, durable context, cross-department routing, and governed production data."/>
   </picture>
 </p>
 
@@ -45,9 +45,9 @@ agent action is invoking the managed Runtime identified in deployment configurat
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture/level-2-container-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="../assets/architecture/level-2-container-light.svg">
-    <img width="1000" src="../assets/architecture/level-2-container-light.svg" alt="Bastion container and managed-service architecture."/>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture/enterprise-fleet-architecture-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../assets/architecture/enterprise-fleet-architecture-light.svg">
+    <img width="1000" src="../assets/architecture/enterprise-fleet-architecture-light.svg" alt="Bastion enterprise fleet architecture and managed-service trust boundaries."/>
   </picture>
 </p>
 

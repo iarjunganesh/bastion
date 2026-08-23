@@ -371,10 +371,10 @@ week one, pick idea and track by **Aug 7**, sketch architecture by **Aug 10**, b
 a required submission item**.
 
 Bastion is behind that suggested timeline: development started Aug 13 rather than Aug 10. The
-artifact the update names — an architecture image, not ASCII — now **exists**: Level 1 and
-Level 2 are hand-authored 1920×1080 SVGs with light and dark variants and an animated GIF of
-each, and Level 3 stays inline mermaid. Every one of them states its own build state in its own
-text, and `scripts/check_docs.py` fails the build if one does not.
+artifact the update names — an architecture image, not ASCII — now **exists**: the
+enterprise-fleet architecture, fleet overview, and governed-investigation flow are hand-authored
+1920×1080 SVG masters with light/dark variants and an animated GIF of each. Their semantic names
+replace internal level numbers, and `scripts/check_docs.py` validates their measured build state.
 
 That disclosure requirement is why they can exist while nothing is deployed. An earlier
 rendered diagram was deleted for showing Firestore, Cloud Run services, Pub/Sub topics and a
