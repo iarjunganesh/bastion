@@ -151,17 +151,21 @@ def test_the_root_agent_is_a_sequential_adk_agent():
 def test_the_fleet_is_three_agents_in_order():
     """ADR-002 fixes the count; the order is the investigation.
 
-    `policy_gate` is a deterministic step, not a fourth agent: it has no model, no instruction
-    and no tools. It sits between the policy step and escalation because that is the only place
-    it can stop an un-scored finding from reaching a human.
+    `policy_gate` and `escalation_gate` are deterministic steps, not a fourth and fifth agent:
+    neither has a model, an instruction, or tools. `policy_gate` sits between the policy step
+    and escalation because that is the only place it can stop an un-scored finding from
+    reaching a human; `escalation_gate` sits after escalation because that is the only place it
+    can refuse to call an investigation complete without confirming delivery (P0.3).
     """
     assert [a.name for a in orchestrator.root_agent.sub_agents] == [
         "access_auditor",
         "policy_step",
         "policy_gate",
         "escalation_agent",
+        "escalation_gate",
     ]
     assert not isinstance(orchestrator.policy_gate, LlmAgent)
+    assert not isinstance(orchestrator.escalation_gate, LlmAgent)
 
 
 def test_the_policy_step_scores_and_routes_without_a_model():
@@ -241,7 +245,11 @@ def test_every_model_facing_agent_is_screened():
             # The policy gate never reaches Gemini, so there is nothing to screen in front of.
             continue
         assert sub.before_model_callback is screen_before_model, sub.name
-        assert sub.after_model_callback is screen_after_model, sub.name
+        # The Access Auditor chains a second callback after Armor (P0.1's fidelity check), so
+        # this accepts either the bare callback or a list that contains it.
+        after = sub.after_model_callback
+        after = after if isinstance(after, list) else [after]
+        assert screen_after_model in after, sub.name
 
 
 def test_the_auditor_instruction_forbids_rescoring():
@@ -284,19 +292,20 @@ def test_local_topology_composes_the_peers_in_process(monkeypatch):
     from agents.access_auditor.agent import access_auditor
     from agents.escalation_agent.agent import escalation_agent
 
-    auditor, policy, gate, escalation = orchestrator.build_sub_agents()
+    auditor, policy, gate, escalation, escalation_gate = orchestrator.build_sub_agents()
 
     assert auditor is access_auditor
     assert policy is orchestrator.policy_step
     assert escalation is escalation_agent
     assert gate is orchestrator.policy_gate
+    assert escalation_gate is orchestrator.escalation_gate
 
 
 def test_remote_topology_replaces_the_peers(monkeypatch):
     monkeypatch.setenv(orchestrator.AUDITOR_CARD_VAR, "https://auditor.a.run.app")
     monkeypatch.setenv(orchestrator.ESCALATION_CARD_VAR, "https://escalation.a.run.app")
 
-    auditor, policy, gate, escalation = orchestrator.build_sub_agents()
+    auditor, policy, gate, escalation, escalation_gate = orchestrator.build_sub_agents()
 
     assert isinstance(auditor, RemoteA2aAgent)
     assert isinstance(escalation, RemoteA2aAgent)
@@ -305,9 +314,10 @@ def test_remote_topology_replaces_the_peers(monkeypatch):
     assert policy is orchestrator.policy_step
     # Names are preserved across the transport change, so a trace reads the same either way.
     assert [auditor.name, escalation.name] == ["access_auditor", "escalation_agent"]
-    # The gate is local in both topologies: a guard that travels over A2A is one the
+    # Both gates are local in both topologies: a guard that travels over A2A is one the
     # caller must trust the callee to run.
     assert gate is orchestrator.policy_gate
+    assert escalation_gate is orchestrator.escalation_gate
 
 
 @pytest.mark.parametrize(
@@ -514,3 +524,157 @@ def test_a_suppressed_finding_is_absent_from_what_crosses_to_escalation(monkeypa
     assert "opaque-user:a@x.com" not in json.dumps(carried)
     delta = event.actions.state_delta[orchestrator.POLICY_DECISIONS_KEY]
     assert delta["suppress_count"] == 1
+
+
+# --- P0.3: the gate that confirms escalation actually delivered what was routed --------------
+
+
+def _routed_department(department: str, count: int = 1) -> dict:
+    return {"department": department, "finding_count": count}
+
+
+def _receipt(department: str, count: int = 1, outcome: str = "delivered") -> dict:
+    return {"department": department, "accepted_count": count, "outcome": outcome}
+
+
+def test_completion_mismatch_accepts_a_faithful_confirmation():
+    expected = [_routed_department("data-platform"), _routed_department("ml-engineering")]
+    receipts = {"receipts": [_receipt("data-platform"), _receipt("ml-engineering")]}
+    assert orchestrator._completion_mismatch(expected, receipts) is None
+
+
+def test_completion_mismatch_accepts_zero_routed_departments():
+    assert orchestrator._completion_mismatch([], {"receipts": []}) is None
+
+
+@pytest.mark.parametrize(
+    "receipts",
+    [None, "not-json", {"receipts": "not-a-list"}],
+    ids=["absent", "wrong-shape", "receipts-not-a-list"],
+)
+def test_completion_mismatch_rejects_missing_receipts(receipts):
+    assert (
+        orchestrator._completion_mismatch([_routed_department("data-platform")], receipts)
+        == "missing_receipts"
+    )
+
+
+def test_completion_mismatch_rejects_a_malformed_receipt():
+    expected = [_routed_department("data-platform")]
+    assert (
+        orchestrator._completion_mismatch(expected, {"receipts": ["not-a-dict"]})
+        == "malformed_receipt"
+    )
+
+
+def test_completion_mismatch_rejects_a_duplicate_receipt():
+    expected = [_routed_department("data-platform")]
+    receipts = {"receipts": [_receipt("data-platform"), _receipt("data-platform")]}
+    assert orchestrator._completion_mismatch(expected, receipts) == "duplicate_receipt"
+
+
+def test_completion_mismatch_rejects_an_unexpected_receipt():
+    expected = [_routed_department("data-platform")]
+    receipts = {"receipts": [_receipt("data-platform"), _receipt("ml-engineering")]}
+    assert orchestrator._completion_mismatch(expected, receipts) == "unexpected_receipt"
+
+
+def test_completion_mismatch_rejects_an_undelivered_receipt():
+    expected = [_routed_department("data-platform")]
+    receipts = {"receipts": [_receipt("data-platform", outcome="skipped")]}
+    assert orchestrator._completion_mismatch(expected, receipts) == "undelivered_receipt"
+
+
+def test_completion_mismatch_rejects_a_count_mismatch():
+    expected = [_routed_department("data-platform", count=2)]
+    receipts = {"receipts": [_receipt("data-platform", count=1)]}
+    assert orchestrator._completion_mismatch(expected, receipts) == "accepted_count_mismatch"
+
+
+def test_completion_mismatch_rejects_a_missing_receipt():
+    expected = [_routed_department("data-platform"), _routed_department("ml-engineering")]
+    receipts = {"receipts": [_receipt("data-platform")]}
+    assert orchestrator._completion_mismatch(expected, receipts) == "missing_receipt"
+
+
+def test_escalation_receipts_are_read_from_the_a2a_reply():
+    receipts = {"receipts": [_receipt("data-platform")]}
+    ctx = _a2a_ctx([_reply("escalation_agent", json.dumps(receipts))])
+    assert orchestrator._escalation_receipts(ctx) == receipts
+
+
+def test_escalation_receipts_ignore_other_authors_and_unparseable_text():
+    ctx = _a2a_ctx(
+        [_reply("access_auditor", '{"receipts": []}'), _reply("escalation_agent", "not json")]
+    )
+    assert orchestrator._escalation_receipts(ctx) is None
+
+
+def test_escalation_receipts_skip_empty_parts_before_the_real_one():
+    receipts = {"receipts": [_receipt("data-platform")]}
+    event = _reply("escalation_agent", None, json.dumps(receipts))
+    assert orchestrator._escalation_receipts(_a2a_ctx([event])) == receipts
+
+
+def test_escalation_receipts_are_none_when_no_reply_arrived():
+    assert orchestrator._escalation_receipts(_a2a_ctx([])) is None
+
+
+def test_the_escalation_gate_passes_when_delivery_is_confirmed():
+    import asyncio
+
+    routing = {"departments": [_routed_department("data-platform")]}
+    receipts = {"receipts": [_receipt("data-platform")]}
+    ctx = _a2a_ctx(
+        [_reply("escalation_agent", json.dumps(receipts))],
+        state={orchestrator.POLICY_ROUTING_KEY: routing},
+    )
+    (event,) = asyncio.run(_drain(orchestrator.escalation_gate, ctx))
+    assert event.actions.state_delta == {"escalation_confirmed": True}
+
+
+def test_the_escalation_gate_passes_on_a_genuinely_clean_run():
+    import asyncio
+
+    routing = {"departments": []}
+    receipts = {"receipts": []}
+    ctx = _a2a_ctx(
+        [_reply("escalation_agent", json.dumps(receipts))],
+        state={orchestrator.POLICY_ROUTING_KEY: routing},
+    )
+    (event,) = asyncio.run(_drain(orchestrator.escalation_gate, ctx))
+    assert event.actions.state_delta == {"escalation_confirmed": True}
+
+
+def test_the_escalation_gate_refuses_an_unconfirmed_delivery():
+    import asyncio
+
+    routing = {
+        "departments": [_routed_department("data-platform"), _routed_department("ml-engineering")]
+    }
+    receipts = {"receipts": [_receipt("data-platform")]}
+    ctx = _a2a_ctx(
+        [_reply("escalation_agent", json.dumps(receipts))],
+        state={orchestrator.POLICY_ROUTING_KEY: routing},
+    )
+    with pytest.raises(orchestrator.EscalationNotConfirmedError, match="missing_receipt"):
+        asyncio.run(_drain(orchestrator.escalation_gate, ctx))
+
+
+def test_the_escalation_gate_refuses_when_no_reply_arrived():
+    """An untrusted peer's silence is not confirmation, the same as a missing policy step."""
+    import asyncio
+
+    routing = {"departments": [_routed_department("data-platform")]}
+    ctx = _a2a_ctx([], state={orchestrator.POLICY_ROUTING_KEY: routing})
+    with pytest.raises(orchestrator.EscalationNotConfirmedError, match="missing_receipts"):
+        asyncio.run(_drain(orchestrator.escalation_gate, ctx))
+
+
+def test_the_escalation_gate_treats_a_missing_routing_state_as_no_expected_departments():
+    """Defensive: a missing `policy_routing` yields an empty `expected` rather than a crash."""
+    import asyncio
+
+    ctx = _a2a_ctx([_reply("escalation_agent", '{"receipts": []}')], state={})
+    (event,) = asyncio.run(_drain(orchestrator.escalation_gate, ctx))
+    assert event.actions.state_delta == {"escalation_confirmed": True}

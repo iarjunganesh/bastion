@@ -4,6 +4,33 @@ Bastion is a governed institutional-agent fleet for event-driven GCP IAM review.
 durable delivery, agent reasoning, production reads, and human-review writes so no single model
 or workload can silently widen access.
 
+## Request path
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture/level-0-request-path-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="../assets/architecture/level-0-request-path-light.svg">
+    <img width="1000" src="../assets/architecture/level-0-request-path-light.svg"
+         alt="Bastion's production request path: Pub/Sub to Eventarc to a Cloud Run durable ingress, which invokes the managed Agent Runtime; all egress leaves through the Agent Gateway under IAP and a Registry allowlist to two protected A2A workers."/>
+  </picture>
+</p>
+
+```text
+Pub/Sub bastion-investigations
+  -> Eventarc + dedicated OIDC delivery identity
+  -> private Cloud Run durable ingress
+       Firestore admission / lease / attempts / terminal state
+  -> identity-bearing Agent Runtime Orchestrator
+  -> Agent-to-Anywhere Gateway + default-deny IAP + Registry allowlist
+       -> Access Auditor A2A worker -> read-only IAM / Asset / Recommender
+       -> Escalation A2A worker -> IAM-private findings API
+  -> Cloud Logging audit sink -> 365-day europe-west4 analytics bucket
+```
+
+The production dispatcher has no local graph fallback. It does not hold the A2A origin secret,
+cannot invoke worker services directly, and has no Model Armor or Pub/Sub publisher role. Its one
+agent action is invoking the managed Runtime identified in deployment configuration.
+
 ## System context
 
 <p align="center">
@@ -24,22 +51,6 @@ or workload can silently widen access.
   </picture>
 </p>
 
-```text
-Pub/Sub bastion-investigations
-  -> Eventarc + dedicated OIDC delivery identity
-  -> private Cloud Run durable ingress
-       Firestore admission / lease / attempts / terminal state
-  -> identity-bearing Agent Runtime Orchestrator
-  -> Agent-to-Anywhere Gateway + default-deny IAP + Registry allowlist
-       -> Access Auditor A2A worker -> read-only IAM / Asset / Recommender
-       -> Escalation A2A worker -> IAM-private findings API
-  -> Cloud Logging audit sink -> 365-day europe-west4 analytics bucket
-```
-
-The production dispatcher has no local graph fallback. It does not hold the A2A origin secret,
-cannot invoke worker services directly, and has no Model Armor or Pub/Sub publisher role. Its one
-agent action is invoking the managed Runtime identified in deployment configuration.
-
 ## Agent responsibilities
 
 ### Orchestrator
@@ -48,19 +59,23 @@ The Orchestrator is deployed to managed Agent Runtime with an Agent Identity. A 
 sequential workflow owns policy validation and transfers already-minimized state between the two
 workers. It can use only destinations catalogued in Agent Registry and admitted by Gateway IAP.
 
-The sequence is `access_auditor -> policy_step -> policy_gate -> escalation_agent`. Two of those
-four steps hold no model. `policy_step` applies the risk threshold and the department catalog by
-calling them directly, so a language model never sits between the Auditor's deterministic output
-and the deterministic decision made from it — it cannot skip the threshold, and it cannot retype
-a finding's opaque id, category, or score on the way past
+The sequence is
+`access_auditor -> policy_step -> policy_gate -> escalation_agent -> escalation_gate`. Three of
+those five steps hold no model at all. `policy_step` applies the risk threshold and the
+department catalog by calling them directly, so a language model never sits between the
+Auditor's deterministic output and the deterministic decision made from it — it cannot skip the
+threshold, and it cannot retype a finding's opaque id, category, or score on the way past
 ([ADR-010](adr/010-policy-enforcement-gate.md),
 [ADR-012](adr/012-structured-findings-across-a2a.md)). `policy_gate` then refuses to continue
 unless `policy_step` left its own result in session state, so an investigation that failed to
-score its findings fails visibly instead of escalating them un-evaluated.
+score its findings fails visibly instead of escalating them un-evaluated. The Escalation Agent
+itself is model-free too (below), and `escalation_gate` refuses to report an investigation
+complete unless every routed department's delivery was confirmed by the Escalation Agent's own
+reply — the same fail-closed shape one hop later.
 
-The gate lives here rather than inside the Escalation Agent because the Escalation Agent is
-remote. A guard that travels over A2A is a guard the caller must trust the callee to run, which
-is not a trust boundary this design has anywhere else.
+Both gates live in the Orchestrator rather than inside the workers they check, because both
+workers are remote. A guard that travels over A2A is a guard the caller must trust the callee to
+run, which is not a trust boundary this design has anywhere else.
 
 ### Access Auditor
 
@@ -71,9 +86,12 @@ tool boundary.
 
 ### Escalation Agent
 
-The Escalation Agent sees only opaque identifiers, categories, score, and department. Its sole
-side-effect tool accepts a fixed schema and sends count-only human-review records to a Bastion-
-owned findings API. It has no IAM or Asset read capability.
+The Escalation Agent is a deterministic worker, not a model: it parses the Orchestrator's
+validated routing envelope and calls the fixed-schema delivery function directly for every
+routed department, with no model or tool declaration in the path to skip one, pick another, or
+answer without the required call ([ADR-012](adr/012-structured-findings-across-a2a.md)). It sees
+only opaque identifiers, categories, score, and department, and sends count-only human-review
+records to a Bastion-owned findings API. It has no IAM or Asset read capability.
 
 ## Catalog and cross-department reuse
 
@@ -130,7 +148,8 @@ Firestore preserves the operational state required for replay and crash recovery
 approved exception is keyed by opaque finding ID and has an explicit `approved_until` expiry;
 the deterministic policy suppresses the same finding while the exception is current and restores
 it after expiry. A live exception approved on 2026-08-19 suppressed its matching finding on
-2026-08-22 across deployments and restarts ([evidence 10](../assets/evidence/10-cross-week-suppression.md)).
+2026-08-22 across deployments and restarts, re-confirmed 2026-08-23 after the
+deterministic-delivery rewrite ([evidence 10](../assets/evidence/10-cross-week-suppression.md)).
 The observed gap is three days, not a literal week; expiry firing remains test-only.
 
 ## Model and data boundary

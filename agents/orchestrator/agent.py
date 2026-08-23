@@ -45,6 +45,7 @@ POLICY_DECISIONS_KEY = "policy_decisions"
 POLICY_ROUTING_KEY = "policy_routing"
 AUDIT_FINDINGS_KEY = "audit_findings"
 AUDITOR_AGENT_NAME = "access_auditor"
+ESCALATION_AGENT_NAME = "escalation_agent"
 FIRESTORE_MEMORY_BACKEND = "firestore"
 MEMORY_BACKEND_VAR = "BASTION_DURABLE_STORE_BACKEND"
 
@@ -268,6 +269,96 @@ def _findings_of(report: Any) -> list[dict[str, Any]]:
     return [f.model_dump() if isinstance(f, BaseModel) else f for f in findings]
 
 
+class EscalationNotConfirmedError(RuntimeError):
+    """Raised when the Escalation Agent's receipts do not confirm the routed delivery.
+
+    The message is one of a small, bounded set of reason codes — never a department, a finding
+    id, or anything else a receipt carried — so it is safe to both raise and, eventually, audit.
+    """
+
+
+def _escalation_receipts(ctx: InvocationContext) -> Any:
+    """The Escalation Agent's receipts, from its A2A reply — content, never state (P0.3).
+
+    Unlike `_audit_report`, there is no state-first path to try: `EscalationAgent` deliberately
+    never writes a receipts state key (its own docstring explains why), so content is not a
+    fallback here, it is the only channel. Scanned the same way regardless of topology, because
+    `ctx.session.events` accumulates every step's events whether that step ran in this process
+    or arrived as an A2A reply authored under the remote agent's own name.
+    """
+    for event in reversed(list(getattr(ctx.session, "events", None) or [])):
+        if getattr(event, "author", None) != ESCALATION_AGENT_NAME:
+            continue
+        for part in getattr(getattr(event, "content", None), "parts", None) or []:
+            text = getattr(part, "text", None)
+            if not text:
+                continue
+            try:
+                return json.loads(text)
+            except ValueError:
+                continue
+    return None
+
+
+def _completion_mismatch(expected: list[Any], receipts: Any) -> str | None:
+    """A bounded reason the receipts do not confirm `expected` was delivered, or `None`."""
+    if not isinstance(receipts, dict) or not isinstance(receipts.get("receipts"), list):
+        return "missing_receipts"
+
+    expected_counts = {
+        entry["department"]: entry.get("finding_count")
+        for entry in expected
+        if isinstance(entry, dict) and "department" in entry
+    }
+
+    seen: set[Any] = set()
+    for receipt in receipts["receipts"]:
+        if not isinstance(receipt, dict):
+            return "malformed_receipt"
+        department_id = receipt.get("department")
+        if department_id in seen:
+            return "duplicate_receipt"
+        seen.add(department_id)
+        if department_id not in expected_counts:
+            return "unexpected_receipt"
+        if receipt.get("outcome") != "delivered":
+            return "undelivered_receipt"
+        if receipt.get("accepted_count") != expected_counts[department_id]:
+            return "accepted_count_mismatch"
+
+    if seen != set(expected_counts):
+        return "missing_receipt"
+    return None
+
+
+class EscalationCompletionGate(BaseAgent):
+    """Refuse to report an investigation complete unless every routed department was confirmed.
+
+    `policy_gate` closed the failure where a skipped step let the sequence continue silently
+    (ADR-010). This closes the same class of gap one hop later: `EscalationAgent` already fails
+    its own A2A task atomically on a bad delivery (P0.2), but nothing before this checked that a
+    *successful-looking* remote task actually confirmed the department set `policy_step` routed
+    — an untrusted peer's reply is exactly the kind of value that channel has carried a poisoned
+    payload through before (D6, D8, ADK issue google/adk-python#6854).
+
+    Zero routed departments is a real, complete outcome: `expected` and the receipts list are
+    both empty, and `_completion_mismatch` returns `None` for that pair the same way it does for
+    a genuinely confirmed non-empty delivery.
+    """
+
+    async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
+        routing = ctx.session.state.get(POLICY_ROUTING_KEY)
+        expected = routing.get("departments", []) if isinstance(routing, dict) else []
+        reason = _completion_mismatch(expected, _escalation_receipts(ctx))
+        if reason is not None:
+            raise EscalationNotConfirmedError(reason)
+        yield Event(
+            author=self.name,
+            invocation_id=ctx.invocation_id,
+            actions=EventActions(state_delta={"escalation_confirmed": True}),
+        )
+
+
 policy_step = PolicyStep(
     name="policy_step",
     description="Applies the deterministic risk threshold and routes findings to their owners.",
@@ -277,6 +368,12 @@ policy_step = PolicyStep(
 policy_gate = PolicyEnforcementGate(
     name="policy_gate",
     description="Fails the investigation closed when the policy rules did not run.",
+)
+
+
+escalation_gate = EscalationCompletionGate(
+    name="escalation_gate",
+    description="Fails the investigation closed unless every routed department was confirmed.",
 )
 
 
@@ -363,6 +460,7 @@ def build_sub_agents() -> list[Any]:
                 httpx_client=private_a2a_client(escalation),
                 a2a_request_meta_provider=_forward_investigation,
             ),
+            escalation_gate,
         ]
 
     # Imported here rather than at module scope, for two reasons that happen to coincide.
@@ -378,10 +476,10 @@ def build_sub_agents() -> list[Any]:
     from agents.access_auditor.agent import access_auditor
     from agents.escalation_agent.agent import escalation_agent
 
-    return [access_auditor, policy_step, policy_gate, escalation_agent]
+    return [access_auditor, policy_step, policy_gate, escalation_agent, escalation_gate]
 
 
-# Audit -> apply policy -> gate -> escalate.
+# Audit -> apply policy -> gate -> escalate -> confirm.
 #
 # **How a step reads its predecessor depends on the transport, and assuming otherwise cost two
 # production defects.** In-process, `output_key` puts the previous step's result in the shared
@@ -395,7 +493,11 @@ def build_sub_agents() -> list[Any]:
 #
 # The gate is a step rather than a check inside the Escalation Agent because the Escalation
 # Agent is remote: a guard that travels over A2A is a guard the caller has to trust the callee
-# to run. Keeping it in the Orchestrator keeps policy enforcement where ADR-002 put it.
+# to run. Keeping it in the Orchestrator keeps policy enforcement where ADR-002 put it. The same
+# reasoning places `escalation_gate` after the Escalation Agent rather than inside it (P0.3):
+# the Escalation Agent already fails its own task atomically on a bad delivery, but confirming
+# that a *successful-looking* reply actually named every routed department is a check on an
+# untrusted peer's answer, which belongs with the caller that has to trust it.
 #
 # The *sequence* is the same either way, which is the point of using `RemoteA2aAgent` rather
 # than two code paths: the order a judge sees in a trace is the order a local run produces.
@@ -404,8 +506,8 @@ root_agent = SequentialAgent(
     name="orchestrator",
     description=(
         "Runs one Bastion access-review investigation: audit the live IAM policy, apply the "
-        "policy rules, route each finding to the department that owns the principal, and "
-        "escalate to those teams."
+        "policy rules, route each finding to the department that owns the principal, escalate "
+        "to those teams, and confirm every routed department was delivered."
     ),
     sub_agents=build_sub_agents(),
 )

@@ -17,16 +17,22 @@ model thought so" — and it means the model never receives the raw policy docum
 from __future__ import annotations
 
 import hmac
+import json
 import os
 from functools import lru_cache
 from hashlib import sha256
 from typing import Any, Literal, TypedDict
 
 from google.adk.agents import LlmAgent
+from google.adk.agents.callback_context import CallbackContext
+from google.adk.models.llm_response import LlmResponse
+from google.adk.tools.base_tool import BaseTool
+from google.adk.tools.tool_context import ToolContext
 from google.cloud import asset_v1
 from pydantic import BaseModel, Field
 
 from model_armor.guardrails import screen_after_model, screen_before_model
+from observability.audit import _investigation, _invocation, record
 from registry.departments import resolve_owning_department
 
 
@@ -82,6 +88,12 @@ OVERLY_BROAD_ROLES = {"roles/owner", "roles/editor"}
 # organisation scope would be a surprising amount of work for an agent turn.
 MAX_POLICY_RESULTS = 500
 FINDING_HMAC_KEY_VAR = "BASTION_FINDING_HMAC_KEY"
+
+# Where `persist_canonical_findings` records the tool's real answer, for
+# `validate_auditor_fidelity` to check the model's structured answer against. Own key, own
+# namespace: this is never the `output_key` the Orchestrator reads, and — because it is state
+# rather than event content — it cannot cross an A2A hop even by accident (ADR-012).
+CANONICAL_FINDINGS_KEY = "canonical_audit_findings"
 
 
 def project_id() -> str:
@@ -179,6 +191,118 @@ def audit_iam_policy() -> dict[str, Any]:
     return {"count": len(findings), "findings": findings}
 
 
+def persist_canonical_findings(
+    tool: BaseTool,
+    args: dict[str, Any],
+    tool_context: ToolContext,
+    tool_response: dict[str, Any],
+) -> None:
+    """Record `audit_iam_policy`'s real answer, before the model gets a chance to retype it.
+
+    An `after_tool_callback` rather than a change to the tool's own body: `audit_iam_policy`
+    keeps its zero-argument signature — the ADR-007 tool-poisoning control that lets
+    `test_audit_tool_takes_no_arguments` hold — while this still fires on every real call,
+    because ADK invokes tool callbacks from the same seam regardless of which tool ran.
+
+    Writing to `tool_context.state` rather than returning an altered response: this must not
+    change what the model sees, only give `validate_auditor_fidelity` something to check the
+    model's eventual answer against.
+    """
+    del args
+    if tool.name == "audit_iam_policy":
+        tool_context.state[CANONICAL_FINDINGS_KEY] = tool_response.get("findings", [])
+
+
+_FIDELITY_FIELDS = ("department", "reason", "risk_score")
+
+
+def _fidelity_mismatch(canonical: Any, reported: list[Any], reported_count: Any) -> str | None:
+    """A bounded reason the reported findings do not match the tool's, or `None` if they do."""
+    if canonical is None:
+        # The model answered without the tool ever having run in this turn — nothing to check
+        # fidelity against, which is exactly the shape a skipped audit would take.
+        return "missing_canonical"
+    try:
+        reported_ids = [finding["finding_id"] for finding in reported]
+        canonical_by_id = {finding["finding_id"]: finding for finding in canonical}
+        if len(set(reported_ids)) != len(reported_ids):
+            return "duplicate_finding_id"
+        if set(reported_ids) != set(canonical_by_id):
+            return "id_set_mismatch"
+        for finding in reported:
+            match = canonical_by_id[finding["finding_id"]]
+            if any(finding.get(field) != match.get(field) for field in _FIDELITY_FIELDS):
+                return "field_mismatch"
+        if reported_count != len(reported):
+            return "count_mismatch"
+    except (KeyError, TypeError, AttributeError):
+        return "malformed_finding"
+    return None
+
+
+class AuditorFidelityError(RuntimeError):
+    """Raised when the Auditor's structured answer does not match the tool's findings.
+
+    Every value the model was allowed to change — the `rationale` — is not checked here.
+    Everything else (`finding_id`, `department`, `reason`, `risk_score`) is the tool's
+    deterministic output copied back verbatim, or this is raised instead.
+    """
+
+
+def _final_answer_text(llm_response: LlmResponse) -> str | None:
+    """The model's own final text, or `None` for a tool-call turn with nothing to check yet."""
+    content = getattr(llm_response, "content", None)
+    parts = content.parts if content is not None else []
+    if any(getattr(part, "function_call", None) is not None for part in parts):
+        return None
+    texts = [part.text for part in parts if getattr(part, "text", None)]
+    return "\n".join(texts) if texts else None
+
+
+def validate_auditor_fidelity(
+    callback_context: CallbackContext, llm_response: LlmResponse
+) -> LlmResponse | None:
+    """ADK `after_model_callback`: reject a schema-valid answer the tool did not produce.
+
+    `AuditReport`'s schema constrains *shape* — a fabricated id cannot match the 24-hex
+    pattern, an invented reason cannot match the enumeration — but shape is not fidelity. A
+    model could still return a schema-valid report that drops a finding, adds a plausible one,
+    or nudges a score, and nothing before this compared the answer against what
+    `audit_iam_policy` actually found. This does, against the canonical list
+    `persist_canonical_findings` wrote to state during the same turn.
+
+    Runs after `screen_after_model` in the callback chain: a response Model Armor has already
+    replaced carries no findings to check, and a clean one is checked here. Raising — rather
+    than returning a refusal `LlmResponse` — fails the investigation the same way
+    `PolicyNotEnforcedError` does downstream: visibly and retryably, never as a silent empty
+    report.
+    """
+    text = _final_answer_text(llm_response)
+    if text is None:
+        return None
+    try:
+        data = json.loads(text)
+    except ValueError:
+        return None
+    if not isinstance(data, dict) or not isinstance(data.get("findings"), list):
+        return None
+
+    reason = _fidelity_mismatch(
+        callback_context.state.get(CANONICAL_FINDINGS_KEY), data["findings"], data.get("count")
+    )
+    if reason is None:
+        return None
+    record(
+        "auditor.fidelity",
+        outcome="rejected",
+        actor="access_auditor",
+        invocation_id=_invocation(callback_context),
+        investigation_id=_investigation(callback_context),
+        detail={"reason": reason},
+    )
+    raise AuditorFidelityError(reason)
+
+
 INSTRUCTION = """You are Bastion's Access Auditor.
 
 Call `audit_iam_policy` to read the live GCP IAM policy. It returns findings that were
@@ -205,7 +329,8 @@ access_auditor = LlmAgent(
     instruction=INSTRUCTION,
     tools=[audit_iam_policy],
     before_model_callback=screen_before_model,
-    after_model_callback=screen_after_model,
+    after_model_callback=[screen_after_model, validate_auditor_fidelity],
+    after_tool_callback=persist_canonical_findings,
     output_schema=AuditReport,
     output_key="audit_findings",
 )

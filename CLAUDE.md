@@ -12,7 +12,7 @@ As of 2026-08-22 the production path is deployed and verified: Pub/Sub/Eventarc 
 Firestore lifecycle, Agent Runtime/Identity, Memory Bank, Agent Gateway/IAP, Agent Registry, two
 protected Cloud Run A2A workers, Model Armor, an IAM-private findings API, and retained operations
 controls. The count-only capture records 21/21 APIs and 39 resources. The Python 3.12 suite has
-251 tests at 100% configured core statement and branch coverage.
+321 tests at 100% configured core statement and branch coverage.
 
 Read these before changing architecture or claims:
 
@@ -89,6 +89,23 @@ python -m infrastructure.rollback
 python -m infrastructure.teardown
 python scripts/capture_gcp_state.py --check
 ```
+
+**`infrastructure/deploy.sh` alone does not redeploy the Orchestrator's actual agent graph.**
+It only pushes the four Cloud Run services (findings API, Access Auditor, Escalation Agent, and
+the durable Eventarc ingress named "orchestrator"). The `SequentialAgent` in
+`agents/orchestrator/agent.py` runs on the managed Agent Runtime (a Vertex AI Reasoning Engine),
+a separate deployment surface updated only by `python -m infrastructure.deploy_agent_runtime`
+(idempotent against the existing `BASTION_RUNTIME_AGENT_ENGINE_ID`). Observed 2026-08-23: changing
+`build_sub_agents()` to add a fifth step and redeploying only via `deploy.sh` left the Runtime
+silently running the old four-step graph — no error, `investigation.run` still reported
+`completed`. After any change to `agents/orchestrator/agent.py` or `runtime.py`, run both:
+
+```powershell
+bash infrastructure/deploy.sh
+python -m infrastructure.deploy_agent_runtime
+```
+
+`bootstrap.ps1` already does both in the right order; this note is for a code-only redeploy.
 
 Rollback and teardown are dry-run-first. Never broaden targets, delete Firestore/secrets/audit
 state, or lock the audit bucket without explicit platform-owner direction. Bucket locking is

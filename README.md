@@ -172,10 +172,18 @@ boundary, in either direction, and nothing warns you** — `output_key` writes i
 of the agent that *declares* it, which is shared in-process and separate over A2A. Every local
 run and every CI job exercises the working topology, so the failure is invisible to an offline
 gate by construction, even at 100% configured core statement and branch coverage. Reported
-upstream as
-[google/adk-python#6854](https://github.com/google/adk-python/issues/6854) and fixed
-structurally in [ADR-012](docs/adr/012-structured-findings-across-a2a.md); the full ledger is
-the [observation backlog](submission/planning/09-capture-backlog.md).
+upstream with a production reproducer in
+[google/adk-python#6854](https://github.com/google/adk-python/issues/6854) (opened by Arjun
+Ganesh) and fixed structurally in
+[ADR-012](docs/adr/012-structured-findings-across-a2a.md); the full ledger is the
+[observation backlog](submission/planning/09-capture-backlog.md). Two upstream PRs address it,
+both open at the time of writing: community PR
+[google/adk-python#6859](https://github.com/google/adk-python/pull/6859) (Sylvester Kaczmarek)
+adds warnings for the outbound state-only-loss and rejected inbound remote-state-delta
+directions, and complementary PR
+[google/adk-python#6862](https://github.com/google/adk-python/pull/6862) (Arjun Ganesh) adds the
+adjacent construction-time warning for the `LlmAgent(output_key) -> RemoteA2aAgent` case that
+carries event content and isn't covered by the state-only warning.
 
 ## The fleet
 
@@ -206,11 +214,14 @@ Bastion does not ask a model to decide whether a permission is safe.
    a gate refuses to escalate anything that step did not score.
 5. Missing or invalid risk is rejected; it can never become a quiet clear.
 6. A current, human-approved exception may suppress the same opaque finding until expiry.
-7. Model Armor screens input — including tool results, not only prompts — and fails closed when
+7. The Escalation Agent is itself a model-free worker: it delivers to every routed department and
+   only those, and a second gate refuses to report the investigation complete unless that
+   delivery was confirmed.
+8. Model Armor screens input — including tool results, not only prompts — and fails closed when
    unavailable.
-8. A deterministic post-model screen blocks principal, role, resource, and PII shapes.
-9. The receiver accepts only an allowlisted department, categories, deterministic summary, and
-   SHA-256 idempotency key.
+9. A deterministic post-model screen blocks principal, role, resource, and PII shapes.
+10. The receiver accepts only an allowlisted department, categories, deterministic summary, and
+    SHA-256 idempotency key.
 
 `AuditPlugin` is registered at every supported Runner seam — never called from inside an agent,
 so there is no audit call site to forget or bypass. It records run, agent, model, and tool
@@ -238,8 +249,14 @@ The network scales on the axes that actually matter in an institution:
 | Axis | How it grows | Cost of growth |
 |---|---|---|
 | **Owning departments** | A row in the catalog with its principal patterns; routing picks it up with no code change | One catalog entry |
-| **Catalogued agents** | An Agent Card registered in the managed Registry and an approved Gateway destination | One registration; no orchestrator change |
 | **Throughput** | Bounded Cloud Run autoscaling behind durable Eventarc delivery, with leases, retry, and a five-attempt dead letter | Configuration |
+| **A new institutional agent** | A Registry Agent Card, an approved Gateway destination, an Agent Identity, **and** a deliberate change to `agents/orchestrator/agent.py`'s `SequentialAgent` to invoke it | Governance, not automatic discovery |
+
+The third axis is deliberately the expensive one. Nothing in `build_sub_agents()` discovers or
+invokes a newly registered agent on its own — a fourth agent requires the same review as the
+three that exist today: Registry, Gateway policy, and identity, plus code review of exactly what
+it can reach. That is the fixed trust boundary [ADR-007](docs/adr/007-tool-poisoning.md) depends
+on working as intended, not a scalability gap.
 
 The measured proof that the first axis is real rather than decorative is
 [evidence 09](assets/evidence/09-cross-department-routing.md): 52 live IAM bindings produced 3

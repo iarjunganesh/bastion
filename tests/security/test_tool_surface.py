@@ -28,16 +28,16 @@ from agents.orchestrator import agent as orchestrator
 # set in the agent module fails this test instead of silently redefining its own expectation.
 EXPECTED_TOOLS = {
     "access_auditor": {"audit_iam_policy"},
-    "escalation_agent": {"notify_human"},
 }
 
-# `policy_step` is deliberately absent: it declares no tools because it reaches no model. Scoring
-# and routing are called directly as Python, so there is no tool surface for a poisoned
-# instruction to talk it into widening — the strongest version of this control, not an exemption
-# from it. `test_the_policy_step_reaches_no_model` pins that.
+# `policy_step` and `escalation_agent` are deliberately absent: neither declares tools because
+# neither reaches a model. Scoring/routing (`policy_step`) and delivery (`escalation_agent`,
+# deterministic since P0.2) are both called directly as Python, so there is no tool surface for
+# a poisoned instruction to talk either into widening — the strongest version of this control,
+# not an exemption from it. `test_the_escalation_agent_holds_no_policy_reading_tool` and
+# `test_the_policy_step_reaches_no_model_and_so_declares_no_tools` pin that.
 AGENTS = {
     "access_auditor": auditor.access_auditor,
-    "escalation_agent": escalation.escalation_agent,
 }
 
 # Any attribute name on an agent module that would mean it can reach the IAM policy directly.
@@ -61,11 +61,14 @@ def test_each_agent_declares_exactly_its_fixed_tool_set(agent_name):
 def test_the_escalation_agent_holds_no_policy_reading_tool():
     """The distinct control of ADR-007: absence of a capability, not an instruction to avoid it.
 
-    A compromised prompt cannot call a tool that was never declared, which is why this is
-    asserted as set equality rather than as the absence of one known-bad name.
+    Since P0.2 this is the strongest form the control can take: the Escalation Agent is a
+    deterministic `BaseAgent` with no tool surface at all, not an `LlmAgent` a poisoned prompt
+    could talk into calling something it was never declared. Same class of guarantee as
+    `test_the_policy_step_reaches_no_model_and_so_declares_no_tools`.
     """
-    assert tool_names("escalation_agent") == {"notify_human"}
-    assert "audit_iam_policy" not in tool_names("escalation_agent")
+    assert not isinstance(escalation.escalation_agent, LlmAgent)
+    assert not hasattr(escalation.escalation_agent, "tools")
+    assert not hasattr(escalation.escalation_agent, "before_model_callback")
 
 
 def test_the_escalation_module_imports_no_iam_or_asset_client():

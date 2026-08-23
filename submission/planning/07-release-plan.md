@@ -50,14 +50,34 @@ verified—never a side effect of an engineering push. The existing decisions ar
 `v0.2.0` carrying the seven deployed-fleet defects found after it, and `v0.2.1` carrying the
 escalation hand-off fix.
 
-`v0.3.0` is the next candidate because changes after `v0.2.1` add a public evidence surface,
-keyless deployment, release-log redaction, a measured request-path visual, and new documentation
-and CI enforcement. A tag cannot contain uncommitted files. The release order is therefore:
+`v0.3.0` shipped the public evidence surface, keyless deployment, release-log redaction, a
+measured request-path visual, and new documentation and CI enforcement.
 
-1. commit the evidence-console source, safety gate, and documentation corrections;
-2. complete and observe the hosted evidence gate above;
-3. add the verified production URL, change the changelog heading from `Unreleased` to `0.3.0`,
-   and bump `pyproject.toml` to `0.3.0`;
-4. run every offline, live, version-upstream, rollback, teardown, and snapshot gate;
-5. commit and push the release metadata, then verify `main` CI green;
-6. create an annotated `v0.3.0` tag at that exact commit and push the tag separately.
+## v0.4.0 — deterministic delivery, deployed and re-verified
+
+Changes after `v0.3.0`: P0.1 (Auditor fidelity validator), P0.2 (deterministic Escalation Agent,
+replacing the `LlmAgent`), and P0.3 (`escalation_gate` completion confirmation) — the plan's own
+"only mandatory new code" for this phase. Deployed to `bastion-fleet-2026` (both the four Cloud
+Run services via `deploy.sh` **and** the managed Agent Runtime via
+`infrastructure.deploy_agent_runtime` — a two-part deployment surface this release discovered the
+hard way, see [ADR-012](../../docs/adr/012-structured-findings-across-a2a.md)'s 2026-08-23
+amendment) and confirmed on a real triggered investigation: `escalation_gate` passing, and the
+approved exception still correctly suppressing its finding. Also closed in the same tag:
+P0.4 (live re-verification), P0.5 (event-driven wording confirmed, no Scheduler added), P1.1
+(scalability wording), P1.2 (coverage-scope wording), and P1.4 (claim reconciliation across
+ADRs/ledgers) — plus a full sweep of every tracked Markdown file for staleness.
+
+1. commit the P0.1–P0.3 code, tests, and every reconciled document;
+2. run every offline, live, and version-upstream gate;
+3. change the changelog heading from `Unreleased` to `0.4.0` and bump `pyproject.toml`;
+4. commit and push the release metadata, then verify `main` CI green;
+5. create an annotated `v0.4.0` tag at that exact commit and push the tag separately.
+
+## v0.5.0 — reproducibility and submission prep (pre-media)
+
+Planned scope: P1.3 (an actual clean-clone reproducibility run), the final claim matrix (Section
+10 of the working plan), and drafted-but-not-published Devpost copy, technical article, and
+social post text. Explicitly excluded from this tag: the demo video, the real evidence
+screenshots (P0.6–P0.11's PNG captures), and the actual Devpost/article/social submission — all
+of which remain human publication tasks per this file's own "Submission gate," not release
+engineering.

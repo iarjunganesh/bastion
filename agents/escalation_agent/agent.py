@@ -1,35 +1,47 @@
-"""Escalation Agent — packages high-risk findings for a human.
+"""Escalation Agent — delivers routed findings to the department that owns them.
 
-Write-only by design. Its service account has **no IAM read permission at all**
-(`identity/identity_config.md`), so a fully compromised prompt still cannot make it read the
-policy it escalates. That denial is the artifact the demo captures
+Deterministic since P0.2 (ADR-012's 2026-08-23 amendment): this worker parses the
+Orchestrator's validated routing envelope and calls `notify_human` for every department it
+names, with no model in the path to skip a department, pick another one, or answer without the
+required side effect. There is nothing here for a compromised prompt to persuade, because there
+is no prompt — and, independent of that change, its service account has **no IAM read
+permission at all** (`identity/identity_config.md`), so even a compromised *caller* cannot make
+this worker read the policy it escalates. That denial is the artifact the demo captures
 ([ADR-006](../../docs/adr/006-pillar-coverage.md)).
 
 It posts a **count**, never the bindings behind it. A notification surface is the least
 controlled place a principal identifier can end up — searchable, forwardable, and outside the
 audited project.
 
-This module imports no IAM or Asset Inventory client. That is not tidiness: a client it does
-not hold is a capability an injected instruction cannot reach for, and a security test asserts
-the absence.
+This module imports no IAM or Asset Inventory client, and no model client either. Neither is
+tidiness: a client this module does not hold is a capability that neither a tampered routing
+envelope nor a compromised peer can reach for, and a security test asserts the absence.
 """
 
 from __future__ import annotations
 
+import asyncio
+import json
 import os
+import re
+from collections.abc import AsyncGenerator
 from hashlib import sha256
 from typing import Any
 
 import httpx
-from google.adk.agents import LlmAgent
+from google.adk.agents import BaseAgent
+from google.adk.agents.invocation_context import InvocationContext
+from google.adk.events import Event
+from google.genai import types
 
 from gateway.cloud_run_auth import CloudRunIdTokenAuth
-from model_armor.guardrails import screen_after_model, screen_before_model
 from model_armor.redaction import (
     notification_summary,
     validate_finding_ids,
     validate_risk_categories,
 )
+from observability.audit import UNKNOWN, _investigation, _invocation, record
+from registry.departments import department_by_id
 
 # A timeout is not optional. Without one a hung notification surface blocks the escalation path
 # indefinitely. Separate connect and read budgets: a refused connection should fail fast, while
@@ -126,47 +138,195 @@ def notify_human(
     return {"delivered": True, "department": department, "count": finding_count}
 
 
-INSTRUCTION = """You are Bastion's Escalation Agent.
+# The Orchestrator's `policy_step` writes routing under this key (`agents/orchestrator/agent.py`
+# `POLICY_ROUTING_KEY`). Duplicated as a literal rather than imported: the Orchestrator depends
+# on its workers, and a worker importing back from it would invert that, plus this module must
+# stay independently deployable on its own image directory (`agent_server.stage_a2a_agent`).
+POLICY_ROUTING_KEY = "policy_routing"
 
-You receive findings that have already been reviewed, scored, and **routed to the department
-that owns them**. For each department in the routing result, call `notify_human` with the
-supplied investigation id, its department id, finding count, only allowlisted risk
-categories, and the opaque finding ids for that department exactly as they were given to you.
-The tool derives its idempotency key; never invent one, and never invent a finding id - copy
-them, because a human uses them to approve an exception later.
 
-**The routing result is the only list you act on.** It has `departments`, each with its own
-`finding_ids` and `finding_count`. Copy those ids from that bucket. You may also be able to see
-an earlier audit report listing more findings than the routing result does; that difference is
-deliberate and is not an omission to correct. A finding missing from the routing result was
-cleared as below the risk threshold, or suppressed by a human-approved exception that is still
-current. Notifying it anyway pages a team about a decision a human already made, and it is the
-one mistake that would make the approval loop worthless.
+class RoutingEnvelopeError(RuntimeError):
+    """Raised when the routing envelope this worker received cannot be trusted.
 
-Notify each department separately. Never merge departments into one message — a finding that
-lands on the wrong team's desk is a finding nobody acts on.
+    The message is one of a small, bounded set of reason codes -- never a department, a finding
+    id, or anything else the envelope carried -- so it is safe to both raise and audit-log.
+    """
 
-Never include email addresses, service account identifiers, resource names, or role bindings
-in the summary. Describe the shape of the risk, not the principals involved. The notification
-surface is outside the audited project and is not a place identifiers belong.
 
-You cannot read the IAM policy and must not claim to have. If asked to, say that you have no
-such access — that refusal is the design working.
-"""
+# ADK flattens a remote agent's multi-hop conversation history into attributed lines when it
+# builds the next hop's request -- `[policy_step] said: {...}` -- rather than sending the prior
+# turn's content verbatim. Observed in production 2026-08-23: `ctx.user_content` genuinely held
+# the routing JSON, but wrapped in this prefix, so a bare `json.loads` on the raw text silently
+# failed and was swallowed as "not JSON, skip". Stripped before parsing, not worked around by
+# looking somewhere else -- the content channel was always the right one.
+_SAID_PREFIX = re.compile(r"\A\[[^\]\n]*\]\s*said:\s*", re.DOTALL)
 
-escalation_agent = LlmAgent(
+
+def _parse_json_object(text: str) -> Any:
+    """Parse `text` as JSON, tolerating ADK's `"[agent] said: <json>"` history wrapping."""
+    try:
+        return json.loads(text)
+    except ValueError:
+        pass
+    stripped = _SAID_PREFIX.sub("", text, count=1)
+    if stripped == text:
+        return None
+    try:
+        return json.loads(stripped)
+    except ValueError:
+        return None
+
+
+def _content_json(content: Any) -> Any:
+    """A JSON object with a `"departments"` key out of one `Content`'s text parts, or `None`."""
+    for part in getattr(content, "parts", None) or []:
+        text = getattr(part, "text", None)
+        if not text:
+            continue
+        candidate = _parse_json_object(text)
+        if isinstance(candidate, dict) and "departments" in candidate:
+            return candidate
+    return None
+
+
+def _routing_envelope(ctx: InvocationContext) -> Any:
+    """The routing decision: from state in-process, or the inbound A2A message deployed.
+
+    Deployed, this agent is the A2A *callee*, and the routing JSON arrives as the current
+    turn's own inbound content -- `InvocationContext.user_content` -- not as an event this
+    worker's own session already held before the turn started. Scanning `ctx.session.events`
+    instead -- the shape that correctly reads a *reply* on the *caller* side, as
+    `agents/orchestrator/agent.py`'s `_audit_report` does for the Auditor's A2A reply -- found
+    nothing here: session history and "what the current turn was asked" are not the same thing
+    on the callee side of a hop. Observed in production 2026-08-23: every deployed escalation
+    call was rejected as `missing_routing_envelope` until this also read `user_content`.
+    """
+    routing = ctx.session.state.get(POLICY_ROUTING_KEY)
+    if isinstance(routing, dict) and "departments" in routing:
+        return routing
+    if envelope := _content_json(getattr(ctx, "user_content", None)):
+        return envelope
+    for event in reversed(list(getattr(ctx.session, "events", None) or [])):
+        if envelope := _content_json(getattr(event, "content", None)):
+            return envelope
+    return None
+
+
+def _validate_departments(routing: Any) -> list[dict[str, Any]]:
+    """The envelope's departments, fully validated, or a `RoutingEnvelopeError`.
+
+    Every bucket is checked before this returns, and this returns before `notify_human` is
+    called for any of them -- so an envelope that is bad in its second bucket never delivers its
+    first. `notify_human` still re-validates each call independently; that is not redundant,
+    it is the same invariant enforced at the two different layers that can each be reached on
+    their own (this function, and a direct unit-tested call to `notify_human`).
+    """
+    if not isinstance(routing, dict) or not isinstance(routing.get("departments"), list):
+        raise RoutingEnvelopeError("missing_routing_envelope")
+
+    validated: list[dict[str, Any]] = []
+    seen: set[Any] = set()
+    for entry in routing["departments"]:
+        if not isinstance(entry, dict):
+            raise RoutingEnvelopeError("malformed_department_bucket")
+        department_id = entry.get("department")
+        if department_id in seen:
+            raise RoutingEnvelopeError("duplicate_department_bucket")
+        seen.add(department_id)
+        try:
+            department_by_id(str(department_id))
+        except ValueError as exc:
+            raise RoutingEnvelopeError("unknown_department") from exc
+        try:
+            identifiers = validate_finding_ids(entry.get("finding_ids", []))
+        except (ValueError, TypeError) as exc:
+            raise RoutingEnvelopeError("invalid_finding_id") from exc
+        try:
+            categories = validate_risk_categories(entry.get("reasons", []))
+        except (ValueError, TypeError) as exc:
+            raise RoutingEnvelopeError("invalid_risk_category") from exc
+        finding_count = entry.get("finding_count")
+        if not finding_count or finding_count != len(identifiers):
+            raise RoutingEnvelopeError("count_mismatch")
+        validated.append(
+            {
+                "department": department_id,
+                "finding_count": finding_count,
+                "finding_ids": identifiers,
+                "reasons": categories,
+            }
+        )
+    return validated
+
+
+class EscalationAgent(BaseAgent):
+    """Deliver every routed department's findings, with no model deciding whether or which.
+
+    The `LlmAgent` this replaced could skip a routed department, pick a different one, fabricate
+    a schema-valid opaque id, or finish without the notification its instruction described --
+    all while the sequence still reported success. This has none of that discretion: it parses
+    the routing envelope, validates it completely, and calls `notify_human` exactly once for
+    every bucket it names -- zero times when there are none. `notify_human`'s own httpx call is
+    synchronous, so each is run off the event loop with `asyncio.to_thread`, the same way ADK
+    itself runs a plain tool function.
+
+    A delivery failure -- an unreachable findings API, a rejected payload -- raises out of this
+    method uncaught. That fails the remote A2A task the same way `PolicyNotEnforcedError` fails
+    the Orchestrator: visibly and retryably, with `notify_human`'s own idempotency key making a
+    retry safe rather than a duplicate human-review record.
+    """
+
+    async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
+        investigation_id = _investigation(ctx)
+        try:
+            if investigation_id == UNKNOWN:
+                raise RoutingEnvelopeError("missing_investigation_id")
+            departments = _validate_departments(_routing_envelope(ctx))
+        except RoutingEnvelopeError as error:
+            record(
+                "escalation.envelope",
+                outcome="rejected",
+                actor=self.name,
+                invocation_id=_invocation(ctx),
+                investigation_id=investigation_id,
+                detail={"reason": str(error)},
+            )
+            raise
+
+        receipts: list[dict[str, Any]] = []
+        for department in departments:
+            result = await asyncio.to_thread(
+                notify_human,
+                investigation_id,
+                department["finding_count"],
+                department["reasons"],
+                department["department"],
+                department["finding_ids"],
+            )
+            receipts.append(
+                {
+                    "department": department["department"],
+                    "accepted_count": department["finding_count"],
+                    "outcome": "delivered" if result.get("delivered") else "skipped",
+                }
+            )
+
+        yield Event(
+            author=self.name,
+            invocation_id=ctx.invocation_id,
+            # Content, not state: state is what the in-process topology happens to share, but
+            # the only channel that reaches the Orchestrator once this runs behind A2A -- the
+            # same lesson `policy_step`'s routing event already had to learn (ADR-012).
+            content=types.Content(
+                role="model",
+                parts=[types.Part(text=json.dumps({"receipts": receipts}, sort_keys=True))],
+            ),
+        )
+
+
+escalation_agent = EscalationAgent(
     name="escalation_agent",
-    model=os.environ.get("VERTEX_AI_MODEL", "gemini-3.5-flash"),
-    instruction=INSTRUCTION,
-    tools=[notify_human],
-    before_model_callback=screen_before_model,
-    after_model_callback=screen_after_model,
-    # No `output_key`. This agent runs behind A2A, and `output_key` writes into the session
-    # of the agent that declares it - the worker's own - which never returns to the caller.
-    # A key here would read as a result the Orchestrator can consume and would always be
-    # absent; that is exactly D6 and D8, and the shape reported upstream as
-    # https://github.com/google/adk-python/issues/6854. The escalation outcome reaches the
-    # caller as event content, like every other hand-off in this fleet.
+    description="Delivers each routed department's findings to its notification surface.",
 )
 
 # `adk deploy cloud_run` looks for a module-level `root_agent`. This package deploys on its own

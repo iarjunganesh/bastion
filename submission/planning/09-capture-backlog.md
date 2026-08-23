@@ -29,7 +29,7 @@ Each needs live GCP credentials and an approved operator workstation. None is a 
 
 | # | Capture | Depends on | Note |
 |---|---|---|---|
-| 1 | ~~An approved exception seeded, then a later matching finding suppressed after a real elapsed gap~~ | — | **Closed 2026-08-22** — [evidence 10](../../assets/evidence/10-cross-week-suppression.md). Approved 08-19, suppressed 08-22; `notify_human` fired once and the owning department was not paged |
+| 1 | ~~An approved exception seeded, then a later matching finding suppressed after a real elapsed gap~~ | — | **Closed 2026-08-22, re-confirmed 2026-08-23** — [evidence 10](../../assets/evidence/10-cross-week-suppression.md). Approved 08-19, suppressed 08-22; `notify_human` fired once and the owning department was not paged. Re-run 08-23 against the same still-valid exception after the P0.1–P0.3 deterministic-delivery rewrite: identical result, queried directly from `bastion_human_review` rather than inferred. |
 | 2 | Model Armor refusing through an agent's `before_model_callback`, not the direct `screen_prompt` probe | Deployed Runtime, D2 | Achievable through the A2A body, which is a real untrusted surface — see the scope note below |
 | 3 | One investigation's reasoning chain in Cloud Trace | Deployed Runtime | `enable_tracing=True` is configured; configuration is not a capture |
 | 4 | Structured audit logs correlated by context ID for that same run, **including a refusal** | Capture 3 | A trail of successes proves nothing about the guardrails |
@@ -79,6 +79,10 @@ D1, D3 and D6 are **observed**, and capture 1 is now closed by
 a **refusal** on this route, so capture 4 stays open — a trail of successes proves nothing about
 the guardrails.
 
+**Status update 2026-08-23:** a fourth instance of the same class was found and fixed the same
+day it was introduced — see D9 below. It is recorded immediately rather than smoothed over,
+consistent with how D1/D6/D8 are written up here.
+
 ### D1. Deterministic policy enforcement does not run, and does not fail closed
 
 **Fixed 2026-08-22** — see [ADR-010](../../docs/adr/010-policy-enforcement-gate.md) and
@@ -123,6 +127,38 @@ the exception.
 step; D8 is the policy step's decision failing to reach escalation. Both are the same root
 cause — ADK session state does not cross an A2A boundary — and any future step that assumes it
 does will fail the same way, silently, in the deployed topology only.
+
+### D9. The deterministic Escalation Agent (P0.2/P0.3) could not read its own inbound request
+
+**Introduced and fixed the same day, 2026-08-23**, while deploying P0.1–P0.3. Every deployed
+investigation failed at the Escalation Agent with a payload-free, correctly-audited refusal
+(`escalation.envelope rejected reason=missing_routing_envelope`) — and every one of them still
+reported `investigation.run completed`, for two independent, compounding reasons documented in
+full in [ADR-012's 2026-08-23 amendment](../../docs/adr/012-structured-findings-across-a2a.md):
+
+1. `EscalationAgent` is the A2A **callee**, and the routing envelope arrives as the current
+   turn's own inbound content (`InvocationContext.user_content`), which is a different channel
+   from scanning session history — the pattern that correctly reads a *reply* on the *caller*
+   side (as `_audit_report` does for the Auditor's reply). Reading the right channel was still
+   not enough: ADK flattens multi-hop history into `"[policy_step] said: {...}"`-attributed
+   text when building the next hop's request, so a bare `json.loads` on it raised and was
+   silently treated as "no envelope found."
+2. `RemoteA2aAgent` converts a failed remote task into an ordinary, contentless, error-free
+   `Event` rather than surfacing the failure as a Python exception — and, separately,
+   `infrastructure/deploy.sh` alone does not redeploy the Orchestrator's actual agent graph
+   (it runs on the managed Agent Runtime, updated only by
+   `infrastructure.deploy_agent_runtime`). Until that ran, `escalation_gate` — the step built
+   specifically to catch a swallowed failure like this — was not even part of the live graph.
+
+Both are fixed: `_parse_json_object` tolerates the attribution wrapping, and both deployment
+surfaces were updated. Confirmed working end to end 2026-08-23: `escalation_gate` observed
+passing, and exactly one `bastion_human_review` record created for the correct department with
+the approved exception's finding still suppressed (capture 1, above).
+
+**This is now a fourth instance of the same class**, and the two compounding mechanisms above —
+an ADK transport that swallows a worker's own failure signal, and a deployment surface that is
+easy to update only half of — are recorded as live risks for the next change to either hand-off,
+not only as history.
 
 ### D2. IAP-mediated egress cannot resolve a non-standard Google host
 

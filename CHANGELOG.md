@@ -10,6 +10,55 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
+## [0.4.0] — 2026-08-23
+
+### Added — a model cannot alter the authoritative finding set or skip a required delivery
+
+- Added `validate_auditor_fidelity`, a deterministic post-model check that compares the Access
+  Auditor's structured answer against `audit_iam_policy`'s own canonical output by `finding_id`.
+  A model may write only the bounded `rationale` field; any other mismatch raises
+  `AuditorFidelityError` with a payload-free, bounded reason (P0.1).
+- Replaced the Escalation Agent's `LlmAgent` with a deterministic `BaseAgent`. It parses the
+  Orchestrator's validated routing envelope, validates every department bucket completely before
+  any delivery, and calls the fixed-schema notification function exactly once per routed
+  department — with no model or tool declaration in the path to skip, redirect, or fabricate one
+  (P0.2).
+- Added `escalation_gate`, a fifth Orchestrator step that refuses to report an investigation
+  complete unless every routed department's delivery was confirmed by the Escalation Agent's own
+  reply (P0.3).
+
+### Fixed — two more silent A2A content surprises, found deploying the above
+
+- The Escalation Agent's inbound routing envelope was unreadable on the deployed A2A path: the
+  correct channel is `InvocationContext.user_content` (the callee's current turn), not session
+  history, and even that channel required stripping an ADK-generated `"[agent] said: ..."`
+  history-attribution prefix before the JSON would parse.
+- Documented, not fixed in this repository: `RemoteA2aAgent` converts a failed remote task into
+  an ordinary, error-free, empty event rather than an exception, and `infrastructure/deploy.sh`
+  alone does not redeploy the Orchestrator's actual agent graph (a separate Agent Runtime
+  surface, updated by `infrastructure.deploy_agent_runtime`). Both compounded to make the first
+  regression above invisible end-to-end before `escalation_gate` existed to catch it. Full account
+  in [ADR-012](docs/adr/012-structured-findings-across-a2a.md)'s 2026-08-23 amendment.
+
+### Changed — documentation reconciled with the deployed, re-verified fleet
+
+- Corrected the fleet composition described in `ADR-005`, `ADR-README`, `ARCHITECTURE.md`, and
+  `SECURITY.md`: one `LlmAgent` (the Access Auditor) and four model-free `BaseAgent` steps, not
+  three `LlmAgent`s and two deterministic steps.
+- Corrected the fleet-scalability claim in `README.md`: adding a new institutional agent is
+  governed (Registry, Gateway, identity, and a deliberate orchestration change), not "one
+  registration, no orchestrator change."
+- Documented why `FirestoreDurableStore` keeps its blanket coverage exclusion in `CONTRIBUTING.md`.
+- Re-confirmed the 2026-08-19/2026-08-22 approved-exception suppression
+  ([evidence 10](assets/evidence/10-cross-week-suppression.md)) on the redeployed, deterministic
+  path: exactly one human-review record created, for the correct department, with the suppressed
+  department still paged zero times.
+- Added `docs/ARCHITECTURE.md`'s missing "Request path" section using the existing
+  `level-0-request-path` diagram, already used in `README.md` but absent from the deeper
+  architecture reference.
+- Refreshed the upstream `google/adk-python` issue/PR attribution (`#6854`, `#6859`, `#6862`) live
+  via `gh`; all three remain open.
+
 ## [0.3.0] — 2026-08-23
 
 The public evidence plane is live at

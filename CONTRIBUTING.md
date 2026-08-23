@@ -39,6 +39,15 @@ CI also runs dependency audit and secret scanning. Coverage remains 100% for sta
 branches in the configured core scope from `pyproject.toml`. Add unit, integration, security, or
 load coverage at the boundary you change.
 
+One class in that scope, `FirestoreDurableStore` (`runtime/firestore.py`), carries a blanket
+`# pragma: no cover`: its transactional logic needs a real Firestore transaction coordinator, and
+a mocked client would test the mock, not the adapter. It is exercised instead through real
+production behavior — `infrastructure.smoke_test`'s durable-async-event check and every live
+investigation the deployed fleet runs, which drive `receive`/`claim`/`finish`/`enqueue`/
+`approved_exception` against the actual service. That is why the 100% figure is stated as
+"configured core," not "100% of the codebase": the pragma is a scoping decision made once and
+documented here, not new production logic excluded to keep the number after the fact.
+
 ## Safety and evidence
 
 - Never commit or print credentials, raw IAM/Asset output, principals, private endpoints, full

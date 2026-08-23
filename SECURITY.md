@@ -29,7 +29,7 @@ rewriting history.
 | Worker origin | Worker origins are network-reachable for cross-region Gateway traffic, but every non-health A2A request requires the Secret Manager origin credential. Missing or wrong credentials return `401`. |
 | Findings write | The findings API is IAM-private. Only the Escalation service identity has `run.invoker`; anonymous requests return `403`. Schema validation, an allowlist, and a deterministic key collapse replays. |
 | Model boundary | Deterministic rules minimise IAM data before Gemini. Model Armor is a fail-closed pre-model callback covering prompt text and tool results alike; deterministic output screening blocks protected shapes. |
-| Model authority | Missing/invalid risk fails closed. The risk threshold and the department catalog are applied by a step that holds no model at all, and a gate refuses to escalate findings that step did not score. The model cannot score or route a finding, create an exception, modify IAM, choose an endpoint, expand a tool schema, or clear an investigation. |
+| Model authority | Missing/invalid risk fails closed. The risk threshold and the department catalog are applied by a step that holds no model at all, and a gate refuses to escalate findings that step did not score. The Auditor's model can write only the bounded rationale field — its finding id, department, reason, and score are checked against the tool's own canonical output and rejected on any mismatch. The Escalation Agent is itself a model-free worker, and a second gate refuses to report an investigation complete unless every routed department's delivery was confirmed. The model cannot score or route a finding, decide whether or which department is notified, create an exception, modify IAM, choose an endpoint, expand a tool schema, or clear an investigation. |
 | Exception approval | Creating an exception is a human act on the IAM-private findings API, not an agent tool. The reviewer is taken from the verified caller ID token rather than the request body, the expiry is capped at 90 days, and the finding id must match the Auditor's opaque shape. `tests/security/test_tool_surface.py` fails if any agent ever declares an approval tool. |
 | Audit trail | `AuditPlugin` covers run, agent, model, tool, refusal, and error seams. Records include an investigation id that survives the A2A boundary, an invocation id that groups one agent run, argument names, and exception classes, never values, prompts, responses, or exception messages. |
 | Durability | Firestore owns admission, leases, attempts, terminal state, exceptions, and notification idempotency. Eventarc has a five-attempt dead-letter policy and review subscription. |
@@ -48,6 +48,11 @@ private findings API uses ordinary Cloud Run IAM and has no `allUsers` binding.
 - ADK 2.7 `RemoteA2aAgent` is experimental, and `SequentialAgent` is deprecated while `Workflow`
   cannot yet serve as an `LlmAgent` sub-agent. Versions are pinned and covered by local and live
   gates; [ADR-005](docs/adr/005-adk-as-the-agent-framework.md) records acceptance.
+- `RemoteA2aAgent` converts a failed remote A2A task into an ordinary, contentless, error-free
+  event rather than surfacing it as a Python exception. A deterministic gate immediately
+  downstream of each remote worker step (`policy_gate`, `escalation_gate`) is the control that
+  catches this instead — recorded in
+  [ADR-012](docs/adr/012-structured-findings-across-a2a.md)'s 2026-08-23 amendment.
 - Audit retention is configured but not WORM/immutable. Locking the bucket requires a separate,
   explicit platform-owner decision.
 

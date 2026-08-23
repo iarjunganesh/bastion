@@ -4,7 +4,8 @@
 rejection of the Antigravity SDK now rests on a measured incompatibility rather than a
 judgement about documentation quality. **Amended 2026-08-22** — version raised to 2.7.1 for the
 `v0.2.0` tag, and the composition below corrected: not every step is an `LlmAgent` any more.
-**Date:** 2026-08-22
+**Amended 2026-08-23** — the Escalation Agent is no longer an `LlmAgent` either (P0.2); only the
+Access Auditor still is. **Date:** 2026-08-23
 
 ## Decision
 
@@ -12,10 +13,14 @@ Bastion's three agents are **ADK agents** (`google-adk==2.7.1`). ADK owns the ag
 definition, the tool-calling loop, and the session and memory service interfaces
 ([ADR-003](003-pillars-on-geap.md)). The GenAI SDK, Antigravity SDK, and Genkit are not used.
 
-Concretely: each of the three *agents* is an `LlmAgent` with explicitly declared tools. The
-Orchestrator's internal sequence also contains two `BaseAgent` steps that hold no model at all —
-`policy_step` and `policy_gate` — because applying a constant threshold and refusing to continue
-without a recorded result are not decisions a model should be in a position to make
+Concretely: the Access Auditor is an `LlmAgent` with an explicitly declared tool. The Escalation
+Agent is a deterministic `BaseAgent` (P0.2, [ADR-012](012-structured-findings-across-a2a.md)) —
+it has no tool declaration and no model, because *whether* and *which* department to notify are
+not decisions a model should be in a position to make either. The Orchestrator's internal
+sequence contains three further `BaseAgent` steps that hold no model at all — `policy_step`,
+`policy_gate`, and `escalation_gate` — for the same reason: applying a constant threshold,
+refusing to continue without a recorded result, and refusing to report completion without a
+confirmed delivery are not model decisions
 ([ADR-010](010-policy-enforcement-gate.md)). ADK supports this directly: `BaseAgent` is a
 first-class member of a `SequentialAgent`, so removing the model cost no framework support. The
 Orchestrator
@@ -121,7 +126,8 @@ this will not pass unnoticed.
 
 This also bounds the blast radius. The composition is a handful of lines in one module; nothing
 else in the repository names `SequentialAgent`, because the pillars are managed products, the
-three agents are plain `LlmAgent`s, and the two deterministic steps are plain `BaseAgent`s.
+Access Auditor is the fleet's one `LlmAgent`, and the Escalation Agent plus the three
+deterministic Orchestrator steps are plain `BaseAgent`s.
 
 ## Absorbed record: A2A as the inter-agent contract (was ADR-013)
 

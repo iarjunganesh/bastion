@@ -42,8 +42,9 @@ or a media platform.
 - [x] **Memory Bank:** managed endpoint live; restart, retrieval, expiry, stale-memory, and
       failure branches covered by integration/unit tests. **Suppression is now observed on the
       deployed path** — an exception approved 2026-08-19 suppressed its matching finding on
-      2026-08-22 ([evidence 10](../assets/evidence/10-cross-week-suppression.md)). Expiry firing
-      has not elapsed and stays test-only.
+      2026-08-22, re-confirmed 2026-08-23 after the deterministic-delivery rewrite (P0.1–P0.3)
+      ([evidence 10](../assets/evidence/10-cross-week-suppression.md)). Expiry firing has not
+      elapsed and stays test-only.
 - [x] **Identity:** deployed Escalation identity denied IAM read while Auditor was permitted
       ([evidence 03](../assets/evidence/03-escalation-agent-denied.md)).
 - [x] **Gateway:** IAP fail-closed policy and per-destination Runtime identity grants verified;
@@ -61,6 +62,12 @@ or a media platform.
 ## Safety, durability, and failure proof
 
 - [x] Missing/invalid risk fails closed.
+- [x] A model cannot alter the authoritative finding set or skip a required delivery: the
+      Auditor's structured answer is checked field-by-field against the tool's own canonical
+      output (P0.1), the Escalation Agent is a deterministic worker with no model or tool surface
+      to poison (P0.2), and a completion gate refuses to report an investigation done unless every
+      routed department was actually confirmed delivered (P0.3). Deployed and observed 2026-08-23
+      on a real triggered investigation.
 - [x] Raw IAM member/binding data stops before the model; unsafe output stops before notification.
 - [x] Fixed tool declarations and allowlists defend the tool-metadata boundary; the Escalation
       Agent holds no policy tool at construction, asserted and shown to fail when widened
@@ -70,7 +77,7 @@ or a media platform.
       are exercised across populated unit, integration, security, and load suites.
 - [x] Real findings endpoint denies anonymous traffic and collapses an authorized duplicate
       ([evidence 06](../assets/evidence/06-durable-findings.md)).
-- [x] 251 tests pass with 100% configured core statement and branch coverage under Python 3.12.
+- [x] 321 tests pass with 100% configured core statement and branch coverage under Python 3.12.
 - [x] Ruff, formatting, mypy, dependency audit, secret scan, docs/version checks, and diagram
       determinism are release gates.
 - [x] ADK deprecation/experimental risk consciously accepted and pinned in
@@ -113,6 +120,7 @@ The following claims are deliberately not made:
       is satisfied per-push rather than once.
 - [x] Release tags are explicit release decisions rather than engineering side effects:
       `v0.2.0` carries the seven deployed-fleet defects found after `v0.1.0`, and `v0.2.1` carries
-      the escalation hand-off fix. `v0.3.0` is the hosted-evidence release; its annotated tag is
-      created only after the hosted gate, release metadata, full gates, pushed commit, and green
-      `main` CI all agree.
+      the escalation hand-off fix. `v0.3.0` is the hosted-evidence release. `v0.4.0` carries the
+      deterministic Auditor-fidelity, Escalation-delivery, and completion-gate rewrite (P0.1–P0.3),
+      deployed and re-verified live the same day. Each annotated tag is created only after its
+      release metadata, full gates, pushed commit, and green `main` CI all agree.
