@@ -32,6 +32,13 @@ Bastion's central claim is backed by redacted captures rather than architecture 
 describe the story directly; internal level numbers are deliberately absent. The README banner
 uses hand-reviewed light/dark SVGs; the 16:9 Devpost banner is another generated master.
 
+Every architecture master carries a `Build state · <date> · 21/21 APIs · 39 resources measured`
+footer. Both halves are gated: `check_diagram_footers_match_state()` has always compared the count,
+and `check_diagram_dates_match_state()` now compares the date, because the date was ungated and
+drifted — every asset read `2026-08-22` against a `2026-08-23` capture, including the PNG uploaded
+to Devpost. A count that agrees with a measurement taken on another day is a coincidence, not a
+grounded claim.
+
 The diagrams are checked against [gcp-state.json](architecture/gcp-state.json), which is generated
 from the live project and contains counts only. No image names a principal, secret, private URL,
 or policy binding. Run:

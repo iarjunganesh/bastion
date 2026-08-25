@@ -15,6 +15,15 @@ The evidence gallery is rendered from the committed sanitized snapshot in
 `data/site-content.json`; the error state links back to the public repository rather than falling
 back to a production API.
 
+Two things on the page look dynamic and are not. The snapshot age beside the verification stamp is
+computed in the browser from the `datetime` attribute `check_site.py` already pins to
+`gcp-state.json`'s `captured_utc` — there is no second source and no request, because a page that
+fetched its own freshness would be claiming a liveness this console deliberately does not have. It
+exists to make staleness visible rather than leave a reader to subtract dates. The footer names the
+release it was built from; that string is written in `index.html` and gated against
+`pyproject.toml` rather than substituted during the build, so the deployed bytes stay identical to
+the reviewed source and `check_site.py` can keep failing on any drift between them.
+
 ## Local preview
 
 From the repository root, build and serve the exact deployable output:

@@ -73,6 +73,19 @@ ADRs/ledgers) — plus a full sweep of every tracked Markdown file for staleness
 4. commit and push the release metadata, then verify `main` CI green;
 5. create an annotated `v0.4.0` tag at that exact commit and push the tag separately.
 
+## v0.5.1 — correct a dated claim on the Devpost architecture image
+
+Shipped 2026-08-25, hours after `v0.5.0`. A patch release for one defect worth releasing quickly:
+every architecture asset was stamped `2026-08-22` against a `2026-08-23` capture, and the affected
+PNG is the required Devpost architecture upload. The count in that footer was gated; the date was
+not.
+
+Also carries the gate that would have caught it, plus two public-console additions — a relative
+snapshot age beside the absolute stamp, and a release string gated against `pyproject.toml`.
+
+No production code changed. **Re-upload `enterprise-fleet-architecture-light.png` to Devpost**
+when the form is next touched; the previously uploaded copy carries the wrong date.
+
 ## v0.5.0 — reproducibility, submission prep, and five closed observations (pre-media)
 
 Shipped 2026-08-25. The planned scope was P1.3 (an actual clean-clone reproducibility run), the

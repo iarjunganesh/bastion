@@ -167,6 +167,35 @@ def check_snapshot_alignment() -> list[str]:
     return failures
 
 
+def check_release_stamp() -> list[str]:
+    """The version the page shows must be the version the repository is.
+
+    The page states which build a reader is looking at. That is a claim like any other, and a
+    hand-written one goes stale the moment `pyproject.toml` moves. It is checked here rather
+    than substituted at build time on purpose: the static build is byte-identical to its source,
+    so every deployable byte can be inspected before Vercel sees it, and a build-time rewrite
+    would trade that property for a convenience.
+    """
+    failures: list[str] = []
+    pinned = re.search(
+        r'^version = "([^"]+)"', (ROOT / "pyproject.toml").read_text(encoding="utf-8"), re.MULTILINE
+    )
+    if pinned is None:
+        failures.append("pyproject.toml has no version for the site stamp to agree with")
+        return failures
+
+    index = (SITE / "index.html").read_text(encoding="utf-8")
+    shown = re.search(r"built from release (v\d+(?:\.\d+)*)", index)
+    if shown is None:
+        failures.append("site index.html no longer states which release it was built from")
+    elif shown.group(1) != f"v{pinned.group(1)}":
+        failures.append(
+            f"site says it was built from release {shown.group(1)}, "
+            f"but pyproject.toml is {pinned.group(1)}"
+        )
+    return failures
+
+
 def check_static_contract() -> list[str]:
     """Verify required pages, sections, metadata, and strict Vercel browser headers."""
     failures: list[str] = []
@@ -283,6 +312,7 @@ def main() -> int:
         *scan_sensitive_content([*site_files(), *reviewed_assets]),
         *manifest_failures,
         *check_snapshot_alignment(),
+        *check_release_stamp(),
         *check_static_contract(),
         *check_built_output(),
     ]

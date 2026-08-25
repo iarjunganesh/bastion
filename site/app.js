@@ -157,6 +157,41 @@ function renderVideo(video) {
   container.replaceWith(frame);
 }
 
+/** Render how old the committed snapshot is, from the stamp already in the markup.
+ *
+ * The absolute UTC time stays authoritative and visible; this only says how far away it is, so a
+ * reader sees staleness instead of having to compute it. It reads the `datetime` attribute that
+ * `check_site.py` already pins to `gcp-state.json`'s `captured_utc` — there is no second source
+ * and no network call, because a page that fetched its own freshness would be claiming liveness
+ * this console deliberately does not have. */
+function renderVerifiedAge() {
+  const stamp = document.querySelector("[data-verified-at]");
+  const target = document.querySelector("[data-verified-age]");
+  if (!stamp || !target) return;
+
+  const captured = Date.parse(stamp.getAttribute("datetime") || "");
+  if (Number.isNaN(captured)) return;
+
+  const seconds = Math.round((captured - Date.now()) / 1000);
+  const units = [
+    ["day", 86400],
+    ["hour", 3600],
+    ["minute", 60],
+  ];
+
+  let label = "just now";
+  for (const [unit, size] of units) {
+    if (Math.abs(seconds) >= size) {
+      const relative = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+      label = relative.format(Math.round(seconds / size), unit);
+      break;
+    }
+  }
+
+  target.textContent = `snapshot ${label}`;
+  target.hidden = false;
+}
+
 async function loadPublicContent() {
   if (!gallery) return;
   try {
@@ -209,4 +244,5 @@ if (header) {
 }
 
 applyTheme(savedTheme());
+renderVerifiedAge();
 loadPublicContent();

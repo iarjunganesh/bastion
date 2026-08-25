@@ -10,6 +10,43 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
+## [0.5.1] — 2026-08-25
+
+A dated claim on a judge-facing image disagreed with the measurement it quoted, and nothing in the
+repository could see it. This release fixes the date, closes the gap that let it drift, and makes
+the public console honest about how old its snapshot is.
+
+### Fixed — the diagram date was ungated, and it had drifted
+
+- Every architecture asset was stamped `Build state · 2026-08-22` while
+  `assets/architecture/gcp-state.json` recorded a capture of `2026-08-23T17:22:39Z`. The count in
+  that footer was gated by `check_diagram_footers_match_state()`; the date beside it never was, so
+  it went stale silently — including in
+  `enterprise-fleet-architecture-light.png`, the image uploaded to Devpost as the required
+  architecture diagram. Re-stamped and regenerated: three masters, six theme variants, nine
+  animated GIFs, and the PNG.
+- Added `check_diagram_dates_match_state()` to `scripts/check_docs.py`. A diagram's build-state
+  date must now equal `gcp-state.json`'s capture date, exactly as its resource count already must.
+  A count that agrees with a measurement taken on another day is a coincidence rather than a
+  grounded claim, and the footer's entire purpose is disclosure.
+
+### Added — the console shows how old its evidence is
+
+- The verification stamp now carries a relative age beside the absolute UTC time. It is computed
+  in the browser from the `datetime` attribute `check_site.py` already pins to `captured_utc`, so
+  there is no second source and no request. The point is to make staleness visible rather than
+  leave a reader subtracting dates.
+- The footer names the release the page was built from, and `check_release_stamp()` fails if that
+  string disagrees with `pyproject.toml`. It is a gated literal rather than a build-time
+  substitution on purpose: the static build stays byte-identical to its reviewed source, so
+  `check_site.py` can keep failing on any drift between what was inspected and what deploys.
+
+### Unchanged
+
+No production code, no deployed resource, and no evidence claim changed. The counts the corrected
+footers quote — 21/21 APIs and 39 resources — are the same measurement they always were; only the
+date beside them is now the one that measurement was taken on.
+
 ## [0.5.0] — 2026-08-25
 
 Pre-media release. No production code changed: the fleet running on `bastion-fleet-2026` is the

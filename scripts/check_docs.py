@@ -433,6 +433,36 @@ def check_diagram_footers_match_state() -> None:
                 )
 
 
+def check_diagram_dates_match_state() -> None:
+    """A diagram's build-state date may not disagree with the capture it quotes.
+
+    Companion to check_diagram_footers_match_state(), which gates the resource *count*. The date
+    was ungated, and it drifted: every architecture asset read `Build state · 2026-08-22` while
+    `gcp-state.json` recorded a 2026-08-23 capture, and the light PNG carrying that footer is the
+    Devpost architecture upload. A count that agrees with a measurement taken on another day is
+    not a grounded claim, it is a coincidence — and the footer's whole purpose is disclosure.
+
+    The date is compared, not the timestamp: the footer is a human-readable build-state line, and
+    a capture time would be noise at diagram scale.
+    """
+    state = json.loads(read("assets/architecture/gcp-state.json"))
+    captured = str(state.get("captured_utc", ""))[:10]
+    if not captured:
+        fail("gcp-state.json has no captured_utc — the diagram date cannot be grounded")
+        return
+
+    stamped = re.compile(r"Build state\s*·\s*(\d{4}-\d{2}-\d{2})")
+    for svg in sorted((ROOT / "assets").rglob("*.svg")):
+        text = svg.read_text(encoding="utf-8")
+        for match in stamped.finditer(text):
+            if match.group(1) != captured:
+                fail(
+                    f"{svg.relative_to(ROOT).as_posix()} is stamped {match.group(1)}, but "
+                    f"gcp-state.json was captured {captured} — re-stamp the master and "
+                    "regenerate with scripts/render_diagrams.py"
+                )
+
+
 def check_diagrams_do_not_contradict_the_fleet() -> None:
     """Phrases a rendered diagram may not carry, because the deployment retired them.
 
@@ -570,6 +600,7 @@ def main() -> int:
     check_retired_deployment_claims()
     check_diagrams_are_grounded()
     check_diagram_footers_match_state()
+    check_diagram_dates_match_state()
     check_diagrams_do_not_contradict_the_fleet()
     check_packets_never_cross_a_component()
 
