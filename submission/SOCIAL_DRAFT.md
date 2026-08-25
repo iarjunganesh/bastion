@@ -17,8 +17,10 @@ decision remained effective three days later across deployments and restarts, su
 matching duplicate notification.
 
 Building the real A2A topology uncovered an ADK session-state boundary that local tests could not
-show, even with full configured core coverage. I reported the reproducer upstream and proposed a
-complementary construction-time warning.
+show, even with full configured core coverage. I reported the reproducer upstream. My own patch was
+closed in favour of a central fix — and the maintainer's reply was the better outcome: they
+confirmed the boundary is a general transport property, not a bug in one agent type. The issue is
+still open.
 
 - Project: TODO_DEVPOST_URL
 - Demo: TODO_VIDEO_URL
@@ -45,5 +47,7 @@ TODO_DEVPOST_URL
   boundary image.
 - [ ] Keep `#AllThingsAgenticHackathon` exact.
 - [ ] Ensure the post and every link are public while signed out.
-- [ ] Do not say the upstream pull request is merged without a live GitHub check.
+- [ ] Re-check upstream state live before posting. As of 2026-08-25: issue #6854 open, community
+  PR #6859 open and unmerged, my PR #6862 closed unmerged. Never imply anything is merged or
+  that Google accepted a fix.
 - [ ] Save the public post URL for the Devpost bonus field.

@@ -12,10 +12,10 @@
     },
     {
       "title": "Real cross-department routing",
-      "summary": "A count-only observation of 52 live IAM bindings produced three findings routed to two owning departments.",
+      "summary": "On the current deployed route, 62 live IAM bindings produced three deterministic findings across two owning departments; policy suppressed an approved exception and two were delivered.",
       "state": "COUNTS ONLY",
       "accent": "#45d3d0",
-      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/09-cross-department-routing.md"
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/11-current-route-correlation.md"
     },
     {
       "title": "Identity-enforced separation",
@@ -25,11 +25,25 @@
       "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/03-escalation-agent-denied.md"
     },
     {
+      "title": "Injection refused at the agent boundary",
+      "summary": "The deployed Auditor callback refused an approved injection sample on its authenticated A2A surface; the task failed closed and no model or tool call followed.",
+      "state": "REFUSAL OBSERVED",
+      "accent": "#ef6f6c",
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/12-agent-mediated-model-armor-refusal.md"
+    },
+    {
       "title": "Durable human exception",
       "summary": "A human-approved exception suppressed its matching finding three days later on the deployed path without becoming a multi-week claim.",
       "state": "3-DAY OBSERVATION",
       "accent": "#60d394",
       "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/10-cross-week-suppression.md"
+    },
+    {
+      "title": "Correlated reasoning chain",
+      "summary": "One connected 22-span trace covers the managed Runtime, both governed worker hops, the durable exception lookup, and the completion gate. Sampled telemetry, not the compliance record.",
+      "state": "CHAIN OBSERVED",
+      "accent": "#9bd1ff",
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/13-current-route-trace.md"
     },
     {
       "title": "Payload-free operations",

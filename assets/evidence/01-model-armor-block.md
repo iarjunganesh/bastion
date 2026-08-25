@@ -26,7 +26,8 @@ rather than the assertion that claims it.
 
 ## Proof boundary
 
-- This capture called `screen_prompt` directly. The same function is now deployed as ADK's
-  `before_model_callback`, and callback/refusal/error behavior is covered by the security and unit
-  suites; this historical file is not presented as an agent-mediated refusal trace.
+- This capture called `screen_prompt` directly. The later
+  [deployed-callback capture](12-agent-mediated-model-armor-refusal.md) observes the same control at
+  ADK's `before_model_callback` boundary; this historical file is not itself presented as an
+  agent-mediated refusal trace.
 - No Gemini call has been made. Screening ran; the model behind it did not.

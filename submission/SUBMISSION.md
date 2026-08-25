@@ -53,11 +53,21 @@ or a media platform.
       Runtime — with the endpoint registered and the role held. Fail-closed is observed; correctly
       admitting a catalogued destination from the Runtime is not. Tracked as D2 in
       [09-capture-backlog.md](planning/09-capture-backlog.md).
-- [x] **Model Armor:** managed template refused injection
-      ([evidence 01](../assets/evidence/01-model-armor-block.md)); callback fail-closed behavior and
-      protected-output screening tested.
+- [x] **Model Armor:** **the deployed agent callback refused a real injection attempt on 2026-08-25**
+      ([evidence 12](../assets/evidence/12-agent-mediated-model-armor-refusal.md)) — sent through the Access
+      Auditor's authenticated A2A surface, the task failed closed with `policy_match` and no model
+      submission, completion or tool call followed. The threat modelled is a compromised authorized
+      caller, not an anonymous one. [Evidence 01](../assets/evidence/01-model-armor-block.md) remains the earlier
+      direct-template probe; fail-closed and protected-output screening are additionally tested.
 - [x] **Observability:** payload-free audit lifecycle, retained regional sink/bucket, four metrics,
-      five alerts, and operations dashboard ([evidence 07](../assets/evidence/07-observability.md)).
+      five alerts, and operations dashboard ([evidence 07](../assets/evidence/07-observability.md), whose
+      `europe-west4` 365-day retention and analytics were re-reviewed in the Console on 2026-08-25 —
+      retention proven, immutability still not claimed because the bucket is unlocked). **One
+      investigation is now reconstructable end to end:** 28 unique payload-free events across three
+      invocation ids under a single investigation id ([evidence 11](../assets/evidence/11-current-route-correlation.md)),
+      plus a connected 22-span Cloud Trace ([evidence 13](../assets/evidence/13-current-route-trace.md)). The trace is
+      sampled and expires; the audit trail is the compliance record. They are never derived from each
+      other.
 
 ## Safety, durability, and failure proof
 

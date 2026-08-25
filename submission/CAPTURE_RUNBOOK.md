@@ -20,6 +20,27 @@ responses, raw IAM members/roles/resources/bindings, or unredacted exception mes
 
 ## Evidence sprint — execute in this order
 
+**Status 2026-08-25 — four of six closed.** Steps 1, 2, 3 and 4 are captured, reviewed and
+promoted; their retained records are evidence 11, 12, 13 and the refreshed evidence 07. Their raw
+1920×1080 sources stay ignored under `.takes/2026-08-25/` until the gallery is composed. Steps 5
+and 6 remain open and their claims remain narrowed — see
+[11-claim-matrix.md](planning/11-claim-matrix.md).
+
+| Step | Capture | State | Retained record |
+|---|---|---|---|
+| 1 | P0.9 current-route IAM provenance | **Closed** | [evidence 11](../assets/evidence/11-current-route-correlation.md) |
+| 2 | P0.6 agent-mediated Model Armor refusal | **Closed** | [evidence 12](../assets/evidence/12-agent-mediated-model-armor-refusal.md) |
+| 3 | P0.8 correlated retained audit | **Closed** | [evidence 11](../assets/evidence/11-current-route-correlation.md) + [evidence 07](../assets/evidence/07-observability.md) |
+| 4 | P0.7 current-route Cloud Trace chain | **Closed** | [evidence 13](../assets/evidence/13-current-route-trace.md) |
+| 5 | P0.10 managed Gateway refusals | Open | none — claim stays narrowed |
+| 6 | P0.11 timeout, retry, bounded failure | Open | none — claim stays narrowed |
+
+A note carried forward from step 5's attempt: every IAP authorization denial observable in this
+project resolves to `unregisteredEndpoint` with an empty `authenticationInfo`, which is D2's
+residual platform behaviour rather than a caller being refused. Producing the intended refusal
+would require deploying a modified Runtime that attempts egress to an unregistered destination,
+which this plan forbids at this stage.
+
 ### 1. Current-route IAM provenance — P0.9
 
 Capture first because it establishes the successful investigation used by later audit/trace views.

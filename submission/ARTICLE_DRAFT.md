@@ -50,14 +50,30 @@ The result is not a workaround that copies more state. It is a service-boundary 
 ## What we reported upstream
 
 The deployed reproducer and both loss directions are recorded in
-[google/adk-python#6854](https://github.com/google/adk-python/issues/6854). A complementary
-construction-time warning for the adjacent `LlmAgent(output_key) -> RemoteA2aAgent` pattern is in
-[google/adk-python#6862](https://github.com/google/adk-python/pull/6862). Another community change,
-[google/adk-python#6859](https://github.com/google/adk-python/pull/6859), addresses related
-state-only outbound loss and rejected inbound remote-state-delta cases.
+[google/adk-python#6854](https://github.com/google/adk-python/issues/6854), which is open. A
+community change, [google/adk-python#6859](https://github.com/google/adk-python/pull/6859) by
+Sylvester Kaczmarek, addresses the state-only outbound loss and rejected inbound
+remote-state-delta cases; it is open and unmerged.
 
-These links describe complementary work; authorship and current merge state must be checked on
-GitHub at publication time.
+I also opened [google/adk-python#6862](https://github.com/google/adk-python/pull/6862), adding a
+construction-time warning for the adjacent `LlmAgent(output_key) -> RemoteA2aAgent` pattern. A
+Google maintainer closed it unmerged on 2026-08-24, and the reply is the most useful artifact this
+whole exercise produced:
+
+> The session state boundary across A2A is a general transport property rather than an issue
+> specific to `SequentialAgent`. It applies equally to `Workflow`, custom agents, and standalone
+> runs. This is already being addressed centrally at the `RemoteA2aAgent` converter and
+> documentation layer in #6859.
+
+Two further reasons were given: `SequentialAgent` is deprecated in favour of `Workflow`, so new
+domain-specific validation should not be added to it; and my `sys.modules.get` reflection check
+was import-order sensitive and could silently skip validation. The last one is simply a correct
+review comment.
+
+So the honest scoreboard is: the boundary is confirmed by a maintainer and being fixed centrally,
+the issue is open, and my patch was closed as the wrong place to fix it. That is a better outcome
+than a merged patch in a deprecated component, and it is not the same thing as "Google accepted
+our fix." Nothing here is merged; check the live state before you repeat any of it.
 
 ## The general rule
 

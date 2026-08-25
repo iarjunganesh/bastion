@@ -12,9 +12,13 @@
 
 ## Residual submission work
 
+The signed-out evidence console at `bastion.arjunganesh.dev` is live and verified, and current-route
+IAM provenance, the agent-mediated Model Armor refusal, the correlated audit trail and the Cloud
+Trace chain are all captured. Managed Gateway refusals and a watched timeout/retry/dead-letter
+sequence remain deliberately unobserved and their claims stay narrowed.
+
 - Record and publish the under-four-minute demo.
-- Deploy and verify the signed-out static evidence console and custom domain; keep every agent
-  endpoint IAM-private.
+- Compose the five-image Devpost gallery from the reviewed raw captures.
 - Upload the architecture GIF/image and complete the Devpost form.
 - Reconfirm billing budget/anomaly notification and service availability before recording.
 - Optionally publish the bonus blog and social post.

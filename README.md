@@ -188,14 +188,20 @@ upstream with a production reproducer in
 [google/adk-python#6854](https://github.com/google/adk-python/issues/6854) (opened by Arjun
 Ganesh) and fixed structurally in
 [ADR-012](docs/adr/012-structured-findings-across-a2a.md); the full ledger is the
-[observation backlog](submission/planning/09-capture-backlog.md). Two upstream PRs address it,
-both open at the time of writing: community PR
-[google/adk-python#6859](https://github.com/google/adk-python/pull/6859) (Sylvester Kaczmarek)
-adds warnings for the outbound state-only-loss and rejected inbound remote-state-delta
-directions, and complementary PR
-[google/adk-python#6862](https://github.com/google/adk-python/pull/6862) (Arjun Ganesh) adds the
-adjacent construction-time warning for the `LlmAgent(output_key) -> RemoteA2aAgent` case that
-carries event content and isn't covered by the state-only warning.
+[observation backlog](submission/planning/09-capture-backlog.md).
+
+Checked live on 2026-08-25: the issue is **open**, and community PR
+[google/adk-python#6859](https://github.com/google/adk-python/pull/6859) (Sylvester Kaczmarek) —
+which adds warnings for the outbound state-only-loss and rejected inbound remote-state-delta
+directions — is **open and unmerged**. A complementary PR of my own,
+[google/adk-python#6862](https://github.com/google/adk-python/pull/6862), adding a
+construction-time warning for the adjacent `LlmAgent(output_key) -> RemoteA2aAgent` case, was
+**closed unmerged on 2026-08-24** in favour of #6859. The maintainer's reason is the more useful
+outcome than the patch would have been: *"the session state boundary across A2A is a general
+transport property rather than an issue specific to `SequentialAgent`"*, and it is being addressed
+centrally at the `RemoteA2aAgent` converter rather than in a deprecated component. That is a
+confirmation of the finding and a decision about where the fix belongs — not an accepted fix, and
+not a rejected report. Nothing here is merged.
 
 ## The fleet
 
@@ -271,9 +277,12 @@ it can reach. That is the fixed trust boundary [ADR-007](docs/adr/007-tool-poiso
 on working as intended, not a scalability gap.
 
 The measured proof that the first axis is real rather than decorative is
-[evidence 09](assets/evidence/09-cross-department-routing.md): 52 live IAM bindings produced 3
-findings that routed to **2 different owning departments**, deterministically and without a
-model deciding who owns what.
+[evidence 11](assets/evidence/11-current-route-correlation.md): on 2026-08-25 the deployed route
+read **62 live IAM bindings**, produced 3 deterministic findings across **2 owning departments**,
+and delivered 2 of them after policy suppressed an approved exception — without a model deciding
+who owns what, and with zero raw IAM fields crossing the model boundary. The binding count moves
+as the project's own IAM changes; [evidence 09](assets/evidence/09-cross-department-routing.md)
+recorded 52 on an earlier date and is retained as that measurement rather than overwritten.
 
 Instance caps are deliberate. `BASTION_MAX_INSTANCES=3` follows the organizers' own cost
 guidance; it is a budget ceiling, not an architectural one. Bastion claims **two** Gateway

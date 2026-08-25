@@ -30,10 +30,10 @@ Each needs live GCP credentials and an approved operator workstation. None is a 
 | # | Capture | Depends on | Note |
 |---|---|---|---|
 | 1 | ~~An approved exception seeded, then a later matching finding suppressed after a real elapsed gap~~ | — | **Closed 2026-08-22, re-confirmed 2026-08-23** — [evidence 10](../../assets/evidence/10-cross-week-suppression.md). Approved 08-19, suppressed 08-22; `notify_human` fired once and the owning department was not paged. Re-run 08-23 against the same still-valid exception after the P0.1–P0.3 deterministic-delivery rewrite: identical result, queried directly from `bastion_human_review` rather than inferred. |
-| 2 | Model Armor refusing through an agent's `before_model_callback`, not the direct `screen_prompt` probe | Deployed Runtime, D2 | Achievable through the A2A body, which is a real untrusted surface — see the scope note below |
-| 3 | One investigation's reasoning chain in Cloud Trace | Deployed Runtime | `enable_tracing=True` is configured; configuration is not a capture |
-| 4 | Structured audit logs correlated by context ID for that same run, **including a refusal** | Capture 3 | A trail of successes proves nothing about the guardrails |
-| 5 | The redacted real-IAM basis for the findings, from the current route | — | [Evidence 02](../../assets/evidence/02-gemini-investigation.md) is labelled historical and pre-Gateway |
+| 2 | ~~Model Armor refusing through an agent's `before_model_callback`, not the direct `screen_prompt` probe~~ | — | **Closed 2026-08-25** — [evidence 12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md). The approved injection sample was sent to the deployed Auditor's authenticated A2A surface: a benign control completed, the sample's task failed closed with `model_armor.input` / `refused` / `policy_match`, and zero model submissions, completions or tool calls followed. This is a compromised authorized caller, not an anonymous one. |
+| 3 | ~~One investigation's reasoning chain in Cloud Trace~~ | — | **Closed 2026-08-25** — [evidence 13](../../assets/evidence/13-current-route-trace.md). One connected 22-span trace over 1m 5.401s covers the managed Runtime, both A2A hops with their agent-card fetches, the Firestore exception lookup nested inside `policy_step`, and `escalation_gate`. D2's feared trace impairment did not materialise on this route. |
+| 4 | ~~Structured audit logs correlated by context ID for that same run, **including a refusal**~~ | — | **Closed 2026-08-25, with a stated boundary** — [evidence 11](../../assets/evidence/11-current-route-correlation.md) assembles 28 unique payload-free events across three invocation ids under one investigation id, and [evidence 12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md) supplies a refusal recorded under the same audit contract. The refusal comes from a separate probe, not from the correlated run itself, so the guardrail trail is observed but the two are not one investigation. |
+| 5 | ~~The redacted real-IAM basis for the findings, from the current route~~ | — | **Closed 2026-08-25** — [evidence 11](../../assets/evidence/11-current-route-correlation.md). A count-only companion probe on the current route measured 62 live bindings, 3 deterministic findings, 2 canonical owning departments and 0 raw IAM fields at the model boundary. This supersedes [evidence 02](../../assets/evidence/02-gemini-investigation.md), which stays retained as historical pre-Gateway proof. |
 | 6 | Gateway refusals: unregistered caller, undeclared skill | — | **Two**, not three. The rate-limit refusal was removed by decision below, not deferred; both remaining refusals are asserted offline in `tests/security/test_gateway_policy.py` |
 | 7 | A worker timing out, retrying, then escalating | Deployed Runtime | Retry is deployed and suite-tested; the sequence has not been watched end to end |
 
@@ -70,7 +70,8 @@ injection has been observed. Route 1 makes one obtainable; until it is captured,
 ## Blocking defects observed in the deployed fleet
 
 Found 2026-08-19/22 while attempting captures 1-4. Each was watched in the deployed system, not
-inferred from code. They are recorded here because all four open captures sit behind them.
+inferred from code. They are recorded here because every capture then outstanding sat behind them;
+captures 1-5 have since closed and only 6 and 7 remain.
 
 **Status at 2026-08-22:** D1, D3, D4, D5, D6, D7 and D8 are fixed. D1-D7 shipped in 0.2.0;
 D8 is fixed after it and ships in 0.2.1. Only D2 remains open, and it is no longer blocking.
@@ -82,6 +83,15 @@ the guardrails.
 **Status update 2026-08-23:** a fourth instance of the same class was found and fixed the same
 day it was introduced — see D9 below. It is recorded immediately rather than smoothed over,
 consistent with how D1/D6/D8 are written up here.
+
+**Status update 2026-08-25:** captures 2, 3, 4 and 5 closed in one evidence sprint against the
+`c81b4af` fleet — evidence 11, 12 and 13. The 08-22 note above says capture 4 stays open because a
+trail of successes proves nothing about the guardrails; that is now answered, though precisely
+rather than fully. A refusal *is* recorded under the audit contract, but it comes from the
+agent-mediated Model Armor probe rather than from the correlated investigation itself, and the
+backlog row says so. D2's predicted consequence — that IAP-mediated egress might impair the
+Runtime's OTel export and cost us capture 3 — did not occur: the trace is complete and connected.
+Captures 6 (Gateway refusals) and 7 (timeout/retry/dead-letter) remain open and unclaimed.
 
 ### D1. Deterministic policy enforcement does not run, and does not fail closed
 
@@ -183,6 +193,14 @@ Three measurements settle it.
    investigation time. Investigations complete, `verify_fleet` passes, and the production
    smoke passes with these denials still being emitted.
 
+   **Measured again 2026-08-25, and more precisely.** The 12 denials recorded that day fell in a
+   single 1.2-second burst at 16:31:52.643Z-16:31:53.857Z. The investigation's root span opens at
+   16:31:56.197Z — three seconds *after* the last denial — and the run then completes at
+   16:33:01.597Z with no further IAP event of any kind. So the denials belong to instance cold
+   start, not to the request path, and the whole governed route ran clean behind them. Every one of
+   the 100 most recent denials resolves to `unregisteredEndpoint` with an empty
+   `authenticationInfo`, which is the same signature described above and not a caller being refused.
+
 **What is actually happening.** Six registered destinations use non-standard Google hostnames
 (`*.rep.googleapis.com`, `*.mtls.googleapis.com`); eight use plain `*.googleapis.com`. Every
 IAP authorization event resolves to
@@ -204,9 +222,13 @@ and it should be asked precisely: *why does Agent-to-Anywhere IAP resolve a regi
 `*.rep.googleapis.com` destination to `unregisteredEndpoint`, when a plain `*.googleapis.com`
 destination in the same regional registry is admitted without an IAP check at all?*
 
-**Consequence to watch, not yet measured.** If IAP-mediated egress to non-standard hosts fails,
-the Runtime's OTel export (`telemetry.mtls.googleapis.com`) may be impaired, which would affect
-capture 3's Cloud Trace chain. **[unknown]** whether it is; the trace capture will show it.
+**Consequence measured 2026-08-25: none.** The concern recorded here was that IAP-mediated egress
+to non-standard hosts might impair the Runtime's OTel export (`telemetry.mtls.googleapis.com`) and
+cost us capture 3. It did not. The trace captured that day is complete and connected — 22 spans
+across the managed Runtime and both A2A workers in one tree, recorded in
+[evidence 13](../../assets/evidence/13-current-route-trace.md). D2 remains open as residual
+platform behaviour with, now, a measured absence of consequence on both the request path and the
+telemetry path.
 
 ### D3. An audit trail cannot be assembled into one investigation
 

@@ -68,5 +68,9 @@ this is acceptable, and `README.md` must say it rather than imply full EU reside
 track's own sentence names **data sovereignty** as a thing not to violate, so an
 overstatement here is a claim against a criterion rather than a footnote.
 
-The endpoint is both reachable and exercised by the ADK fleet; the captured run is recorded in
-[evidence 02](../../assets/evidence/02-gemini-investigation.md).
+The endpoint is both reachable and exercised by the ADK fleet. The current-route proof is
+[evidence 11](../../assets/evidence/11-current-route-correlation.md), whose deployed Access Auditor
+submitted to `gemini-3.5-flash` on 2026-08-25, with the call visible as a span in
+[evidence 13](../../assets/evidence/13-current-route-trace.md). The original 2026-08-15 capture,
+[evidence 02](../../assets/evidence/02-gemini-investigation.md), predates the Gateway and is
+retained as historical only.

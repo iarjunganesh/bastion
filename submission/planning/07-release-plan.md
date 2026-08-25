@@ -73,11 +73,26 @@ ADRs/ledgers) — plus a full sweep of every tracked Markdown file for staleness
 4. commit and push the release metadata, then verify `main` CI green;
 5. create an annotated `v0.4.0` tag at that exact commit and push the tag separately.
 
-## v0.5.0 — reproducibility and submission prep (pre-media)
+## v0.5.0 — reproducibility, submission prep, and five closed observations (pre-media)
 
-Planned scope: P1.3 (an actual clean-clone reproducibility run), the final claim matrix (Section
-10 of the working plan), and drafted-but-not-published Devpost copy, technical article, and
-social post text. Explicitly excluded from this tag: the demo video, the real evidence
-screenshots (P0.6–P0.11's PNG captures), and the actual Devpost/article/social submission — all
-of which remain human publication tasks per this file's own "Submission gate," not release
-engineering.
+Shipped 2026-08-25. The planned scope was P1.3 (an actual clean-clone reproducibility run), the
+final claim matrix, and drafted-but-not-published Devpost, article and social copy. All three
+landed — and the scope then grew, deliberately, because the evidence sprint ran before the tag
+rather than after it.
+
+What this tag actually carries beyond the plan: current-route IAM provenance, the agent-mediated
+Model Armor refusal, the correlated payload-free audit trail, and the Cloud Trace chain
+(evidence 11, 12, 13), plus the documentation reconciliation those captures forced. Splitting them
+into a later tag would have released a claim matrix that disagreed with the evidence ledger beside
+it.
+
+No production code changed. The deployed fleet is the one `v0.4.0` deployed.
+
+Explicitly excluded and still excluded: the demo video, the five composed gallery PNGs, and the
+actual Devpost/article/social publication — human publication tasks per this file's own
+"Submission gate," not release engineering. Also excluded on purpose: P0.10 managed Gateway
+refusals and P0.11 timeout/retry/dead-letter, which take the sanctioned narrower wording.
+
+Two mutable facts must be re-checked at the final freeze rather than trusted from this tag:
+`gcp-state.json` was captured 2026-08-23 and is not recaptured here, and upstream issue/PR state
+changed once already between a documented check and a release.

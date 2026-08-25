@@ -1,5 +1,11 @@
 # Four-minute demo storyboard
 
+> **Superseded 2026-08-25 by [DEMO_SCRIPT.md](../DEMO_SCRIPT.md)**, which is the shot list that will
+> actually be recorded. That file carries the current timings, the narration wording checked against
+> the claim matrix, and the rule that a partially observed item loses its shot rather than being
+> narrated as a target state. This page is retained as the earlier planning sketch; where the two
+> disagree, DEMO_SCRIPT.md wins.
+
 Target **3:35–3:50**, leaving platform/player margin. Never display a principal, policy dump,
 token, secret, Runtime ID, or private URL.
 

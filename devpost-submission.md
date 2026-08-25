@@ -4,10 +4,13 @@
 - **Track:** Fortified Enterprise Fleet
 - **Submission owner:** Arjun Ganesh
 - **Local status:** Drafting only — nothing in this file has been submitted or published.
-- **Last reconciled:** 2026-08-24
+- **Last reconciled:** 2026-08-25
 
 - **Live Devpost draft:** <https://devpost.com/software/bastion-pfuy71>
 - **Read-only check on 2026-08-24:** `submission_draft`; no submission timestamp; no video URL.
+- **Unverified as of 2026-08-25:** a `https://youtu.be/TBD` placeholder was reported saved in the
+  live video field. It cannot be confirmed from a read-only view. Open the draft and clear or
+  replace it — a dead placeholder in a required field reads as an incomplete entry.
 
 This is the field-by-field source for the Devpost form shown in the four screenshots under
 `.tmp/devpost-my-project-form-questions/`. Use it while filling the live form; do not substitute
@@ -218,16 +221,20 @@ claim.
 - Gemini uses the Vertex AI `global` endpoint, so Bastion makes no end-to-end EU residency claim.
 - The retained audit bucket has a 365-day policy but is not WORM/immutable.
 - The current snapshot is event-driven and claims no deployed recurring Scheduler job.
-- Until the named captures close, use the narrower wording in
-  [`submission/planning/11-claim-matrix.md`](submission/planning/11-claim-matrix.md) for Model
-  Armor, Gateway refusals, retry/dead-letter behavior, and Cloud Trace.
+- Two observations remain deliberately open: a managed Gateway refusal of an unregistered caller,
+  and a watched timeout/retry/dead-letter sequence. Use the narrower wording in
+  [`submission/planning/11-claim-matrix.md`](submission/planning/11-claim-matrix.md) for both, and
+  never call the instance cap or delivery bound a per-caller rate limit. The agent-mediated Model
+  Armor refusal and the current-route Cloud Trace chain closed on 2026-08-25 and may now be stated
+  as observed.
 
 ## Final manual fields and gates
 
 - [ ] Open and approve the 3:2 thumbnail.
 - [ ] Capture and approve all five gallery images.
 - [ ] Record, redact-review, upload, and verify the video while signed out.
-- [ ] Refresh mutable GCP counts and upstream issue/PR status.
+- [ ] Refresh mutable GCP counts and upstream issue/PR status. Checked 2026-08-25: issue #6854
+      open, PR #6859 open and unmerged, PR #6862 **closed unmerged**. Nothing is merged.
 - [ ] Publish and verify the optional article and social post, or leave both bonus fields blank.
 - [ ] Paste/save every field in Devpost and confirm the selected category.
 - [ ] Re-open every public link while signed out.

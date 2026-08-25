@@ -201,23 +201,46 @@ minutes it took to find this. No principal, binding, or credential was in that c
 was still model/tool-adjacent text in a channel this codebase otherwise keeps payload-free by
 construction — an accepted, bounded exception for live incident diagnosis, not a precedent.
 
-## Upstream contribution status (checked live 2026-08-23)
+## Upstream contribution status (checked live 2026-08-25)
 
 - Issue [google/adk-python#6854](https://github.com/google/adk-python/issues/6854), opened by
-  Arjun Ganesh: **open**. Documents both directions of the state-crossing defect above with a
-  production reproducer, root cause, and proposed warnings/documentation.
+  Arjun Ganesh: **open**, five comments, last updated 2026-08-24. Documents both directions of the
+  state-crossing defect above with a production reproducer, root cause, and proposed
+  warnings/documentation.
 - PR [google/adk-python#6859](https://github.com/google/adk-python/pull/6859), authored by
   Sylvester Kaczmarek: **open, not merged**. Adds warnings for the outbound state-only-loss
   direction and the rejected inbound remote-state-delta direction, plus tests and docs.
 - PR [google/adk-python#6862](https://github.com/google/adk-python/pull/6862), authored by Arjun
-  Ganesh: **open, not merged**. Adds the complementary construction-time warning for the adjacent
-  `LlmAgent(output_key) -> RemoteA2aAgent` case, which carries event content and is not covered
-  by the state-only warning.
+  Ganesh: **closed unmerged on 2026-08-24 by a Google maintainer**, who recommended closing it in
+  favour of #6859. Three reasons were given, and they are worth recording precisely because two of
+  them concede the finding and one criticises the patch:
+  1. `SequentialAgent` is deprecated in favour of `Workflow`, and Google does not want new
+     domain-specific validation or a `RemoteA2aAgent` coupling added to a deprecated component.
+  2. **"The session state boundary across A2A is a general transport property rather than an issue
+     specific to `SequentialAgent`."** It applies equally to `Workflow`, custom agents, and
+     standalone runs, and is *"already being addressed centrally at the `RemoteA2aAgent` converter
+     and documentation layer in #6859."*
+  3. The patch's `sys.modules.get` reflection check is sensitive to module import order and would
+     silently skip validation if `RemoteA2aAgent` were imported lazily or aliased. That is a fair
+     criticism of the implementation.
+
+**What the closure does and does not mean.** It is a routing decision about where a fix belongs,
+not a rejection of the defect: reason 2 is a maintainer confirming, in writing, that the boundary
+is real, general, and already being fixed centrally. The honest sentence is therefore *"the issue
+is open and a maintainer has confirmed the boundary is a general transport property being
+addressed in #6859; our own PR was closed in favour of that one."* It is **not** *"Google rejected
+our finding"*, and it is emphatically not *"Google accepted our fix."*
+
+The same reply asked why Bastion used `SequentialAgent` rather than `Workflow`. That question is
+unanswered upstream, and the deprecation it points at is the risk already accepted in
+[ADR-005](005-adk-as-the-agent-framework.md).
+
 - The third finding recorded in this amendment set — attributed-history wrapping breaking a
   bare-JSON parse on the callee side of a hop, and a failed remote task reaching the caller as an
   empty, error-free event — has not been filed upstream. It is a live risk, documented here, not
   yet a reported one.
 
-None of the three items above should be described as accepted, merged, or resolved by Google
-until this status is re-checked immediately before publication (`gh pr view --repo
-google/adk-python <number>`, or the corresponding issue command).
+No item above may be described as accepted, merged, or resolved by Google. Status must be
+re-checked immediately before publication (`gh pr view --repo google/adk-python <number>`, or the
+corresponding issue command); #6862 already changed state once between a documented check and a
+release.

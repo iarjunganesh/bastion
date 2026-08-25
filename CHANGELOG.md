@@ -10,6 +10,94 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
+## [0.5.0] — 2026-08-25
+
+Pre-media release. No production code changed: the fleet running on `bastion-fleet-2026` is the
+same one `v0.4.0` deployed. What became true is that five of seven outstanding observations were
+watched and retained, and the repository stopped describing them as pending.
+
+### Added — five observations closed, and the proof they produced
+
+- Added [evidence 11](assets/evidence/11-current-route-correlation.md): one investigation
+  completed across the managed Runtime, the deployed Access Auditor, the deterministic policy
+  gates, and the deployed Escalation Agent, assembling 28 unique payload-free events across three
+  invocation ids under a single investigation id. A count-only companion probe measured 62 live
+  IAM bindings, 3 deterministic findings, 2 canonical owning departments, and zero raw IAM fields
+  at the model boundary (P0.8, P0.9).
+- Added [evidence 12](assets/evidence/12-agent-mediated-model-armor-refusal.md): the deployed
+  `before_model_callback` refused an approved injection sample sent through the Access Auditor's
+  authenticated A2A surface. A benign control completed; the sample's task failed closed with
+  `policy_match`, and zero model submissions, completions, or tool calls followed. This is the
+  agent-mediated refusal that [evidence 01](assets/evidence/01-model-armor-block.md), a direct
+  managed-template probe, was never proof of (P0.6).
+- Added [evidence 13](assets/evidence/13-current-route-trace.md): one connected 22-span Cloud
+  Trace over 1m 5.401s covering both A2A hops with their agent-card fetches, the Firestore
+  exception lookup nested inside `policy_step`, and `escalation_gate`. D2's predicted risk — that
+  IAP-mediated egress might impair the Runtime's OTel export and cost this capture — did not
+  occur (P0.7).
+- Added [10-reproducibility.md](submission/planning/10-reproducibility.md): a measured clean-clone
+  run rather than a claim about one. A fresh unauthenticated clone reaches 321 passing tests at
+  100% configured core coverage with every gate green and zero untracked files (P1.3).
+- Added [11-claim-matrix.md](submission/planning/11-claim-matrix.md), the internal gate that stops
+  public copy claiming more than the evidence shows. Eight of ten rows are now fully claimable;
+  two remain narrowed.
+- Added the judge-facing submission package: a paste-ready Devpost narrative, a field-by-field
+  form worksheet, an ordered capture runbook, a shot-by-shot demo script, and technical-article
+  and social drafts. None is published.
+- Renamed the architecture masters from the internal `level-0/1/2` taxonomy to semantic names,
+  added the required static 1920×1080 PNG and a 3:2 thumbnail, and regenerated every theme
+  variant and GIF.
+
+### Changed — the documentation caught up with what is now observed
+
+- Model Armor and Agent Observability in [ADR-006](docs/adr/006-pillar-coverage.md) moved from
+  configuration and test proof to observed proof, citing evidence 11, 12 and 13.
+- Closed captures 2, 3, 4 and 5 in
+  [09-capture-backlog.md](submission/planning/09-capture-backlog.md). Capture 4 closed with its
+  boundary stated rather than smoothed: a refusal *is* recorded under the audit contract, but it
+  comes from the Model Armor probe, not from the correlated investigation itself.
+- Sharpened D2 with a second measurement. The 12 IAP denials on 2026-08-25 fell in a single
+  1.2-second burst ending three seconds before the investigation's root span, which then ran
+  clean. The denials belong to instance cold start, not the request path.
+- Marked [evidence 02](assets/evidence/02-gemini-investigation.md) superseded as current-route
+  proof and re-pointed ADR-004, the ADR index, and the judging matrix at evidence 11 and 13.
+- Resolved the two coexisting IAM binding counts: 62 is current, and evidence 09's 52 is retained
+  as its own dated measurement rather than overwritten.
+- Superseded `02-demo-storyboard.md` with [DEMO_SCRIPT.md](submission/DEMO_SCRIPT.md), which had
+  conflicting timings.
+- Synchronised the public evidence console: refreshed the stale binding count and added cards for
+  the refusal and the trace.
+
+### Fixed — an upstream claim that went stale between a check and a release
+
+- **PR `google/adk-python#6862` was closed unmerged on 2026-08-24**, and five documents still
+  described it as open. A Google maintainer declined it in favour of community PR `#6859`,
+  because `SequentialAgent` is deprecated and *"the session state boundary across A2A is a
+  general transport property rather than an issue specific to `SequentialAgent`."* That is a
+  maintainer confirming the finding and deciding where the fix belongs — not an accepted fix and
+  not a rejected report. Issue `#6854` and PR `#6859` remain open. Nothing is merged. Corrected
+  in README, [ADR-012](docs/adr/012-structured-findings-across-a2a.md), and the article, Devpost
+  and social drafts.
+- Corrected [10-reproducibility.md](submission/planning/10-reproducibility.md), which cited commit
+  `4fe8d59` — squashed and force-pushed away, so the hash no longer resolved in a fresh clone. A
+  reproducibility record naming an unreachable commit proves nothing, so it was re-run against
+  `c81b4af` rather than re-pointed.
+- Removed pre-capture wording that had become false: the Devpost narrative no longer says the
+  agent-mediated refusal *"remains a named capture"* or that *"the immediate next step is
+  evidence."*
+- Documented the py-launcher gap in README and CONTRIBUTING: `py -3.12` resolves only a CPython
+  registered with the Windows launcher, which uv, pyenv-win, conda and the Microsoft Store are
+  not.
+
+### Still deliberately not claimed
+
+Two observations remain open and their claims stay narrowed: a managed Gateway refusal of an
+unregistered caller, and a watched timeout/retry/dead-letter sequence. Every observable IAP denial
+in this project resolves to `unregisteredEndpoint` with an empty `authenticationInfo`, which is
+D2's residual platform behaviour rather than a caller being refused; producing the intended
+refusal would require deploying a modified Runtime, which this stage forbids. No demo video and no
+gallery image exists yet.
+
 ## [0.4.0] — 2026-08-23
 
 ### Added — a model cannot alter the authoritative finding set or skip a required delivery

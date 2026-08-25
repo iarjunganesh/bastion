@@ -40,8 +40,9 @@ elapsed; the architecture is designed for longer asynchronous work and expiry be
 - Firestore supplies durable inbox, leases, retry, idempotency, exception, and delivery state;
   managed sessions and Memory Bank supply agent context.
 - Gateway policy and registered destinations bound agent-to-agent access and fail closed.
-- Model Armor refused the retained injection sample; the agent callback and fail-closed path are
-  tested and deployed. The final agent-mediated refusal remains a named capture before video.
+- Model Armor refused a live injection attempt at the **deployed agent callback** on 2026-08-25:
+  the A2A task failed closed and no model or tool call followed. The fail-closed path is
+  additionally covered by tests.
 - Payload-free audit events preserve investigation and invocation correlation without retaining
   prompts, responses, raw principals, bindings, or private endpoints.
 
@@ -75,10 +76,14 @@ the value a caller expected. Bastion replaced that assumption with structured, v
 across the A2A boundary and durable request metadata for correlation.
 
 That production finding was reported upstream in
-[google/adk-python#6854](https://github.com/google/adk-python/issues/6854). The complementary
-construction-time warning is proposed in
-[google/adk-python#6862](https://github.com/google/adk-python/pull/6862). We refresh the live
-issue/PR state immediately before publication rather than freezing it in this draft.
+[google/adk-python#6854](https://github.com/google/adk-python/issues/6854), which is open. A
+complementary PR of mine, [google/adk-python#6862](https://github.com/google/adk-python/pull/6862),
+was closed unmerged on 2026-08-24 by a Google maintainer who confirmed the underlying point — the
+A2A session-state boundary is a general transport property, not a `SequentialAgent` bug — and
+directed the fix to community PR
+[google/adk-python#6859](https://github.com/google/adk-python/pull/6859), which remains open.
+Nothing is merged, and the live state is re-checked immediately before publication rather than
+frozen in this draft.
 
 Other difficult boundaries were equally useful: a passing test does not prove a deployed route,
 a configured retry policy does not prove redelivery was observed, and an architecture diagram can
@@ -109,9 +114,11 @@ when it is merely promised to remain confidential after the fact.
 
 ## What's next
 
-The immediate next step is evidence, not a larger feature surface: capture the final current-route
-Model Armor, Gateway, retry, trace, and IAM provenance artifacts; assemble the five-image gallery;
-and record the under-four-minute live demo. After the hackathon, the most valuable extensions are
+Current-route IAM provenance, the agent-mediated Model Armor refusal, the correlated audit trail and
+the Cloud Trace chain are captured and retained. Two observations are deliberately still open and
+are not claimed: a managed Gateway refusal of an unregistered caller, and a watched
+timeout/retry/dead-letter sequence. What remains is presentation — the five-image gallery and the
+under-four-minute live demo. After the hackathon, the most valuable extensions are
 additional governed department catalogs, a deliberate recurring trigger with an operational pause
 control, and hardening the retained audit store if an immutable retention requirement is adopted.
 

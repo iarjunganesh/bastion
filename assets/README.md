@@ -11,15 +11,18 @@ Bastion's central claim is backed by redacted captures rather than architecture 
 | Evidence | Captured fact | Boundary |
 |---|---|---|
 | [01 — Model Armor block](evidence/01-model-armor-block.md) | The live regional template refused a prompt-injection sample | Direct managed-service probe; callback wiring is additionally tested |
-| [02 — Gemini investigation](evidence/02-gemini-investigation.md) | Gemini 3.5 Flash processed minimized state from a real IAM review | Historical pre-Gateway run; not proof of the current route |
+| [02 — Gemini investigation](evidence/02-gemini-investigation.md) | Gemini 3.5 Flash processed minimized state from a real IAM review | Historical pre-Gateway run; **superseded 2026-08-25 by evidence 11** as current-route proof and retained as history only |
 | [03 — identity denial](evidence/03-escalation-agent-denied.md) | Escalation was denied IAM read while Auditor was permitted | Workstation impersonation of deployed identities |
 | [04 — private fleet](evidence/04-private-fleet-deployment.md) | 21 APIs and 39 deployed resources measured without principals | Count-only inventory, not a request trace |
 | [05 — Runtime and Gateway](evidence/05-runtime-gateway.md) | Managed Runtime session streamed events; Gateway/Registry/IAP configuration verified | Status and count proof; no private URLs or identities retained |
 | [06 — durable findings](evidence/06-durable-findings.md) | Eventarc/Firestore completion plus findings IAM and idempotency | Live production smoke; payload intentionally omitted |
-| [07 — observability](evidence/07-observability.md) | Regional audit retention, sink, metrics, alerts, and dashboard exist | Configuration proof; not historical SLO attainment |
+| [07 — observability](evidence/07-observability.md) | Regional audit retention, sink, metrics, alerts, and dashboard exist | Reviewed bucket capture proves region, 365-day retention, and analytics; not immutability/WORM or historical SLO attainment |
 | [08 — tool poisoning](evidence/08-tool-poisoning.md) | Fixed tool sets at construction; Escalation holds no policy tool or Asset client | Construction-time proof, verified to fail when widened; not a live refusal trace |
-| [09 — cross-department routing](evidence/09-cross-department-routing.md) | 52 live bindings produced 3 findings routed to 2 owning departments | Counts and department ids only; routing measurement, not a completed investigation |
+| [09 — cross-department routing](evidence/09-cross-department-routing.md) | 52 live bindings produced 3 findings routed to 2 owning departments | Counts and department ids only; routing measurement, not a completed investigation. Its 52 bindings are that date's measurement — evidence 11 measured 62 on 2026-08-25 and is the current figure |
 | [10 — cross-week suppression](evidence/10-cross-week-suppression.md) | A human exception approved 2026-08-19 suppressed its matching finding on 2026-08-22, on the deployed path; re-confirmed 2026-08-23 after the deterministic-delivery rewrite (P0.1–P0.3) | Three-day gap, not a calendar week; expiry firing is covered by tests only |
+| [11 — current-route correlation](evidence/11-current-route-correlation.md) | One fresh investigation completed across Runtime, deployed Auditor and Escalation revisions, and Gemini 3.5 Flash; a companion probe measured 62 bindings, 3 canonical findings, and 2 post-policy deliveries | Payload-free route correlation plus count-only companion measurement; reviewed raw source awaits final gallery composition |
+| [12 — agent-mediated Model Armor refusal](evidence/12-agent-mediated-model-armor-refusal.md) | The deployed Auditor callback refused the approved injection sample and its A2A task failed before another model or tool call | Direct authenticated Auditor probe, not a durable Runtime investigation; reviewed raw source awaits the IAM-denial composite |
+| [13 — current-route trace](evidence/13-current-route-trace.md) | One connected 22-span Cloud Trace covered the managed Runtime, both A2A workers with their agent-card fetches, the Firestore exception lookup inside the policy step, and the completion gate | Sampled explanatory telemetry with span attributes deliberately unopened; not the retained compliance record and not a latency claim |
 
 ## Architecture and brand assets
 

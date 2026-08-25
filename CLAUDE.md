@@ -8,11 +8,17 @@ Bastion is a Fortified Enterprise Fleet submission for the All Things Agentic Ha
 Google ADK agents review a real GCP IAM policy from approved asynchronous events: a managed Runtime
 Orchestrator, a read-only Access Auditor, and a no-IAM-read Escalation Agent.
 
-As of 2026-08-22 the production path is deployed and verified: Pub/Sub/Eventarc durable ingress,
+As of 2026-08-25 the production path is deployed and verified: Pub/Sub/Eventarc durable ingress,
 Firestore lifecycle, Agent Runtime/Identity, Memory Bank, Agent Gateway/IAP, Agent Registry, two
 protected Cloud Run A2A workers, Model Armor, an IAM-private findings API, and retained operations
 controls. The count-only capture records 21/21 APIs and 39 resources. The Python 3.12 suite has
 321 tests at 100% configured core statement and branch coverage.
+
+Five of seven observation captures are closed. Current-route IAM provenance, the agent-mediated
+Model Armor refusal, the correlated payload-free audit trail and the Cloud Trace chain were all
+captured on 2026-08-25 (evidence 11, 12, 13). Two remain deliberately open and their claims stay
+narrowed: a managed Gateway refusal of an unregistered caller, and a watched
+timeout/retry/dead-letter sequence. No demo video or gallery image exists yet.
 
 Read these before changing architecture or claims:
 

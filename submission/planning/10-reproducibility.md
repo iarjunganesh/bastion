@@ -1,7 +1,11 @@
 # Clean-clone reproducibility
 
-**Run 2026-08-24 against commit `4fe8d59`** — the public `main` at the time, which is `v0.4.0`
-plus the site-sync commit.
+**Re-run 2026-08-25 against commit `c81b4af`**, the current public `main`.
+
+The first run of this record cited commit `4fe8d59`. That commit was later folded into
+`c81b4af` and force-pushed away, so the hash no longer resolves in a fresh clone — a
+reproducibility record naming an unreachable commit proves nothing, which is exactly the class
+of quiet staleness this file exists to catch. It was re-run rather than re-pointed.
 
 This closes P1.3. Its purpose is narrow and worth stating precisely: prove that a judge who has
 never seen the author's machine can clone the public repository and reach a green offline gate
@@ -22,29 +26,30 @@ Every gate passed. The output column quotes the tools, not a summary of them.
 
 | Step | Result |
 |---|---|
-| `git clone` over public HTTPS, unauthenticated | HEAD `4fe8d59` on `main` |
+| `git clone` over public HTTPS, unauthenticated | HEAD `c81b4af` on `main` |
 | Virtual environment under Python 3.12 | CPython 3.12.12 |
 | `pip install -r requirements-dev.txt` | resolved and installed with no conflict |
 | `pytest tests --cov --cov-fail-under=100` | 321 passed; 894 statements, 248 branches, 100.00% |
 | `ruff check .` | `All checks passed!` |
-| `ruff format --check .` | `125 files already formatted` |
+| `ruff format --check .` | `134 files already formatted` |
 | `mypy` over the eight packages | `Success: no issues found in 40 source files` |
 | `python scripts/check_docs.py` | `Documentation agrees with the repository.` |
-| `python scripts/check_versions.py` | `versions agree across 33 documents and 17 pins.` |
+| `python scripts/check_versions.py` | `versions agree across 41 documents and 17 pins.` |
 | `python scripts/render_diagrams.py --check` | `Theme variants are current (4 masters).` |
 | `python scripts/check_site.py` | `Public site is snapshot-aligned and contains no prohibited data shapes or origins.` |
-| `npx markdownlint-cli2 "**/*.md"` | `Summary: 0 issues in 0 files` across 48 files |
+| `npx markdownlint-cli2 "**/*.md"` | `Summary: 0 issues in 0 files` across 57 files |
 
 Four checks are specific to reproducibility rather than correctness, and all four held:
 
 - **No untracked required file.** `git status --porcelain` was empty after the entire gate ran.
   Nothing the suite, the coverage run, or the diagram check produces escapes `.gitignore`, so a
   contributor's first run cannot leave the tree dirty and cannot hide a missing committed asset.
-- **185 tracked files** constitute the whole repository. `.env` is absent, as it must be;
+- **197 tracked files** constitute the whole repository. `.env` is absent, as it must be;
   `.env.example` is present and is the only configuration a live run needs.
-- **Diagrams resolve on both GitHub themes.** All light and dark SVG variants of the three
-  architecture masters and the request path are committed, and README.md selects between them
-  with `<picture>` and `prefers-color-scheme` at four separate places.
+- **Diagrams resolve on both GitHub themes.** Light and dark SVG variants of every architecture
+  master are committed and README.md selects between them with `<picture>` and
+  `prefers-color-scheme`. The masters were renamed from the internal `level-0/1/2` taxonomy to
+  semantic names, and `render_diagrams.py --check` reports all four current.
 - **The demo-video badge is deliberately unlinked.** It renders as a plain image with the
   wrapping instruction sitting directly above it in an HTML comment, so it becomes a link only
   when a public video URL exists to point it at.
