@@ -55,6 +55,11 @@ community change, [google/adk-python#6859](https://github.com/google/adk-python/
 Sylvester Kaczmarek, addresses the state-only outbound loss and rejected inbound
 remote-state-delta cases; it is open and unmerged.
 
+A second collaborator later added that the `output_key` half is expected behaviour — remote
+sessions are per-agent by design. That is true, and it was never the complaint: the report asked
+for the silent boundary to become observable, not for the semantics to change. They also asked for
+a reproduction to test #6859, which I supplied on 2026-08-27.
+
 I also opened [google/adk-python#6862](https://github.com/google/adk-python/pull/6862), adding a
 construction-time warning for the adjacent `LlmAgent(output_key) -> RemoteA2aAgent` pattern. A
 Google maintainer closed it unmerged on 2026-08-24, and the reply is the most useful artifact this

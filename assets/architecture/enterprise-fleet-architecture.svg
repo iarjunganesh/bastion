@@ -262,6 +262,6 @@ svg {
     <circle cx="680" cy="1046" r="9" fill="none" stroke="var(--ghost)" stroke-width="2"/>
     <text class="legend" x="698" y="1054">boundary disclosed</text>
   </g>
-  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-23 · 21/21 APIs · 39 resources measured</text>
+  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-27 · 21/21 APIs · 39 resources measured</text>
   <text class="foot"  x="1860" y="1016" text-anchor="end">Three deployed services, three identities. The Escalation Agent holds no IAM read role at all — see ARCHITECTURE.md.</text>
 </svg>

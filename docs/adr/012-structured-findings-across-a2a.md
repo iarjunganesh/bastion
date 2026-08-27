@@ -201,10 +201,10 @@ minutes it took to find this. No principal, binding, or credential was in that c
 was still model/tool-adjacent text in a channel this codebase otherwise keeps payload-free by
 construction — an accepted, bounded exception for live incident diagnosis, not a precedent.
 
-## Upstream contribution status (checked live 2026-08-25)
+## Upstream contribution status (checked live 2026-08-27)
 
 - Issue [google/adk-python#6854](https://github.com/google/adk-python/issues/6854), opened by
-  Arjun Ganesh: **open**, five comments, last updated 2026-08-24. Documents both directions of the
+  Arjun Ganesh: **open**, seven comments, last updated 2026-08-27. Documents both directions of the
   state-crossing defect above with a production reproducer, root cause, and proposed
   warnings/documentation.
 - PR [google/adk-python#6859](https://github.com/google/adk-python/pull/6859), authored by
@@ -231,8 +231,33 @@ is open and a maintainer has confirmed the boundary is a general transport prope
 addressed in #6859; our own PR was closed in favour of that one."* It is **not** *"Google rejected
 our finding"*, and it is emphatically not *"Google accepted our fix."*
 
-The same reply asked why Bastion used `SequentialAgent` rather than `Workflow`. That question is
-unanswered upstream, and the deprecation it points at is the risk already accepted in
+### The 2026-08-27 exchange, which changed two things
+
+A second Google collaborator replied on the issue, and the position is worth recording exactly
+because it is easy to overstate in either direction:
+
+1. **They characterise the `output_key` direction as intended.** `RemoteA2aAgent` accepts no
+   `output_key`; a remote agent's own `output_key` writes to its server-side session; sessions are
+   per-agent across A2A — *"therefore, this is the expected behavior."* That is correct, and it is
+   compatible with the report rather than a rebuttal of it: the report never asked for the
+   semantics to change. Its remedies were a warning, a warning, and a documentation note, and the
+   only behavioural suggestion was explicitly optional. **The surviving ask is observability, not
+   semantics** — that crossing the boundary is a silent no-op.
+2. **They asked for a reproduction sample to test #6859**, and said that PR *"can be merged if the
+   reviewer approves it."* That is a conditional statement about a review that has not happened.
+   It is not an approval, and nothing may cite it as one.
+
+A verified reproduction was supplied the same day: self-contained, no model or cloud, serving the
+remote agent over A2A on localhost, and reproducing identically on `google-adk` 2.7.1 and 2.8.0.
+One detail from running it on 2.8.0 was reported as useful to that PR's reviewer — the substituted
+content now arrives wrapped in the release's `<<<BEGIN_QUOTED_AGENT_CONTENT>>>` injection-guard
+markers, so the guard is working but wrapping the *wrong* payload, and the drop is still silent.
+
+**The `Workflow` question is now answered.** The maintainer who closed #6862 had asked why Bastion
+used `SequentialAgent`; that was unanswered until 2026-08-27, when it was answered on the issue
+with the blocker named in the deprecation warning's own second sentence — `Workflow` cannot yet be
+an `LlmAgent` sub-agent, which is exactly the composition Bastion uses. Re-verified against 2.8.0,
+which emits the identical warning. The deprecation it points at remains the risk accepted in
 [ADR-005](005-adk-as-the-agent-framework.md).
 
 - The third finding recorded in this amendment set — attributed-history wrapping breaking a

@@ -47,7 +47,9 @@ TODO_DEVPOST_URL
   boundary image.
 - [ ] Keep `#AllThingsAgenticHackathon` exact.
 - [ ] Ensure the post and every link are public while signed out.
-- [ ] Re-check upstream state live before posting. As of 2026-08-25: issue #6854 open, community
-  PR #6859 open and unmerged, my PR #6862 closed unmerged. Never imply anything is merged or
-  that Google accepted a fix.
+- [ ] Re-check upstream state live before posting. As of 2026-08-27: issue #6854 open with seven
+  comments, community PR #6859 open and unmerged, my PR #6862 closed unmerged. A Google
+  collaborator has said #6859 *can* be merged if its reviewer approves — that is a conditional
+  about a review that has not happened. Never imply anything is merged or that Google accepted a
+  fix.
 - [ ] Save the public post URL for the Devpost bonus field.

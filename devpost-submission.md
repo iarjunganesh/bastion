@@ -247,8 +247,10 @@ claim.
 - [x] Capture and approve all five gallery images. Composed 2026-08-27, all dark, all passing
       `python scripts/redact_evidence.py --check`; three captions narrowed — see the runbook.
 - [ ] Record, redact-review, upload, and verify the video while signed out.
-- [ ] Refresh mutable GCP counts and upstream issue/PR status. Checked 2026-08-25: issue #6854
-      open, PR #6859 open and unmerged, PR #6862 **closed unmerged**. Nothing is merged.
+- [ ] Refresh mutable GCP counts and upstream issue/PR status. Checked 2026-08-27: issue #6854
+      open with seven comments, PR #6859 open and unmerged, PR #6862 **closed unmerged**. Nothing
+      is merged. A Google collaborator asked for a reproduction to test #6859 and one was supplied
+      on 2026-08-27; their "can be merged if the reviewer approves" is conditional, not approval.
 - [ ] Publish and verify the optional article and social post, or leave both bonus fields blank.
 - [ ] Paste/save every field in Devpost and confirm the selected category.
 - [ ] Re-open every public link while signed out.

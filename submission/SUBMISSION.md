@@ -23,8 +23,10 @@ or a media platform.
       only, not a public agent endpoint.
 - [ ] Devpost category selected and all required fields saved.
 - [ ] Public English demo video under four minutes.
-- [x] Architecture GIF/image uploaded to Devpost; the live draft carries the dark architecture
-      GIF and its footer reads the current `2026-08-23` build state.
+- [ ] Architecture GIF/image uploaded to Devpost. The live draft carries the dark architecture
+      GIF footed `2026-08-23`; the fleet was re-measured on 2026-08-27 and every asset regenerated,
+      so **the uploaded copy is one capture behind and must be replaced**. Counts are identical —
+      21/21 APIs, 39 resources — so only the disclosed date differs.
 - [ ] Final submission sent before the deadline.
 
 ## Three track obligations

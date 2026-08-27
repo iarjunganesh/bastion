@@ -213,6 +213,6 @@ svg {
     <circle cx="500" cy="1046" r="9" fill="var(--red-d)"/>
     <text class="legend" x="518" y="1054">real production IAM, read-only</text>
   </g>
-  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-23 · 21/21 APIs · 39 deployed resources</text>
+  <text class="footb" x="1860" y="1046" text-anchor="end">Build state · 2026-08-27 · 21/21 APIs · 39 deployed resources</text>
   <text class="foot"  x="1860" y="1016" text-anchor="end">Raw members, roles and bindings never leave step 6a — see DATA_GOVERNANCE.md.</text>
 </svg>

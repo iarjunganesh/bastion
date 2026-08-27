@@ -94,9 +94,10 @@ they name the current Cloud Run revisions — and recomposing gallery images 03,
 Until then "deployed and verified" means the older resolution; see
 [ADR-005](../../docs/adr/005-adk-as-the-agent-framework.md).
 
-**Re-check before the final freeze:** `gcp-state.json` still records a 2026-08-23 capture, the
-clean-clone gate is due from the public `v0.6.0` tag, and the demo video remains the only
-outstanding mandatory Devpost artifact.
+**Re-check before the final freeze:** the clean-clone gate is due from the public `v0.6.0` tag,
+and the demo video remains the only outstanding mandatory Devpost artifact. `gcp-state.json` was
+re-measured 2026-08-27 — same 21/21 APIs and 39 resources, so every count in the diagrams and on
+the public console is unchanged and only the disclosure date moved.
 
 ## v0.5.2 — the judge-facing image set, and the gate that clears it
 

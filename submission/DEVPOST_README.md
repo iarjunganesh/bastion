@@ -86,8 +86,11 @@ was closed unmerged on 2026-08-24 by a Google maintainer who confirmed the under
 A2A session-state boundary is a general transport property, not a `SequentialAgent` bug — and
 directed the fix to community PR
 [google/adk-python#6859](https://github.com/google/adk-python/pull/6859), which remains open.
-Nothing is merged, and this status is re-verified against GitHub immediately before submission
-rather than quoted from memory.
+On 2026-08-27 a second Google collaborator described the `output_key` half as expected behaviour
+— which the report had never disputed, its ask being that the silent boundary become observable —
+and asked for a reproduction to test #6859. One was supplied the same day. Nothing is merged, and
+this status is re-verified against GitHub immediately before submission rather than quoted from
+memory.
 
 Other difficult boundaries were equally useful: a passing test does not prove a deployed route,
 a configured retry policy does not prove redelivery was observed, and an architecture diagram can

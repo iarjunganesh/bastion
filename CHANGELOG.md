@@ -10,6 +10,42 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
+## [Unreleased]
+
+### Fixed — the public console called a fleet inventory an evidence verification
+
+- `site/index.html` labelled its timestamp "Last evidence verification" while the value is
+  `gcp-state.json`'s `captured_utc` — a count-only inventory of enabled APIs and deployed
+  resources. It is now "Fleet inventory captured". The old wording also made the evidence look
+  older than it is: the observations in evidence 11, 12 and 13 were captured 2026-08-25, two days
+  *after* the date the site presented as the last verification.
+
+### Changed — upstream contribution status moved, in both directions
+
+- A second Google collaborator replied on
+  [#6854](https://github.com/google/adk-python/issues/6854) on 2026-08-27, describing the
+  `output_key` half as expected behaviour and asking for a reproduction to test community PR
+  #6859. A verified self-contained reproduction was supplied the same day, along with the answer
+  to the `Workflow`-versus-`SequentialAgent` question that had been open since #6862 was closed.
+- The semantics point is conceded and was never disputed: the report's ask was that the silent
+  boundary become observable, not that per-agent sessions change. Recorded in
+  [ADR-012](docs/adr/012-structured-findings-across-a2a.md) with the exact wording, because
+  *"can be merged if the reviewer approves"* is a conditional about a review that has not
+  happened and must never be cited as approval.
+- Every judge-facing surface that states this status was moved from its 2026-08-25 check to
+  2026-08-27: the README, the Devpost write-up, the article and social drafts, and the
+  publication checklists.
+
+### Changed — the fleet inventory was re-measured, and every dated asset re-stamped
+
+- `gcp-state.json` re-measured 2026-08-27: **21/21 APIs and 39 resources, identical to the
+  2026-08-23 capture**. Nothing about the fleet changed; only the disclosure date moved.
+- The three architecture masters were re-stamped and every variant, GIF and still regenerated, and
+  gallery image 01 recopied from the dark still, because
+  `check_diagram_dates_match_state()` gates the footer date against the capture it quotes.
+- The Devpost draft's uploaded architecture GIF is now one capture behind and needs replacing;
+  tracked in [SUBMISSION.md](submission/SUBMISSION.md). The counts it shows are still correct.
+
 ## [0.6.0] — 2026-08-27
 
 Every pinned dependency moved to the newest release the resolver allows, including the agent

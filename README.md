@@ -195,11 +195,12 @@ run and every CI job exercises the working topology, so the failure is invisible
 gate by construction, even at 100% configured core statement and branch coverage. Reported
 upstream with a production reproducer in
 [google/adk-python#6854](https://github.com/google/adk-python/issues/6854) (opened by Arjun
-Ganesh) and fixed structurally in
+Ganesh) — where Google has since confirmed the per-session semantics are intended, leaving the
+silence rather than the behaviour as the open ask — and fixed structurally in
 [ADR-012](docs/adr/012-structured-findings-across-a2a.md); the full ledger is the
 [observation backlog](submission/planning/09-capture-backlog.md).
 
-Checked live on 2026-08-25: the issue is **open**, and community PR
+Checked live on 2026-08-27: the issue is **open** with seven comments, and community PR
 [google/adk-python#6859](https://github.com/google/adk-python/pull/6859) (Sylvester Kaczmarek) —
 which adds warnings for the outbound state-only-loss and rejected inbound remote-state-delta
 directions — is **open and unmerged**. A complementary PR of my own,
