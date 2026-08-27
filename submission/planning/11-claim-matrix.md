@@ -1,7 +1,7 @@
 # Final claim matrix
 
-- **Reviewed:** 2026-08-24; reconciled 2026-08-27 against release `v0.5.2` after the P0.6-P0.9
-  evidence sprint and the gallery composition
+- **Reviewed:** 2026-08-24; reconciled 2026-08-27 against release `v0.6.0` after the P0.6-P0.9
+  evidence sprint, the gallery composition, and the dependency bump
 - **Purpose:** Internal pre-publication gate before drafting Devpost, article, social, screenshot,
   or demo copy. `Partial` means the public sentence must use the narrower wording in the final
   column; it does not mean the underlying architecture is absent.
@@ -44,6 +44,13 @@ planned were never captured: image 02 shows the catalog but not per-agent owners
 metadata, image 04 shows inline screening but not the IAM read split, and image 05 shows
 correlation and retention but not cross-week exception continuity. Each underlying claim keeps its
 status here — the narrowing is about what a screenshot proves, not about what is true.
+
+**One claim shape is newly unsafe as of `v0.6.0`:** anything implying the repository's dependency
+versions are the ones running in production. They are not. The repository pins `google-adk` 2.8.0;
+both deployed surfaces still run the 2.7.1 resolution `v0.4.0` deployed. Every observation in the
+evidence set stays true of the fleet it observed, but "we run ADK 2.8.0 in production" is not
+available until a redeploy and live re-verification happen — which will also oblige re-capturing
+evidence 11, 12 and 13 and recomposing gallery images 03, 04 and 05.
 
 Mutable live counts, upstream issue/PR status, public links, official rules, and video availability
 must be refreshed immediately before publication; this review is not authority for facts that can

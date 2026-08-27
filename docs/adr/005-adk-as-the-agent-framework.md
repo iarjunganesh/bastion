@@ -5,12 +5,11 @@ rejection of the Antigravity SDK now rests on a measured incompatibility rather 
 judgement about documentation quality. **Amended 2026-08-22** — version raised to 2.7.1 for the
 `v0.2.0` tag, and the composition below corrected: not every step is an `LlmAgent` any more.
 **Amended 2026-08-23** — the Escalation Agent is no longer an `LlmAgent` either (P0.2); only the
-Access Auditor still is. **Amended 2026-08-27** — `2.8.0` reviewed before the `v0.5.2` tag and
-deliberately not taken; see "2.8.0 was reviewed and declined" below. **Date:** 2026-08-27
+Access Auditor still is. **Amended 2026-08-27** — version raised to 2.8.0 for the `v0.6.0` tag; see "2.8.0 was reviewed, declined, then taken" below. **Date:** 2026-08-27
 
 ## Decision
 
-Bastion's three agents are **ADK agents** (`google-adk==2.7.1`). ADK owns the agent
+Bastion's three agents are **ADK agents** (`google-adk==2.8.0`). ADK owns the agent
 definition, the tool-calling loop, and the session and memory service interfaces
 ([ADR-003](003-pillars-on-geap.md)). The GenAI SDK, Antigravity SDK, and Genkit are not used.
 
@@ -61,9 +60,10 @@ any code.
   one choice. `adk deploy` offers `agent_engine`, `cloud_run`, and `gke`; the Cloud Run form
   carries `--trace_to_cloud`, `--a2a`, `--session_service_uri` and `--memory_service_uri`, so
   four pillars are flags rather than modules.
-- **Zero installation risk.** Re-verified 2026-08-22 against `google-adk==2.7.1`, as it was on
-  2026-08-15 against 2.7.0: `google.adk.agents`, `.tools`, `.memory`, `.sessions`, `.a2a`,
-  `.plugins` and `vertexai.agent_engines.AdkApp` all import cleanly. Re-run rather than
+- **Zero installation risk.** Re-verified 2026-08-27 against `google-adk==2.8.0`, as it was on
+  2026-08-22 against 2.7.1 and 2026-08-15 against 2.7.0: `google.adk.agents`, `.tools`, `.memory`,
+  `.sessions`, `.a2a`, `.plugins` and `vertexai.agent_engines.AdkApp` all import cleanly. Re-run
+  rather than
   re-dated — a verification claim that is edited to match a new pin is no longer a verification.
 
 **The Antigravity SDK is not merely undocumented — it cannot be installed alongside this
@@ -101,7 +101,9 @@ framework's own server; Flask is removed from `requirements.txt`.
 **ADK releases fast — 2.6.3 to 2.7.0 inside two days.** Every document naming a version goes
 stale silently, and the README badge is the version a judge actually reads.
 `scripts/check_versions.py` holds documents to `requirements.txt` offline on every push, and
-`--check-upstream` compares the pin against PyPI before a tag.
+`--check-upstream` compares the pin against PyPI before a tag. Only the five packages a document
+names can *fail* that check; since `v0.6.0` every other pin is surveyed and reported too, because
+a gate covering five of twenty-three pins was being read as covering all of them.
 
 ### `SequentialAgent` is deprecated in 2.7.0, and Bastion keeps using it
 
@@ -125,36 +127,40 @@ migration trigger is explicit: **when `Workflow` can be an `LlmAgent` sub-agent,
 `scripts/check_versions.py --check-upstream` runs before every tag, so a release that changes
 this will not pass unnoticed.
 
-### 2.8.0 was reviewed and declined
+### 2.8.0 was reviewed, declined, then taken
 
-`--check-upstream` failed before the `v0.5.2` tag: PyPI now carries a `2.8.0` release against this
-ADR's `2.7.1` pin. The gate did its job; the pin stays anyway, and the reasoning belongs here
-rather than in a commit message. (The version named in the previous sentence is deliberately not
-written adjacent to the package name, because `scripts/check_versions.py` reads that shape as a
-documented pin and would fail on a version this document is declining.)
+`--check-upstream` failed before the `v0.6.0` tag: PyPI carried a newer release than this ADR's
+pin. The first decision was to decline it, on the grounds that the migration trigger had not
+fired and that the deployed fleet was running the older resolution. The platform owner overrode
+that, and the pin moved. Both halves are recorded because the reasoning for declining is still
+the reasoning that governs the *deployment*, which has not moved with it.
 
-**The migration trigger did not fire.** 2.8.0's notes change neither `SequentialAgent`'s
-deprecation status nor `Workflow`'s eligibility as an `LlmAgent` sub-agent, so the one condition
-this ADR commits to acting on is still unmet. Nothing in the release is a breaking change for the
-composition above.
+**The migration trigger still has not fired.** The newer release changes neither
+`SequentialAgent`'s deprecation status nor `Workflow`'s eligibility as an `LlmAgent` sub-agent, so
+the one condition this ADR commits to acting on remains unmet and the composition below is
+unchanged.
 
-**Two of its additions land exactly on Bastion's most sensitive seams**, which is an argument for
-care rather than for speed: native task-mode support in `RemoteA2aAgent`, which is how both A2A
-worker hops are made, and a Model Armor guardrail plugin, which is the surface
-[ADR-009](009-model-armor-threshold.md)'s fail-closed callback already occupies. Taking either
-without a live re-verification would replace a measured integration with an assumed one.
+**What was verified before the pin moved.** The full suite passes on the new resolution — 321
+tests at 100% statement and branch coverage — along with Ruff, the type checker, and every
+documentation gate. The import claim above was re-run rather than re-dated. A local A2A
+round-trip was exercised end to end: a `SequentialAgent` calling a `RemoteA2aAgent` served over
+HTTP, agent card resolved, remote executed.
 
-**The pin is not only a repository fact.** `v0.4.0` deployed this fleet and verified it live on
-`2.7.1`; the managed Agent Runtime and both Cloud Run workers are running that resolution now.
-Bumping the pin without redeploying both surfaces would put the repository and the deployed fleet
-into disagreement while every "deployed and verified" claim in the evidence set still pointed at
-the old one — the precise failure mode
-[CLAUDE.md](../../CLAUDE.md)'s two-part deployment note exists to prevent.
+**What was not verified, and cannot be from here.** OpenTelemetry is capped by the framework at
+`<=1.42.1`, so the trace path did not move and needs no re-verification. But the release adds
+native task mode to `RemoteA2aAgent` and a Model Armor guardrail plugin, which are the two seams
+[ADR-009](009-model-armor-threshold.md)'s fail-closed callback and both A2A worker hops occupy.
+A passing local suite is not a live fleet.
 
-So this is a deliberate lag, not an oversight, and it is bounded: revisit when the fleet is next
-redeployed and re-verified live, or immediately if `Workflow` becomes usable as an `LlmAgent`
-sub-agent. Until then `--check-upstream` will keep failing on this pin, and that is the correct
-behaviour for a gate whose purpose is to make the lag visible rather than to hide it.
+**So the repository and the deployment now disagree, deliberately and temporarily.** The managed
+Agent Runtime and both Cloud Run workers are still running the resolution `v0.4.0` deployed.
+Until both surfaces are redeployed and re-verified live, every "deployed and verified" claim in
+the evidence set describes the older resolution, and redeploying will mint new Cloud Run
+revisions — which the evidence records name explicitly, so
+[evidence 11](../../assets/evidence/11-current-route-correlation.md),
+[12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md) and
+[13](../../assets/evidence/13-current-route-trace.md) will need re-capturing when it happens.
+That is the cost of the bump, and it is stated here rather than discovered later.
 
 This also bounds the blast radius. The composition is a handful of lines in one module; nothing
 else in the repository names `SequentialAgent`, because the pillars are managed products, the

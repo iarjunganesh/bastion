@@ -9,6 +9,23 @@ holds that a pillar closes only when implementation, deployment, and an observab
 and [SUBMISSION.md](../SUBMISSION.md)'s checkbox convention means *observed*, not *built*. A
 capability with code and no capture is deliberately not claimed.
 
+## Carried in from `v0.6.0` — the repository moved and the deployment did not
+
+**Both surfaces still run the `google-adk` 2.7.1 resolution `v0.4.0` deployed; the repository now
+pins 2.8.0.** This is not an observation gap in the usual sense — the capability is not merely
+unwatched, the deployment is a release behind the tree that describes it. It sits here because the
+consequence is observational: redeploying mints new Cloud Run revisions, and
+[evidence 11](../../assets/evidence/11-current-route-correlation.md) and
+[12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md) name
+`bastion-access-auditor-00031-sbr` and `bastion-escalation-agent-00027-nkv` explicitly.
+
+Closing it therefore means, in order: redeploy both surfaces, re-verify live, re-run the
+investigation, re-capture evidence 11, 12 and 13, and recompose gallery images 03, 04 and 05 from
+the new captures. Nothing may claim production runs the newer resolution until that is done.
+
+The alternative is equally acceptable and costs nothing: leave the fleet where it is and say so,
+which is what every current claim already does.
+
 ## Why this file exists
 
 The backlog previously lived only in an untracked scratch file. A record of outstanding work that

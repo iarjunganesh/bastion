@@ -11,7 +11,7 @@ or a media platform.
 
 - [x] Gemini 3.5 Flash through Vertex AI `global`; live calls captured in
       [evidence 02](../assets/evidence/02-gemini-investigation.md).
-- [x] Google ADK 2.7.1; three ADK agents, A2A workers, plugins, tools, and managed Runtime.
+- [x] Google ADK 2.8.0; three ADK agents, A2A workers, plugins, tools, and managed Runtime.
 - [x] Google Cloud infrastructure; measured deployment in
       [evidence 04](../assets/evidence/04-private-fleet-deployment.md).
 - [x] Fortified Enterprise Fleet brief addressed across Registry, Runtime, Memory, Identity,
@@ -134,7 +134,7 @@ The following claims are deliberately not made:
 - [ ] Keep private services running through judging; do not expose an agent merely to create a
       public hosted-project URL.
 - [x] Run the complete local and live release gates, push `main`, and confirm GitHub Actions
-      green. Done for `v0.5.1`; due again for `v0.5.2` and after the final submission-preparation
+      green. Done for `v0.5.1`; due again for `v0.6.0` and after the final submission-preparation
       commit, because this
       one is satisfied per-push rather than once.
 - [x] Release tags are explicit release decisions rather than engineering side effects:
@@ -144,6 +144,13 @@ The following claims are deliberately not made:
       deployed and re-verified live the same day. `v0.5.0` packages clean-clone proof, the claim
       matrix, submission drafts, and five closed observations; `v0.5.1` corrects and gates the
       architecture capture date; `v0.5.2` composes the five-image gallery and adds the redaction
-      gate that caught an operator account photo in a promoted evidence capture. Each annotated tag
-      is created only after its release metadata, full gates, pushed commit, and green `main` CI
-      all agree.
+      gate that caught an operator account photo in a promoted evidence capture; `v0.6.0` moves
+      every pin to the newest release the resolver allows and fixes the pre-tag gate that had been
+      surveying five pins of twenty-three. Each annotated tag is created only after its release
+      metadata, full gates, pushed commit, and green `main` CI all agree.
+
+- [ ] **Redeploy both surfaces onto the `v0.6.0` dependency resolution and re-verify live.** Until
+      this happens the repository pins `google-adk` 2.8.0 while the fleet runs 2.7.1, and no claim
+      may say production runs the newer resolution. Doing it obliges re-capturing evidence 11, 12
+      and 13 and recomposing gallery images 03, 04 and 05, because those records name the current
+      Cloud Run revisions.

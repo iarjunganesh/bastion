@@ -28,7 +28,7 @@
 ![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)
 
 <!-- Row 2 — what Bastion is actually built on, plus the program badge earned before it. -->
-[![Google ADK 2.7.1](https://img.shields.io/badge/Google_ADK-2.7.1-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
+[![Google ADK 2.8.0](https://img.shields.io/badge/Google_ADK-2.8.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
 [![A2A SDK](https://img.shields.io/badge/A2A_SDK-1.1.2-1A73E8)](https://github.com/a2aproject/a2a-python)
 [![Gemini Enterprise Agent Ready](https://img.shields.io/badge/GEAR-Gemini_Enterprise_Agent_Ready-4285F4?logo=google&logoColor=white)](https://developers.google.com/profile/badges/community/gear?u=iarjunganesh)
 
@@ -172,6 +172,15 @@ Observed production checks include:
   one ([evidence 10](assets/evidence/10-cross-week-suppression.md));
 - a Vertex quota failure recorded as a payload-free `model.request=failed`, with the
   investigation left reclaimable rather than cleared.
+
+**One divergence, stated plainly because the badge above would otherwise imply otherwise.** On
+2026-08-27 every pin moved to the newest release the resolver allows, so this repository builds on
+`google-adk` 2.8.0 and the badge reads 2.8.0. **The deployed fleet has not been redeployed onto
+it** and still runs the 2.7.1 resolution `v0.4.0` deployed. Every observation in the evidence set
+therefore describes the older resolution, and remains exactly as true as it was — what is not yet
+true is that the deployment matches the repository. Closing that gap means redeploying both
+surfaces, re-verifying live, and re-capturing the evidence that names the current Cloud Run
+revisions. See [ADR-005](docs/adr/005-adk-as-the-agent-framework.md).
 
 The retained evidence is indexed in [assets/README.md](assets/README.md). The exact distinction
 between deployed, observed, configured, and still-to-capture lives in

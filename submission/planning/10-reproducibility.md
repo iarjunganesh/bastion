@@ -7,10 +7,17 @@ and force-pushed away, so the hash no longer resolves in a fresh clone. The gate
 than re-pointed then, and rerun again from the public `v0.5.1` tag now: a reproducibility record
 naming an older revision does not establish the current release.
 
-**Outstanding for `v0.5.2`.** This run verified `v0.5.1`. `v0.5.2` adds a `media-safety` CI job
-and a new `requirements-media.txt`, so a fresh clone now has one more dependency file to resolve
-and one more gate to pass. By this record's own rule the run must be repeated from the public
-`v0.5.2` tag once it is pushed; until then, treat the table below as establishing `v0.5.1` only.
+**Outstanding for `v0.6.0`.** This run verified `v0.5.1`. Two releases have landed since, and
+both change what a fresh clone resolves: `v0.5.2` added a `media-safety` CI job and a
+`requirements-media.txt`, and `v0.6.0` moved every pin to the newest release the resolver allows
+and regenerated `requirements.lock`. A clean clone therefore installs a materially different
+dependency set than the one this table recorded. By this record's own rule the run must be
+repeated from the public `v0.6.0` tag; until then, treat the table below as establishing `v0.5.1`
+only.
+
+Note also what a clean clone cannot establish after `v0.6.0`: it proves the *repository* is
+self-consistent on the new pins, while the deployed fleet still runs the older resolution. Green
+here is not evidence that the deployment matches.
 
 This closes P1.3. Its purpose is narrow and worth stating precisely: prove that a judge who has
 never seen the author's machine can clone the public repository and reach a green offline gate

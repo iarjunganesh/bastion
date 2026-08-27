@@ -73,6 +73,31 @@ ADRs/ledgers) — plus a full sweep of every tracked Markdown file for staleness
 4. commit and push the release metadata, then verify `main` CI green;
 5. create an annotated `v0.4.0` tag at that exact commit and push the tag separately.
 
+## v0.6.0 — every pin to the newest release the resolver allows
+
+Shipped 2026-08-27. A minor release, not a patch: no production code changed, but the dependency
+resolution the whole fleet is built on did, including the agent framework.
+
+**The gate that should have surfaced this examined five pins of twenty-three.** `--check-upstream`
+only ever queried the packages a document names, because its purpose was catching a false claim.
+`v0.5.2` therefore shipped on a run that reported one problem and read as though everything else
+had been checked, when ten other pins were behind. The survey added here is the actual fix; the
+bump is the decision it made possible.
+
+**`opentelemetry-api` and `-sdk` did not move**, because `google-adk==2.8.0` caps them at 1.42.1.
+"Everything latest" is not a satisfiable resolution while the framework is pinned — the resolver
+settled that, not a judgement call.
+
+**The deployment did not move with the pin, and that is this tag's open item.** Both surfaces still
+run the resolution `v0.4.0` deployed. Redeploying obliges re-capturing evidence 11, 12 and 13 —
+they name the current Cloud Run revisions — and recomposing gallery images 03, 04 and 05 from them.
+Until then "deployed and verified" means the older resolution; see
+[ADR-005](../../docs/adr/005-adk-as-the-agent-framework.md).
+
+**Re-check before the final freeze:** `gcp-state.json` still records a 2026-08-23 capture, the
+clean-clone gate is due from the public `v0.6.0` tag, and the demo video remains the only
+outstanding mandatory Devpost artifact.
+
 ## v0.5.2 — the judge-facing image set, and the gate that clears it
 
 Shipped 2026-08-27. A patch release on the same reasoning as `v0.5.1`: no production code changed,

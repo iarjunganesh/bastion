@@ -10,6 +10,61 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
+## [0.6.0] — 2026-08-27
+
+Every pinned dependency moved to the newest release the resolver allows, including the agent
+framework. A minor release rather than a patch: nothing in `agents/`, `runtime/` or the pillars
+changed, but the resolution the whole fleet is built on did.
+
+### Fixed — the pre-tag version gate examined five pins and read as though it examined all
+
+- `scripts/check_versions.py --check-upstream` only ever queried the five packages named in a
+  document, because its purpose was catching a *false claim* — a README badge disagreeing with a
+  pin. That is a good purpose and it is unchanged. What was missing is that the other eighteen
+  pins were never looked at, so a run reporting one problem read as "everything else is current"
+  when nothing else had been examined. Ten of them were in fact behind PyPI, and `v0.5.2` shipped
+  without anyone seeing them.
+- The check now surveys every pin across `requirements.txt`, `requirements-dev.txt` and
+  `requirements-media.txt`, and reports the ones behind. Tracked packages still fail; the rest are
+  advisory, because a pin one patch behind is not a lie about anything and failing on it would
+  make the gate permanently red and therefore ignored. The module docstring now states what a
+  pass does and does not promise.
+
+### Changed — every pin moved to the newest release the resolver allows
+
+- `google-adk` 2.7.1 → **2.8.0**, plus `google-auth` 2.57.0, `google-cloud-firestore` 2.29.0,
+  `google-cloud-bigquery` 3.44.0, `google-cloud-logging` 3.16.3,
+  `opentelemetry-exporter-gcp-trace` 1.15.0, `python-dotenv` 1.2.3, `ruff` 0.16.5 and `mypy` 2.3.1,
+  with `requirements.lock` regenerated.
+- **`opentelemetry-api` and `opentelemetry-sdk` stay at 1.42.1, and 1.44.0 is unreachable rather
+  than declined.** `google-adk==2.8.0` declares `opentelemetry-api<=1.42.1` and
+  `opentelemetry-sdk<=1.42.1`, so "everything latest" is not a satisfiable resolution while the
+  framework is pinned at all. The resolver said so; this is not a judgement call. One incidental
+  benefit: the trace path that
+  [evidence 13](assets/evidence/13-current-route-trace.md) rests on did not move.
+- Verified on the new resolution before the pins were committed: 321 tests at 100% statement and
+  branch coverage, Ruff, the type checker, every documentation gate, and a local A2A round-trip
+  with a `RemoteA2aAgent` served over HTTP. [ADR-005](docs/adr/005-adk-as-the-agent-framework.md)'s
+  import claim was re-run against 2.8.0 rather than re-dated, as it was for 2.7.1 before it.
+- The migration trigger still has not fired: 2.8.0 changes neither `SequentialAgent`'s deprecation
+  nor `Workflow`'s eligibility as an `LlmAgent` sub-agent. `SequentialAgent` remains
+  deprecated-but-required.
+
+### Still deliberately not claimed — the deployment did not move with the pin
+
+**The repository now pins 2.8.0; the managed Agent Runtime and both Cloud Run workers still run
+the 2.7.1 resolution `v0.4.0` deployed.** Nothing in the evidence set was re-observed, so every
+"deployed and verified" claim describes the older resolution until both surfaces are redeployed
+and re-verified live. Redeploying will mint new Cloud Run revisions, and
+[evidence 11](assets/evidence/11-current-route-correlation.md) and
+[12](assets/evidence/12-agent-mediated-model-armor-refusal.md) name the current ones explicitly, so
+that step also obliges re-capturing evidence 11, 12 and 13 and recomposing gallery images 03, 04
+and 05. The gap is recorded rather than closed by rewording, and ADR-005 carries the full cost.
+
+The two open observations are unchanged, and no demo video exists yet.
+
+No production code changed.
+
 ## [0.5.2] — 2026-08-27
 
 The judge-facing image set existed only as raw takes, and the one promotion that had happened

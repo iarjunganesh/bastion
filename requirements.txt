@@ -14,7 +14,7 @@
 # NOT installed, deliberately: the `antigravity` extra. `google-antigravity` ships protobuf 7
 # gencode while a2a-sdk and google-cloud-aiplatform both pin protobuf<7, so it cannot coexist
 # with the Gateway and Runtime pillars. See docs/adr/007-adk-as-the-agent-framework.md.
-google-adk[a2a,agent-identity,gcp,otel-gcp,mcp,tools,eval]==2.7.1
+google-adk[a2a,agent-identity,gcp,otel-gcp,mcp,tools,eval]==2.8.0
 
 # Pinned explicitly because the ADK extras above do not carry them, and the versions a
 # document may name must resolve to something.
@@ -32,23 +32,23 @@ google-cloud-modelarmor==0.7.1
 # API's approval endpoint. Imported directly by `gateway/cloud_run_auth.py` and
 # `infrastructure/findings_api.py`, so it is a direct pin rather than something inherited from
 # whatever constraint google-cloud-firestore happens to carry this month.
-google-auth==2.56.3
+google-auth==2.57.0
 
 # Findings history and scheduling.
-google-cloud-firestore==2.28.1
+google-cloud-firestore==2.29.0
 google-cloud-scheduler==2.20.0
-google-cloud-bigquery==3.43.0
+google-cloud-bigquery==3.44.0
 
 # Observability. OpenTelemetry is held at 1.42.1, the newest release google-adk accepts
 # (it pins opentelemetry-api/sdk <=1.42.1). Raise both together when ADK does.
 opentelemetry-api==1.42.1
 opentelemetry-sdk==1.42.1
-opentelemetry-exporter-gcp-trace==1.14.0
+opentelemetry-exporter-gcp-trace==1.15.0
 google-cloud-trace==1.20.0
-google-cloud-logging==3.16.2
+google-cloud-logging==3.16.3
 
 # Outbound HTTP for the escalation surface. httpx rather than requests: explicit
 # connect/read timeout budgets, and transport retries that do not replay an already-sent
 # request. Flask is gone — ADK serves its own FastAPI/Starlette app.
 httpx==0.28.1
-python-dotenv==1.2.2
+python-dotenv==1.2.3

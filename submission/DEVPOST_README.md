@@ -52,7 +52,7 @@ elapsed; the architecture is designed for longer asynchronous work and expiry be
 
 ## How we built it
 
-Bastion uses Google ADK 2.7.1 and A2A for a three-agent graph, Gemini 3.5 Flash through Vertex AI,
+Bastion uses Google ADK 2.8.0 and A2A for a three-agent graph, Gemini 3.5 Flash through Vertex AI,
 and the managed enterprise-agent pillars: Agent Runtime, Registry, Identity, Gateway, Memory Bank,
 Model Armor, and Observability. Cloud Run hosts private worker and receiver surfaces. Pub/Sub and
 Eventarc provide durable event admission. Firestore holds operational continuity. Cloud Asset
