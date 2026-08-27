@@ -19,6 +19,8 @@ exception messages.
 - [ ] Prepare narrow, count-only console filters before recording anything.
 - [ ] Create a fresh ignored directory under `.takes/` for raw screenshots and recordings.
 - [ ] Confirm local `ffmpeg` and `ffprobe` are on `PATH` before recording video.
+- [x] Generate the narration and the measured shot table with `make voiceover`; the cut is
+      locked at **3:49**. See [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md).
 - [ ] Confirm the healthy revision and rollback path before any staged failure.
 
 Raw files under `.takes/` remain untouched. For each promoted PNG or MP4, add an explicit reviewed

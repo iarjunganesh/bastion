@@ -63,3 +63,7 @@ console-*.txt
 # This was ignored only by a personal ~/.config/git/ignore rule, which does not exist on CI or
 # on anyone else's checkout - so the protection held only where it was least needed.
 .claude/settings.local.json
+
+# Per-sentence measurement probes. Intermediate: the committed clip is the artifact.
+assets/demo-voiceover/probes/
+assets/demo-voiceover/auditions/

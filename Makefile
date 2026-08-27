@@ -1,6 +1,6 @@
 .PHONY: help install test test-unit test-integration test-security test-load test-fast \
         coverage lint format format-check typecheck markdown docs versions diagrams ci \
-        redact-evidence media-check \
+        redact-evidence media-check voiceover \
         run-orchestrator iam-policy deploy verify smoke rollback teardown \
         audit-dependencies clean
 
@@ -15,6 +15,7 @@ help:
 	@echo "typecheck         - mypy the shipped Python packages"
 	@echo "redact-evidence   - apply declared masks to promoted screenshots and videos"
 	@echo "media-check       - reject undeclared or unmasked judge-facing media"
+	@echo "voiceover         - synthesise demo narration, captions, and the shot table"
 	@echo "ci                - run the local quality gate"
 	@echo "run-orchestrator  - run the Orchestrator locally"
 	@echo "iam-policy        - dump the live IAM policy (gitignored; redact before publishing)"
@@ -84,6 +85,9 @@ redact-evidence:
 
 media-check:
 	$(PYTHON) scripts/redact_evidence.py --check
+
+voiceover:
+	$(PYTHON) scripts/generate_demo_voiceover.py
 
 markdown:
 	npx --yes markdownlint-cli2 "**/*.md"

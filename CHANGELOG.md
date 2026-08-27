@@ -20,6 +20,29 @@ The current release process is in
   older than it is: the observations in evidence 11, 12 and 13 were captured 2026-08-25, two days
   *after* the date the site presented as the last verification.
 
+### Added — the demo narration is generated, measured, and locked at 3:49
+
+- `scripts/generate_demo_voiceover.py` is now the source of truth for the narration. It synthesises
+  eleven beats with Google Cloud Text-to-Speech (Chirp3-HD, same project as the fleet), measures
+  every clip, emits the shot table into
+  [`submission/DEMO_SCRIPT.md`](submission/DEMO_SCRIPT.md), and cuts a 35-cue caption track.
+- **The cut is 3:49**, measured rather than estimated: 195s narrated across eleven beats plus 35s
+  of holds for live action. The first attempt measured 4:14 and the second 4:12 — the ceiling is
+  hard and judges have said they stop at four minutes, so the timeline is built from real clip
+  durations instead of word-count estimates.
+- **Chirp3-HD returns a different duration for identical text on each call** — one beat measured
+  16.2s, 18.9s and 16.2s across three runs. The committed MP3 is therefore the stable artifact, and
+  a SHA-256 sidecar per clip means regeneration happens only when the words change, so a casual
+  re-run cannot re-jitter every timing the shot table depends on.
+- Caption cues come from per-sentence probe clips scaled to each beat's measured length, because no
+  timepointing is exposed for Chirp3-HD. That is a scaled measurement, not a word-count estimate,
+  and the script says so rather than implying precision it does not have.
+- The upstream ADK finding is now mentioned twice by design: one clause in the hook so a judge
+  knows it exists, and the full story with the maintainer's confirmation in the close — which is
+  where the internal winning plan wanted it, and where the slot had been sitting empty.
+- `google-cloud-texttospeech==2.37.0` pinned, `requirements.lock` regenerated, `make voiceover`
+  added. Enabling the API did not move the gated `21/21` count, which counts named services.
+
 ### Changed — upstream contribution status moved, in both directions
 
 - A second Google collaborator replied on
