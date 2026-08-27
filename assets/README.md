@@ -20,7 +20,7 @@ Bastion's central claim is backed by redacted captures rather than architecture 
 | [08 — tool poisoning](evidence/08-tool-poisoning.md) | Fixed tool sets at construction; Escalation holds no policy tool or Asset client | Construction-time proof, verified to fail when widened; not a live refusal trace |
 | [09 — cross-department routing](evidence/09-cross-department-routing.md) | 52 live bindings produced 3 findings routed to 2 owning departments | Counts and department ids only; routing measurement, not a completed investigation. Its 52 bindings are that date's measurement — evidence 11 measured 62 on 2026-08-25 and is the current figure |
 | [10 — cross-week suppression](evidence/10-cross-week-suppression.md) | A human exception approved 2026-08-19 suppressed its matching finding on 2026-08-22, on the deployed path; re-confirmed 2026-08-23 after the deterministic-delivery rewrite (P0.1–P0.3) | Three-day gap, not a calendar week; expiry firing is covered by tests only |
-| [11 — current-route correlation](evidence/11-current-route-correlation.md) | One fresh investigation completed across Runtime, deployed Auditor and Escalation revisions, and Gemini 3.5 Flash; a companion probe measured 62 bindings, 3 canonical findings, and 2 post-policy deliveries | Payload-free route correlation plus count-only companion measurement; reviewed raw source awaits final gallery composition |
+| [11 — current-route correlation](evidence/11-current-route-correlation.md) | One fresh investigation completed across Runtime, deployed Auditor and Escalation revisions, and Gemini 3.5 Flash; a companion probe measured 62 bindings, 3 canonical findings, and 2 post-policy deliveries | Payload-free route correlation plus count-only companion measurement; composed into gallery images 03 and 05 on 2026-08-27 |
 | [12 — agent-mediated Model Armor refusal](evidence/12-agent-mediated-model-armor-refusal.md) | The deployed Auditor callback refused the approved injection sample and its A2A task failed before another model or tool call | Direct authenticated Auditor probe, not a durable Runtime investigation; reviewed raw source awaits the IAM-denial composite |
 | [13 — current-route trace](evidence/13-current-route-trace.md) | One connected 22-span Cloud Trace covered the managed Runtime, both A2A workers with their agent-card fetches, the Firestore exception lookup inside the policy step, and the completion gate | Sampled explanatory telemetry with span attributes deliberately unopened; not the retained compliance record and not a latency claim |
 
@@ -52,8 +52,10 @@ python scripts/render_diagrams.py --check
 
 The committed visuals preserve motion as decoration: every first frame communicates the full
 architecture, while arrows, route pulses, and status dots improve scanning. SVG is used on GitHub;
-GIF stays under Devpost's 5 MB gallery limit. `enterprise-fleet-architecture-light.png` is the
-static 1920×1080 upload for Devpost's required architecture field.
+GIF stays under Devpost's 5 MB gallery limit. `enterprise-fleet-architecture-light.png` and
+`enterprise-fleet-architecture-dark.png` are both emitted as static 1920×1080 stills: the light one
+sits inside the light-background judge write-up, and the dark one is the Devpost architecture
+upload and gallery image 01, because every other promoted capture is dark.
 `brand/devpost-thumbnail-3x2.svg` is the editable source for the 1200×800
 `brand/devpost-thumbnail-3x2.png` project thumbnail. The final five-image packet belongs under
 `screenshots/` and is governed by
@@ -69,6 +71,11 @@ static 1920×1080 upload for Devpost's required architecture field.
 - A simulated prior-week timestamp proves deterministic expiry/retrieval logic, not that a
   wall-clock week elapsed during the capture.
 
-Screenshots and video remain publication artifacts. The under-four-minute demo should show the
-catalog, durable state, identity denial, Model Armor refusal, minimized review record, and the
-correlated operations surface without exposing a principal.
+The five gallery screenshots were composed on 2026-08-27 and live under `screenshots/`; the video
+remains a publication artifact. The under-four-minute demo should show the catalog, durable state,
+identity denial, Model Armor refusal, minimized review record, and the correlated operations
+surface without exposing a principal.
+
+Supporting captures promoted under `evidence/screenshots/` are covered by the same redaction gate
+as the gallery, because a file promoted to back a written record is likelier to be copied from
+`.takes/` unreviewed.

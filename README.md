@@ -409,6 +409,7 @@ pytest tests --cov --cov-report=term-missing --cov-fail-under=100
 python scripts/check_docs.py
 python scripts/check_versions.py
 python scripts/render_diagrams.py --check
+python scripts/redact_evidence.py --check
 node site/build.mjs
 python scripts/check_site.py
 ```
@@ -451,7 +452,7 @@ observability/              payload-free ADK audit plugin
 registry/                   department routing policy
 runtime/                    durable SQLite contract and Firestore production adapter
 infrastructure/             bootstrap, deploy, Gateway, Runtime, smoke, rollback, teardown
-scripts/                    live-state capture, docs/version gates, diagram renderer
+scripts/                    live-state capture, docs/version/media gates, diagram renderer
 site/                       static public evidence console; no operational backend or GCP calls
 tests/                      unit, integration, security, and load suites
 assets/                     brand, architecture, and redacted evidence

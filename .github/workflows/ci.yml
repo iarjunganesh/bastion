@@ -189,6 +189,32 @@ jobs:
       - name: Documented versions match dependency pins
         run: python scripts/check_versions.py
 
+  media-safety:
+    name: Judge-facing media is reviewed and redacted
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install media tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-media.txt
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      # A final PNG or MP4 is rejected until its redaction decision is declared in code.
+      # Video checks sample frames with ffmpeg/ffprobe; they never silently skip missing tools.
+      - name: Evidence media passed the redaction gate
+        run: python scripts/redact_evidence.py --check
+
   secrets:
     name: No credentials committed
     runs-on: ubuntu-latest

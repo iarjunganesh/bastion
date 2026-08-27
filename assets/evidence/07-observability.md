@@ -18,7 +18,11 @@ because locking is irreversible. These are live control configurations, not proo
 has attained its target SLOs over time.
 
 The reviewed Console capture does not expose a lock field, so it is retained as configuration
-proof only and does not visually upgrade the immutability boundary.
+proof only and does not visually upgrade the immutability boundary. It is retained as
+[`screenshots/07-audit-bucket-retention.png`](screenshots/07-audit-bucket-retention.png), with the
+signed-in operator's account photo masked in the console header by
+[`scripts/redact_evidence.py`](../../scripts/redact_evidence.py); the unmasked source stays ignored
+under `.takes/`. The same view is the retention panel of gallery image 05.
 
 ```powershell
 python -m infrastructure.provision_observability

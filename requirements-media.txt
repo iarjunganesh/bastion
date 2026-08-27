@@ -1,0 +1,3 @@
+# Judge-facing screenshot and video sanitization. FFmpeg/ffprobe remain system tools because
+# their platform packages provide the codecs used by scripts/redact_evidence.py.
+Pillow==12.3.0

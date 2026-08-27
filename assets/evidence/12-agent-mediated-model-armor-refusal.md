@@ -43,6 +43,9 @@ credential, principal, IAM binding, role, or private endpoint inventory.
   dead-letter boundary.
 - The fixed refusal sentence was not returned in the A2A task payload; the task failed and the
   payload-free callback audit event is the retained proof of the refusal.
-- The raw screenshot passed sensitive-data and readability review. It remains an ignored source
-  take until it is composed with the separate IAM-denial proof into the final security-boundary
-  gallery image.
+- The screenshot passed sensitive-data and readability review and is retained as
+  [`screenshots/12-agent-mediated-model-armor-refusal.png`](screenshots/12-agent-mediated-model-armor-refusal.png);
+  the unmasked source stays ignored under `.takes/`. It was composed 2026-08-27 into gallery image
+  04 **alone**: the separate IAM-denial panel that image originally assumed was never captured, so
+  the image proves inline screening only and its caption was narrowed to match. The IAM read split
+  stays asserted by [evidence 03](03-escalation-agent-denied.md).

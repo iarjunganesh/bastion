@@ -4,13 +4,11 @@
 - **Track:** Fortified Enterprise Fleet
 - **Submission owner:** Arjun Ganesh
 - **Local status:** Drafting only — nothing in this file has been submitted or published.
-- **Last reconciled:** 2026-08-25
+- **Last reconciled:** 2026-08-27
 
 - **Live Devpost draft:** <https://devpost.com/software/bastion-pfuy71>
-- **Read-only check on 2026-08-24:** `submission_draft`; no submission timestamp; no video URL.
-- **Unverified as of 2026-08-25:** a `https://youtu.be/TBD` placeholder was reported saved in the
-  live video field. It cannot be confirmed from a read-only view. Open the draft and clear or
-  replace it — a dead placeholder in a required field reads as an incomplete entry.
+- **Read-only check on 2026-08-27:** `submission_draft`; no submission timestamp; the live video
+  field is empty. No Devpost write was made during this check.
 
 This is the field-by-field source for the Devpost form shown in the four screenshots under
 `.tmp/devpost-my-project-form-questions/`. Use it while filling the live form; do not substitute
@@ -53,14 +51,21 @@ work, evidence, or a scoring bonus—and separates it from the individual-contri
 
 ### Built with
 
-Use no more than 25 tags:
+Use no more than 25 tags. These are 24:
 
 ```text
 Gemini 3.5 Flash, Vertex AI, Google ADK, A2A, Agent Runtime, Agent Identity,
-Agent Gateway, Agent Registry, Memory Bank, Model Armor, Cloud Run, Firestore,
-Pub/Sub, Eventarc, Cloud Asset Inventory, Cloud Logging, Cloud Trace,
-Secret Manager, Workload Identity Federation, Python, pytest, Vercel
+Agent Gateway, Agent Registry, Identity-Aware Proxy, Memory Bank, Model Armor,
+Cloud Run, Firestore, Pub/Sub, Eventarc, Cloud Asset Inventory, Cloud Logging,
+Cloud Monitoring, Cloud Trace, Secret Manager, Workload Identity Federation,
+Python, pytest, Vercel
 ```
+
+Cloud Build and Artifact Registry are enabled and are genuinely used by `infrastructure/deploy.sh`,
+but they are commodity build plumbing rather than an enforcement or observability boundary, so the
+last slot stays empty rather than being spent on them. Cloud Storage is deliberately absent: the
+retained audit bucket is a **Cloud Logging** bucket, so `Cloud Logging` already covers it and a
+storage tag would overclaim.
 
 ### Try it out
 
@@ -80,6 +85,11 @@ Upload only the five final files defined in
 3. `03-production-iam-routing.png`
 4. `04-enforced-security-boundary.png`
 5. `05-durable-context-and-audit.png`
+
+All five exist as of 2026-08-27, are 1920×1080 dark PNGs under 1 MB each, and pass
+`python scripts/redact_evidence.py --check`. Three carry narrowed captions because the panels they
+originally planned were not captured; the exact wording to use is in
+[`submission/CAPTURE_RUNBOOK.md`](submission/CAPTURE_RUNBOOK.md).
 
 Each must be JPG, PNG, or GIF, no more than 5 MB, readable as a thumbnail, and free of private
 origins, principals, tokens, prompts, responses, and raw IAM policy data.
@@ -164,9 +174,12 @@ Logging, Cloud Trace, Workload Identity Federation, and the managed enterprise-a
 
 ### Architecture diagram
 
-- Upload: `assets/architecture/enterprise-fleet-architecture-light.png`
+- Upload: `assets/architecture/enterprise-fleet-architecture-dark.png`
 - Format: PNG, 1920×1080, below the 35 MB form limit.
-- The source SVG and dark/light variants are generated and checked in CI.
+- The draft already carries the dark architecture GIF, which shows the same diagram with motion
+  and needs no replacement; the dark PNG is the static equivalent if the field rejects a GIF.
+- Dark, not light, so the required image matches the five dark gallery images beside it.
+- The source SVG, both theme variants, and both stills are generated and checked in CI.
 
 ### Startup prize fields
 
@@ -231,7 +244,8 @@ claim.
 ## Final manual fields and gates
 
 - [ ] Open and approve the 3:2 thumbnail.
-- [ ] Capture and approve all five gallery images.
+- [x] Capture and approve all five gallery images. Composed 2026-08-27, all dark, all passing
+      `python scripts/redact_evidence.py --check`; three captions narrowed — see the runbook.
 - [ ] Record, redact-review, upload, and verify the video while signed out.
 - [ ] Refresh mutable GCP counts and upstream issue/PR status. Checked 2026-08-25: issue #6854
       open, PR #6859 open and unmerged, PR #6862 **closed unmerged**. Nothing is merged.

@@ -3,6 +3,10 @@
 **A private fleet of catalogued agents that audits live GCP IAM, remembers human decisions, and
 routes minimized findings without gaining write access.**
 
+<!-- Devpost renders the title and tagline above from its own form fields. Begin the pasted
+     description at the link row below, or the live page repeats its own header. Observed
+     duplicated on the draft 2026-08-25. -->
+
 [Public evidence console](https://bastion.arjunganesh.dev/) ·
 [Source code](https://github.com/iarjunganesh/bastion) ·
 [Architecture](https://github.com/iarjunganesh/bastion/blob/main/docs/ARCHITECTURE.md) ·
@@ -82,8 +86,8 @@ was closed unmerged on 2026-08-24 by a Google maintainer who confirmed the under
 A2A session-state boundary is a general transport property, not a `SequentialAgent` bug — and
 directed the fix to community PR
 [google/adk-python#6859](https://github.com/google/adk-python/pull/6859), which remains open.
-Nothing is merged, and the live state is re-checked immediately before publication rather than
-frozen in this draft.
+Nothing is merged, and this status is re-verified against GitHub immediately before submission
+rather than quoted from memory.
 
 Other difficult boundaries were equally useful: a passing test does not prove a deployed route,
 a configured retry policy does not prove redelivery was observed, and an architecture diagram can
@@ -117,10 +121,12 @@ when it is merely promised to remain confidential after the fact.
 Current-route IAM provenance, the agent-mediated Model Armor refusal, the correlated audit trail and
 the Cloud Trace chain are captured and retained. Two observations are deliberately still open and
 are not claimed: a managed Gateway refusal of an unregistered caller, and a watched
-timeout/retry/dead-letter sequence. What remains is presentation — the five-image gallery and the
-under-four-minute live demo. After the hackathon, the most valuable extensions are
-additional governed department catalogs, a deliberate recurring trigger with an operational pause
-control, and hardening the retained audit store if an immutable retention requirement is adopted.
+timeout/retry/dead-letter sequence. They are deferred behind the honest narrower wording in the
+claim matrix; the five-image gallery is composed, so the remaining pre-submission work is the
+under-four-minute live demo. After the hackathon, the most valuable extensions are closing those
+two observations, adding governed department catalogs, introducing a deliberate recurring trigger
+with an operational pause control, and hardening the retained audit store if an immutable retention
+requirement is adopted.
 
 ## Reproduce it
 

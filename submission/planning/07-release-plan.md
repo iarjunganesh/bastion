@@ -73,6 +73,30 @@ ADRs/ledgers) — plus a full sweep of every tracked Markdown file for staleness
 4. commit and push the release metadata, then verify `main` CI green;
 5. create an annotated `v0.4.0` tag at that exact commit and push the tag separately.
 
+## v0.5.2 — the judge-facing image set, and the gate that clears it
+
+Shipped 2026-08-27. A patch release on the same reasoning as `v0.5.1`: no production code changed,
+and the defect is in a judge-facing artifact rather than in the fleet.
+
+Two things made it worth a tag rather than a loose commit. The gallery is a required Devpost field
+and now exists in full, so the repository's own claim ledger, runbook and public console had to
+agree about it in one commit. And the redaction gate caught a real leak on its first run:
+`assets/evidence/screenshots/` held verbatim copies of raw takes, two of them carrying the signed-in
+operator's Google account photo, referenced by no evidence record and outside the gate's globs.
+
+Also carries the dark architecture still, three deliberately narrowed gallery captions, and the
+full Markdown sweep those changes forced.
+
+**Pre-tag `--check-upstream` fails on purpose.** `google-adk` 2.8.0 exists against a 2.7.1 pin.
+Declined for this tag and recorded in [ADR-005](../../docs/adr/005-adk-as-the-agent-framework.md):
+the migration trigger has not fired, and the deployed fleet runs 2.7.1. Unlike the 2.7.0 → 2.7.1
+bump in `v0.2.0`, taking this one would require redeploying both surfaces and re-verifying live.
+Do not read a green `--check-upstream` as a precondition for this tag; read the ADR.
+
+**Re-check before the final freeze:** `gcp-state.json` still records a 2026-08-23 capture, the
+clean-clone gate is due again from the public `v0.5.2` tag, and the demo video remains the only
+outstanding mandatory Devpost artifact.
+
 ## v0.5.1 — correct a dated claim on the Devpost architecture image
 
 Shipped 2026-08-25, hours after `v0.5.0`. A patch release for one defect worth releasing quickly:

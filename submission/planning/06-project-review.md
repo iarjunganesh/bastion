@@ -18,7 +18,6 @@ Trace chain are all captured. Managed Gateway refusals and a watched timeout/ret
 sequence remain deliberately unobserved and their claims stay narrowed.
 
 - Record and publish the under-four-minute demo.
-- Compose the five-image Devpost gallery from the reviewed raw captures.
 - Upload the architecture GIF/image and complete the Devpost form.
 - Reconfirm billing budget/anomaly notification and service availability before recording.
 - Optionally publish the bonus blog and social post.

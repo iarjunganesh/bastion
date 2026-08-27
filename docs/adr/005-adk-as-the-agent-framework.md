@@ -5,7 +5,8 @@ rejection of the Antigravity SDK now rests on a measured incompatibility rather 
 judgement about documentation quality. **Amended 2026-08-22** — version raised to 2.7.1 for the
 `v0.2.0` tag, and the composition below corrected: not every step is an `LlmAgent` any more.
 **Amended 2026-08-23** — the Escalation Agent is no longer an `LlmAgent` either (P0.2); only the
-Access Auditor still is. **Date:** 2026-08-23
+Access Auditor still is. **Amended 2026-08-27** — `2.8.0` reviewed before the `v0.5.2` tag and
+deliberately not taken; see "2.8.0 was reviewed and declined" below. **Date:** 2026-08-27
 
 ## Decision
 
@@ -123,6 +124,37 @@ when to move, and this repository's whole argument is that its claims are checka
 migration trigger is explicit: **when `Workflow` can be an `LlmAgent` sub-agent, switch.**
 `scripts/check_versions.py --check-upstream` runs before every tag, so a release that changes
 this will not pass unnoticed.
+
+### 2.8.0 was reviewed and declined
+
+`--check-upstream` failed before the `v0.5.2` tag: PyPI now carries a `2.8.0` release against this
+ADR's `2.7.1` pin. The gate did its job; the pin stays anyway, and the reasoning belongs here
+rather than in a commit message. (The version named in the previous sentence is deliberately not
+written adjacent to the package name, because `scripts/check_versions.py` reads that shape as a
+documented pin and would fail on a version this document is declining.)
+
+**The migration trigger did not fire.** 2.8.0's notes change neither `SequentialAgent`'s
+deprecation status nor `Workflow`'s eligibility as an `LlmAgent` sub-agent, so the one condition
+this ADR commits to acting on is still unmet. Nothing in the release is a breaking change for the
+composition above.
+
+**Two of its additions land exactly on Bastion's most sensitive seams**, which is an argument for
+care rather than for speed: native task-mode support in `RemoteA2aAgent`, which is how both A2A
+worker hops are made, and a Model Armor guardrail plugin, which is the surface
+[ADR-009](009-model-armor-threshold.md)'s fail-closed callback already occupies. Taking either
+without a live re-verification would replace a measured integration with an assumed one.
+
+**The pin is not only a repository fact.** `v0.4.0` deployed this fleet and verified it live on
+`2.7.1`; the managed Agent Runtime and both Cloud Run workers are running that resolution now.
+Bumping the pin without redeploying both surfaces would put the repository and the deployed fleet
+into disagreement while every "deployed and verified" claim in the evidence set still pointed at
+the old one — the precise failure mode
+[CLAUDE.md](../../CLAUDE.md)'s two-part deployment note exists to prevent.
+
+So this is a deliberate lag, not an oversight, and it is bounded: revisit when the fleet is next
+redeployed and re-verified live, or immediately if `Workflow` becomes usable as an `LlmAgent`
+sub-agent. Until then `--check-upstream` will keep failing on this pin, and that is the correct
+behaviour for a gate whose purpose is to make the lag visible rather than to hide it.
 
 This also bounds the blast radius. The composition is a handful of lines in one module; nothing
 else in the repository names `SequentialAgent`, because the pillars are managed products, the

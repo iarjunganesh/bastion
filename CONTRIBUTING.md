@@ -36,6 +36,7 @@ pytest tests --cov --cov-report=term-missing --cov-fail-under=100
 python scripts/check_docs.py
 python scripts/check_versions.py
 python scripts/render_diagrams.py --check
+python scripts/redact_evidence.py --check
 npx markdownlint-cli2 "**/*.md"
 ```
 

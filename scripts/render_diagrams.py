@@ -8,8 +8,10 @@ dark palette. This was measured, not assumed: forcing light mode in a headless b
 the diagram's cards dark. GitHub's supported answer is a `<picture>` element with two files
 and a `media` attribute. So: one master, two emitted variants, nothing hand-maintained twice.
 
-**Why PNG and GIF.** Devpost's required architecture field accepts PNG/JPG/PDF, not SVG, so the
-light enterprise-fleet architecture is also emitted as a deterministic 1920x1080 PNG. Gallery
+**Why PNG and GIF.** Devpost's required architecture field accepts PNG/JPG/PDF, not SVG, so both
+enterprise-fleet architecture variants are also emitted as deterministic 1920x1080 PNGs. Both,
+not just light: the Devpost gallery and the demo video are composed entirely from dark console
+captures, and a light architecture panel in that sequence reads as a different project. Gallery
 surfaces accept GIF, which preserves the optional motion. GIF's 256-colour palette is not a
 problem here because the diagrams are flat fills and antialiased text; measured output is well
 under Devpost's 5 MB gallery cap at full 1920x1080.
@@ -84,7 +86,10 @@ WORKERS = 6
 
 # Devpost accepts JPG, PNG and GIF, never SVG, and caps a gallery image here.
 DEVPOST_IMAGE_CAP_MB = 5
-DEVPOST_ARCHITECTURE_STILL = "enterprise-fleet-architecture-light"
+ARCHITECTURE_STILLS = (
+    "enterprise-fleet-architecture-light",
+    "enterprise-fleet-architecture-dark",
+)
 
 # Headless Chromium renders each frame. Edge ships with Windows and Chrome does not, so both
 # are tried; CI has neither, which is why --check never touches the GIFs.
@@ -235,7 +240,7 @@ def render_gif(svg: Path, binary: str, ffmpeg: str) -> Path | None:
         workdir = Path(raw)
         if capture_frames(svg, binary, workdir) != FRAMES:
             return None
-        if svg.stem == DEVPOST_ARCHITECTURE_STILL:
+        if svg.stem in ARCHITECTURE_STILLS:
             shutil.copyfile(workdir / "frame000.png", svg.with_suffix(".png"))
         if not assemble_gif(workdir, target, ffmpeg):
             return None
@@ -301,8 +306,8 @@ def main() -> int:
         megabytes = gif.stat().st_size / 1_048_576
         over = "  OVER Devpost's 5 MB cap" if megabytes > DEVPOST_IMAGE_CAP_MB else ""
         print(f"  {gif.name}  {megabytes:.2f} MB{over}")
-        if target.stem == DEVPOST_ARCHITECTURE_STILL:
-            print(f"  {target.with_suffix('.png').name}  Devpost architecture upload")
+        if target.stem in ARCHITECTURE_STILLS:
+            print(f"  {target.with_suffix('.png').name}  1920x1080 still")
     print(f"GIFs: {FRAMES} frames, {LOOP_SECONDS}s loop at {FPS}fps, {WIDTH}x{HEIGHT}")
     return 0
 

@@ -23,7 +23,8 @@ or a media platform.
       only, not a public agent endpoint.
 - [ ] Devpost category selected and all required fields saved.
 - [ ] Public English demo video under four minutes.
-- [ ] Architecture GIF/image uploaded to Devpost.
+- [x] Architecture GIF/image uploaded to Devpost; the live draft carries the dark architecture
+      GIF and its footer reads the current `2026-08-23` build state.
 - [ ] Final submission sent before the deadline.
 
 ## Three track obligations
@@ -98,8 +99,8 @@ or a media platform.
 - [x] Hackathon credits/project available; sensitive account details omitted.
 - [x] [Gemini Enterprise Agent Ready badge](https://developers.google.com/profile/badges/community/gear?u=iarjunganesh)
       claimed and linked from README.
-- [x] Devpost registration and submission ownership reconfirmed on 2026-08-24; live project
-      `1398552` remains an unsubmitted pre-draft.
+- [x] Devpost registration and project ownership reconfirmed on 2026-08-27; live project `1398552`
+      remains a `submission_draft`, with no submission timestamp and an empty video field.
 - [ ] Billing budget/anomaly notification reconfirmed in the console before final recording.
 - [ ] Optional launch blog published with the hackathon disclosure.
 - [ ] Optional social post published with `#AllThingsAgenticHackathon`.
@@ -120,8 +121,10 @@ The following claims are deliberately not made:
 ## Final publication pass
 
 - [x] Prepare the field-by-field local Devpost worksheet, judge-facing write-up, architecture PNG,
-      3:2 thumbnail, capture runbook, demo script, and bonus-copy drafts. Nothing has been uploaded
-      or published; see [`../devpost-submission.md`](../devpost-submission.md).
+      3:2 thumbnail, capture runbook, demo script, and bonus-copy drafts. The Devpost draft,
+      required architecture image, and the five-image gallery now exist; the demo video is the
+      remaining mandatory publication work. See
+      [`../devpost-submission.md`](../devpost-submission.md).
 
 - [ ] Record the catalog → event → Runtime/Gateway → IAM denial → Armor refusal → idempotent review
       → audit dashboard story without exposing a principal or endpoint.
@@ -131,11 +134,16 @@ The following claims are deliberately not made:
 - [ ] Keep private services running through judging; do not expose an agent merely to create a
       public hosted-project URL.
 - [x] Run the complete local and live release gates, push `main`, and confirm GitHub Actions
-      green. Done for `v0.2.1`; repeat before the final submission commit, because this one
-      is satisfied per-push rather than once.
+      green. Done for `v0.5.1`; due again for `v0.5.2` and after the final submission-preparation
+      commit, because this
+      one is satisfied per-push rather than once.
 - [x] Release tags are explicit release decisions rather than engineering side effects:
       `v0.2.0` carries the seven deployed-fleet defects found after `v0.1.0`, and `v0.2.1` carries
       the escalation hand-off fix. `v0.3.0` is the hosted-evidence release. `v0.4.0` carries the
       deterministic Auditor-fidelity, Escalation-delivery, and completion-gate rewrite (P0.1–P0.3),
-      deployed and re-verified live the same day. Each annotated tag is created only after its
-      release metadata, full gates, pushed commit, and green `main` CI all agree.
+      deployed and re-verified live the same day. `v0.5.0` packages clean-clone proof, the claim
+      matrix, submission drafts, and five closed observations; `v0.5.1` corrects and gates the
+      architecture capture date; `v0.5.2` composes the five-image gallery and adds the redaction
+      gate that caught an operator account photo in a promoted evidence capture. Each annotated tag
+      is created only after its release metadata, full gates, pushed commit, and green `main` CI
+      all agree.

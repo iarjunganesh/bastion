@@ -10,6 +10,65 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
+## [0.5.2] — 2026-08-27
+
+The judge-facing image set existed only as raw takes, and the one promotion that had happened
+copied a light architecture still into a gallery of dark console captures. This release composes
+the five gallery images, and adds the gate that decides whether a promoted file is safe to publish.
+
+### Added — a promoted image cannot reach Git without a recorded review decision
+
+- Added `scripts/redact_evidence.py`. Every judge-facing PNG and MP4 must appear in `REDACTIONS`
+  or `VIDEO_REDACTIONS`, including files reviewed and deliberately left unmasked, which are
+  declared with an empty tuple. Undeclared media fails the check. PNG masks are applied losslessly
+  with Pillow; MP4 masks are burned in with local FFmpeg and verified at the start, middle and end.
+- Added a `media-safety` CI job, `make redact-evidence` and `make media-check`, and a
+  `requirements-media.txt` pinning `Pillow==12.3.0`.
+- `scripts/render_diagrams.py` now emits a dark 1920x1080 architecture still alongside the light
+  one. The light still re-rendered byte-identical, so the renderer's determinism is unchanged.
+
+### Fixed — the operator's account photo was about to be committed
+
+- `assets/evidence/screenshots/` held five captures copied verbatim from `.takes/`, referenced by
+  no evidence record and outside the redaction gate's globs. Two carried the signed-in operator's
+  Google account photo in the console header. The gate now covers that directory, and both photos
+  are masked. A supporting capture is promoted to back a written record rather than to be looked
+  at, which is why it is the likelier place for this to happen than the gallery.
+
+### Added — the five-image Devpost gallery
+
+- All five are 1920x1080 and dark, including the architecture still: the sequence is otherwise
+  entirely dark console and terminal captures, and one light panel reads as a different project.
+- No gallery image needed a mask. Browser chrome, the project-bearing URL and the operator avatar
+  were cropped out rather than covered, and every value that remains is already published in an
+  evidence record.
+- The runbook now carries a composition rule: an image may be cropped, may stack contiguous strips
+  of one capture with dead space removed, and may carry a drawn label, but may not reorder, retime
+  or recolour evidence, and may show no number absent from a retained record.
+
+### Still deliberately not claimed
+
+Three captions are narrower than the runbook originally planned, because the panels they assumed
+were never captured. Image 02 shows the governed catalog but not per-agent ownership, skill,
+classification or approval, which live on an uncaptured Agent Card detail view. Image 04 shows
+inline screening but not the Auditor-permitted/Escalation-denied IAM split. Image 05 shows
+correlation, minimization and retention but not cross-week human-decision continuity. Each
+underlying claim keeps its existing status from evidence 05, 03 and 10 respectively; what narrowed
+is what a screenshot proves.
+
+The two open observations are unchanged: a managed Gateway refusal of an unregistered caller, and
+a watched timeout/retry/dead-letter sequence. No demo video exists yet.
+
+`google-adk` stays pinned at **2.7.1** although PyPI now carries 2.8.0, so
+`scripts/check_versions.py --check-upstream` fails on this pin by design. 2.8.0 does not change
+`SequentialAgent`'s deprecation or make `Workflow` usable as an `LlmAgent` sub-agent, so
+[ADR-005](docs/adr/005-adk-as-the-agent-framework.md)'s migration trigger has not fired; two of its
+additions land on `RemoteA2aAgent` task mode and Model Armor guardrails, which are the fleet's two
+most sensitive seams and would need a live re-verification rather than a pin bump. The deployed
+fleet runs 2.7.1. The reasoning is recorded in ADR-005 rather than left to a commit message.
+
+No production code changed. The deployed fleet is the one `v0.4.0` deployed.
+
 ## [0.5.1] — 2026-08-25
 
 A dated claim on a judge-facing image disagreed with the measurement it quoted, and nothing in the

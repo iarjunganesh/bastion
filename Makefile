@@ -1,5 +1,6 @@
 .PHONY: help install test test-unit test-integration test-security test-load test-fast \
         coverage lint format format-check typecheck markdown docs versions diagrams ci \
+        redact-evidence media-check \
         run-orchestrator iam-policy deploy verify smoke rollback teardown \
         audit-dependencies clean
 
@@ -12,6 +13,8 @@ help:
 	@echo "lint              - ruff check"
 	@echo "format-check      - verify ruff formatting"
 	@echo "typecheck         - mypy the shipped Python packages"
+	@echo "redact-evidence   - apply declared masks to promoted screenshots and videos"
+	@echo "media-check       - reject undeclared or unmasked judge-facing media"
 	@echo "ci                - run the local quality gate"
 	@echo "run-orchestrator  - run the Orchestrator locally"
 	@echo "iam-policy        - dump the live IAM policy (gitignored; redact before publishing)"
@@ -65,7 +68,7 @@ audit-dependencies:
 	uv pip install --system -r requirements.lock
 	uvx pip-audit -r requirements.lock
 
-ci: lint format-check typecheck coverage markdown docs versions diagrams audit-dependencies
+ci: lint format-check typecheck coverage markdown docs versions diagrams media-check audit-dependencies
 
 docs:
 	$(PYTHON) scripts/check_docs.py
@@ -75,6 +78,12 @@ versions:
 
 diagrams:
 	$(PYTHON) scripts/render_diagrams.py --check --no-gif
+
+redact-evidence:
+	$(PYTHON) scripts/redact_evidence.py
+
+media-check:
+	$(PYTHON) scripts/redact_evidence.py --check
 
 markdown:
 	npx --yes markdownlint-cli2 "**/*.md"

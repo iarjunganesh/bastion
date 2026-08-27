@@ -65,7 +65,11 @@ remain ignored under `.takes/` and are not publication assets.
 - The binding/finding/ownership measurement is a count-only companion probe taken immediately
   after the route. The route's own retained audit proves the deployed worker called the IAM tool;
   it does not embed raw policy values or these aggregate counts in telemetry.
-- The P0.9 raw screenshot passed sensitive-data and readability review. It remains an ignored
-  source take until the final production-routing gallery image is composed and reviewed.
+- The P0.9 screenshots passed sensitive-data and readability review and are retained as
+  [`screenshots/11-current-route-count-only-summary.png`](screenshots/11-current-route-count-only-summary.png)
+  and [`screenshots/11-current-route-audit-log.png`](screenshots/11-current-route-audit-log.png);
+  the latter carries a mask over the operator's account photo. Composed 2026-08-27 into gallery
+  image 03 (count-only routing) and the audit panel of image 05. The unmasked sources stay ignored
+  under `.takes/`.
 - It is not an agent-mediated Model Armor refusal, a Cloud Trace span chain, a retention/WORM
   claim, or historical SLO attainment.

@@ -53,8 +53,10 @@ The retained record above carries span names, durations, ordering, and the opaqu
 workload identifiers only. Span *attributes* were deliberately not opened or captured: the
 transport spans carry `http.url` and `/http/host` values naming private Cloud Run worker origins,
 along with project identifiers, and those are prohibited from judge-facing artifacts. The
-reviewed screenshot expands no span for that reason, and the raw source remains ignored under
-`.takes/`.
+reviewed screenshot expands no span for that reason, and is retained as
+[`screenshots/13-current-route-trace.png`](screenshots/13-current-route-trace.png); the raw source
+remains ignored under `.takes/`. Gallery image 05 crops it further, stopping left of the
+Service/workload column, so no partial workload id appears there.
 
 ## Proof boundary
 

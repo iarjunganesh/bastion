@@ -1,6 +1,7 @@
 # Final claim matrix
 
-- **Reviewed:** 2026-08-24; reconciled 2026-08-25 after the P0.6-P0.9 evidence sprint
+- **Reviewed:** 2026-08-24; reconciled 2026-08-27 against release `v0.5.2` after the P0.6-P0.9
+  evidence sprint and the gallery composition
 - **Purpose:** Internal pre-publication gate before drafting Devpost, article, social, screenshot,
   or demo copy. `Partial` means the public sentence must use the narrower wording in the final
   column; it does not mean the underlying architecture is absent.
@@ -33,6 +34,17 @@ fail-closed observation — never an observed Eventarc redelivery, an observed f
 dead-letter, or the planned unregistered-caller refusal. Per-caller rate limiting is never claimed
 at all; it does not exist.
 
+For the current hackathon packet, those two captures are deliberately deferred rather than treated
+as video blockers. The narrower wording above is the accepted publication boundary; with the
+five-image gallery composed on 2026-08-27, the remaining mandatory work is recording the public
+demo.
+
+Three gallery captions are themselves narrower than this matrix allows, because the panels they
+planned were never captured: image 02 shows the catalog but not per-agent ownership or policy
+metadata, image 04 shows inline screening but not the IAM read split, and image 05 shows
+correlation and retention but not cross-week exception continuity. Each underlying claim keeps its
+status here — the narrowing is about what a screenshot proves, not about what is true.
+
 Mutable live counts, upstream issue/PR status, public links, official rules, and video availability
 must be refreshed immediately before publication; this review is not authority for facts that can
-change after 2026-08-25.
+change after 2026-08-27.

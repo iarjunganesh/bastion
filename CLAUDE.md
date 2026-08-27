@@ -18,7 +18,9 @@ Five of seven observation captures are closed. Current-route IAM provenance, the
 Model Armor refusal, the correlated payload-free audit trail and the Cloud Trace chain were all
 captured on 2026-08-25 (evidence 11, 12, 13). Two remain deliberately open and their claims stay
 narrowed: a managed Gateway refusal of an unregistered caller, and a watched
-timeout/retry/dead-letter sequence. No demo video or gallery image exists yet.
+timeout/retry/dead-letter sequence. The five Devpost gallery images were composed on
+2026-08-27 from those captures and are all dark; three carry captions narrowed to the panels
+actually captured. No demo video exists yet.
 
 Read these before changing architecture or claims:
 
@@ -81,6 +83,7 @@ pytest tests --cov --cov-report=term-missing --cov-fail-under=100
 python scripts/check_docs.py
 python scripts/check_versions.py
 python scripts/render_diagrams.py --check
+python scripts/redact_evidence.py --check
 npx markdownlint-cli2 "**/*.md"
 ```
 
