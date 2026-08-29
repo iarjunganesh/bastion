@@ -21,13 +21,18 @@ or a media platform.
 - [x] Signed-out public evidence console verified at
       [`bastion.arjunganesh.dev`](https://bastion.arjunganesh.dev/); this is a presentation plane
       only, not a public agent endpoint.
-- [ ] Devpost category selected and all required fields saved.
+- [x] Devpost category selected and all required fields saved. **Fortified Enterprise Fleet**,
+      with description, five-image gallery, video link, repo, hosted URL, testing instructions,
+      SDK, services, models and architecture upload all populated as of 2026-08-29.
 - [x] Public English demo video under four minutes — **3:53** at [https://youtu.be/Xpj8YmzFfpk](https://youtu.be/Xpj8YmzFfpk),
       with the 36-cue English caption track attached.
-- [ ] Architecture GIF/image uploaded to Devpost. The live draft carries the dark architecture
-      GIF footed `2026-08-23`; the fleet was re-measured on 2026-08-27 and every asset regenerated,
-      so **the uploaded copy is one capture behind and must be replaced**. Counts are identical —
-      21/21 APIs, 39 resources — so only the disclosed date differs.
+- [x] Architecture GIF/image uploaded to Devpost. Two copies exist and they age differently: the
+      one *inside* the description is fetched live from `raw.githubusercontent.com/.../main/`, so it
+      is current by construction — confirmed on 2026-08-29 reading `Build state · 2026-08-27 ·
+      21/21 APIs · 39 resources measured` off the rendered page. The one uploaded under **Additional
+      info** is a static copy whose vintage cannot be read at thumbnail resolution; re-upload
+      `assets/architecture/enterprise-fleet-architecture-dark.png` to be certain and to match the
+      five dark gallery images. Counts have not moved, so only a disclosed date could differ.
 - [ ] Final submission sent before the deadline.
 
 ## Three track obligations
@@ -164,8 +169,10 @@ The following claims are deliberately not made:
       architecture capture date; `v0.5.2` composes the five-image gallery and adds the redaction
       gate that caught an operator account photo in a promoted evidence capture; `v0.6.0` moves
       every pin to the newest release the resolver allows and fixes the pre-tag gate that had been
-      surveying five pins of twenty-three. Each annotated tag is created only after its release
-      metadata, full gates, pushed commit, and green `main` CI all agree.
+      surveying five pins of twenty-three; `v0.7.0` is the publication release — it assembles the
+      3:53 demo from the committed narration, publishes it, and threads the URL through the README,
+      the public console, the Devpost write-up and the bonus drafts. Each annotated tag is created
+      only after its release metadata, full gates, pushed commit, and green `main` CI all agree.
 
 - [ ] **Redeploy both surfaces onto the `v0.6.0` dependency resolution and re-verify live.** Until
       this happens the repository pins `google-adk` 2.8.0 while the fleet runs 2.7.1, and no claim

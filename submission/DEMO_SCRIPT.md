@@ -2,7 +2,8 @@
 
 - **Target:** **3:53**, locked and measured. Never exceeds four minutes.
 - **Start only after:** `submission/CAPTURE_RUNBOOK.md` is complete and the claim matrix is
-  reconciled. Both were as of 2026-08-27.
+  reconciled. The runbook was complete as of 2026-08-27; the matrix was reconciled again on
+  2026-08-29, when publication made its `In demo` column answerable and eight rows became `Yes`.
 
 ## Recording setup
 

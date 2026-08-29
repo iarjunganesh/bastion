@@ -73,6 +73,43 @@ ADRs/ledgers) — plus a full sweep of every tracked Markdown file for staleness
 4. commit and push the release metadata, then verify `main` CI green;
 5. create an annotated `v0.4.0` tag at that exact commit and push the tag separately.
 
+## v0.7.0 — the demo is built, published, and threaded through every surface
+
+Shipped 2026-08-29. A minor release: no production code changed, but the submission's one
+mandatory missing artifact stopped being missing.
+
+`assets/demo-video/bastion.mp4` is **3:53**, twelve beats, 1920×1080, published at
+<https://youtu.be/Xpj8YmzFfpk> with a 36-cue English caption track. It is *assembled*, not edited:
+[`scripts/assemble_demo_video.py`](../../scripts/assemble_demo_video.py) builds the timeline from
+the measured narration, so the picture cannot drift from the sound. The opening is a real recording
+of the live public console driven by `scripts/capture_site_hook.mjs`; the rest is the redacted
+evidence retained as 11, 12 and 13 plus the generated masters — which is why the narration says the
+cut was **captured from the deployed fleet** rather than claiming it happens live on camera.
+
+Three defects were found and fixed in the making, each of the same shape — a generated artifact
+silently describing a version of the cut that no longer existed:
+
+- the caption sidecar was written when the hook still held for 3.0s, leaving every cue after the
+  hook **2.000s late**; invisible on a thirteen-second cue and obvious only on the shortest, where
+  "Thank you for watching" was captioned after the words had finished. The assembler now refuses to
+  render unless each beat's first cue starts when the beat starts;
+- the cross-dissolve surplus was added per beat while twelve transitions exist, so the picture
+  finished 0.4s ahead of the narration;
+- the governed-flow stop in the hook parked where the figure's bottom row fell out of frame.
+
+**The published URL points at a fixed file.** Dropping a recording into `assets/demo-video/beats/`
+still takes precedence automatically, but acting on it now means re-uploading rather than
+re-rendering — and the Devpost description pulls its architecture image live from `main`, so after
+submission neither `main`'s diagrams nor the video may change without re-checking what judges see.
+That is the reason this tag exists before submission rather than after it.
+
+**Re-check before the final freeze:** the clean-clone gate is due from the public `v0.7.0` tag —
+the retained record still verifies `v0.5.1`, two releases back. The two deferred observations
+(managed Gateway refusal, retry/dead-letter) stay deferred by decision, with the narrower wording
+already in the claim matrix; closing either would mean changing the deployed fleet and
+invalidating the captures this video is built from. Bonus publication (article, social post) and
+the Devpost submission itself remain open and are not release work.
+
 ## v0.6.0 — every pin to the newest release the resolver allows
 
 Shipped 2026-08-27. A minor release, not a patch: no production code changed, but the dependency

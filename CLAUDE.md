@@ -36,6 +36,15 @@ caption track attached, and any beat can still be upgraded by dropping a screen 
 `assets/demo-video/beats/`, which takes precedence automatically — a re-cut means re-uploading,
 since the URL now points at a fixed file.
 
+**The Devpost entry is a draft, and after it is submitted two things freeze.** As of 2026-08-29 it
+stands at `DRAFT`, 4/5 steps, with every field populated; its public URL returns a login page until
+it is sent. The description embeds the architecture image from
+`raw.githubusercontent.com/.../main/`, so it re-renders from `main` on every page load — meaning a
+later `scripts/render_diagrams.py` run silently changes the picture on the judged page. The video
+URL likewise points at a fixed YouTube upload that cannot be replaced in place. After submission,
+do not regenerate diagrams on `main` or re-cut the video without deciding explicitly to re-check
+what judges see. Tag `v0.7.0` exists so there is a fixed point that matches the submission.
+
 Read these before changing architecture or claims:
 
 | File | Purpose |

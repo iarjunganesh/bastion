@@ -10,7 +10,7 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
-## [Unreleased]
+## [0.7.0] — 2026-08-29
 
 ### Added — the demo video is published
 

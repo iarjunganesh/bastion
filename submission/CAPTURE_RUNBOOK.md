@@ -5,15 +5,20 @@ Devpost gallery images. Raw captures belong in ignored `.takes/`; only reviewed,
 artifacts move into `assets/screenshots/` or `assets/evidence/`.
 
 The evidence sprint has reached its safe publication boundary: four observations are closed and
-the other two are explicitly deferred under narrower wording. Do not start the video until the
-gallery acceptance gate is complete. Do not expose service-account principals, private origins,
+the other two are explicitly deferred under narrower wording. The gallery acceptance gate closed on
+2026-08-27 and the video was published on 2026-08-29, so what follows is no longer a critical path
+— it is the procedure for any further capture, and the standing rules that govern one. Do not
+expose service-account principals, private origins,
 tokens, secrets, prompts, responses, raw IAM members/roles/resources/bindings, or unredacted
 exception messages.
 
 ## Before the first capture
 
-- [ ] Freeze the code revision that will appear in the video.
-- [ ] Reconfirm the deployed revision matches it.
+- [ ] ~~Freeze the code revision that will appear in the video.~~ *(moot in this form — the cut is
+      assembled from evidence already retained and reviewed, so there is no live take whose
+      revision could drift. It applies again to any beat recorded from here.)*
+- [ ] ~~Reconfirm the deployed revision matches it.~~ *(moot for the same reason; the deployed
+      fleet still runs the 2.7.1 resolution every retained capture was taken against.)*
 - [ ] Use a clean browser profile with notifications, bookmarks, extensions, and autofill hidden.
 - [ ] Set the desktop and browser to 1920×1080 and at least 125% console text zoom.
 - [ ] Prepare narrow, count-only console filters before recording anything.
@@ -24,11 +29,14 @@ exception messages.
 - [x] Record the opening beat from the live public console with `make capture-hook`. It drives a
       real browser from a fresh profile, so that one beat needs none of the browser-chrome
       precautions above — there is no chrome in the frame to hide.
-- [ ] Record the nine console beats into `assets/demo-video/beats/<NN>-<slug>.mp4`. Record
-      one beat at a time: `python scripts/assemble_demo_video.py --beat <slug>` re-cuts a single
-      one, so a fluffed step costs a beat rather than a take, and `--check` lists what is still a
-      placeholder and exits non-zero while any remain. Overshoot each beat by a few seconds; the
-      assembler trims to the measured length and holds the final frame if a take runs short.
+- [ ] **Optional upgrade, not outstanding work.** Record any of the nine console beats into
+      `assets/demo-video/beats/<NN>-<slug>.mp4` to replace its retained-evidence still. Every beat
+      is already marked `final`, so `--check` passes as it stands; a recording simply takes
+      precedence. Record one beat at a time — `python scripts/assemble_demo_video.py --beat <slug>`
+      re-cuts a single one, so a fluffed step costs a beat rather than a take. Overshoot by a few
+      seconds; the assembler trims to the measured length and holds the final frame if a take runs
+      short. **The published URL points at a fixed file**, so acting on this now means re-uploading
+      to YouTube and re-threading the new URL, not just re-rendering.
 - [ ] Confirm the healthy revision and rollback path before any staged failure.
 
 Raw files under `.takes/` remain untouched. For each promoted PNG or MP4, add an explicit reviewed

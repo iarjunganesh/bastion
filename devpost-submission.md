@@ -3,12 +3,15 @@
 - **Hackathon:** All Things Agentic Hackathon
 - **Track:** Fortified Enterprise Fleet
 - **Submission owner:** Arjun Ganesh
-- **Local status:** Drafting only — nothing in this file has been submitted or published.
-- **Last reconciled:** 2026-08-27
+- **Local status:** Every field is filled on the live draft and the demo is published; the
+  **entry itself has not been submitted** — it stands at `DRAFT`, 4/5 steps.
+- **Last reconciled:** 2026-08-29
 
 - **Live Devpost draft:** <https://devpost.com/software/bastion-pfuy71>
-- **Read-only check on 2026-08-27:** `submission_draft`; no submission timestamp; the live video
-  field is empty. No Devpost write was made during this check.
+- **Read-only check on 2026-08-29:** still `submission_draft` with no submission timestamp, and
+  the public URL returns Devpost's login page — which is what an unsubmitted draft does. The video
+  field, the five-image gallery, the description, the category and the architecture upload are all
+  populated. No Devpost write was made during this check.
 
 This is the field-by-field source for the Devpost form shown in the four screenshots under
 `.tmp/devpost-my-project-form-questions/`. Use it while filling the live form; do not substitute
