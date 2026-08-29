@@ -64,7 +64,7 @@ Four checks are specific to reproducibility rather than correctness, and all fou
   semantic names, and `render_diagrams.py --check` reports all four current.
 - **The demo-video badge is deliberately unlinked.** It renders as a plain image with the
   wrapping instruction sitting directly above it in an HTML comment, so it becomes a link only
-  when a public video URL exists to point it at.
+  now that the public video URL exists to point it at: <https://youtu.be/Xpj8YmzFfpk>.
 
 ## Two environment findings, neither a repository defect
 

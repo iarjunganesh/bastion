@@ -105,5 +105,5 @@ Bastion's repository, evidence, and final demo links:
 
 - <https://github.com/iarjunganesh/bastion>
 - <https://bastion.arjunganesh.dev/>
-- `TODO — public Devpost project URL`
-- `TODO — public demo video URL`
+- <https://devpost.com/software/bastion-pfuy71>
+- <https://youtu.be/Xpj8YmzFfpk>

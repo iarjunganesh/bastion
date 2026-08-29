@@ -1,7 +1,12 @@
 # Social launch copy
 
-Publication drafts only. Refresh the Devpost/video URLs and upstream status immediately before
-posting. Publish one primary post; do not fragment the bonus proof across unrelated posts.
+Publication drafts only. The video and Devpost URLs are filled; re-check the upstream status
+immediately before posting. Publish one primary post; do not fragment the bonus proof across
+unrelated posts.
+
+A ready-to-paste LinkedIn build of the draft below — Unicode sans-serif bold, emoji, and the
+measured numbers from evidence 11 — is generated outside the tree at `.tmp/linkedin-post.txt`;
+this file stays the reviewed source of the claims it makes.
 
 ## LinkedIn draft
 
@@ -22,8 +27,8 @@ closed in favour of a central fix — and the maintainer's reply was the better 
 confirmed the boundary is a general transport property, not a bug in one agent type. The issue is
 still open.
 
-- Project: TODO_DEVPOST_URL
-- Demo: TODO_VIDEO_URL
+- Project: <https://devpost.com/software/bastion-pfuy71>
+- Demo: <https://youtu.be/Xpj8YmzFfpk>
 - Evidence: <https://bastion.arjunganesh.dev/>
 
 \#AllThingsAgenticHackathon
@@ -36,13 +41,14 @@ decisions, and routes minimized findings—without IAM write access.
 Deterministic findings. Gemini 3.5 Flash rationale. IAM-separated agents. Durable context. Real
 GCP proof.
 
-TODO_DEVPOST_URL
+<https://devpost.com/software/bastion-pfuy71>
 
 \#AllThingsAgenticHackathon
 
 ## Publication gate
 
-- [ ] Replace every `TODO_*` placeholder.
+- [x] Replace every `TODO_*` placeholder. Filled 2026-08-29: the video URL and the
+  Devpost project URL.
 - [ ] Attach `assets/screenshots/01-enterprise-fleet-architecture.png` or the approved security
   boundary image.
 - [ ] Keep `#AllThingsAgenticHackathon` exact.

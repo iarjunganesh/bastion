@@ -31,8 +31,10 @@ rather than from a timeline editor, so the picture cannot drift from the sound. 
 recording of the live public console; the rest is the redacted console and terminal evidence
 retained as evidence 11, 12 and 13, plus the generated architecture and brand masters. The
 narration therefore says the cut was **captured from the deployed fleet**, not that it happens live
-on camera. It is built but **not yet uploaded**, and any beat can still be upgraded by dropping a
-screen recording into `assets/demo-video/beats/`, which takes precedence automatically.
+on camera. It was published on 2026-08-29 at [https://youtu.be/Xpj8YmzFfpk](https://youtu.be/Xpj8YmzFfpk) with the 36-cue
+caption track attached, and any beat can still be upgraded by dropping a screen recording into
+`assets/demo-video/beats/`, which takes precedence automatically — a re-cut means re-uploading,
+since the URL now points at a fixed file.
 
 Read these before changing architecture or claims:
 

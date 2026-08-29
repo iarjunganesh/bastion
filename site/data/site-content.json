@@ -54,8 +54,8 @@
     }
   ],
   "video": {
-    "status": "pending",
+    "status": "published",
     "title": "Bastion demo video",
-    "embedUrl": ""
+    "embedUrl": "https://www.youtube-nocookie.com/embed/Xpj8YmzFfpk"
   }
 }

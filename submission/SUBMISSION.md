@@ -22,7 +22,8 @@ or a media platform.
       [`bastion.arjunganesh.dev`](https://bastion.arjunganesh.dev/); this is a presentation plane
       only, not a public agent endpoint.
 - [ ] Devpost category selected and all required fields saved.
-- [ ] Public English demo video under four minutes.
+- [x] Public English demo video under four minutes — **3:53** at [https://youtu.be/Xpj8YmzFfpk](https://youtu.be/Xpj8YmzFfpk),
+      with the 36-cue English caption track attached.
 - [ ] Architecture GIF/image uploaded to Devpost. The live draft carries the dark architecture
       GIF footed `2026-08-23`; the fleet was re-measured on 2026-08-27 and every asset regenerated,
       so **the uploaded copy is one capture behind and must be replaced**. Counts are identical —
@@ -124,8 +125,7 @@ The following claims are deliberately not made:
 
 - [x] Prepare the field-by-field local Devpost worksheet, judge-facing write-up, architecture PNG,
       3:2 thumbnail, capture runbook, demo script, and bonus-copy drafts. The Devpost draft,
-      required architecture image, and the five-image gallery now exist; the demo video is the
-      remaining mandatory publication work. See
+      required architecture image, the five-image gallery and the demo video now all exist. See
       [`../devpost-submission.md`](../devpost-submission.md).
 
 - [x] Generate the narration and lock the cut. Twelve beats are synthesised with Google Cloud
@@ -139,13 +139,13 @@ The following claims are deliberately not made:
       the page viewport from a fresh profile, so no browser chrome or account photo can enter
       frame.
 
-- [ ] Record the catalog → event → Runtime/Gateway → IAM denial → Armor refusal → idempotent review
-      → audit dashboard story without exposing a principal or endpoint. **Built, not uploaded.**
-      `assets/demo-video/bastion.mp4` is 3:53 and declared in `VIDEO_REDACTIONS`; the outstanding
-      work is upload, signed-out verification, and publishing the URL. Any beat can still be
-      upgraded by dropping a screen recording into `assets/demo-video/beats/`. Record into
-      `assets/demo-video/beats/<NN>-<slug>.mp4`; `python scripts/assemble_demo_video.py --check`
-      lists what is outstanding and exits non-zero while any placeholder remains.
+- [x] Record the catalog → event → Runtime/Gateway → IAM denial → Armor refusal → idempotent review
+      → audit dashboard story without exposing a principal or endpoint. **Published 2026-08-29** at
+      [https://youtu.be/Xpj8YmzFfpk](https://youtu.be/Xpj8YmzFfpk): 3:53, twelve beats, declared in `VIDEO_REDACTIONS`
+      and reviewed at every beat boundary. Any beat can still be upgraded by dropping a screen
+      recording into `assets/demo-video/beats/<NN>-<slug>.mp4`, which takes precedence
+      automatically — but the published URL points at a fixed file, so a re-cut means re-uploading.
+      `python scripts/assemble_demo_video.py --check` lists what each beat is showing.
 - [ ] Verify every Devpost number against `gcp-state.json` immediately before submission.
 - [x] Verify the static evidence console and custom domain while signed out; its observed browser
       network log contains no private GCP request.

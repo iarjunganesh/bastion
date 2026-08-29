@@ -138,15 +138,28 @@ def check_model_config() -> None:
         fail("README.md references gemini-3.5-pro, which is unavailable — see ADR-004")
 
 
+BADGE_DOCS = ("README.md", "submission/DEVPOST_README.md")
+
+
 def check_badge_versions() -> None:
-    """Every version quoted in a README badge matches what is actually pinned.
+    """Every version quoted in a badge matches what is actually pinned.
 
     A static badge is a claim like any other. These are cheap to write and easy to forget,
     so a badge reading `Flask-3.1.3` over a requirements file pinning something else is
     exactly the small dishonesty this project cannot afford.
+
+    Both documents that carry badges are checked. `DEVPOST_README.md` is pasted verbatim into
+    the public Devpost description, so a stale version badge there is read by judges rather than
+    by contributors — the surface where being wrong costs the most, and the one nobody would
+    think to re-check.
     """
-    readme = read("README.md")
     pins = read("requirements.txt") + read("requirements-dev.txt")
+    for document in BADGE_DOCS:
+        _check_badges_in(document, pins)
+
+
+def _check_badges_in(document: str, pins: str) -> None:
+    readme = read(document)
 
     # badge label → package name in the pin files
     tracked = {
@@ -169,10 +182,10 @@ def check_badge_versions() -> None:
             rf"^{re.escape(package)}(?:\[[^\]]*\])?==([0-9][0-9.]*)$", pins, re.MULTILINE
         )
         if pinned is None:
-            fail(f"README badge quotes {label} {badge.group(1)}, but {package} is not pinned")
+            fail(f"{document} badge quotes {label} {badge.group(1)}, but {package} is not pinned")
         elif badge.group(1) != pinned.group(1):
             fail(
-                f"README badge says {label} {badge.group(1)}, "
+                f"{document} badge says {label} {badge.group(1)}, "
                 f"but {package} is pinned at {pinned.group(1)}"
             )
 
@@ -180,7 +193,7 @@ def check_badge_versions() -> None:
     requires = re.search(r'requires-python = ">=([0-9.]+)"', read("pyproject.toml"))
     if python_badge and requires and python_badge.group(1) != requires.group(1):
         fail(
-            f"README badge says Python {python_badge.group(1)}, "
+            f"{document} badge says Python {python_badge.group(1)}, "
             f"but pyproject requires >={requires.group(1)}"
         )
 

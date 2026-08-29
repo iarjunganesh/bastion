@@ -16,16 +16,13 @@
 <p align="center">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</p>
 
 <!-- Row 1 — repository state. Same five as the sibling repositories, same order.
-     Publishing the demo: wrap the last line as
-     [![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)](https://youtu.be/YOUR_ID)
-     Four minutes is the brief's ceiling — see submission/SUBMISSION.md.
      Nothing may be inserted between these badge lines: a comment breaks the paragraph and
      drops the badge after it onto a row of its own. -->
 [![CI](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml)
 [![Codecov](https://codecov.io/gh/iarjunganesh/bastion/graph/badge.svg)](https://codecov.io/gh/iarjunganesh/bastion)
 [![Release](https://img.shields.io/badge/release-latest-2ea44f?logo=github&logoColor=white)](https://github.com/iarjunganesh/bastion/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)
+[![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)](https://youtu.be/Xpj8YmzFfpk)
 
 <!-- Row 2 — what Bastion is actually built on, plus the program badge earned before it. -->
 [![Google ADK 2.8.0](https://img.shields.io/badge/Google_ADK-2.8.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)

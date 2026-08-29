@@ -12,6 +12,42 @@ The current release process is in
 
 ## [Unreleased]
 
+### Added — the demo video is published
+
+- The cut is public at [https://youtu.be/Xpj8YmzFfpk](https://youtu.be/Xpj8YmzFfpk): **3:53**, twelve beats,
+  English captions attached from `assets/demo-video/bastion.srt`. The README badge, the public
+  console, the Devpost worksheet, the article and social drafts, and the submission ledger all
+  point at it, and `site/data/site-content.json` moves the video panel from `pending` to
+  `published` so the console embeds it through `youtube-nocookie.com`.
+- The published URL points at a fixed file. A re-cut is still possible — dropping a recording into
+  `assets/demo-video/beats/` takes precedence automatically — but it now means re-uploading rather
+  than re-rendering, which is a different decision and is recorded as one.
+
+### Fixed — the caption sidecar described a cut that no longer existed
+
+- `assets/demo-video/bastion.srt` was generated while the hook still held for 3.0s. The hold became
+  1.0s and the audio and shot table followed; the sidecar did not, leaving **every cue after the
+  hook exactly 2.000s late**. Two seconds inside a thirteen-second cue reads as nothing, which is
+  why it survived review — it showed only on the shortest cue, where "Thank you for watching" was
+  captioned half a second *after* the words had finished and ran past the end of the video.
+- Regenerated from the cached clips and probes, so no synthesis re-ran and not one word changed,
+  then verified against the master rather than trusted: `silencedetect` puts every beat's speech
+  onset 0.23–0.68s after its first cue across all twelve, consistent and without accumulation.
+  That residue is the leading silence inside each TTS clip, and a caption landing a beat before the
+  words is correct lead-in.
+- `scripts/assemble_demo_video.py` now refuses to render unless each beat's first cue starts when
+  the beat starts, within 0.25s. Cue boundaries *inside* a beat come from per-sentence probes the
+  assembler never sees and stay unchecked; the cumulative clock is what drifts.
+
+### Changed — the governed-flow stop in the opening hook drifts rather than freezing
+
+- The third stop parked at the section top, which put the viewport bottom above the figure's own
+  bottom row: Access Auditor, Escalation Agent, and the live IAM policy card the beat is about all
+  fell out of frame. No single 1080px frame holds both the heading and the whole diagram — they
+  span 1029px of content against 1004px of viewport below the sticky nav — so the stop now crosses
+  2185 to 2500 across its existing hold at roughly 48px a second. It costs no time, and the cut is
+  still 3:53.
+
 ### Fixed — the public console called a fleet inventory an evidence verification
 
 - `site/index.html` labelled its timestamp "Last evidence verification" while the value is

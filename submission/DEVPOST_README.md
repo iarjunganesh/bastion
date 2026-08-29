@@ -1,11 +1,15 @@
-# Bastion
+<!-- Paste this whole file into Devpost's "About the project" box. It deliberately carries no
+     title and no tagline: Devpost prints both from its own form fields, directly above the
+     description, so a heading here renders the project name and tagline twice. This file used to
+     open with them plus a note telling a human to skip them, which failed exactly the way such a
+     note fails -- the duplicate was observed on the live draft on 2026-08-25 and again on
+     2026-08-29 after a re-paste. There is now nothing to skip. -->
 
-**A private fleet of catalogued agents that audits live GCP IAM, remembers human decisions, and
-routes minimized findings without gaining write access.**
-
-<!-- Devpost renders the title and tagline above from its own form fields. Begin the pasted
-     description at the link row below, or the live page repeats its own header. Observed
-     duplicated on the draft 2026-08-25. -->
+[![CI](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml)
+[![Codecov](https://codecov.io/gh/iarjunganesh/bastion/graph/badge.svg)](https://codecov.io/gh/iarjunganesh/bastion)
+[![Google ADK 2.8.0](https://img.shields.io/badge/Google_ADK-2.8.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/iarjunganesh/bastion/blob/main/LICENSE)
 
 [Public evidence console](https://bastion.arjunganesh.dev/) ·
 [Source code](https://github.com/iarjunganesh/bastion) ·
@@ -125,8 +129,8 @@ Current-route IAM provenance, the agent-mediated Model Armor refusal, the correl
 the Cloud Trace chain are captured and retained. Two observations are deliberately still open and
 are not claimed: a managed Gateway refusal of an unregistered caller, and a watched
 timeout/retry/dead-letter sequence. They are deferred behind the honest narrower wording in the
-claim matrix; the five-image gallery is composed, so the remaining pre-submission work is the
-under-four-minute live demo. After the hackathon, the most valuable extensions are closing those
+claim matrix; the five-image gallery is composed and the 3:53 demo is published. After the
+hackathon, the most valuable extensions are closing those
 two observations, adding governed department catalogs, introducing a deliberate recurring trigger
 with an operational pause control, and hardening the retained audit store if an immutable retention
 requirement is adopted.

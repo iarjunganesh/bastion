@@ -79,7 +79,7 @@ drift from the sound and no timeline editor is involved. Four directories feed o
 | `demo-video/beats/` | no | Raw per-beat screen recordings. `00-hook.mp4` is produced by [`scripts/capture_site_hook.mjs`](../scripts/capture_site_hook.mjs) from the live public console. |
 | `demo-video/statics/` | yes | Reviewed page captures the cut uses, promoted from ignored `.takes/` under the rules in [`screenshots/README.md`](screenshots/README.md). |
 | `demo-video/build/` | no | Per-beat segments and intermediates, reconciled against the current plan on every run so the directory cannot describe an older cut. |
-| `demo-video/bastion.mp4` | no | The finished cut. Untracked because it is ~20 MB and rewritten on every render, which would add a blob to history each time; it is published to YouTube. |
+| `demo-video/bastion.mp4` | no | The finished cut. Untracked because it is ~20 MB and rewritten on every render, which would add a blob to history each time; it is published at [https://youtu.be/Xpj8YmzFfpk](https://youtu.be/Xpj8YmzFfpk). |
 
 A beat whose shots are not marked `final` is a stand-in for footage still to be recorded, and a
 build containing one is written to `demo-video/build/` instead. The master name sits inside the
