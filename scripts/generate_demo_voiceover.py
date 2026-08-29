@@ -51,8 +51,11 @@ LANGUAGE = "en-US"
 AUDITION_VOICES = ("Kore", "Aoede", "Zephyr", "Autonoe", "Sulafat", "Leda")
 
 # The brief's hard ceiling is four minutes and judges have said they stop at it, so the cut is
-# built to land here with room for a render that comes out a second long.
-TARGET_LOW, TARGET_HIGH = 225.0, 230.0
+# built to land here with room for a render that comes out a second long. The window moved from
+# 225-230s when the closing sign-off was added: three seconds bought a warm ending and still
+# leaves seven in hand, which is a deliberate trade rather than drift. Widen it again only for a
+# reason worth writing down, and never past the ceiling.
+TARGET_LOW, TARGET_HIGH = 230.0, 236.0
 
 
 @dataclass(frozen=True)
@@ -75,20 +78,23 @@ class Beat:
 NARRATION: list[Beat] = [
     Beat(
         "hook",
-        "Title over the dark enterprise-fleet architecture, then straight into the console",
+        "The live public evidence console, scrolled: the hero claim, the fleet counters, the "
+        "governed production-data path, and the remembered human decision",
         "Enterprise permissions change every day. Access reviews don't. Bastion is a fleet of "
         "three governed agents that audits the Google Cloud project it runs inside — reading "
         "production IAM read-only. It can ask a human to review a permission. It cannot change "
         "one. It's deployed on Google's managed agent stack, not a local script — and building "
         "it there surfaced a real defect in Google's own ADK, which we reported upstream. "
-        "Everything after this is live.",
+        "Everything after this was captured from the deployed fleet.",
         "Enterprise permissions change every day. Access reviews don't. Bastion is a fleet of "
         "three governed agents that audits the Google Cloud project it runs inside — reading "
         "production I-A-M read-only. It can ask a human to review a permission. It cannot change "
         "one. It's deployed on Google's managed agent stack, not a local script — and building "
         "it there surfaced a real defect in Google's own A-D-K, which we reported upstream. "
-        "Everything after this is live.",
-        hold=3.0,
+        "Everything after this was captured from the deployed fleet.",
+        # The opening take runs 34.3s, so a long hold here only clones its final frame. Trimmed to
+        # 1.0s when the honest-capture rewording added 2.4s of speech and pushed the cut to 3:55.
+        hold=1.0,
     ),
     Beat(
         "event",
@@ -186,7 +192,7 @@ NARRATION: list[Beat] = [
     ),
     Beat(
         "close",
-        "Closing on the dark architecture still",
+        "The architecture flow animating, then the coverage report on the same commit",
         "Bastion turns real IAM into remembered, department-owned action — without ever giving an "
         "agent write access. The ADK defect it surfaced is now an open issue upstream, "
         "confirmed by a Google maintainer. Every claim here has a proof boundary in the "
@@ -196,6 +202,15 @@ NARRATION: list[Beat] = [
         "confirmed by a Google maintainer. Every claim here has a proof boundary in the "
         "public repository.",
         hold=2.0,
+    ),
+    # A short sign-off over a closing card carrying the repository, the console and the track.
+    # It costs three seconds of a four-minute ceiling, which the measured cut can afford; the
+    # card, not the narration, is what carries the two URLs a judge might want to type.
+    Beat(
+        "thanks",
+        "The animated brand banner, with the repository and public evidence console URLs",
+        "Thank you for watching.",
+        hold=1.6,
     ),
 ]
 

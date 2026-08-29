@@ -67,3 +67,17 @@ console-*.txt
 # Per-sentence measurement probes. Intermediate: the committed clip is the artifact.
 assets/demo-voiceover/probes/
 assets/demo-voiceover/auditions/
+# Demo video assembly. Raw per-beat takes and intermediate renders are large binaries rebuilt by
+# scripts/assemble_demo_video.py; only the reviewed final cut is ever a candidate for tracking,
+# and that is published to YouTube rather than committed.
+assets/demo-video/beats/
+assets/demo-video/build/
+# The finished cut is ~20 MB and is republished on every re-render, so committing it would
+# add a fresh blob to history each time. It is published to YouTube; the narration, the
+# reviewed stills and scripts/assemble_demo_video.py are what the repository keeps.
+assets/demo-video/bastion.mp4
+
+# Node tooling is run through npx or an out-of-tree install; never vendored here.
+node_modules/
+package-lock.json
+

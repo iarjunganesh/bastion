@@ -20,6 +20,10 @@
 - `infrastructure/teardown.py` — dry-run-first serving-resource removal
 - `scripts/capture_gcp_state.py` — count-only live inventory
 - `scripts/render_diagrams.py` — SVG variants and GIFs
+- `scripts/redact_evidence.py` — declared masks for promoted PNGs and MP4s; `--check` is the gate
+- `scripts/generate_demo_voiceover.py` — narration, captions, and the measured shot table
+- `scripts/assemble_demo_video.py` — cuts the video from that narration; `--check` reports the plan
+- `scripts/capture_site_hook.mjs` — records the opening beat from the live public console
 
 ## Fixed versions and regions
 

@@ -20,7 +20,15 @@ exception messages.
 - [ ] Create a fresh ignored directory under `.takes/` for raw screenshots and recordings.
 - [ ] Confirm local `ffmpeg` and `ffprobe` are on `PATH` before recording video.
 - [x] Generate the narration and the measured shot table with `make voiceover`; the cut is
-      locked at **3:49**. See [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md).
+      locked at **3:53**. See [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md).
+- [x] Record the opening beat from the live public console with `make capture-hook`. It drives a
+      real browser from a fresh profile, so that one beat needs none of the browser-chrome
+      precautions above — there is no chrome in the frame to hide.
+- [ ] Record the nine console beats into `assets/demo-video/beats/<NN>-<slug>.mp4`. Record
+      one beat at a time: `python scripts/assemble_demo_video.py --beat <slug>` re-cuts a single
+      one, so a fluffed step costs a beat rather than a take, and `--check` lists what is still a
+      placeholder and exits non-zero while any remain. Overshoot each beat by a few seconds; the
+      assembler trims to the measured length and holds the final frame if a take runs short.
 - [ ] Confirm the healthy revision and rollback path before any staged failure.
 
 Raw files under `.takes/` remain untouched. For each promoted PNG or MP4, add an explicit reviewed
@@ -124,6 +132,85 @@ and fail-closed behavior are tested and deployed.
 - Narrow any row that still lacks observed proof.
 - Refresh mutable counts in `assets/architecture/gcp-state.json` and regenerate diagrams only if
   the deployed inventory changed.
+
+## Video recording session — execute in this order
+
+**This session is optional.** The assembled cut is complete and honest without it: its pictures
+are the redacted console and terminal captures retained as evidence 11, 12 and 13, and the
+narration says the cut was captured from the deployed fleet rather than claiming it happens live on
+camera. Recording a beat upgrades it — motion reads as more convincing than a still — and a file
+dropped into `assets/demo-video/beats/` takes precedence automatically, so beats can be upgraded
+one at a time with no deadline risk.
+
+If you do record, the beats are **not independent**, and shooting them in script order would waste
+most of the work: one successful investigation produces the material for six of them, and the Model
+Armor probe deliberately fails an investigation, so running it early puts a failed run beside the
+successful one in every console view captured afterwards.
+
+Record with OBS at 1920×1080/30fps into `assets/demo-video/beats/<NN>-<slug>.mp4`. **No audio** —
+the narration is already committed. Overshoot each beat by a few seconds; the assembler trims to
+the measured length and holds the final frame if a take runs short. Re-cut one beat with
+`python scripts/assemble_demo_video.py --beat <slug>`, so a fluffed step costs a beat and not a
+take.
+
+### A. Before recording anything
+
+1. Freeze the code revision that will appear, and confirm the deployed revision matches it.
+2. `python -m infrastructure.verify_fleet` and `python scripts/capture_gcp_state.py --check`.
+3. Clean browser profile; notifications, bookmarks, extensions and autofill hidden. Console text
+   at 125% or more.
+4. Pre-open every tab and pre-enter every count-only filter. A judge should never watch a query
+   being typed, and a half-typed filter is where an unredactable value appears.
+5. `python scripts/assemble_demo_video.py --check` — the list of outstanding beats is the shot list.
+
+### B. One successful investigation — beats 01, 02, 03, 04, 05, 08
+
+Publish once and capture the whole chain from that single run. `.takes/2026-08-25/capture_p09_summary.py`
+is the count-only summary used for evidence 11 and prints the figures the narration quotes.
+
+| Beat | What is on screen |
+|---|---|
+| `01-event` | Publishing the approved event, and the durable inbox admitting it |
+| `02-iam` | The Auditor's live binding count landing, then the canonical deterministic findings |
+| `03-model` | The bounded Gemini rationale, then the fidelity check passing |
+| `04-deliver` | Both department deliveries and the single durable review record |
+| `05-memory` | The approved `platform-infra` exception, and that team's absent notification |
+| `08-audit` | That investigation's Cloud Trace span tree, then its payload-free audit query |
+
+Beat 05 needs no second run: the suppression is a property of this investigation, because the
+approved exception removes the `platform-infra` finding from it. Keep the investigation ID visible
+where the narration refers to it, and hold the trace and audit views apart — the trace is sampled
+and expires, the audit is the compliance record, and beat 08 says exactly that.
+
+### C. Standalone beats — 06, 09
+
+Neither depends on an investigation, so record them whenever the console is already clean.
+
+- `06-identity` — the impersonation denial from [evidence 03](../assets/evidence/03-escalation-agent-denied.md):
+  the Auditor identity performs the read, the Escalation identity is denied the same call. The
+  narration already discloses that this is reproduced by impersonation rather than captured
+  mid-investigation, so do not stage it as though it happened inside the run.
+- `09-cloud` — the deployment overview across the managed surface, with no private origin or
+  principal in frame.
+
+### D. The Model Armor refusal — beat 07, last
+
+`.takes/2026-08-25/capture_p06_armor.py` drives the approved injection sample through the Auditor's
+authenticated A2A surface. **Record this after everything else.** It fails an investigation closed
+by design, and once it exists it sits next to the successful run in the audit and Firestore views
+that beats 04 and 08 need. Capture the refusal and the payload-free audit event; never show the
+sample text.
+
+### E. Finish
+
+1. `python scripts/assemble_demo_video.py` — with all nine present it writes
+   `assets/demo-video/bastion.mp4` rather than the scaffold path.
+2. Review every transition frame at 200% zoom, then declare the file in `VIDEO_REDACTIONS` and run
+   `python scripts/redact_evidence.py --check`. It fails until the declaration exists, which is the
+   check that twice caught an operator account photo already promoted into `assets/`.
+3. Upload with `assets/demo-video/bastion.srt` as the caption track. Verify 1080p playback while
+   signed out.
+4. Add the URL to the README badge, the public console, and `devpost-submission.md`.
 
 ## Five-image Devpost gallery
 

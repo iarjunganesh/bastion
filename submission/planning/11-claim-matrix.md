@@ -21,8 +21,14 @@
 
 ## Publication rule
 
-No row is currently in the demo because the final public video has not been recorded. Public copy
-may use every `Yes` row within its stated boundary. A `Partial` row must keep the narrower wording
+No row is currently in the demo because the video has not been published yet. The column
+stays `No` until a claim appears in a *published* cut: as of 2026-08-29 the video is assembled at
+3:53 and declared in `VIDEO_REDACTIONS`, but it has not been uploaded, so nothing here has been
+published yet. The narration was drafted against this table —
+every sentence in [`../DEMO_SCRIPT.md`](../DEMO_SCRIPT.md) is defensible against a row here, and
+the two `Partial` rows are absent from it entirely rather than narrowed, so no wording below can
+be weakened by what gets said aloud. Public copy may use every `Yes` row within its stated
+boundary. A `Partial` row must keep the narrower wording
 above until its named capture closes and the evidence ledger, submission handoff, site, and this
 matrix are updated together.
 
@@ -36,8 +42,8 @@ at all; it does not exist.
 
 For the current hackathon packet, those two captures are deliberately deferred rather than treated
 as video blockers. The narrower wording above is the accepted publication boundary; with the
-five-image gallery composed on 2026-08-27, the remaining mandatory work is recording the public
-demo.
+five-image gallery composed on 2026-08-27 and the cut locked on 2026-08-29, the remaining
+mandatory work is uploading the assembled cut and publishing its URL.
 
 Three gallery captions are themselves narrower than this matrix allows, because the panels they
 planned were never captured: image 02 shows the catalog but not per-agent ownership or policy

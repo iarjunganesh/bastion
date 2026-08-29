@@ -1,139 +1,143 @@
 1
-00:00:00,000 --> 00:00:02,584
+00:00:00,000 --> 00:00:02,745
 Enterprise permissions change every day.
 
 2
-00:00:02,584 --> 00:00:04,444
+00:00:02,745 --> 00:00:04,721
 Access reviews don't.
 
 3
-00:00:04,444 --> 00:00:13,307
+00:00:04,721 --> 00:00:14,136
 Bastion is a fleet of three governed agents that audits the Google Cloud project it runs inside — reading production IAM read-only.
 
 4
-00:00:13,307 --> 00:00:15,940
+00:00:14,136 --> 00:00:16,933
 It can ask a human to review a permission.
 
 5
-00:00:15,940 --> 00:00:17,655
+00:00:16,933 --> 00:00:18,754
 It cannot change one.
 
 6
-00:00:17,655 --> 00:00:27,605
+00:00:18,754 --> 00:00:29,325
 It's deployed on Google's managed agent stack, not a local script — and building it there surfaced a real defect in Google's own ADK, which we reported upstream.
 
 7
-00:00:27,605 --> 00:00:30,648
-Everything after this is live.
+00:00:29,325 --> 00:00:33,096
+Everything after this was captured from the deployed fleet.
 
 8
-00:00:33,648 --> 00:00:37,166
+00:00:34,096 --> 00:00:37,614
 An approved enterprise event opens the investigation.
 
 9
-00:00:37,166 --> 00:00:43,461
+00:00:37,614 --> 00:00:43,909
 Pub/Sub and Eventarc give it a durable inbox with a lease, so the work survives a restart.
 
 10
-00:00:43,461 --> 00:00:48,576
+00:00:43,909 --> 00:00:49,024
 This deployment is event-triggered — there is no recurring schedule in this snapshot.
 
 11
-00:00:52,576 --> 00:01:01,409
+00:00:53,024 --> 00:01:01,857
 The Access Auditor reads production IAM with read-only authority — sixty-two live bindings on this route.
 
 12
-00:01:01,409 --> 00:01:07,635
+00:01:01,857 --> 00:01:08,083
 Deterministic rules, not the model, produce the findings: three, across two owning teams.
 
 13
-00:01:07,635 --> 00:01:13,000
+00:01:08,083 --> 00:01:13,448
 Raw principals, roles and bindings stop inside that tool.
 
 14
-00:01:17,000 --> 00:01:21,668
+00:01:17,448 --> 00:01:22,116
 Gemini 3.5 Flash writes a bounded rationale for one finding.
 
 15
-00:01:21,668 --> 00:01:25,235
+00:01:22,116 --> 00:01:25,683
 It cannot add, drop, re-score or redirect one.
 
 16
-00:01:25,235 --> 00:01:32,744
+00:01:25,683 --> 00:01:33,192
 Every field is checked against the tool's canonical output; if they disagree, the investigation fails closed.
 
 17
-00:01:36,744 --> 00:01:42,366
+00:01:37,192 --> 00:01:42,814
 The Escalation Agent holds no IAM read role at all, and no model.
 
 18
-00:01:42,366 --> 00:01:50,422
+00:01:42,814 --> 00:01:50,870
 It delivers count-only reviews to the teams that own them — two findings to security-engineering, one durable review record.
 
 19
-00:01:50,422 --> 00:01:53,1000
+00:01:50,870 --> 00:01:54,448
 Completion requires a receipt from every required delivery.
 
 20
-00:01:56,1000 --> 00:02:00,850
+00:01:57,448 --> 00:02:01,298
 A human approved an exception for platform-infra.
 
 21
-00:02:00,850 --> 00:02:07,697
+00:02:01,298 --> 00:02:08,145
 Three days later, across redeployments and restarts, the matching finding was suppressed and that team was not paged again.
 
 22
-00:02:07,697 --> 00:02:13,968
+00:02:08,145 --> 00:02:14,416
 The decision was remembered across a real elapsed gap — not re-derived by a model.
 
 23
-00:02:17,968 --> 00:02:22,519
+00:02:18,416 --> 00:02:22,967
 Separation is enforced by IAM, not prompt wording.
 
 24
-00:02:22,519 --> 00:02:28,925
+00:02:22,967 --> 00:02:29,373
 The Auditor identity performs this read; the Escalation identity is denied the same call.
 
 25
-00:02:28,925 --> 00:02:34,144
+00:02:29,373 --> 00:02:34,592
 This denial is reproduced by impersonation, not captured mid-investigation.
 
 26
-00:02:37,144 --> 00:02:42,369
+00:02:37,592 --> 00:02:42,817
 A compromised authorized caller sends an injection through the Auditor's own A2A surface.
 
 27
-00:02:42,369 --> 00:02:45,373
+00:02:42,817 --> 00:02:45,821
 The deployed callback refuses it before Gemini.
 
 28
-00:02:45,373 --> 00:02:51,232
+00:02:45,821 --> 00:02:51,680
 The task fails closed, and zero model submissions, completions or tool calls follow.
 
 29
-00:02:54,232 --> 00:03:00,488
+00:02:54,680 --> 00:03:00,936
 Cloud Trace shows one connected chain — twenty-two spans across the Runtime and both workers.
 
 30
-00:03:00,488 --> 00:03:08,684
+00:03:00,936 --> 00:03:09,132
 Separately, a payload-free audit joins every event under one investigation ID, retained a year in europe-west4.
 
 31
-00:03:08,684 --> 00:03:12,040
+00:03:09,132 --> 00:03:12,488
 The trace expires; the audit is the compliance record.
 
 32
-00:03:15,040 --> 00:03:27,976
+00:03:15,488 --> 00:03:28,424
 All of it runs privately on Google Cloud — managed Agent Runtime, Gateway, Registry and Memory Bank, with Cloud Run, Firestore, Pub/Sub and Vertex AI behind an IAM-private boundary.
 
 33
-00:03:29,976 --> 00:03:37,305
+00:03:30,424 --> 00:03:37,753
 Bastion turns real IAM into remembered, department-owned action — without ever giving an agent write access.
 
 34
-00:03:37,305 --> 00:03:43,530
+00:03:37,753 --> 00:03:43,978
 The ADK defect it surfaced is now an open issue upstream, confirmed by a Google maintainer.
 
 35
-00:03:43,530 --> 00:03:47,592
+00:03:43,978 --> 00:03:48,040
 Every claim here has a proof boundary in the public repository.
+
+36
+00:03:50,040 --> 00:03:51,744
+Thank you for watching.

@@ -20,16 +20,17 @@ The current release process is in
   older than it is: the observations in evidence 11, 12 and 13 were captured 2026-08-25, two days
   *after* the date the site presented as the last verification.
 
-### Added — the demo narration is generated, measured, and locked at 3:49
+### Added — the demo video is generated, measured, and assembled at 3:53
 
 - `scripts/generate_demo_voiceover.py` is now the source of truth for the narration. It synthesises
-  eleven beats with Google Cloud Text-to-Speech (Chirp3-HD, same project as the fleet), measures
+  twelve beats with Google Cloud Text-to-Speech (Chirp3-HD, same project as the fleet), measures
   every clip, emits the shot table into
   [`submission/DEMO_SCRIPT.md`](submission/DEMO_SCRIPT.md), and cuts a 35-cue caption track.
-- **The cut is 3:49**, measured rather than estimated: 195s narrated across eleven beats plus 35s
+- **The cut is 3:53**, measured rather than estimated: 199s narrated across twelve beats plus 34s
   of holds for live action. The first attempt measured 4:14 and the second 4:12 — the ceiling is
   hard and judges have said they stop at four minutes, so the timeline is built from real clip
-  durations instead of word-count estimates.
+  durations instead of word-count estimates. A closing sign-off over a card carrying the
+  repository and console URLs was added last, spending three of the eleven spare seconds.
 - **Chirp3-HD returns a different duration for identical text on each call** — one beat measured
   16.2s, 18.9s and 16.2s across three runs. The committed MP3 is therefore the stable artifact, and
   a SHA-256 sidecar per clip means regeneration happens only when the words change, so a casual
@@ -42,6 +43,84 @@ The current release process is in
   where the internal winning plan wanted it, and where the slot had been sitting empty.
 - `google-cloud-texttospeech==2.37.0` pinned, `requirements.lock` regenerated, `make voiceover`
   added. Enabling the API did not move the gated `21/21` count, which counts named services.
+
+### Added — the demo video is assembled from the narration, not edited by hand
+
+- `scripts/assemble_demo_video.py` cuts the video from the committed narration and per-beat screen
+  recordings. It imports the beat list from `scripts/generate_demo_voiceover.py` rather than
+  re-describing it, so the picture cannot drift from the sound: each beat occupies its measured
+  clip length plus its declared hold, a long take is trimmed and a short one holds its final
+  frame. `make assemble-video` added; the plan reproduces the locked 3:53 exactly. The sign-off runs the
+  animated brand banner — already rendered at 1920x1080 because `render_diagrams.py` covers
+  `assets/brand` — with the repository and console URLs composited over it at render time, in the
+  clear band beneath the banner's own stats row. The overlay is applied to the video frame and
+  never to the SVG: `assets/brand/` is hand-reviewed artwork whose pair must stay visually
+  aligned, and a URL line belongs to this one video rather than to every surface the banner
+  appears on. A flat text card was built first and worked; the banner is simply the better
+  closing image, and it captures nothing either, so the redaction gate has no opinion on it.
+- **A build containing any placeholder still is a scaffold, not the submission**, and the
+  difference is structural rather than a note to remember. A scaffold is written to the ignored
+  `assets/demo-video/build/`; only a fully live cut earns `assets/demo-video/bastion.mp4`, which
+  sits inside the redaction gate's watched globs and so must be declared in `VIDEO_REDACTIONS` and
+  frame-reviewed before the offline gate goes green. The hook narration promises live footage and
+  a screenshot reel would not keep that promise.
+- Placeholder stills render motionless and pixel-exact. A slow Ken Burns push was tried first and
+  rejected: `zoompan` driven off a `-loop 1` input advances `on` per emitted frame, so the zoom
+  raced past its ceiling and cropped the left edge — on a terminal capture that silently amputates
+  the very counts the narration cites.
+- `scripts/capture_site_hook.mjs` records the opening beat from the **live** public console at
+  `bastion.arjunganesh.dev`, driving a real browser rather than panning a screenshot: the hero
+  route diagram carries 24 `animateMotion` and 20 `animate` elements that a still would discard.
+  It records the page viewport from a fresh profile, so no browser chrome or account photo can
+  enter frame at all — the leak the promoted `.takes/` captures had to be cropped around. Two
+  traps are documented in the script because both are silent: the site's `scroll-behavior: smooth`
+  makes a per-frame `scrollTo` crawl a few hundred pixels instead of travelling, and the obvious
+  fix — Playwright's `reducedMotion` — would switch off the very route animation being captured.
+  The override goes through the CSSOM because the site's strict `style-src 'self'` rejects an
+  injected style tag, and that policy is part of the submission rather than something to defeat.
+- **The hook claimed more than the cut delivers, and the claim was the thing that was wrong.**
+  It said *"Everything after this is live"*, which turned every unrecorded beat into a blocker
+  and made the master filename unreachable — while the pictures it disparaged are the redacted
+  console and terminal captures retained as evidence 11, 12 and 13, real output from real
+  deployed runs. The line is now *"Everything after this was captured from the deployed
+  fleet"*, which is what the video actually shows. `assets/demo-video/bastion.mp4` follows at
+  3:53, declared in `VIDEO_REDACTIONS` and reviewed at all twelve beat boundaries. The
+  rewording cost 2.4s, paid for by trimming the hook's hold, which had only been cloning the
+  final frame of a 34.3s recording.
+- **The opening stops to be read.** A single 27s glide was tried first and nothing landed: text
+  moved past faster than a viewer could take in, which made a page full of substance feel skimmed.
+  The pan now rests on five measured section offsets — the hero with its route animation running,
+  the fleet counters, the governed production-data path, the remembered human decision, and the
+  seven managed pillars, which arrives under "deployed on Google's managed agent stack".
+- **Beats are joined by a cross-dissolve** and the film opens and closes on black. The surplus each
+  segment carries to feed its dissolve is per *segment*, not per beat: a beat holding two shots
+  contributes two dissolves, and compensating per beat left the picture finishing 0.4s ahead of the
+  narration.
+- `model` and `deliver` had shown the **same frame for forty consecutive seconds**, the longest
+  static stretch in the cut. `deliver` now shows the `escalation_agent` and `escalation_gate`
+  events completing, which is the receipt that beat's narration describes.
+- A shot can be marked `final`, meaning it is the intended finished picture rather than a
+  stand-in. Without it the completeness check could never pass: the two closing beats are
+  graphics by design and will never have a live take, so the master filename
+  `assets/demo-video/bastion.mp4` was unreachable no matter how much footage was recorded.
+  `--check` now names the beats still outstanding and marks placeholders with a `*`.
+- [`CAPTURE_RUNBOOK.md`](submission/CAPTURE_RUNBOOK.md) gains a recording-session order. The
+  nine outstanding beats are not independent: one successful investigation supplies six of
+  them, and the Model Armor probe fails an investigation by design, so recording it early
+  would leave a failed run beside the successful one in every console view captured
+  afterwards. It goes last.
+- Beats carry **shots**, not just stills: held, looped, or scrolled. Every diagram placeholder is
+  now the **animated**
+  master rather than the still: the event beat runs the governed investigation flow, whose dots
+  travel Pub/Sub to Eventarc to the durable ingress exactly as that beat's narration describes,
+  and the close loops the fleet architecture before cutting to the Codecov report. Two page captures were promoted out of ignored `.takes/2026-08-29/` under the
+  gallery runbook: browser chrome cropped away, the three account photos still present in page
+  content masked through `REDACTIONS`, and both now covered by the redaction gate.
+- The coverage page is shown and never narrated. 100% is evidence of test discipline, and this
+  project's own upstream ADK finding is the standing proof that it is not evidence of correctness.
+- `--burn-captions` sizes against libass's 288px reference height, where the repo's first attempt
+  produced 67px captions across the architecture diagram. Captions otherwise stay a sidecar for
+  the YouTube upload.
 
 ### Changed — upstream contribution status moved, in both directions
 

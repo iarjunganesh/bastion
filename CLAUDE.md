@@ -22,7 +22,17 @@ captured on 2026-08-25 (evidence 11, 12, 13). Two remain deliberately open and t
 narrowed: a managed Gateway refusal of an unregistered caller, and a watched
 timeout/retry/dead-letter sequence. The five Devpost gallery images were composed on
 2026-08-27 from those captures and are all dark; three carry captions narrowed to the panels
-actually captured. No demo video exists yet.
+actually captured.
+
+**The demo video is assembled, not edited.** As of 2026-08-29 `assets/demo-video/bastion.mp4`
+exists: **3:53**, twelve beats, built by
+[`scripts/assemble_demo_video.py`](scripts/assemble_demo_video.py) from the committed narration
+rather than from a timeline editor, so the picture cannot drift from the sound. The opening is a
+recording of the live public console; the rest is the redacted console and terminal evidence
+retained as evidence 11, 12 and 13, plus the generated architecture and brand masters. The
+narration therefore says the cut was **captured from the deployed fleet**, not that it happens live
+on camera. It is built but **not yet uploaded**, and any beat can still be upgraded by dropping a
+screen recording into `assets/demo-video/beats/`, which takes precedence automatically.
 
 Read these before changing architecture or claims:
 

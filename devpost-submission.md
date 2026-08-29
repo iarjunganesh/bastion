@@ -104,6 +104,10 @@ Requirements: public, English narration or English subtitles, under four minutes
 and visible proof that the backend runs on Google Cloud. Follow
 [`submission/DEMO_SCRIPT.md`](submission/DEMO_SCRIPT.md).
 
+`assets/demo-video/bastion.mp4` is built and ready to upload: **3:53**, seven seconds inside the
+ceiling, 1920×1080, with a 36-cue caption track at `assets/demo-video/bastion.srt` to upload
+alongside it. Every frame comes from a source the redaction gate has cleared.
+
 ## Additional Info
 
 ### Created by — Describe your contribution

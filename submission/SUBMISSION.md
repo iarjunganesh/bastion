@@ -128,8 +128,24 @@ The following claims are deliberately not made:
       remaining mandatory publication work. See
       [`../devpost-submission.md`](../devpost-submission.md).
 
+- [x] Generate the narration and lock the cut. Twelve beats are synthesised with Google Cloud
+      Text-to-Speech, measured rather than estimated, and hash-stamped so a casual re-run cannot
+      re-jitter the timings; the cut is **3:53**, inside the four-minute ceiling with seven
+      seconds to spare. `scripts/assemble_demo_video.py` builds the timeline from that committed
+      audio, so the picture cannot drift from the sound and no timeline editor is involved.
+- [x] Capture the opening beat from the live public console. `scripts/capture_site_hook.mjs`
+      drives a real browser against `bastion.arjunganesh.dev` and records the hero, the fleet
+      counters, the governed production-data path and the remembered human decision. It records
+      the page viewport from a fresh profile, so no browser chrome or account photo can enter
+      frame.
+
 - [ ] Record the catalog → event → Runtime/Gateway → IAM denial → Armor refusal → idempotent review
-      → audit dashboard story without exposing a principal or endpoint.
+      → audit dashboard story without exposing a principal or endpoint. **Built, not uploaded.**
+      `assets/demo-video/bastion.mp4` is 3:53 and declared in `VIDEO_REDACTIONS`; the outstanding
+      work is upload, signed-out verification, and publishing the URL. Any beat can still be
+      upgraded by dropping a screen recording into `assets/demo-video/beats/`. Record into
+      `assets/demo-video/beats/<NN>-<slug>.mp4`; `python scripts/assemble_demo_video.py --check`
+      lists what is outstanding and exits non-zero while any placeholder remains.
 - [ ] Verify every Devpost number against `gcp-state.json` immediately before submission.
 - [x] Verify the static evidence console and custom domain while signed out; its observed browser
       network log contains no private GCP request.

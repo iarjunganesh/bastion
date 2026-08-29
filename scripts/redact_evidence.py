@@ -102,8 +102,50 @@ REDACTIONS: dict[str, tuple[Region, ...]] = {
     # can appear. The audit rows show `"detail":{…}` collapsed, which is the deployed shape
     # rather than an applied mask.
     "screenshots/05-durable-context-and-audit.png": (),
+    # --- Stills the demo video cuts to, promoted from .takes/2026-08-29/. ------------------
+    # Codecov coverage. Browser chrome — the tab strip, the project-bearing URL, the signed-in
+    # account photo, and the vendor announcement banner — is absent because the promoted copy is
+    # cropped from below it, not masked, exactly as gallery image 02 is. Nothing masked: the
+    # branch, commit sha, per-module line counts and percentages are the evidence.
+    "demo-video/statics/codecov-coverage.png": (),
+    # The repository header, held for five seconds so the project identity registers before the
+    # scroll starts. The signed-in header avatar went with the rest of the browser chrome, but two
+    # copies of the same photo sit in page content rather than chrome, so they are masked instead.
+    # Masking them is a deliberate choice over leaving them: the account is the author's and the
+    # repository is public, so this is consistency with the console captures above, not a secret.
+    "demo-video/statics/github-repository-header.png": (
+        Region(
+            box=(320, 54, 344, 78),
+            why="owner account photo beside the repository name",
+            circle=True,
+        ),
+        Region(
+            box=(332, 182, 356, 206),
+            why="author account photo in the latest-commit row",
+            circle=True,
+        ),
+    ),
+    # The README itself, scrolled under the opening narration. Cropped to start below the file
+    # tree and the About sidebar, so unlike the header above it contains no commit row and no
+    # contributor list — and therefore no account photo to mask. Nothing else here is private:
+    # it is the rendered README of a public repository.
+    "demo-video/statics/github-repository.png": (),
 }
-VIDEO_REDACTIONS: dict[str, tuple[Region, ...]] = {}
+VIDEO_REDACTIONS: dict[str, tuple[Region, ...]] = {
+    # The opening beat, recorded from the live public console by scripts/capture_site_hook.mjs.
+    # Nothing to mask, and the reason is structural rather than lucky: Playwright records the page
+    # viewport, so there is no browser chrome in the frame at all, and it drives a fresh profile,
+    # so no account photo, bookmark or open tab exists to leak. Every value on screen is published
+    # copy from site/data/site-content.json. Absent on a clean clone, where the gate skips it.
+    "demo-video/beats/00-hook.mp4": (),
+    # The finished cut. Nothing to mask, and it inherits rather than assumes that: every frame
+    # comes from a source already declared above — the console and terminal captures retained as
+    # evidence 11, 12 and 13, the generated architecture and brand masters, the two promoted page
+    # captures, and the site recording. The sign-off URLs are drawn from repository-authored text.
+    # Reviewed at the beat boundaries as well as the sampled points, because a transition is where
+    # an unreviewed frame would hide.
+    "demo-video/bastion.mp4": (),
+}
 
 
 def _tool(name: str) -> str:
