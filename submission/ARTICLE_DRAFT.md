@@ -1,7 +1,9 @@
 # What 100% Test Coverage Missed: State Across Google ADK A2A Boundaries
 
-> Publication draft. Refresh all issue, pull-request, release, test-count, and demo-link facts
-> immediately before publishing.
+> **Published 2026-08-29** at <https://dev.to/arjunganesh/what-100-test-coverage-missed-state-across-google-adk-a2a-boundaries-29i1>,
+> with a 1000x420 cover and the hackathon-disclosure line below as its first body sentence. Every
+> issue and pull-request fact was re-verified live against GitHub immediately before publication.
+> This file is the reviewed source; the published piece adds a TL;DR and two code excerpts.
 
 I created this article for the purpose of entering the All Things Agentic Hackathon.
 

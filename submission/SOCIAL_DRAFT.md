@@ -1,7 +1,10 @@
 # Social launch copy
 
-Publication drafts only. The video and Devpost URLs are filled; re-check the upstream status
-immediately before posting. Publish one primary post; do not fragment the bonus proof across
+**Published 2026-08-29.** The LinkedIn post is live at <https://www.linkedin.com/posts/iarjunganesh_allthingsagentichackathon-googlecloud-share-7499586701733068801-PENp/> and the
+technical article at <https://dev.to/arjunganesh/what-100-test-coverage-missed-state-across-google-adk-a2a-boundaries-29i1>; both URLs are entered in the Devpost
+bonus fields. What follows is the reviewed source of those claims, retained as the record of what
+was approved before publication rather than as a draft still awaiting it. Re-check the upstream
+status before reusing any of it. Publish one primary post; do not fragment the bonus proof across
 unrelated posts.
 
 A ready-to-paste LinkedIn build of the draft below — Unicode sans-serif bold, emoji, and the
@@ -49,13 +52,17 @@ GCP proof.
 
 - [x] Replace every `TODO_*` placeholder. Filled 2026-08-29: the video URL and the
   Devpost project URL.
-- [ ] Attach `assets/screenshots/01-enterprise-fleet-architecture.png` or the approved security
+- [x] Attach an approved image. Used `assets/architecture/enterprise-fleet-overview-dark.gif`
+  rather than the architecture still: at LinkedIn's 552px feed width the overview stays legible
+  while the denser architecture master does not. Same reviewed source, animated. Alternative was
+  `assets/screenshots/01-enterprise-fleet-architecture.png` or the approved security
   boundary image.
-- [ ] Keep `#AllThingsAgenticHackathon` exact.
-- [ ] Ensure the post and every link are public while signed out.
+- [x] Keep `#AllThingsAgenticHackathon` exact.
+- [x] Ensure the post and every link are public while signed out. Verified 2026-08-30: an
+  unauthenticated fetch returns the post body, the hashtag and all five links — not a login wall.
 - [ ] Re-check upstream state live before posting. As of 2026-08-27: issue #6854 open with seven
   comments, community PR #6859 open and unmerged, my PR #6862 closed unmerged. A Google
   collaborator has said #6859 *can* be merged if its reviewer approves — that is a conditional
   about a review that has not happened. Never imply anything is merged or that Google accepted a
   fix.
-- [ ] Save the public post URL for the Devpost bonus field.
+- [x] Save the public post URL for the Devpost bonus field.

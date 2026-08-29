@@ -112,8 +112,8 @@ or a media platform.
 - [x] Devpost registration and project ownership reconfirmed on 2026-08-27; live project `1398552`
       remains a `submission_draft`, with no submission timestamp and an empty video field.
 - [ ] Billing budget/anomaly notification reconfirmed in the console before final recording.
-- [ ] Optional launch blog published with the hackathon disclosure.
-- [ ] Optional social post published with `#AllThingsAgenticHackathon`.
+- [x] Optional launch blog published with the hackathon disclosure. <https://dev.to/arjunganesh/what-100-test-coverage-missed-state-across-google-adk-a2a-boundaries-29i1>
+- [x] Optional social post published with `#AllThingsAgenticHackathon`. <https://www.linkedin.com/posts/iarjunganesh_allthingsagentichackathon-googlecloud-share-7499586701733068801-PENp/>
 
 ## Do not claim until verified
 
