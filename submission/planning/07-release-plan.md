@@ -103,8 +103,10 @@ re-rendering — and the Devpost description pulls its architecture image live f
 submission neither `main`'s diagrams nor the video may change without re-checking what judges see.
 That is the reason this tag exists before submission rather than after it.
 
-**Re-check before the final freeze:** the clean-clone gate is due from the public `v0.7.0` tag —
-the retained record still verifies `v0.5.1`, two releases back. The two deferred observations
+**Re-check before the final freeze:** the clean-clone gate was re-run from the public `v0.7.0`
+tag on 2026-08-29 and is **green** — 321 tests at 100% coverage from a credential-free clone, with
+the README's `py -3.12` fallback actually exercised because the launcher had no 3.12 registered
+([10-reproducibility.md](10-reproducibility.md)). The two deferred observations
 (managed Gateway refusal, retry/dead-letter) stay deferred by decision, with the narrower wording
 already in the claim matrix; closing either would mean changing the deployed fleet and
 invalidating the captures this video is built from. Bonus publication (article, social post) and

@@ -33,7 +33,9 @@ or a media platform.
       info** is a static copy whose vintage cannot be read at thumbnail resolution; re-upload
       `assets/architecture/enterprise-fleet-architecture-dark.png` to be certain and to match the
       five dark gallery images. Counts have not moved, so only a disclosed date could differ.
-- [ ] Final submission sent before the deadline.
+- [x] Final submission sent before the deadline. Submitted 2026-08-29; the project page at
+      <https://devpost.com/software/bastion-pfuy71> resolves publicly while signed out, with the
+      video embedded, five gallery images, and no incomplete-submission notice.
 
 ## Three track obligations
 

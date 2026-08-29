@@ -1,23 +1,29 @@
 # Clean-clone reproducibility
 
-**Re-run 2026-08-27 against tag `v0.5.1`, commit `0edd128`**, the current public `main`.
+**Re-run 2026-08-29 against tag `v0.7.0`, commit `d2d9ef9`** — the submitted release, and the
+current public `main`.
+
+**Result: green.** A fresh public clone of the tag installed `requirements-dev.txt` under CPython
+3.12.12 and reached **321 tests at 100% statement and branch coverage** in the configured core
+scope, with no credentials, no `.env`, no Google Cloud project, and no undocumented step. The
+working tree was clean afterwards apart from the `.venv` the instructions create, so the run left
+nothing behind and needed nothing the repository does not ship. 244 tracked files, 894 statements
+and 248 branches measured.
+
+**One documented fallback was exercised, which is the useful part.** `py -3.12` failed in this
+environment — the Windows launcher had no 3.12 registered, exactly the case the README warns about
+— so the interpreter was called by its own path instead, as the README instructs. That fallback is
+not decoration; it was needed on the first attempt, and it worked.
 
 The first run of this record cited commit `4fe8d59`. That commit was later folded into `c81b4af`
-and force-pushed away, so the hash no longer resolves in a fresh clone. The gate was rerun rather
-than re-pointed then, and rerun again from the public `v0.5.1` tag now: a reproducibility record
-naming an older revision does not establish the current release.
+and force-pushed away, so the hash no longer resolves in a fresh clone. The gate has been rerun
+rather than re-pointed at every release since: a reproducibility record naming an older revision
+does not establish the current one. `v0.5.1` and `v0.6.0` were each superseded this way, and the
+2026-08-27 run recorded below is retained as the measurement it was on its own date.
 
-**Outstanding for `v0.6.0`.** This run verified `v0.5.1`. Two releases have landed since, and
-both change what a fresh clone resolves: `v0.5.2` added a `media-safety` CI job and a
-`requirements-media.txt`, and `v0.6.0` moved every pin to the newest release the resolver allows
-and regenerated `requirements.lock`. A clean clone therefore installs a materially different
-dependency set than the one this table recorded. By this record's own rule the run must be
-repeated from the public `v0.6.0` tag; until then, treat the table below as establishing `v0.5.1`
-only.
-
-Note also what a clean clone cannot establish after `v0.6.0`: it proves the *repository* is
-self-consistent on the new pins, while the deployed fleet still runs the older resolution. Green
-here is not evidence that the deployment matches.
+Note what a clean clone cannot establish: it proves the *repository* is self-consistent on its
+current pins, while the deployed fleet still runs the older 2.7.1 resolution `v0.4.0` deployed.
+Green here is not evidence that the deployment matches.
 
 This closes P1.3. Its purpose is narrow and worth stating precisely: prove that a judge who has
 never seen the author's machine can clone the public repository and reach a green offline gate
