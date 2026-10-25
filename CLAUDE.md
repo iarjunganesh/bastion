@@ -61,6 +61,11 @@ Read these before changing architecture or claims:
 
 ## Non-negotiable architecture
 
+The offline study in `experiments/minimisation/` uses synthetic policies only to
+evaluate this design. The real-IAM rule below governs the product path. Study
+fixtures must never use the project's actual IAM, HMAC key or credentials.
+The study is outside shipped runtime code, core coverage and mypy scope.
+
 - Audit real project IAM; synthetic data is never the primary source.
 - Keep exactly three agents. Policy enforcement remains deterministic inside Orchestration.
 - The production Eventarc dispatcher invokes managed Runtime only. It must not construct a local

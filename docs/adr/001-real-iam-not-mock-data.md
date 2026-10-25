@@ -6,6 +6,11 @@
 
 ## Decision
 
+**Offline evaluation scope (11 October 2026):** `experiments/minimisation/`
+evaluates representation choices with synthetic policies only, because a raw
+experimental arm must not receive real IAM. This does not replace or modify the
+product's real-IAM data source. Synthetic experiment outputs are not live evidence.
+
 The Access Auditor's primary data source is the live IAM policy of the GCP project Bastion
 is deployed into, read through the IAM and Cloud Asset Inventory APIs. A hand-authored
 entitlement dataset is not the source of truth, and may exist only as a small seeded

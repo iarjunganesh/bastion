@@ -465,6 +465,7 @@ tests/                      unit, integration, security, and load suites
 assets/                     brand, architecture, and redacted evidence
 docs/                       architecture, governance, operations, and ADRs
 submission/                 Devpost copy, checklist, and planning ledger
+experiments/minimisation/    synthetic offline evaluation; no product or live data path
 ```
 
 ## Evidence and decisions
