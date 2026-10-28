@@ -14,7 +14,7 @@ The submitted packet and August observations below remain dated records. A separ
 27 October, records 20 real-IAM executions on unchanged deployment metadata. It is not part
 of the submitted video/gallery and does not close the two partial refusal/retry observations
 or create an award claim. Its method and limits are integrated in the
-[technical report draft](../report/README.md).
+local technical report draft (intentionally uncommitted).
 
 - [x] Gemini 3.5 Flash through Vertex AI `global`; live calls captured in
       [evidence 02](../assets/evidence/02-gemini-investigation.md).

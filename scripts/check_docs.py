@@ -345,6 +345,7 @@ SKIP_DIRS = {
     "venv",
     ".audit-venv",
     ".tmp",
+    ".local",
     "node_modules",
     ".git",
     ".mypy_cache",
@@ -361,7 +362,11 @@ PROSE_PATH = re.compile(
 
 
 def repository_markdown() -> list[Path]:
-    return [path for path in sorted(ROOT.rglob("*.md")) if not SKIP_DIRS.intersection(path.parts)]
+    return [
+        path
+        for path in sorted(ROOT.rglob("*.md"))
+        if not SKIP_DIRS.intersection(path.relative_to(ROOT).parts)
+    ]
 
 
 def repository_sources() -> list[Path]:
@@ -370,7 +375,7 @@ def repository_sources() -> list[Path]:
         path
         for pattern in ("*.py", "*.sh")
         for path in ROOT.rglob(pattern)
-        if not SKIP_DIRS.intersection(path.parts)
+        if not SKIP_DIRS.intersection(path.relative_to(ROOT).parts)
     )
 
 

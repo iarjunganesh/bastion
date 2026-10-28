@@ -1,7 +1,7 @@
 # Live-validation supplement - 27 October 2026
 
 Static, redacted data for [evidence 14](../14-live-validation.md) and the
-[technical report](../../../report/README.md). These files were promoted from the
+local technical report draft (intentionally uncommitted). These files were promoted from the
 verified local capture without changing the bundle or its data. They are intended
 repository artifacts; promotion here does not create a release, DOI or permission
 for another live run.
