@@ -57,7 +57,7 @@ TRACKED: dict[str, tuple[str, ...]] = {
 DOC_GLOBS = (
     "*.md",
     "docs/**/*.md",
-    "submission/**/*.md",
+    "archive/**/*.md",
     "report/*.md",
     "site/*.md",
     "assets/**/*.md",

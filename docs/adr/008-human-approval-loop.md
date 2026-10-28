@@ -1,7 +1,7 @@
 # ADR-008: The exception ledger gets a production writer, and it is a human
 
 **Status:** Accepted 2026-08-18
-**Traces to:** [hackathon brief](../../submission/DEVPOST.md)
+**Traces to:** [hackathon brief](../../archive/hackathon-2026/submission/DEVPOST.md)
 
 ## Decision
 

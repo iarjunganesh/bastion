@@ -55,7 +55,7 @@ GCP proof.
 - [x] Attach an approved image. Used `assets/architecture/enterprise-fleet-overview-dark.gif`
   rather than the architecture still: at LinkedIn's 552px feed width the overview stays legible
   while the denser architecture master does not. Same reviewed source, animated. Alternative was
-  `assets/screenshots/01-enterprise-fleet-architecture.png` or the approved security
+  `archive/hackathon-2026/assets/screenshots/01-enterprise-fleet-architecture.png` or the approved security
   boundary image.
 - [x] Keep `#AllThingsAgenticHackathon` exact.
 - [x] Ensure the post and every link are public while signed out. Verified 2026-08-30: an

@@ -92,8 +92,9 @@ are what an injected instruction would try to redirect. That is
 [ADR-007](007-tool-poisoning.md), a consequence of this decision rather than an independent
 idea.
 
-ADK 2.13.0 accepts `opentelemetry-api`/`sdk` through 1.44. Bastion retains the compatible
-1.42.1 pair during this upgrade. ADK changes its default GenAI trace schema in this release;
+ADK 2.13.0 accepts `opentelemetry-api`/`sdk` through 1.44. The current candidate uses
+the 1.44.0 pair; its unresolved security advisory blocks the Python release (see
+[dependency status](../DEPENDENCY-STATUS.md)). ADK changes its default GenAI trace schema in this release;
 new traces must be reviewed rather than assumed identical to the August captures.
 
 **ADK ships FastAPI, Starlette and uvicorn.** Bastion's Flask surfaces were competing with the

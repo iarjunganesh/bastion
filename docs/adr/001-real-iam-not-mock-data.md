@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Date:** 2026-08-13
-**Traces to:** [`submission/DEVPOST.md`](../../submission/DEVPOST.md)
+**Traces to:** [`archive/hackathon-2026/submission/DEVPOST.md`](../../archive/hackathon-2026/submission/DEVPOST.md)
 
 ## Decision
 
@@ -66,7 +66,7 @@ leaked identifier from an access-governance project would discredit the submissi
 than a missing feature would.
 
 Findings are not guaranteed to be dramatic on any given day. The seeded overlay exists for
-exactly that risk, and any use of it must be disclosed on camera and in `submission/`.
+exactly that risk, and any use of it must be disclosed on camera and in `archive/hackathon-2026/submission/`.
 
 ## Absorbed record: where Gemini sits in the loop (was ADR-008)
 

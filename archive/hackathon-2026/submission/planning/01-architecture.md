@@ -1,6 +1,6 @@
 # Submission architecture summary
 
-The authoritative design is [docs/ARCHITECTURE.md](../../docs/ARCHITECTURE.md). The video and
+The authoritative design is [docs/ARCHITECTURE.md](../../../../docs/ARCHITECTURE.md). The video and
 Devpost copy should use this compressed sequence:
 
 ```text

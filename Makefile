@@ -1,6 +1,6 @@
 .PHONY: help install test test-unit test-integration test-security test-load test-fast \
         coverage lint format format-check typecheck markdown docs versions diagrams ci \
-        redact-evidence media-check voiceover assemble-video capture-hook \
+        redact-evidence media-check \
         run-orchestrator iam-policy deploy verify smoke rollback teardown \
         audit-dependencies clean
 
@@ -15,9 +15,6 @@ help:
 	@echo "typecheck         - mypy the shipped Python packages"
 	@echo "redact-evidence   - apply declared masks to promoted screenshots and videos"
 	@echo "media-check       - reject undeclared or unmasked judge-facing media"
-	@echo "voiceover         - synthesise demo narration, captions, and the shot table"
-	@echo "assemble-video    - cut the demo from the narration and per-beat footage"
-	@echo "capture-hook      - record the opening beat from the live public console"
 	@echo "ci                - run the local quality gate"
 	@echo "run-orchestrator  - run the Orchestrator locally"
 	@echo "iam-policy        - dump the live IAM policy (gitignored; redact before publishing)"
@@ -67,9 +64,10 @@ format-check:
 typecheck:
 	mypy agents gateway identity registry runtime model_armor observability infrastructure
 
+# One maintainer-accepted advisory, CVE-2026-114603; see docs/DEPENDENCY-STATUS.md.
 audit-dependencies:
 	uv pip install --system -r requirements.lock
-	uvx pip-audit -r requirements.lock
+	uvx pip-audit -r requirements.lock --ignore-vuln CVE-2026-114603
 
 ci: lint format-check typecheck coverage markdown docs versions diagrams media-check audit-dependencies
 
@@ -88,18 +86,9 @@ redact-evidence:
 media-check:
 	$(PYTHON) scripts/redact_evidence.py --check
 
-voiceover:
-	$(PYTHON) scripts/generate_demo_voiceover.py
 
-# --check reports which beats have a live take and which are still placeholders, and exits
-# non-zero while any placeholder remains: a scaffold is a rehearsal aid, not the submission.
-assemble-video:
-	$(PYTHON) scripts/assemble_demo_video.py
-
-# Needs Playwright and Edge, neither vendored here; see the script's header for the
-# out-of-tree install that keeps them off the clean-clone surface.
-capture-hook:
-	node scripts/capture_site_hook.mjs
+# The demo-video targets (voiceover, assemble-video, capture-hook) were retired with the
+# hackathon material; archive/hackathon-2026/README.md explains how to rebuild from v0.7.0.
 
 markdown:
 	npx --yes markdownlint-cli2 "**/*.md"

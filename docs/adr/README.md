@@ -3,7 +3,7 @@
 These records capture decisions that constrain the implementation. They are short by design;
 [`../ARCHITECTURE.md`](../ARCHITECTURE.md) explains how the decisions compose.
 
-**The ground truth is [`../../submission/DEVPOST.md`](../../submission/DEVPOST.md)**, which
+**The ground truth is [`../../submission/DEVPOST.md`](../../archive/hackathon-2026/submission/DEVPOST.md)**, which
 quotes the hackathon's overview, rules, and resources pages rather than paraphrasing them.
 Every record below traces to a line there.
 

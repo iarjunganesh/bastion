@@ -122,7 +122,7 @@ installer does and uv, pyenv-win, conda and the Microsoft Store do not. If `py -
 3.12, call that interpreter by its own path instead — `& "C:\path\to\python3.12.exe" -m venv .venv`
 — or on macOS and Linux use `python3.12 -m venv .venv`. Any CPython 3.12 works; the launcher is a
 convenience, not a requirement. The gate above is verified from a fresh public clone in
-[10-reproducibility.md](submission/planning/10-reproducibility.md).
+[10-reproducibility.md](archive/hackathon-2026/submission/planning/10-reproducibility.md).
 
 That runs the unit, integration, security and load suites against the real agent graph with the
 cloud seams faked at their boundaries. To point it at a live project instead:
@@ -180,7 +180,7 @@ production runs the new release. Existing evidence stays dated and unchanged.
 
 The retained evidence is indexed in [assets/README.md](assets/README.md). The exact distinction
 between deployed, observed, configured, and still-to-capture lives in
-[submission/SUBMISSION.md](submission/SUBMISSION.md) — those words are used precisely and are not
+[archive/hackathon-2026/submission/SUBMISSION.md](archive/hackathon-2026/submission/SUBMISSION.md) — those words are used precisely and are not
 interchangeable in this repository.
 
 **Post-hackathon validation, separately dated 2026-10-27.**
@@ -207,7 +207,7 @@ upstream with a production reproducer in
 Ganesh) — where Google confirmed the per-session semantics are intended, leaving the silence
 rather than the behaviour as the ask — and fixed structurally in
 [ADR-012](docs/adr/012-structured-findings-across-a2a.md); the full ledger is the
-[observation backlog](submission/planning/09-capture-backlog.md).
+[observation backlog](docs/research/observation-backlog.md).
 
 Checked live on 2026-10-27: the silence is fixed upstream. Community PR
 [google/adk-python#6859](https://github.com/google/adk-python/pull/6859) (opened by Sylvester
@@ -479,20 +479,21 @@ scripts/                    live-state capture, docs/version/media gates, diagra
 site/                       static public evidence console; no operational backend or GCP calls
 tests/                      unit, integration, security, and load suites
 assets/                     brand, architecture, and redacted evidence
-docs/                       architecture, governance, operations, and ADRs
-submission/                 Devpost copy, checklist, and planning ledger
+docs/                       architecture, governance, operations, ADRs; research/ holds the
+                            report plan, claim matrix and evidence ledgers
 experiments/minimisation/    synthetic offline evaluation; no product or live data path
 report/                     local uncommitted technical-report draft (not in release)
+archive/hackathon-2026/     frozen hackathon submission, demo media and their tooling
 ```
 
 ## Evidence and decisions
 
 - [Architecture](docs/ARCHITECTURE.md) · [Data governance](docs/DATA_GOVERNANCE.md) ·
   [Operations](docs/OPERATIONS.md) · [Security](SECURITY.md)
-- [Evidence index](assets/README.md) · [Submission readiness](submission/SUBMISSION.md) ·
-  [Observation backlog](submission/planning/09-capture-backlog.md) ·
-  [Audit remediation ledger](submission/planning/08-audit-remediation-plan.md) ·
-  [Captured hackathon brief](submission/DEVPOST.md)
+- [Evidence index](assets/README.md) · [Claim matrix](docs/research/claim-matrix.md) ·
+  [Observation backlog](docs/research/observation-backlog.md) ·
+  [Audit remediation ledger](docs/research/remediation-ledger.md) ·
+  [Hackathon archive](archive/hackathon-2026/README.md)
 - Technical report (local draft) ·
   [27 October validation and verified data](assets/evidence/14-live-validation.md)
 - Architecture decisions — [index](docs/adr/README.md):

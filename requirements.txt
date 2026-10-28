@@ -9,11 +9,12 @@
 #                      and the OpenTelemetry GCP exporters
 #   otel-gcp        -> Cloud Trace / Cloud Logging exporters for `--trace_to_cloud`
 #   mcp, tools      -> tool surface; Agent Registry catalogs MCP servers alongside agents
-#   eval            -> `adk eval`, the reasoning-chain evidence the track asks for
+# Evaluation-only extras are excluded from the shipped fleet; C4 uses a separate
+# synthetic study scaffold and contributes no paid evaluation results.
 #
 # The `antigravity` extra is not used. Its incompatibility was measured on the
 # August stack; see docs/adr/005-adk-as-the-agent-framework.md for the dated decision.
-google-adk[a2a,agent-identity,gcp,otel-gcp,mcp,tools,eval]==2.13.0
+google-adk[a2a,agent-identity,gcp,otel-gcp,mcp,tools]==2.13.0
 
 # Pinned explicitly because the ADK extras above do not carry them, and the versions a
 # document may name must resolve to something.
@@ -40,10 +41,10 @@ google-cloud-firestore==2.29.0
 google-cloud-scheduler==2.20.0
 google-cloud-bigquery==3.44.0
 
-# Observability. Retain the compatible 1.42.1 API/SDK pair during this upgrade.
-# ADK 2.13.0 accepts through 1.44; review the new default GenAI telemetry schema.
-opentelemetry-api==1.42.1
-opentelemetry-sdk==1.42.1
+# Observability. ADK 2.13.0 caps the API/SDK pair at 1.44.0.
+# Review the new default GenAI telemetry schema and the release security gate.
+opentelemetry-api==1.44.0
+opentelemetry-sdk==1.44.0
 opentelemetry-exporter-gcp-trace==1.15.0
 google-cloud-trace==1.20.0
 google-cloud-logging==3.16.3

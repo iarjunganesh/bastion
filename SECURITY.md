@@ -56,4 +56,4 @@ private findings API uses ordinary Cloud Run IAM and has no `allUsers` binding.
 - Audit retention is configured but not WORM/immutable. Locking the bucket requires a separate,
   explicit platform-owner decision.
 
-The grounded deployment and evidence ledger is [submission/SUBMISSION.md](submission/SUBMISSION.md).
+The grounded deployment and evidence ledger is [archive/hackathon-2026/submission/SUBMISSION.md](archive/hackathon-2026/submission/SUBMISSION.md).

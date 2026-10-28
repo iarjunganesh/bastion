@@ -10,17 +10,17 @@ or a media platform.
 ## Pass/fail technology gates
 
 The submitted packet and August observations below remain dated records. A separate
-[post-hackathon report supplement](../assets/evidence/14-live-validation.md), collected
+[post-hackathon report supplement](../../../assets/evidence/14-live-validation.md), collected
 27 October, records 20 real-IAM executions on unchanged deployment metadata. It is not part
 of the submitted video/gallery and does not close the two partial refusal/retry observations
 or create an award claim. Its method and limits are integrated in the
 local technical report draft (intentionally uncommitted).
 
 - [x] Gemini 3.5 Flash through Vertex AI `global`; live calls captured in
-      [evidence 02](../assets/evidence/02-gemini-investigation.md).
+      [evidence 02](../../../assets/evidence/02-gemini-investigation.md).
 - [x] Google ADK 2.13.0 source target; three ADK agents, A2A workers, plugins, tools, and managed Runtime.
 - [x] Google Cloud infrastructure; measured deployment in
-      [evidence 04](../assets/evidence/04-private-fleet-deployment.md).
+      [evidence 04](../../../assets/evidence/04-private-fleet-deployment.md).
 - [x] Fortified Enterprise Fleet brief addressed across Registry, Runtime, Memory, Identity,
       Gateway, Model Armor, and Observability.
 - [x] Public MIT-licensed repository with history inside the submission period.
@@ -49,41 +49,41 @@ local technical report draft (intentionally uncommitted).
 | Requirement | Closed by |
 |---|---|
 | Catalog agents for cross-department use | Managed Registry has the Runtime and two worker cards; cards contain owner/department/purpose/skill/classification/version/approval metadata; deterministic routing rejects unknown departments. |
-| Safely maintain context across weeks of asynchronous operations | Firestore IDs/leases/retry/dedup, managed sessions and Memory Bank, expiring approved exceptions, five-attempt DLQ, and idempotent notification. A human exception was observed suppressing its matching finding after a real three-day gap across deployments and restarts ([evidence 10](../assets/evidence/10-cross-week-suppression.md)); expiry firing remains test-only and no literal-week claim is made. |
+| Safely maintain context across weeks of asynchronous operations | Firestore IDs/leases/retry/dedup, managed sessions and Memory Bank, expiring approved exceptions, five-attempt DLQ, and idempotent notification. A human exception was observed suppressing its matching finding after a real three-day gap across deployments and restarts ([evidence 10](../../../assets/evidence/10-cross-week-suppression.md)); expiry firing remains test-only and no literal-week claim is made. |
 | Use production data without violating policy | Read-only live IAM/Asset access. Raw members, roles, resources and bindings never cross the model boundary at all — minimisation is the sovereignty control, not residency. Opaque IDs, fail-closed Model Armor, post-model protected-data screen, separated identities, count-only private findings record, and explicit regional/global disclosure. |
 
 ## Seven-pillar proof
 
 - [x] **Registry:** three governed Bastion agent records and approved platform destinations.
 - [x] **Runtime:** identity-bearing Python 3.12 managed Runtime streamed live events through its
-      Gateway-bound configuration ([evidence 05](../assets/evidence/05-runtime-gateway.md)).
+      Gateway-bound configuration ([evidence 05](../../../assets/evidence/05-runtime-gateway.md)).
 - [x] **Memory Bank:** managed endpoint live; restart, retrieval, expiry, stale-memory, and
       failure branches covered by integration/unit tests. **Suppression is now observed on the
       deployed path** — an exception approved 2026-08-19 suppressed its matching finding on
       2026-08-22, re-confirmed 2026-08-23 after the deterministic-delivery rewrite (P0.1–P0.3)
-      ([evidence 10](../assets/evidence/10-cross-week-suppression.md)). Expiry firing has not
+      ([evidence 10](../../../assets/evidence/10-cross-week-suppression.md)). Expiry firing has not
       elapsed and stays test-only.
 - [x] **Identity:** deployed Escalation identity denied IAM read while Auditor was permitted
-      ([evidence 03](../assets/evidence/03-escalation-agent-denied.md)).
+      ([evidence 03](../../../assets/evidence/03-escalation-agent-denied.md)).
 - [x] **Gateway:** IAP fail-closed policy and per-destination Runtime identity grants verified;
       dispatcher direct-peer credential and invoker grants removed. **Caveat:** IAP currently also
       denies a *legitimate* destination — Model Armor's regional endpoint, called from inside the
       Runtime — with the endpoint registered and the role held. Fail-closed is observed; correctly
       admitting a catalogued destination from the Runtime is not. Tracked as D2 in
-      [09-capture-backlog.md](planning/09-capture-backlog.md).
+      [09-capture-backlog.md](../../../docs/research/observation-backlog.md).
 - [x] **Model Armor:** **the deployed agent callback refused a real injection attempt on 2026-08-25**
-      ([evidence 12](../assets/evidence/12-agent-mediated-model-armor-refusal.md)) — sent through the Access
+      ([evidence 12](../../../assets/evidence/12-agent-mediated-model-armor-refusal.md)) — sent through the Access
       Auditor's authenticated A2A surface, the task failed closed with `policy_match` and no model
       submission, completion or tool call followed. The threat modelled is a compromised authorized
-      caller, not an anonymous one. [Evidence 01](../assets/evidence/01-model-armor-block.md) remains the earlier
+      caller, not an anonymous one. [Evidence 01](../../../assets/evidence/01-model-armor-block.md) remains the earlier
       direct-template probe; fail-closed and protected-output screening are additionally tested.
 - [x] **Observability:** payload-free audit lifecycle, retained regional sink/bucket, four metrics,
-      five alerts, and operations dashboard ([evidence 07](../assets/evidence/07-observability.md), whose
+      five alerts, and operations dashboard ([evidence 07](../../../assets/evidence/07-observability.md), whose
       `europe-west4` 365-day retention and analytics were re-reviewed in the Console on 2026-08-25 —
       retention proven, immutability still not claimed because the bucket is unlocked). **One
       investigation is now reconstructable end to end:** 28 unique payload-free events across three
-      invocation ids under a single investigation id ([evidence 11](../assets/evidence/11-current-route-correlation.md)),
-      plus a connected 22-span Cloud Trace ([evidence 13](../assets/evidence/13-current-route-trace.md)). The trace is
+      invocation ids under a single investigation id ([evidence 11](../../../assets/evidence/11-current-route-correlation.md)),
+      plus a connected 22-span Cloud Trace ([evidence 13](../../../assets/evidence/13-current-route-trace.md)). The trace is
       sampled and expires; the audit trail is the compliance record. They are never derived from each
       other.
 
@@ -99,17 +99,17 @@ local technical report draft (intentionally uncommitted).
 - [x] Raw IAM member/binding data stops before the model; unsafe output stops before notification.
 - [x] Fixed tool declarations and allowlists defend the tool-metadata boundary; the Escalation
       Agent holds no policy tool at construction, asserted and shown to fail when widened
-      ([evidence 08](../assets/evidence/08-tool-poisoning.md)).
+      ([evidence 08](../../../assets/evidence/08-tool-poisoning.md)).
 - [x] Worker timeout/malformed response, hallucinated arguments, Model Armor/dependency outage,
       notification failure, duplicate event, expired lease, retry, dead letter, and stale memory
       are exercised across populated unit, integration, security, and load suites.
 - [x] Real findings endpoint denies anonymous traffic and collapses an authorized duplicate
-      ([evidence 06](../assets/evidence/06-durable-findings.md)).
+      ([evidence 06](../../../assets/evidence/06-durable-findings.md)).
 - [x] 321 tests pass with 100% configured core statement and branch coverage under Python 3.12.
 - [x] Ruff, formatting, mypy, dependency audit, secret scan, docs/version checks, and diagram
       determinism are release gates.
 - [x] ADK deprecation/experimental risk consciously accepted and pinned in
-      [ADR-005](../docs/adr/005-adk-as-the-agent-framework.md).
+      [ADR-005](../../../docs/adr/005-adk-as-the-agent-framework.md).
 
 ## Prerequisites and bonus
 
@@ -145,9 +145,9 @@ The following claims are deliberately not made:
 - [x] Generate the narration and lock the cut. Twelve beats are synthesised with Google Cloud
       Text-to-Speech, measured rather than estimated, and hash-stamped so a casual re-run cannot
       re-jitter the timings; the cut is **3:53**, inside the four-minute ceiling with seven
-      seconds to spare. `scripts/assemble_demo_video.py` builds the timeline from that committed
+      seconds to spare. `archive/hackathon-2026/scripts/assemble_demo_video.py` builds the timeline from that committed
       audio, so the picture cannot drift from the sound and no timeline editor is involved.
-- [x] Capture the opening beat from the live public console. `scripts/capture_site_hook.mjs`
+- [x] Capture the opening beat from the live public console. `archive/hackathon-2026/scripts/capture_site_hook.mjs`
       drives a real browser against `bastion.arjunganesh.dev` and records the hero, the fleet
       counters, the governed production-data path and the remembered human decision. It records
       the page viewport from a fresh profile, so no browser chrome or account photo can enter
@@ -159,7 +159,7 @@ The following claims are deliberately not made:
       and reviewed at every beat boundary. Any beat can still be upgraded by dropping a screen
       recording into `assets/demo-video/beats/<NN>-<slug>.mp4`, which takes precedence
       automatically — but the published URL points at a fixed file, so a re-cut means re-uploading.
-      `python scripts/assemble_demo_video.py --check` lists what each beat is showing.
+      `python archive/hackathon-2026/scripts/assemble_demo_video.py --check` lists what each beat is showing.
 - [ ] Verify every Devpost number against `gcp-state.json` immediately before submission.
 - [x] Verify the static evidence console and custom domain while signed out; its observed browser
       network log contains no private GCP request.
@@ -184,7 +184,7 @@ The following claims are deliberately not made:
       only after its release metadata, full gates, pushed commit, and green `main` CI all agree.
 
 - [ ] **Redeploy both surfaces onto the `v0.6.0` dependency resolution and re-verify live.** Until
-      this happens the source targets the upgrade in [version provenance](../docs/VERSIONS.md), and no claim
+      this happens the source targets the upgrade in [version provenance](../../../docs/VERSIONS.md), and no claim
       may say production runs the newer resolution. Doing it obliges re-capturing evidence 11, 12
       and 13 and recomposing gallery images 03, 04 and 05, because those records name the current
       Cloud Run revisions.

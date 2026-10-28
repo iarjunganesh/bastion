@@ -129,11 +129,11 @@ python scripts/check_site.py
 It is an offline gate, and offline is exactly its value: it proves the repository is complete and
 self-consistent without privileged access. It proves nothing about the deployed fleet. This
 repository has now shipped four defects that were true of the code and false of the running system
-— recorded as D1, D6, D8, and D9 in [09-capture-backlog.md](09-capture-backlog.md) — so a green
+— recorded as D1, D6, D8, and D9 in [09-capture-backlog.md](../../../../docs/research/observation-backlog.md) — so a green
 clean-clone gate must never be read as evidence that Google Cloud did anything. The live gate is
-separate, needs credentials, and is documented in [OPERATIONS.md](../../docs/OPERATIONS.md).
+separate, needs credentials, and is documented in [OPERATIONS.md](../../../../docs/OPERATIONS.md).
 
 Current upgrade boundary (28 October 2026): source targets Google ADK 2.13.0.
 The package resolution and checks recorded above are historical. See
-[version provenance](../../docs/VERSIONS.md)
+[version provenance](../../../../docs/VERSIONS.md)
 and the upgrade plan before running new captures.

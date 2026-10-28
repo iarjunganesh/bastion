@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Date:** 2026-08-13
-**Traces to:** [`submission/DEVPOST.md`](../../submission/DEVPOST.md)
+**Traces to:** [`archive/hackathon-2026/submission/DEVPOST.md`](../../archive/hackathon-2026/submission/DEVPOST.md)
 
 ## Decision
 

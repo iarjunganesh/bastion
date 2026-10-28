@@ -2,7 +2,7 @@
 
 **The cut is defined by the audio, not by the editor.** Each beat's on-screen duration is the
 measured length of its committed narration clip plus the deliberate hold declared beside the words
-in `scripts/generate_demo_voiceover.py`. That module is imported here rather than re-described, so
+in `archive/hackathon-2026/scripts/generate_demo_voiceover.py`. That module is imported here rather than re-described, so
 a wording change cannot silently desynchronise the picture from the sound: re-run the voiceover
 generator, re-run this, and the timeline follows.
 
@@ -23,10 +23,10 @@ A beat can still be upgraded by dropping a recording into ``beats/``, which simp
 that beat as still wanting footage.
 
 Usage:
-    python scripts/assemble_demo_video.py --check          # what is live, what is still, runtime
-    python scripts/assemble_demo_video.py                  # render assets/demo-video/bastion.mp4
-    python scripts/assemble_demo_video.py --burn-captions  # hard-subtitle the render
-    python scripts/assemble_demo_video.py --beat iam       # re-render one beat's segment only
+    python archive/hackathon-2026/scripts/assemble_demo_video.py --check          # what is live, what is still, runtime
+    python archive/hackathon-2026/scripts/assemble_demo_video.py                  # render archive/hackathon-2026/assets/demo-video/bastion.mp4
+    python archive/hackathon-2026/scripts/assemble_demo_video.py --burn-captions  # hard-subtitle the render
+    python archive/hackathon-2026/scripts/assemble_demo_video.py --beat iam       # re-render one beat's segment only
 """
 
 from __future__ import annotations
@@ -91,7 +91,7 @@ class Shot:
 # passes `scripts/redact_evidence.py --check`; nothing enters a frame the redaction gate has not
 # cleared. The two page captures were promoted out of `.takes/2026-08-29/` with their browser
 # chrome cropped away and the remaining account photos masked, per the runbook in
-# `assets/screenshots/README.md`.
+# `archive/hackathon-2026/assets/screenshots/README.md`.
 PICTURES: dict[str, tuple[Shot, ...]] = {
     # The repository header is held just long enough to register the project identity — name,
     # commit count, releases, deployments — and the pan then starts at the README banner rather
@@ -645,7 +645,7 @@ def main() -> int:
         ]
     else:
         mux += ["-c:v", "copy"]
-    # The master path is earned, not chosen. `assets/demo-video/bastion.mp4` sits inside the
+    # The master path is earned, not chosen. `archive/hackathon-2026/assets/demo-video/bastion.mp4` sits inside the
     # redaction gate's VIDEO_GLOBS, so anything written there must be declared in VIDEO_REDACTIONS
     # and frame-reviewed before the offline gate goes green again. A scaffold has not been reviewed
     # and is not the submission, so it stays in the ignored build directory where it cannot be
@@ -663,7 +663,7 @@ def main() -> int:
     if scaffold:
         print(
             "Scaffold build — rehearsal and timing only, not the submission. See --check.\n"
-            "The reviewed cut is written to assets/demo-video/bastion.mp4 once every beat is live."
+            "The reviewed cut is written to archive/hackathon-2026/assets/demo-video/bastion.mp4 once every beat is live."
         )
     else:
         print(

@@ -1,19 +1,19 @@
 # Observation backlog
 
 **Status:** opened 2026-08-16. Every deterministic engineering item is closed in
-[08-audit-remediation-plan.md](08-audit-remediation-plan.md); what remains here is *observation*
+[08-audit-remediation-plan.md](remediation-ledger.md); what remains here is *observation*
 — capabilities that are deployed and tested but have not been watched working and recorded.
 
-This distinction is the project's own standard, not bookkeeping. [ADR-006](../../docs/adr/006-pillar-coverage.md)
+This distinction is the project's own standard, not bookkeeping. [ADR-006](../adr/006-pillar-coverage.md)
 holds that a pillar closes only when implementation, deployment, and an observable proof agree,
-and [SUBMISSION.md](../SUBMISSION.md)'s checkbox convention means *observed*, not *built*. A
+and [SUBMISSION.md](../../archive/hackathon-2026/submission/SUBMISSION.md)'s checkbox convention means *observed*, not *built*. A
 capability with code and no capture is deliberately not claimed.
 
 ## Upgrade verification — source and deployment are separate
 
 **Current source target: Google ADK 2.13.0.** The retained evidence describes the historical
 fleet; upgraded production is unverified until both deployment surfaces pass. See
-[version provenance](../../docs/VERSIONS.md). The
+[version provenance](../VERSIONS.md). The
 consequence is observational: redeploying mints new Cloud Run revisions, and
 [evidence 11](../../assets/evidence/11-current-route-correlation.md) and
 [12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md) name
@@ -118,8 +118,8 @@ Captures 6 (Gateway refusals) and 7 (timeout/retry/dead-letter) remain open and 
 
 ### D1. Deterministic policy enforcement does not run, and does not fail closed
 
-**Fixed 2026-08-22** — see [ADR-010](../../docs/adr/010-policy-enforcement-gate.md) and
-[ADR-012](../../docs/adr/012-structured-findings-across-a2a.md). Both halves are closed. An
+**Fixed 2026-08-22** — see [ADR-010](../adr/010-policy-enforcement-gate.md) and
+[ADR-012](../adr/012-structured-findings-across-a2a.md). Both halves are closed. An
 earlier revision of this entry said only the fail-open half was fixed and that the step still
 could not run because D2 was unresolved. That is no longer true, and the reason is worth stating:
 the step was made deterministic, so it no longer needs the screening that D2 denies.
@@ -167,7 +167,7 @@ does will fail the same way, silently, in the deployed topology only.
 investigation failed at the Escalation Agent with a payload-free, correctly-audited refusal
 (`escalation.envelope rejected reason=missing_routing_envelope`) — and every one of them still
 reported `investigation.run completed`, for two independent, compounding reasons documented in
-full in [ADR-012's 2026-08-23 amendment](../../docs/adr/012-structured-findings-across-a2a.md):
+full in [ADR-012's 2026-08-23 amendment](../adr/012-structured-findings-across-a2a.md):
 
 1. `EscalationAgent` is the A2A **callee**, and the routing envelope arrives as the current
    turn's own inbound content (`InvocationContext.user_content`), which is a different channel
@@ -272,7 +272,7 @@ than writing arbitrary text through.
 
 ### D4. Inbound screening skips tool output
 
-**Fixed 2026-08-22** — see [ADR-011](../../docs/adr/011-inbound-screening-covers-tool-results.md).
+**Fixed 2026-08-22** — see [ADR-011](../adr/011-inbound-screening-covers-tool-results.md).
 `screen_before_model` now reads `function_response` parts, matching what `screen_after_model`
 already did.
 
@@ -348,12 +348,12 @@ dead-letter subscription. Those are real, deployed and observable — and they a
 cap and a delivery bound, not a per-caller rate limit. Calling them one would be the same
 category error in prose that option 3 would be in code.
 
-Recorded as an amendment to [ADR-003](../../docs/adr/003-pillars-on-geap.md), which is the
+Recorded as an amendment to [ADR-003](../adr/003-pillars-on-geap.md), which is the
 record this reasoning applies.
 
 ## Closing rule
 
-Nothing here may be marked closed in [SUBMISSION.md](../SUBMISSION.md) on the strength of a
+Nothing here may be marked closed in [SUBMISSION.md](../../archive/hackathon-2026/submission/SUBMISSION.md) on the strength of a
 passing test. A test proves the logic; the capture proves the deployed system did it. Where only
 one exists, say which — as [evidence 08](../../assets/evidence/08-tool-poisoning.md) does for the
-tool boundary, and as [ADR-006](../../docs/adr/006-pillar-coverage.md) does for Memory Bank.
+tool boundary, and as [ADR-006](../adr/006-pillar-coverage.md) does for Memory Bank.

@@ -24,7 +24,7 @@ focus, 404 behavior, external links, and browser network isolation passed.
    add the URL to README and the Devpost draft.
 
 The detailed dashboard checklist and local build commands are in
-[`site/README.md`](../../site/README.md).
+[`site/README.md`](../../../../site/README.md).
 
 ## Engineering release gate
 
@@ -60,7 +60,7 @@ replacing the `LlmAgent`), and P0.3 (`escalation_gate` completion confirmation) 
 "only mandatory new code" for this phase. Deployed to `bastion-fleet-2026` (both the four Cloud
 Run services via `deploy.sh` **and** the managed Agent Runtime via
 `infrastructure.deploy_agent_runtime` — a two-part deployment surface this release discovered the
-hard way, see [ADR-012](../../docs/adr/012-structured-findings-across-a2a.md)'s 2026-08-23
+hard way, see [ADR-012](../../../../docs/adr/012-structured-findings-across-a2a.md)'s 2026-08-23
 amendment) and confirmed on a real triggered investigation: `escalation_gate` passing, and the
 approved exception still correctly suppressing its finding. Also closed in the same tag:
 P0.4 (live re-verification), P0.5 (event-driven wording confirmed, no Scheduler added), P1.1
@@ -78,11 +78,11 @@ ADRs/ledgers) — plus a full sweep of every tracked Markdown file for staleness
 Shipped 2026-08-29. A minor release: no production code changed, but the submission's one
 mandatory missing artifact stopped being missing.
 
-`assets/demo-video/bastion.mp4` is **3:53**, twelve beats, 1920×1080, published at
+`archive/hackathon-2026/assets/demo-video/bastion.mp4` is **3:53**, twelve beats, 1920×1080, published at
 <https://youtu.be/Xpj8YmzFfpk> with a 36-cue English caption track. It is *assembled*, not edited:
-[`scripts/assemble_demo_video.py`](../../scripts/assemble_demo_video.py) builds the timeline from
+[`archive/hackathon-2026/scripts/assemble_demo_video.py`](../../scripts/assemble_demo_video.py) builds the timeline from
 the measured narration, so the picture cannot drift from the sound. The opening is a real recording
-of the live public console driven by `scripts/capture_site_hook.mjs`; the rest is the redacted
+of the live public console driven by `archive/hackathon-2026/scripts/capture_site_hook.mjs`; the rest is the redacted
 evidence retained as 11, 12 and 13 plus the generated masters — which is why the narration says the
 cut was **captured from the deployed fleet** rather than claiming it happens live on camera.
 
@@ -131,7 +131,7 @@ settled that, not a judgement call.
 run the resolution `v0.4.0` deployed. Redeploying obliges re-capturing evidence 11, 12 and 13 —
 they name the current Cloud Run revisions — and recomposing gallery images 03, 04 and 05 from them.
 Until then "deployed and verified" means the older resolution; see
-[ADR-005](../../docs/adr/005-adk-as-the-agent-framework.md).
+[ADR-005](../../../../docs/adr/005-adk-as-the-agent-framework.md).
 
 **Re-check before the final freeze:** the clean-clone gate is due from the public `v0.6.0` tag,
 and the demo video remains the only outstanding mandatory Devpost artifact. `gcp-state.json` was
@@ -153,7 +153,7 @@ Also carries the dark architecture still, three deliberately narrowed gallery ca
 full Markdown sweep those changes forced.
 
 **Pre-tag `--check-upstream` fails on purpose.** `google-adk` 2.8.0 exists against a 2.7.1 pin.
-Declined for this tag and recorded in [ADR-005](../../docs/adr/005-adk-as-the-agent-framework.md):
+Declined for this tag and recorded in [ADR-005](../../../../docs/adr/005-adk-as-the-agent-framework.md):
 the migration trigger has not fired, and the deployed fleet runs 2.7.1. Unlike the 2.7.0 → 2.7.1
 bump in `v0.2.0`, taking this one would require redeploying both surfaces and re-verifying live.
 Do not read a green `--check-upstream` as a precondition for this tag; read the ADR.

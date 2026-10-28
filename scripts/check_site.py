@@ -187,12 +187,12 @@ def check_release_stamp() -> list[str]:
         return failures
 
     index = (SITE / "index.html").read_text(encoding="utf-8")
-    shown = re.search(r"built from release (v\d+(?:\.\d+)*)", index)
+    shown = re.search(r"source version (v\d+(?:\.\d+)*)", index)
     if shown is None:
-        failures.append("site index.html no longer states which release it was built from")
+        failures.append("site index.html no longer states its source version")
     elif shown.group(1) != f"v{pinned.group(1)}":
         failures.append(
-            f"site says it was built from release {shown.group(1)}, "
+            f"site says its source version is {shown.group(1)}, "
             f"but pyproject.toml is {pinned.group(1)}"
         )
     return failures

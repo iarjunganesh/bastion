@@ -2,7 +2,7 @@
 
 **Purpose:** close only the observations required for safe public claims, then produce the five
 Devpost gallery images. Raw captures belong in ignored `.takes/`; only reviewed, cropped, redacted
-artifacts move into `assets/screenshots/` or `assets/evidence/`.
+artifacts move into `archive/hackathon-2026/assets/screenshots/` or `assets/evidence/`.
 
 The evidence sprint has reached its safe publication boundary: four observations are closed and
 the other two are explicitly deferred under narrower wording. The gallery acceptance gate closed on
@@ -32,7 +32,7 @@ exception messages.
 - [ ] **Optional upgrade, not outstanding work.** Record any of the nine console beats into
       `assets/demo-video/beats/<NN>-<slug>.mp4` to replace its retained-evidence still. Every beat
       is already marked `final`, so `--check` passes as it stands; a recording simply takes
-      precedence. Record one beat at a time — `python scripts/assemble_demo_video.py --beat <slug>`
+      precedence. Record one beat at a time — `python archive/hackathon-2026/scripts/assemble_demo_video.py --beat <slug>`
       re-cuts a single one, so a fluffed step costs a beat rather than a take. Overshoot by a few
       seconds; the assembler trims to the measured length and holds the final frame if a take runs
       short. **The published URL points at a fixed file**, so acting on this now means re-uploading
@@ -56,14 +56,14 @@ IDs, or other values cited by the surrounding submission.
 captured, reviewed and promoted; their retained records are evidence 11, 12, 13 and the refreshed
 evidence 07. Their raw 1920×1080 sources stay ignored under `.takes/2026-08-25/` until the gallery
 is composed. Steps 5 and 6 are post-hackathon evidence work; their claims remain narrowed — see
-[11-claim-matrix.md](planning/11-claim-matrix.md).
+[11-claim-matrix.md](../../../docs/research/claim-matrix.md).
 
 | Step | Capture | State | Retained record |
 |---|---|---|---|
-| 1 | P0.9 current-route IAM provenance | **Closed** | [evidence 11](../assets/evidence/11-current-route-correlation.md) |
-| 2 | P0.6 agent-mediated Model Armor refusal | **Closed** | [evidence 12](../assets/evidence/12-agent-mediated-model-armor-refusal.md) |
-| 3 | P0.8 correlated retained audit | **Closed** | [evidence 11](../assets/evidence/11-current-route-correlation.md) + [evidence 07](../assets/evidence/07-observability.md) |
-| 4 | P0.7 current-route Cloud Trace chain | **Closed** | [evidence 13](../assets/evidence/13-current-route-trace.md) |
+| 1 | P0.9 current-route IAM provenance | **Closed** | [evidence 11](../../../assets/evidence/11-current-route-correlation.md) |
+| 2 | P0.6 agent-mediated Model Armor refusal | **Closed** | [evidence 12](../../../assets/evidence/12-agent-mediated-model-armor-refusal.md) |
+| 3 | P0.8 correlated retained audit | **Closed** | [evidence 11](../../../assets/evidence/11-current-route-correlation.md) + [evidence 07](../../../assets/evidence/07-observability.md) |
+| 4 | P0.7 current-route Cloud Trace chain | **Closed** | [evidence 13](../../../assets/evidence/13-current-route-trace.md) |
 | 5 | P0.10 managed Gateway refusals | Deferred | none — claim stays narrowed |
 | 6 | P0.11 timeout, retry, bounded failure | Deferred | none — claim stays narrowed |
 
@@ -136,7 +136,7 @@ and fail-closed behavior are tested and deployed.
 ### 7. Reconcile the claim matrix
 
 - Update the relevant evidence ledger for each accepted capture.
-- Update `submission/planning/11-claim-matrix.md` column by column.
+- Update `docs/research/claim-matrix.md` column by column.
 - Narrow any row that still lacks observed proof.
 - Refresh mutable counts in `assets/architecture/gcp-state.json` and regenerate diagrams only if
   the deployed inventory changed.
@@ -158,7 +158,7 @@ successful one in every console view captured afterwards.
 Record with OBS at 1920×1080/30fps into `assets/demo-video/beats/<NN>-<slug>.mp4`. **No audio** —
 the narration is already committed. Overshoot each beat by a few seconds; the assembler trims to
 the measured length and holds the final frame if a take runs short. Re-cut one beat with
-`python scripts/assemble_demo_video.py --beat <slug>`, so a fluffed step costs a beat and not a
+`python archive/hackathon-2026/scripts/assemble_demo_video.py --beat <slug>`, so a fluffed step costs a beat and not a
 take.
 
 ### A. Before recording anything
@@ -169,7 +169,7 @@ take.
    at 125% or more.
 4. Pre-open every tab and pre-enter every count-only filter. A judge should never watch a query
    being typed, and a half-typed filter is where an unredactable value appears.
-5. `python scripts/assemble_demo_video.py --check` — the list of outstanding beats is the shot list.
+5. `python archive/hackathon-2026/scripts/assemble_demo_video.py --check` — the list of outstanding beats is the shot list.
 
 ### B. One successful investigation — beats 01, 02, 03, 04, 05, 08
 
@@ -194,7 +194,7 @@ and expires, the audit is the compliance record, and beat 08 says exactly that.
 
 Neither depends on an investigation, so record them whenever the console is already clean.
 
-- `06-identity` — the impersonation denial from [evidence 03](../assets/evidence/03-escalation-agent-denied.md):
+- `06-identity` — the impersonation denial from [evidence 03](../../../assets/evidence/03-escalation-agent-denied.md):
   the Auditor identity performs the read, the Escalation identity is denied the same call. The
   narration already discloses that this is reproduced by impersonation rather than captured
   mid-investigation, so do not stage it as though it happened inside the run.
@@ -211,14 +211,14 @@ sample text.
 
 ### E. Finish
 
-1. `python scripts/assemble_demo_video.py` — with all nine present it writes
-   `assets/demo-video/bastion.mp4` rather than the scaffold path.
+1. `python archive/hackathon-2026/scripts/assemble_demo_video.py` — with all nine present it writes
+   `archive/hackathon-2026/assets/demo-video/bastion.mp4` rather than the scaffold path.
 2. Review every transition frame at 200% zoom, then declare the file in `VIDEO_REDACTIONS` and run
    `python scripts/redact_evidence.py --check`. It fails until the declaration exists, which is the
    check that twice caught an operator account photo already promoted into `assets/`.
-3. Upload with `assets/demo-video/bastion.srt` as the caption track. Verify 1080p playback while
+3. Upload with `archive/hackathon-2026/assets/demo-video/bastion.srt` as the caption track. Verify 1080p playback while
    signed out.
-4. Add the URL to the README badge, the public console, and `devpost-submission.md`.
+4. Add the URL to the README badge, the public console, and `archive/hackathon-2026/devpost-submission.md`.
 
 ## Five-image Devpost gallery
 
@@ -233,7 +233,7 @@ capture with dead space between them removed, and may carry a drawn label naming
 shows. It may not reorder, retime, or recolour evidence, and every number it displays must already
 appear in a retained evidence record.
 
-### 01 — `assets/screenshots/01-enterprise-fleet-architecture.png`
+### 01 — `archive/hackathon-2026/assets/screenshots/01-enterprise-fleet-architecture.png`
 
 Source: `assets/architecture/enterprise-fleet-architecture-dark.png`, emitted by
 `scripts/render_diagrams.py` alongside the light still.
@@ -243,7 +243,7 @@ Caption: **A managed, zero-trust institutional-agent fleet where raw IAM stops b
 Acceptance: three agents, seven managed pillars, data-minimization boundary, durable state, and
 audit/trace outputs are readable at gallery-thumbnail size.
 
-### 02 — `assets/screenshots/02-governed-agent-catalog.png`
+### 02 — `archive/hackathon-2026/assets/screenshots/02-governed-agent-catalog.png`
 
 Source: `.takes/2026-08-27/02a-agent-registry-list.png`, cropped to the breadcrumb, the Registry
 title, and the filtered catalog; the empty search hero between them is removed.
@@ -262,20 +262,20 @@ records without a worker origin or an operator identity.
 classification, or approval; those fields live on each record's Agent Card detail view, which has
 not been captured. Do not caption this image as showing ownership or policy metadata until that
 capture exists. The fields themselves are asserted by
-[evidence 05](../assets/evidence/05-runtime-gateway.md), not by this screenshot.
+[evidence 05](../../../assets/evidence/05-runtime-gateway.md), not by this screenshot.
 
-### 03 — `assets/screenshots/03-production-iam-routing.png`
+### 03 — `archive/hackathon-2026/assets/screenshots/03-production-iam-routing.png`
 
 Source: `.takes/2026-08-25/11-current-route-count-only-summary.png`, cropped to the evidence block.
 The invoking command line is dropped so the counts scale up; its provenance is
-[evidence 11](../assets/evidence/11-current-route-correlation.md).
+[evidence 11](../../../assets/evidence/11-current-route-correlation.md).
 
 Show the final current-route binding count, deterministic findings, and owning departments. Do not
 show principal/member values.
 
 Caption: **One production IAM review routes minimized findings to the teams that actually own them.**
 
-### 04 — `assets/screenshots/04-enforced-security-boundary.png`
+### 04 — `archive/hackathon-2026/assets/screenshots/04-enforced-security-boundary.png`
 
 Source: `.takes/2026-08-25/12-agent-mediated-model-armor-refusal.png`, cropped to the evidence
 block.
@@ -290,10 +290,10 @@ screening callback, not by agent instructions.**
 **Narrowed against the original plan.** The planned side-by-side of Auditor read permitted and
 Escalation read denied has not been captured, so this image proves inline screening only, not the
 IAM split. The IAM split remains asserted by
-[evidence 03](../assets/evidence/03-escalation-agent-denied.md). Do not caption this image as
+[evidence 03](../../../assets/evidence/03-escalation-agent-denied.md). Do not caption this image as
 showing an IAM denial.
 
-### 05 — `assets/screenshots/05-durable-context-and-audit.png`
+### 05 — `archive/hackathon-2026/assets/screenshots/05-durable-context-and-audit.png`
 
 Sources, composed into three labelled panels: `.takes/2026-08-25/11-current-route-audit-log.png`,
 `07-audit-bucket-retention.png`, and `13-current-route-trace.png`.
@@ -310,11 +310,11 @@ payload-free, and retained for a year.**
 and the absent notification for the suppressed department, have not been captured. This image
 therefore proves correlation, minimization, and retention — not cross-week human-decision
 continuity, which remains asserted by
-[evidence 10](../assets/evidence/10-cross-week-suppression.md).
+[evidence 10](../../../assets/evidence/10-cross-week-suppression.md).
 
 ## Gallery acceptance gate
 
-- [x] Exactly five ordered files exist under `assets/screenshots/`.
+- [x] Exactly five ordered files exist under `archive/hackathon-2026/assets/screenshots/`.
 - [x] Each is 1920×1080, under 5 MB, and legible at 480 px width.
 - [x] Captions describe visible proof rather than implementation intent. Three were narrowed on
       2026-08-27 to the panels that were actually captured; see each entry above.
@@ -329,5 +329,5 @@ continuity, which remains asserted by
 
 Current upgrade boundary (28 October 2026): source targets Google ADK 2.13.0.
 The package resolution and checks recorded above are historical. See
-[version provenance](../docs/VERSIONS.md)
+[version provenance](../../../docs/VERSIONS.md)
 and the upgrade plan before running new captures.

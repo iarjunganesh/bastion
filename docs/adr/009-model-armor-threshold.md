@@ -97,4 +97,4 @@ investigations now complete, and a later run observed an approved exception bein
 
 IAP still fails to resolve some registered non-standard Google hosts from the Runtime. That is
 retained as residual platform behaviour in the
-[observation backlog](../../submission/planning/09-capture-backlog.md), not described as fixed.
+[observation backlog](../research/observation-backlog.md), not described as fixed.
