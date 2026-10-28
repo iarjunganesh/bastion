@@ -8,7 +8,7 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 
 - 28 October 2026: branch `feature/technical-report`; starting HEAD `405988a`.
   PR #1 was merged on GitHub as `75ab108` on 28 October; its static-site correction
-  was deployed by Vercel. Follow-up dependency remediation is on this branch; Python release
+  was deployed by Vercel. Follow-up dependency remediation is in PR #2; Python release
   remains blocked. No GCP deployment or paid study was performed.
 - Source pins Google ADK 2.13.0, A2A SDK 1.3.0, AI Platform/Agent Platform 2.6.0,
   and Model Armor 0.7.3. Universal Python 3.12 lock applies to CI, Cloud Run and managed Runtime.
@@ -34,10 +34,10 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 
 ## Next step
 
-1. Finish verifying the refreshed 150-package environment and separately publish the static
-   console. Follow-up remediation needs a new PR; no tag while the dependency audit fails. See
-   docs/DEPENDENCY-STATUS.md. Do not suppress the OpenTelemetry advisory or force an
-   incompatible resolution to turn the gate green.
+1. Resolve the release-blocking OpenTelemetry constraint in PR #2. The refreshed 150-package
+   environment passes 321 tests and mypy; all PR #2 checks at `d3fe889` pass except the
+   dependency audit. See docs/DEPENDENCY-STATUS.md. Do not suppress the advisory or force
+   an incompatible resolution. No v0.8.0 tag/release has been created.
 2. Resolve credit usage scope and paid-account spillover protection. Budget alerts are not hard caps. No payment/billing mutation.
 3. Once credits-only coverage is established, deploy both Cloud Run and managed Runtime,
    verify exact package/image/revision provenance and one pilot before any batch.
@@ -71,3 +71,20 @@ it uncommitted. Do not rebuild it as a routine gate during the remaining impleme
   fleet extras and raised Pillow to 13.0.0; only the ADK-constrained OpenTelemetry advisory
   remains. Hold Python release; static console correction is independent.
 - Maintainer stopped iterative report edits/builds; no report change since that correction.
+
+### 2026-10-28 / Codex — public console verified, closeout
+
+- Published the reviewed static console from `d3fe889` through Vercel production deployment
+  `dpl_BEFTqCsqiwydwdouBL7ArGYmc2k1`; public custom domain is READY. HTML/JSON/JavaScript
+  match source (line-ending normalization only). Nine immutable evidence targets exist.
+- Production desktop 1440px/mobile 375px checks pass: nine cards, dated inventory,
+  explicit release-pending source stamp, no overflow/page errors/private network requests.
+- PR #2 holds refreshed dependency remediation. At `d3fe889` every check except the known
+  OpenTelemetry audit passes. No tag, GCP deployment, new event or model call was performed.
+- The report remains uncommitted and untouched since the maintainer stopped iterative builds.
+  Finish engineering/control evidence before one clean report generation.
+- Validated local interpreter: `.tmp/adk-upgrade-venv/Scripts/python.exe` (Python 3.12);
+  the pre-existing `.venv` was preserved and still represents the older environment. Recreate
+  a fresh environment from `requirements.lock` when resuming; do not infer pins from `.venv`.
+- Starting and final private/report work are preserved in external verified archives;
+  exact machine-local paths and billing details remain in `.local/`, outside public commits.

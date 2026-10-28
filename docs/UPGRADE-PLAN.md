@@ -83,3 +83,14 @@ finds the ADK-constrained OpenTelemetry advisory. See [DEPENDENCY-STATUS.md](DEP
 Do not tag a Python release while that gate fails. PR #1 was merged on GitHub; dependency
 remediation and an explicit release-pending site stamp are a follow-up. Credits-only paid
 execution remains held independently. No report/PDF work until engineering/evidence are settled.
+
+## Verified closeout
+
+The static console was published from `d3fe889` and its public HTML/JSON/JavaScript match the
+reviewed source. Desktop/mobile checks pass. The refreshed 150-package environment passes
+321 core-suite cases at 100% configured coverage and mypy on 40 files. The existing fleet's
+read-only configuration verifier passes with no new events, model calls or deployment.
+
+PR #2 retains the security remediation and the unresolved OpenTelemetry audit. No v0.8.0
+tag/release exists. Paid GCP work remains held by the credits-only condition. The report is
+preserved locally; no further manuscript/PDF edits occurred after the maintainer's correction.
