@@ -7,8 +7,9 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 ## Current state
 
 - 28 October 2026: branch `feature/technical-report`; starting HEAD `405988a`.
-  Candidate code/evidence is in PR #1. Python release is blocked by the dependency audit;
-  static-site correction is being published separately. No GCP deployment or paid study performed.
+  PR #1 was merged on GitHub as `75ab108` on 28 October; its static-site correction
+  was deployed by Vercel. Follow-up dependency remediation is on this branch; Python release
+  remains blocked. No GCP deployment or paid study was performed.
 - Source pins Google ADK 2.13.0, A2A SDK 1.3.0, AI Platform/Agent Platform 2.6.0,
   and Model Armor 0.7.3. Universal Python 3.12 lock applies to CI, Cloud Run and managed Runtime.
 - Refreshed 150-package environment: 321 tests, 100% configured core coverage; mypy
@@ -34,7 +35,7 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 ## Next step
 
 1. Finish verifying the refreshed 150-package environment and separately publish the static
-   console. PR #1 remains open; no tag/merge while the dependency audit fails. See
+   console. Follow-up remediation needs a new PR; no tag while the dependency audit fails. See
    docs/DEPENDENCY-STATUS.md. Do not suppress the OpenTelemetry advisory or force an
    incompatible resolution to turn the gate green.
 2. Resolve credit usage scope and paid-account spillover protection. Budget alerts are not hard caps. No payment/billing mutation.

@@ -75,3 +75,11 @@ Stop iterative manuscript/PDF amendments and rebuilds. Finish the code, dependen
 deployment and feasible control/evidence work first. Then reconcile the final evidence and
 generate one clean technical report. The current report is an interim local draft; preserve
 it uncommitted. Do not rebuild it as a routine gate during the remaining implementation.
+
+## Current release blockers
+
+The local refreshed runtime passes the full offline core gate, but the dependency audit still
+finds the ADK-constrained OpenTelemetry advisory. See [DEPENDENCY-STATUS.md](DEPENDENCY-STATUS.md).
+Do not tag a Python release while that gate fails. PR #1 was merged on GitHub; dependency
+remediation and an explicit release-pending site stamp are a follow-up. Credits-only paid
+execution remains held independently. No report/PDF work until engineering/evidence are settled.
