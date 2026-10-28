@@ -1,7 +1,7 @@
 # ADR-006: Observable proof closes each pillar
 
 **Status:** Accepted 2026-08-13; proof ledger refreshed 2026-08-16  
-**Traces to:** [hackathon brief](../../submission/DEVPOST.md)
+**Traces to:** [hackathon brief](../../archive/hackathon-2026/submission/DEVPOST.md)
 
 ## Decision
 
@@ -14,7 +14,7 @@ enabled API or folder name is not proof.
 | Agent Runtime | A managed identity-bearing Runtime accepts a session and streams events | **Observed.** A live session returned streamed events through the Gateway-bound deployment. |
 | Memory Bank | Durable context and an approved exception survive process restart and suppress a later matching opaque finding | **Observed across a real elapsed gap, and reconfirmed after the deterministic-delivery rewrite.** An exception approved 2026-08-19 suppressed its matching finding on 2026-08-22 across deployments and restarts ([evidence 10](../../assets/evidence/10-cross-week-suppression.md)). The gap is three days, not a literal week; expiry firing remains test-only. Re-verified live on 2026-08-23 against the same still-valid exception after the Auditor fidelity check (P0.1), deterministic Escalation Agent (P0.2), and completion gate (P0.3) redeployed: exactly one human-review record was created, for `security-engineering`; the suppressed department received none. |
 | Agent Identity | The write-scoped agent is denied a real IAM read while the read-scoped agent succeeds | **Observed.** Redacted denial is [evidence 03](../../assets/evidence/03-escalation-agent-denied.md). |
-| Agent Gateway | Runtime is Gateway-bound, IAP is fail-closed, and no production direct-peer credential remains | **Deployed and verified, with one open defect.** Fleet verifier checks Gateway policy and dispatcher bypass removal. IAP also denies a *catalogued* destination called from inside the Runtime — Model Armor's regional endpoint — with the endpoint registered and `roles/iap.egressor` held. Refusing is observed; correctly admitting from the Runtime is not. Tracked as D2 in [09-capture-backlog.md](../../submission/planning/09-capture-backlog.md). |
+| Agent Gateway | Runtime is Gateway-bound, IAP is fail-closed, and no production direct-peer credential remains | **Deployed and verified, with one open defect.** Fleet verifier checks Gateway policy and dispatcher bypass removal. IAP also denies a *catalogued* destination called from inside the Runtime — Model Armor's regional endpoint — with the endpoint registered and `roles/iap.egressor` held. Refusing is observed; correctly admitting from the Runtime is not. Tracked as D2 in [09-capture-backlog.md](../research/observation-backlog.md). |
 | Model Armor | Injection is refused at the deployed agent callback before any model call; unavailable screening also refuses | **Observed at the agent boundary 2026-08-25.** An approved injection sample sent to the deployed Auditor's authenticated A2A surface was refused by `before_model_callback` with `policy_match`; the task failed closed and no model submission, completion or tool call followed ([evidence 12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md)). The earlier direct-template probe is [evidence 01](../../assets/evidence/01-model-armor-block.md); fail-closed seams remain covered by tests. |
 | Agent Observability | Payload-free correlated actions are retained and operational signals are alertable | **Observed 2026-08-25, both artifacts.** One investigation assembled 28 unique payload-free events across three invocation ids under a single investigation id ([evidence 11](../../assets/evidence/11-current-route-correlation.md)), and the same run produced a connected 22-span Cloud Trace ([evidence 13](../../assets/evidence/13-current-route-trace.md)). Regional sink/bucket, four metrics, five policies and dashboard are live; the `europe-west4` 365-day retention was re-reviewed in Console ([evidence 07](../../assets/evidence/07-observability.md)). Retention is proven, immutability is not. |
 
@@ -41,4 +41,4 @@ human publication tasks and are not infrastructure defects.
 Documentation must use **implemented**, **deployed**, **observed**, and **not claimed** precisely.
 The evidence index is [assets/README.md](../../assets/README.md), the deployment inventory is
 [gcp-state.json](../../assets/architecture/gcp-state.json), and the handoff checklist is
-[submission/SUBMISSION.md](../../submission/SUBMISSION.md).
+[archive/hackathon-2026/submission/SUBMISSION.md](../../archive/hackathon-2026/submission/SUBMISSION.md).

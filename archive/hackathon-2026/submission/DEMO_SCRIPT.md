@@ -1,7 +1,7 @@
 # Bastion demo recording script
 
 - **Target:** **3:53**, locked and measured. Never exceeds four minutes.
-- **Start only after:** `submission/CAPTURE_RUNBOOK.md` is complete and the claim matrix is
+- **Start only after:** `archive/hackathon-2026/submission/CAPTURE_RUNBOOK.md` is complete and the claim matrix is
   reconciled. The runbook was complete as of 2026-08-27; the matrix was reconciled again on
   2026-08-29, when publication made its `In demo` column answerable and eight rows became `Yes`.
 
@@ -23,8 +23,8 @@
 ## Timed shot list and narration
 
 **Generated — do not hand-edit.** The narration text lives in
-[`scripts/generate_demo_voiceover.py`](../scripts/generate_demo_voiceover.py); this table is
-emitted by `python scripts/generate_demo_voiceover.py --table` from the **measured** duration of
+[`archive/hackathon-2026/scripts/generate_demo_voiceover.py`](../scripts/generate_demo_voiceover.py); this table is
+emitted by `python archive/hackathon-2026/scripts/generate_demo_voiceover.py --table` from the **measured** duration of
 each committed clip, plus a deliberate hold for the live action on screen. Editing the words here
 instead is how a shooting script and its committed audio drift apart, which is worse than either
 being wrong alone: the session trusts the doc and the timeline trusts the audio.
@@ -50,7 +50,7 @@ trimming that beat's hold — it was only cloning the final frame of a 34.3s rec
 | 3:30–3:50 | The architecture flow animating, then the coverage report on the same commit | “Bastion turns real IAM into remembered, department-owned action — without ever giving an agent write access. The ADK defect it surfaced is now an open issue upstream, confirmed by a Google maintainer. Every claim here has a proof boundary in the public repository.” |
 | 3:50–3:53 | The animated brand banner, with the repository and public evidence console URLs | “Thank you for watching.” |
 
-The narration is bounded by [`planning/11-claim-matrix.md`](planning/11-claim-matrix.md). The two
+The narration is bounded by [`planning/11-claim-matrix.md`](../../../docs/research/claim-matrix.md). The two
 `Partial` rows — managed Gateway refusal and retry/dead-letter — appear nowhere in the script at
 all, rather than appearing in narrowed form. If a further item turns out partial on the day, remove
 its shot and narration rather than speaking the target state.
@@ -66,32 +66,32 @@ the managed stack.
 ### Producing the audio
 
 ```powershell
-python scripts/generate_demo_voiceover.py            # synthesise clips, captions, and this table
-python scripts/generate_demo_voiceover.py --table    # re-measure without re-synthesising
-python scripts/generate_demo_voiceover.py --clip hook # after changing one beat's wording
+python archive/hackathon-2026/scripts/generate_demo_voiceover.py            # synthesise clips, captions, and this table
+python archive/hackathon-2026/scripts/generate_demo_voiceover.py --table    # re-measure without re-synthesising
+python archive/hackathon-2026/scripts/generate_demo_voiceover.py --clip hook # after changing one beat's wording
 ```
 
-Clips are committed under `assets/demo-voiceover/` with a SHA-256 sidecar each. **Chirp3-HD returns
+Clips are committed under `archive/hackathon-2026/assets/demo-voiceover/` with a SHA-256 sidecar each. **Chirp3-HD returns
 a slightly different duration for identical text on each call** — one beat measured 16.2s, 18.9s
 and 16.2s across three runs — so the committed MP3 is the stable artifact and the sidecar stops a
 casual re-run from re-jittering every timing this table depends on. Regeneration happens only when
 the words change.
 
-Captions are at `assets/demo-video/bastion.srt`, 36 cues. No timepointing is exposed for Chirp3-HD,
+Captions are at `archive/hackathon-2026/assets/demo-video/bastion.srt`, 36 cues. No timepointing is exposed for Chirp3-HD,
 so each cue boundary is a real per-sentence measurement scaled to the beat clip's measured length —
 a scaled measurement, not a word-count estimate, and not a direct one either.
 
 ### Assembling the cut
 
 ```powershell
-python scripts/assemble_demo_video.py --check   # which beats are live, which are still placeholder
-python scripts/assemble_demo_video.py           # render
-python scripts/assemble_demo_video.py --beat iam  # after re-recording one beat
+python archive/hackathon-2026/scripts/assemble_demo_video.py --check   # which beats are live, which are still placeholder
+python archive/hackathon-2026/scripts/assemble_demo_video.py           # render
+python archive/hackathon-2026/scripts/assemble_demo_video.py --beat iam  # after re-recording one beat
 ```
 
 **The audio defines the cut, so the edit is not a judgement call.** Each beat occupies its measured
 narration length plus its declared hold; the assembler reads both from
-[`scripts/generate_demo_voiceover.py`](../scripts/generate_demo_voiceover.py) rather than from this
+[`archive/hackathon-2026/scripts/generate_demo_voiceover.py`](../scripts/generate_demo_voiceover.py) rather than from this
 table, so the picture cannot drift from the sound. A take longer than its beat is trimmed; a shorter
 one holds its final frame. Nothing needs to be nudged on a timeline by hand.
 
@@ -99,7 +99,7 @@ Until a beat has a live take the assembler substitutes a reviewed still, and say
 is a rehearsal scaffold, not the submission** — the hook narration promises live footage, and a
 screenshot reel would not keep that promise. The distinction is structural rather than a note to
 remember: a scaffold is written to the ignored `assets/demo-video/build/`, and only a fully live cut
-earns the name `assets/demo-video/bastion.mp4`, which sits inside the redaction gate's watched globs
+earns the name `archive/hackathon-2026/assets/demo-video/bastion.mp4`, which sits inside the redaction gate's watched globs
 and must therefore be declared in `VIDEO_REDACTIONS` and frame-reviewed before the offline gate goes
 green again.
 
@@ -112,7 +112,7 @@ and covering only the beat seams left the picture finishing 0.4s ahead of the na
 
 A placeholder is not always a frozen frame. `PICTURES` in the assembler declares each beat's
 shots, and a shot is held, looped, or scrolled. The hook is recorded from the live public console by
-[`scripts/capture_site_hook.mjs`](../scripts/capture_site_hook.mjs), which drives a real browser
+[`archive/hackathon-2026/scripts/capture_site_hook.mjs`](../scripts/capture_site_hook.mjs), which drives a real browser
 against `bastion.arjunganesh.dev` and pans the hero, the fleet counters, the governed
 production-data path and the remembered human decision. It is a recording rather than a scrolled
 screenshot because the page genuinely moves — the hero route diagram carries 24 `animateMotion`
@@ -138,7 +138,7 @@ track.
 ## Rehearsal and publication gate
 
 - [x] The assembled cut measures 3:53. It is built rather than performed, so it cannot drift
-      between takes; re-run `python scripts/assemble_demo_video.py --check` after any change.
+      between takes; re-run `python archive/hackathon-2026/scripts/assemble_demo_video.py --check` after any change.
 - [ ] The problem and the self-audit twist land inside the first 20 seconds of the hook, before
   the ADK clause.
 - [ ] Live behavior and Google Cloud proof are unmistakable.
@@ -147,11 +147,11 @@ track.
 - [x] The video never claims IAM remediation, end-to-end EU residency, immutable retention,
   recurring scheduling, or an unobserved failure boundary.
 - [x] Review every transition frame for sensitive data. Reviewed at all twelve beat boundaries
-      as well as the gate's sampled points; `assets/demo-video/bastion.mp4` is declared in
+      as well as the gate's sampled points; `archive/hackathon-2026/assets/demo-video/bastion.mp4` is declared in
       `VIDEO_REDACTIONS` and the redaction gate passes.
 - [ ] Upload to YouTube or Vimeo and enable English subtitles/captions.
 - [ ] Verify 1080p public playback while signed out.
-- [ ] Add the final URL to README, the public evidence console, and `devpost-submission.md`.
+- [ ] Add the final URL to README, the public evidence console, and `archive/hackathon-2026/devpost-submission.md`.
 
 ## Failure recovery
 

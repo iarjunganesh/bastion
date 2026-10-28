@@ -12,7 +12,7 @@
 | Claim | Implemented | Tested | Deployed | Observed | In demo | Safe to claim? | Evidence boundary and safe wording |
 |---|---:|---:|---:|---:|---:|---:|---|
 | Real IAM read | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 11](../../assets/evidence/11-current-route-correlation.md) is the 25 Aug binding/count proof: 62 live bindings, 3 deterministic findings, 2 canonical owning departments and 0 raw IAM finding-schema fields. [Evidence 14](../../assets/evidence/14-live-validation.md) re-observes 20 IAM-tool/gated execution paths on 27 Oct, without a new binding/pre-policy census. Evidence 09's 52 bindings remain earlier history; evidence 02 remains pre-Gateway. Say **read-only production IAM**, keep census dates explicit, and never imply raw principals/bindings are retained. |
-| Exact deterministic finding set | Yes | Yes | Yes | Yes | Yes | Yes | P0.1 checks model fields against canonical tool findings; [ADR-012](../../docs/adr/012-structured-findings-across-a2a.md) records the Aug 23 successful enforced path. [Evidence 14](../../assets/evidence/14-live-validation.md) adds 20 gated successful paths on 27 Oct, not new mutation probes. The model may write bounded rationale, not alter authoritative fields; mutation refusals remain offline test proof. |
+| Exact deterministic finding set | Yes | Yes | Yes | Yes | Yes | Yes | P0.1 checks model fields against canonical tool findings; [ADR-012](../adr/012-structured-findings-across-a2a.md) records the Aug 23 successful enforced path. [Evidence 14](../../assets/evidence/14-live-validation.md) adds 20 gated successful paths on 27 Oct, not new mutation probes. The model may write bounded rationale, not alter authoritative fields; mutation refusals remain offline test proof. |
 | Cross-department routing | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 11](../../assets/evidence/11-current-route-correlation.md): 25 Aug, 3 canonical findings/2 departments before policy, 2 delivered findings/1 review record after suppression. [Evidence 14](../../assets/evidence/14-live-validation.md): 27 Oct, 3 delivered instances/2 department records per investigation, across 20 runs. The latter is not a new canonical census or expiry measurement; 60 delivered instances are not 60 distinct risks. |
 | Human exception continuity | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 10](../../assets/evidence/10-cross-week-suppression.md) observes the 19-22 Aug three-day gap, reverified 23 Aug. Not re-probed on 27 Oct. Say **remembered across a real elapsed gap**; do not infer expiry or a literal week from October's delivered counts. |
 | Escalation IAM denial | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 03](../../assets/evidence/03-escalation-agent-denied.md) records successful impersonation then IAM-read denial on 15 Aug, with an Auditor success control. This negative probe was not repeated on 27 Oct; successful Escalation deliveries are not new denial proof. |
@@ -45,7 +45,7 @@ published on 2026-08-29 at <https://youtu.be/Xpj8YmzFfpk>, so eight rows are now
 verified against the beat text rather than assumed from the row title. The two `Partial` rows are
 the two that stay `No`: the narration never claims a managed Gateway refusal or an observed
 redelivery, which is the point. The narration was drafted against this table —
-every sentence in [`../DEMO_SCRIPT.md`](../DEMO_SCRIPT.md) is defensible against a row here, and
+every sentence in [`../DEMO_SCRIPT.md`](../../archive/hackathon-2026/submission/DEMO_SCRIPT.md) is defensible against a row here, and
 the two `Partial` rows are absent from it entirely rather than narrowed, so no wording below can
 be weakened by what gets said aloud. Public copy may use every `Yes` row within its stated
 boundary. A `Partial` row must keep the narrower wording
@@ -53,7 +53,7 @@ above until its named capture closes and the evidence ledger, submission handoff
 matrix are updated together.
 
 Two rows remain `Partial`, and they are exactly the two captures still open in
-[09-capture-backlog.md](09-capture-backlog.md): managed Gateway refusals (capture 6) and
+[09-capture-backlog.md](observation-backlog.md): managed Gateway refusals (capture 6) and
 timeout/retry/dead-letter (capture 7). Until those close, public copy says **bounded delivery is
 configured and retry/idempotency paths are tested** and claims only the governed route and its
 fail-closed observation — never an observed Eventarc redelivery, an observed fifth-attempt
@@ -73,7 +73,7 @@ status here — the narrowing is about what a screenshot proves, not about what 
 
 **Version boundary:** the source targets Google ADK 2.13.0; the retained August and
 October cohorts describe the earlier deployment. A source pin does not establish a production
-version. See [the canonical provenance table](../../docs/VERSIONS.md). Fresh captures must name
+version. See [the canonical provenance table](../VERSIONS.md). Fresh captures must name
 new revisions and remain separate from the immutable historical bundles.
 
 Mutable live counts, upstream issue/PR status, public links, official rules, and video availability

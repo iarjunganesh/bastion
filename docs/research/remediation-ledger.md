@@ -1,11 +1,11 @@
 # P0/P1 audit remediation ledger
 
 **Status:** engineering remediation complete on 2026-08-16; publication tasks remain in
-[SUBMISSION.md](../SUBMISSION.md).
+[SUBMISSION.md](../../archive/hackathon-2026/submission/SUBMISSION.md).
 
 Closure here means the deterministic engineering is done. Capabilities that are deployed and
 tested but have not yet been *observed* working are tracked separately in
-[09-capture-backlog.md](09-capture-backlog.md), because a passing test and a capture are
+[09-capture-backlog.md](observation-backlog.md), because a passing test and a capture are
 different kinds of proof.
 
 ## P0 — deterministic safety

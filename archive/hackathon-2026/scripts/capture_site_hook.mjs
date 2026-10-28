@@ -10,7 +10,7 @@
  * Deliberate choices:
  *
  * - **Dark.** The site follows `prefers-color-scheme`, and every other asset in the cut is dark;
- *   `assets/screenshots/README.md` asks for that on purpose, so the sequence reads as one project.
+ *   `archive/hackathon-2026/assets/screenshots/README.md` asks for that on purpose, so the sequence reads as one project.
  * - **A fresh browser profile**, which is why no account photo, bookmark bar or open tab can leak
  *   into frame the way they did in the promoted `.takes/` captures. Playwright records the page
  *   viewport only — there is no browser chrome in the output at all.
@@ -22,7 +22,7 @@
  *
  *     npm install playwright@1.62.1 --prefix "$env:TEMP/bastion-media"
  *     $env:BASTION_PLAYWRIGHT = "file:///$env:TEMP/bastion-media/node_modules/playwright/index.mjs"
- *     node scripts/capture_site_hook.mjs
+ *     node archive/hackathon-2026/scripts/capture_site_hook.mjs
  *
  * The result is written to `assets/demo-video/beats/00-hook.mp4`, which is gitignored like every
  * other raw take. Declare it in `VIDEO_REDACTIONS` and run `python scripts/redact_evidence.py

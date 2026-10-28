@@ -36,8 +36,8 @@ gha-creds-*.json
 *.iam-policy.json
 data/iam-raw/
 
-# Raw screen captures. The takes that survive get copied into assets/demo-video/
-# under the names submission/DEMO_SCRIPT.md gives them; the rest are discarded attempts.
+# Raw screen captures. The takes that survived were copied into the archived demo-video folder
+# under the names its DEMO_SCRIPT.md gave them; the rest are discarded attempts.
 .takes/
 
 # Logs
@@ -64,18 +64,18 @@ console-*.txt
 # on anyone else's checkout - so the protection held only where it was least needed.
 .claude/settings.local.json
 
-# Per-sentence measurement probes. Intermediate: the committed clip is the artifact.
-assets/demo-voiceover/probes/
-assets/demo-voiceover/auditions/
+# Hackathon demo media, archived under archive/hackathon-2026/. Per-sentence measurement probes
+# are intermediate: the committed clip is the artifact.
+archive/hackathon-2026/assets/demo-voiceover/probes/
+archive/hackathon-2026/assets/demo-voiceover/auditions/
 # Demo video assembly. Raw per-beat takes and intermediate renders are large binaries rebuilt by
-# scripts/assemble_demo_video.py; only the reviewed final cut is ever a candidate for tracking,
-# and that is published to YouTube rather than committed.
-assets/demo-video/beats/
-assets/demo-video/build/
-# The finished cut is ~20 MB and is republished on every re-render, so committing it would
-# add a fresh blob to history each time. It is published to YouTube; the narration, the
-# reviewed stills and scripts/assemble_demo_video.py are what the repository keeps.
-assets/demo-video/bastion.mp4
+# the archived assemble_demo_video.py; only the reviewed final cut was ever a candidate for
+# tracking, and that is published to YouTube rather than committed.
+archive/hackathon-2026/assets/demo-video/beats/
+archive/hackathon-2026/assets/demo-video/build/
+# The finished cut is ~20 MB and would add a fresh blob to history on every re-render. It is
+# published to YouTube; the narration, the reviewed stills and the assembly script are kept.
+archive/hackathon-2026/assets/demo-video/bastion.mp4
 
 # Node tooling is run through npx or an out-of-tree install; never vendored here.
 node_modules/

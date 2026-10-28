@@ -83,8 +83,11 @@ jobs:
         run: |
           uv venv .audit-venv --python "${{ env.PYTHON_VERSION }}"
           uv pip install --python .audit-venv/bin/python -r requirements.lock
+      # One maintainer-accepted advisory: CVE-2026-114603 in opentelemetry-api 1.44.0. Every
+      # google-adk release caps OpenTelemetry below the 1.45.1 fix (docs/DEPENDENCY-STATUS.md).
+      # Remove the ignore once an ADK release admits 1.45.1. Any other advisory still fails.
       - name: Audit known vulnerabilities
-        run: uvx pip-audit -r requirements.lock
+        run: uvx pip-audit -r requirements.lock --ignore-vuln CVE-2026-114603
 
   tests:
     name: Tests and coverage
@@ -161,8 +164,8 @@ jobs:
       - name: Require judge-facing documentation
         run: |
           for path in README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md LICENSE \
-            docs/ARCHITECTURE.md docs/adr/README.md submission/planning/07-release-plan.md \
-            submission/SUBMISSION.md assets/README.md \
+            docs/ARCHITECTURE.md docs/adr/README.md docs/research/claim-matrix.md \
+            archive/hackathon-2026/README.md assets/README.md \
             assets/architecture/gcp-state.json assets/brand/banner-dark.svg; do
             test -f "$path" || { echo "::error::missing $path"; exit 1; }
           done
@@ -170,7 +173,8 @@ jobs:
       - name: Reject unfinished public documentation markers
         run: |
           if grep -RInE '\[to fill\]|TBD|FIXME|XXX|lorem ipsum' \
-            README.md CHANGELOG.md SECURITY.md docs/ARCHITECTURE.md docs/adr submission; then
+            README.md CHANGELOG.md SECURITY.md docs/ARCHITECTURE.md docs/adr docs/research \
+            archive/hackathon-2026/submission; then
             echo "::error::Unfinished marker in judge-facing documentation."
             exit 1
           fi

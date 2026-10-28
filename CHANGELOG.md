@@ -7,20 +7,32 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versio
 An entry describes **what became true**, not which files moved. Historical sections preserve the
 state known on their date; current proof and limitations are recorded together.
 
-The current release process is in
-[`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
+The current release sequence is in [docs/UPGRADE-PLAN.md](docs/UPGRADE-PLAN.md); the
+hackathon-era release plan is archived with the rest of the submission material.
 
 ## [Unreleased]
 
-## [0.8.0] - Unreleased candidate (2026-10-28)
+## [0.8.0] - 2026-10-28
+
+### Changed — repository organized around the technical report
+
+- Hackathon-only material (Devpost copy and planning, gallery images, demo video sources and
+  their tooling) is frozen in [archive/hackathon-2026/](archive/hackathon-2026/README.md);
+  `v0.7.0` remains the exact submitted tree. Files the Devpost page or public console link on
+  `main` did not move.
+- The claim matrix, remediation ledger, observation backlog and report plan live in
+  [docs/research/](docs/research/README.md). Documentation, version and redaction gates and CI
+  follow the new paths; the demo-video Make targets are retired and Markdownlint has one config.
 
 ### Changed — ADK source upgrade and shared continuity
 
 - Target Google ADK 2.13.0, A2A SDK 1.3.0, Google Cloud AI Platform/Agent Platform 2.6.0,
   and Model Armor client 0.7.3; refresh the universal Python 3.12 dependency lock.
   Remove unused evaluation-only extras from the shipped fleet and update Pillow to 13.0.0.
-  The audit is reduced to one unresolved OpenTelemetry advisory incompatible with ADK's
-  current upper bound; no audit suppression or production release is claimed.
+  One OpenTelemetry advisory (CVE-2026-114603) remains because every ADK release caps
+  OpenTelemetry below its fix. The maintainer accepted it with a documented, single-ID audit
+  exception ([dependency status](docs/DEPENDENCY-STATUS.md)); removal is tracked in
+  [issue #3](https://github.com/iarjunganesh/bastion/issues/3).
   Installed production remains the historical cohort until a separate credits-only deployment
   and live verification. This release does not claim an upgraded production fleet.
 - Add root AGENTS.md, HANDOFF.md, report roadmap, upgrade/control plan, and thin Claude/Copilot
@@ -31,7 +43,7 @@ The current release process is in
   gate from interpreting private collector counts as production-suite claims.
 - The technical report remains a local, uncommitted draft and is excluded from the candidate.
   The static console is independently deployable; its evidence links use an existing public
-  immutable commit and its footer marks the source version as release pending.
+  immutable commit and its footer states the released source version.
 
 ### Added — separately dated live validation evidence
 
@@ -70,7 +82,7 @@ The current release process is in
 ### Added — the demo video is published
 
 - The cut is public at [https://youtu.be/Xpj8YmzFfpk](https://youtu.be/Xpj8YmzFfpk): **3:53**, twelve beats,
-  English captions attached from `assets/demo-video/bastion.srt`. The README badge, the public
+  English captions attached from `archive/hackathon-2026/assets/demo-video/bastion.srt`. The README badge, the public
   console, the Devpost worksheet, the article and social drafts, and the submission ledger all
   point at it, and `site/data/site-content.json` moves the video panel from `pending` to
   `published` so the console embeds it through `youtube-nocookie.com`.
@@ -80,7 +92,7 @@ The current release process is in
 
 ### Fixed — the caption sidecar described a cut that no longer existed
 
-- `assets/demo-video/bastion.srt` was generated while the hook still held for 3.0s. The hold became
+- `archive/hackathon-2026/assets/demo-video/bastion.srt` was generated while the hook still held for 3.0s. The hold became
   1.0s and the audio and shot table followed; the sidecar did not, leaving **every cue after the
   hook exactly 2.000s late**. Two seconds inside a thirteen-second cue reads as nothing, which is
   why it survived review — it showed only on the shortest cue, where "Thank you for watching" was
@@ -90,7 +102,7 @@ The current release process is in
   onset 0.23–0.68s after its first cue across all twelve, consistent and without accumulation.
   That residue is the leading silence inside each TTS clip, and a caption landing a beat before the
   words is correct lead-in.
-- `scripts/assemble_demo_video.py` now refuses to render unless each beat's first cue starts when
+- `archive/hackathon-2026/scripts/assemble_demo_video.py` now refuses to render unless each beat's first cue starts when
   the beat starts, within 0.25s. Cue boundaries *inside* a beat come from per-sentence probes the
   assembler never sees and stay unchecked; the cumulative clock is what drifts.
 
@@ -113,10 +125,10 @@ The current release process is in
 
 ### Added — the demo video is generated, measured, and assembled at 3:53
 
-- `scripts/generate_demo_voiceover.py` is now the source of truth for the narration. It synthesises
+- `archive/hackathon-2026/scripts/generate_demo_voiceover.py` is now the source of truth for the narration. It synthesises
   twelve beats with Google Cloud Text-to-Speech (Chirp3-HD, same project as the fleet), measures
   every clip, emits the shot table into
-  [`submission/DEMO_SCRIPT.md`](submission/DEMO_SCRIPT.md), and cuts a 35-cue caption track.
+  [`archive/hackathon-2026/submission/DEMO_SCRIPT.md`](archive/hackathon-2026/submission/DEMO_SCRIPT.md), and cuts a 35-cue caption track.
 - **The cut is 3:53**, measured rather than estimated: 199s narrated across twelve beats plus 34s
   of holds for live action. The first attempt measured 4:14 and the second 4:12 — the ceiling is
   hard and judges have said they stop at four minutes, so the timeline is built from real clip
@@ -137,8 +149,8 @@ The current release process is in
 
 ### Added — the demo video is assembled from the narration, not edited by hand
 
-- `scripts/assemble_demo_video.py` cuts the video from the committed narration and per-beat screen
-  recordings. It imports the beat list from `scripts/generate_demo_voiceover.py` rather than
+- `archive/hackathon-2026/scripts/assemble_demo_video.py` cuts the video from the committed narration and per-beat screen
+  recordings. It imports the beat list from `archive/hackathon-2026/scripts/generate_demo_voiceover.py` rather than
   re-describing it, so the picture cannot drift from the sound: each beat occupies its measured
   clip length plus its declared hold, a long take is trimmed and a short one holds its final
   frame. `make assemble-video` added; the plan reproduces the locked 3:53 exactly. The sign-off runs the
@@ -151,7 +163,7 @@ The current release process is in
   closing image, and it captures nothing either, so the redaction gate has no opinion on it.
 - **A build containing any placeholder still is a scaffold, not the submission**, and the
   difference is structural rather than a note to remember. A scaffold is written to the ignored
-  `assets/demo-video/build/`; only a fully live cut earns `assets/demo-video/bastion.mp4`, which
+  `assets/demo-video/build/`; only a fully live cut earns `archive/hackathon-2026/assets/demo-video/bastion.mp4`, which
   sits inside the redaction gate's watched globs and so must be declared in `VIDEO_REDACTIONS` and
   frame-reviewed before the offline gate goes green. The hook narration promises live footage and
   a screenshot reel would not keep that promise.
@@ -159,7 +171,7 @@ The current release process is in
   rejected: `zoompan` driven off a `-loop 1` input advances `on` per emitted frame, so the zoom
   raced past its ceiling and cropped the left edge — on a terminal capture that silently amputates
   the very counts the narration cites.
-- `scripts/capture_site_hook.mjs` records the opening beat from the **live** public console at
+- `archive/hackathon-2026/scripts/capture_site_hook.mjs` records the opening beat from the **live** public console at
   `bastion.arjunganesh.dev`, driving a real browser rather than panning a screenshot: the hero
   route diagram carries 24 `animateMotion` and 20 `animate` elements that a still would discard.
   It records the page viewport from a fresh profile, so no browser chrome or account photo can
@@ -174,7 +186,7 @@ The current release process is in
   and made the master filename unreachable — while the pictures it disparaged are the redacted
   console and terminal captures retained as evidence 11, 12 and 13, real output from real
   deployed runs. The line is now *"Everything after this was captured from the deployed
-  fleet"*, which is what the video actually shows. `assets/demo-video/bastion.mp4` follows at
+  fleet"*, which is what the video actually shows. `archive/hackathon-2026/assets/demo-video/bastion.mp4` follows at
   3:53, declared in `VIDEO_REDACTIONS` and reviewed at all twelve beat boundaries. The
   rewording cost 2.4s, paid for by trimming the hook's hold, which had only been cloning the
   final frame of a 34.3s recording.
@@ -193,9 +205,9 @@ The current release process is in
 - A shot can be marked `final`, meaning it is the intended finished picture rather than a
   stand-in. Without it the completeness check could never pass: the two closing beats are
   graphics by design and will never have a live take, so the master filename
-  `assets/demo-video/bastion.mp4` was unreachable no matter how much footage was recorded.
+  `archive/hackathon-2026/assets/demo-video/bastion.mp4` was unreachable no matter how much footage was recorded.
   `--check` now names the beats still outstanding and marks placeholders with a `*`.
-- [`CAPTURE_RUNBOOK.md`](submission/CAPTURE_RUNBOOK.md) gains a recording-session order. The
+- [`CAPTURE_RUNBOOK.md`](archive/hackathon-2026/submission/CAPTURE_RUNBOOK.md) gains a recording-session order. The
   nine outstanding beats are not independent: one successful investigation supplies six of
   them, and the Model Armor probe fails an investigation by design, so recording it early
   would leave a failed run beside the successful one in every console view captured
@@ -237,7 +249,7 @@ The current release process is in
   gallery image 01 recopied from the dark still, because
   `check_diagram_dates_match_state()` gates the footer date against the capture it quotes.
 - The Devpost draft's uploaded architecture GIF is now one capture behind and needs replacing;
-  tracked in [SUBMISSION.md](submission/SUBMISSION.md). The counts it shows are still correct.
+  tracked in [SUBMISSION.md](archive/hackathon-2026/submission/SUBMISSION.md). The counts it shows are still correct.
 
 ## [0.6.0] — 2026-08-27
 
@@ -415,10 +427,10 @@ watched and retained, and the repository stopped describing them as pending.
   exception lookup nested inside `policy_step`, and `escalation_gate`. D2's predicted risk — that
   IAP-mediated egress might impair the Runtime's OTel export and cost this capture — did not
   occur (P0.7).
-- Added [10-reproducibility.md](submission/planning/10-reproducibility.md): a measured clean-clone
+- Added [10-reproducibility.md](archive/hackathon-2026/submission/planning/10-reproducibility.md): a measured clean-clone
   run rather than a claim about one. A fresh unauthenticated clone reaches 321 passing tests at
   100% configured core coverage with every gate green and zero untracked files (P1.3).
-- Added [11-claim-matrix.md](submission/planning/11-claim-matrix.md), the internal gate that stops
+- Added [11-claim-matrix.md](docs/research/claim-matrix.md), the internal gate that stops
   public copy claiming more than the evidence shows. Eight of ten rows are now fully claimable;
   two remain narrowed.
 - Added the judge-facing submission package: a paste-ready Devpost narrative, a field-by-field
@@ -433,7 +445,7 @@ watched and retained, and the repository stopped describing them as pending.
 - Model Armor and Agent Observability in [ADR-006](docs/adr/006-pillar-coverage.md) moved from
   configuration and test proof to observed proof, citing evidence 11, 12 and 13.
 - Closed captures 2, 3, 4 and 5 in
-  [09-capture-backlog.md](submission/planning/09-capture-backlog.md). Capture 4 closed with its
+  [09-capture-backlog.md](docs/research/observation-backlog.md). Capture 4 closed with its
   boundary stated rather than smoothed: a refusal *is* recorded under the audit contract, but it
   comes from the Model Armor probe, not from the correlated investigation itself.
 - Sharpened D2 with a second measurement. The 12 IAP denials on 2026-08-25 fell in a single
@@ -443,7 +455,7 @@ watched and retained, and the repository stopped describing them as pending.
   proof and re-pointed ADR-004, the ADR index, and the judging matrix at evidence 11 and 13.
 - Resolved the two coexisting IAM binding counts: 62 is current, and evidence 09's 52 is retained
   as its own dated measurement rather than overwritten.
-- Superseded `02-demo-storyboard.md` with [DEMO_SCRIPT.md](submission/DEMO_SCRIPT.md), which had
+- Superseded `02-demo-storyboard.md` with [DEMO_SCRIPT.md](archive/hackathon-2026/submission/DEMO_SCRIPT.md), which had
   conflicting timings.
 - Synchronised the public evidence console: refreshed the stale binding count and added cards for
   the refusal and the trace.
@@ -458,7 +470,7 @@ watched and retained, and the repository stopped describing them as pending.
   not a rejected report. Issue `#6854` and PR `#6859` remain open. Nothing is merged. Corrected
   in README, [ADR-012](docs/adr/012-structured-findings-across-a2a.md), and the article, Devpost
   and social drafts.
-- Corrected [10-reproducibility.md](submission/planning/10-reproducibility.md), which cited commit
+- Corrected [10-reproducibility.md](archive/hackathon-2026/submission/planning/10-reproducibility.md), which cited commit
   `4fe8d59` — squashed and force-pushed away, so the hash no longer resolved in a fresh clone. A
   reproducibility record naming an unreachable commit proves nothing, so it was re-run against
   `c81b4af` rather than re-pointed.
@@ -819,7 +831,7 @@ rather than left for a reader to discover.
 - **Investigations truncating after the Auditor (D6) is closed** — fixed and observed
   completing end to end on 2026-08-22. Its cause is recorded above.
 - Both are tracked in
-  [09-capture-backlog.md](submission/planning/09-capture-backlog.md) alongside the observation
+  [09-capture-backlog.md](docs/research/observation-backlog.md) alongside the observation
   backlog. Nothing in this release claims either is fixed.
 
 ### Changed — dependency pins raised for the tag
@@ -950,7 +962,7 @@ rather than left for a reader to discover.
 
 ### Added — the observation backlog is tracked in the repository
 
-- Added [09-capture-backlog.md](submission/planning/09-capture-backlog.md), which tracks what is
+- Added [09-capture-backlog.md](docs/research/observation-backlog.md), which tracks what is
   deployed and tested but not yet observed. What remains before submission is observation, not
   construction, and that distinction is now a tracked document rather than an assumption.
 - Records that the cross-week continuity seed targets the Firestore `bastion_exceptions`
@@ -969,7 +981,7 @@ rather than left for a reader to discover.
 First tagged release. The production path is deployed and verified; the remaining work before
 submission is observation and publication, not construction. What is deployed but **not yet
 captured as an observed artifact** is recorded in
-[`submission/SUBMISSION.md`](submission/SUBMISSION.md) rather than claimed here.
+[`archive/hackathon-2026/submission/SUBMISSION.md`](archive/hackathon-2026/submission/SUBMISSION.md) rather than claimed here.
 
 ### Added — governed managed Runtime path
 
@@ -1002,7 +1014,7 @@ captured as an observed artifact** is recorded in
 
 ### Changed — documentation matches the deployed fleet
 
-- The rubric self-assessment in [`submission/DEVPOST.md`](submission/DEVPOST.md) records managed
+- The rubric self-assessment in [`archive/hackathon-2026/submission/DEVPOST.md`](archive/hackathon-2026/submission/DEVPOST.md) records managed
   retry as implemented and deployed, with the timeout → retry → escalate sequence marked as not
   yet captured rather than upgraded to observed.
 - The `Makefile` exposes `verify`, `smoke`, `rollback`, and `teardown` against the real

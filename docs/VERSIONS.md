@@ -5,7 +5,7 @@ This table separates the source target from measured deployments. Updated 28 Oct
 
 | Scope | Framework / revision | What the evidence establishes |
 |---|---|---|
-| Current source / v0.8.0 target | Google ADK 2.13.0; A2A SDK 1.3.0; Python 3.12 | Locked offline suite: 321 passed, 100% core coverage; production upgrade not established |
+| Release v0.8.0 (current source) | Google ADK 2.13.0; A2A SDK 1.3.0; Python 3.12 | Locked offline suite: 321 passed, 100% core coverage; production upgrade not established |
 | Submitted v0.7.0 tree | `google-adk` v2.8.0 source pin | Historical submission source, distinct from its deployed resolution |
 | August fleet observations | Recorded `google-adk` v2.7.1 resolution deployed by v0.4.0 | Dated observations; evidence 11–13 identify code revision `c81b4af` |
 | 27 October study | Same worker revisions and Runtime update metadata as August | 20 completed investigations; installed packages were not freshly inventoried |
@@ -25,6 +25,5 @@ replace old version labels with current pins, or infer deployment from a README 
 The report's Section 4.1 contains its cohort table. Release/source changes do not upgrade
 the framework version of any measurement already in the report.
 
-The Python v0.8.0 release is currently blocked by the [dependency audit](DEPENDENCY-STATUS.md).
-The static console can publish corrected dated evidence independently, and labels the source
-version as release pending. No production upgrade or released tag is implied.
+v0.8.0 is released as source with one accepted advisory ([dependency status](DEPENDENCY-STATUS.md)).
+It does not upgrade production: the fleet still runs its August deployment (verified 28 October).

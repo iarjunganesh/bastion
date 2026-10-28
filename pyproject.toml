@@ -8,6 +8,8 @@ license = { file = "LICENSE" }
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# Archived hackathon tooling is frozen as submitted; it is a record, not maintained code.
+extend-exclude = ["archive"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "ANN201", "S"]

@@ -1,4 +1,14 @@
 {
+  // Single markdownlint configuration for the CLI, CI and editors.
+  "config": {
+    "MD013": false,
+    "MD041": false,
+    "MD033": {
+      "allowed_elements": ["p", "em", "strong", "picture", "source", "img", "a", "br", "details", "summary"]
+    },
+    "MD024": { "siblings_only": true },
+    "MD060": { "style": "padded" }
+  },
   "ignores": [
     ".audit-venv/**",
     ".tmp/**",

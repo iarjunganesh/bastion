@@ -5,11 +5,11 @@ preserved in [DEVPOST.md](../DEVPOST.md); this file maps that wording to reposit
 
 | Gate / criterion | Bastion answer | Proof |
 |---|---|---|
-| Gemini 3.5+ | Gemini 3.5 Flash through Vertex AI `global` | [evidence 11](../../assets/evidence/11-current-route-correlation.md) and [evidence 13](../../assets/evidence/13-current-route-trace.md) on the current deployed route; [evidence 02](../../assets/evidence/02-gemini-investigation.md) retained as historical; pinned config |
+| Gemini 3.5+ | Gemini 3.5 Flash through Vertex AI `global` | [evidence 11](../../../../assets/evidence/11-current-route-correlation.md) and [evidence 13](../../../../assets/evidence/13-current-route-trace.md) on the current deployed route; [evidence 02](../../../../assets/evidence/02-gemini-investigation.md) retained as historical; pinned config |
 | Google agent framework | Google ADK 2.13.0 and official A2A SDK | Runtime/agent code, version gate |
-| GCP infrastructure | Managed Runtime/Memory/Gateway/Registry plus Cloud Run, Firestore, Eventarc, Model Armor, Logging/Monitoring | [evidence 04–07](../../assets/README.md) |
-| Innovation and utility | Read-only IAM review of the same project that runs the agents; deterministic self-audit and human exception memory | [ADR-001](../../docs/adr/001-real-iam-not-mock-data.md) |
-| Technical implementation | Durable admission/leases/retry/DLQ, no direct production bypass, fixed schemas, Model Armor, separated identities | [architecture](../../docs/ARCHITECTURE.md), [P0/P1 ledger](08-audit-remediation-plan.md) |
+| GCP infrastructure | Managed Runtime/Memory/Gateway/Registry plus Cloud Run, Firestore, Eventarc, Model Armor, Logging/Monitoring | [evidence 04–07](../../../../assets/README.md) |
+| Innovation and utility | Read-only IAM review of the same project that runs the agents; deterministic self-audit and human exception memory | [ADR-001](../../../../docs/adr/001-real-iam-not-mock-data.md) |
+| Technical implementation | Durable admission/leases/retry/DLQ, no direct production bypass, fixed schemas, Model Armor, separated identities | [architecture](../../../../docs/ARCHITECTURE.md), [P0/P1 ledger](../../../../docs/research/remediation-ledger.md) |
 | Demo and presentation | Catalog → durable event → governed route → denial/refusal → minimized review → audit dashboard | [storyboard](02-demo-storyboard.md) |
 
 ## Track-specific questions
@@ -17,7 +17,7 @@ preserved in [DEVPOST.md](../DEVPOST.md); this file maps that wording to reposit
 | Requirement | Evidence-backed response |
 |---|---|
 | Cataloged for cross-department use | Three governed agent entries, institutional Agent Card metadata, deterministic department ownership, unknown-route refusal |
-| Context across weeks of asynchronous operations | Managed session/memory plus Firestore lifecycle and expiring approved exceptions; suppression observed after a real three-day gap across deployments/restarts, with expiry firing test-only ([evidence 10](../../assets/evidence/10-cross-week-suppression.md)) |
+| Context across weeks of asynchronous operations | Managed session/memory plus Firestore lifecycle and expiring approved exceptions; suppression observed after a real three-day gap across deployments/restarts, with expiry firing test-only ([evidence 10](../../../../assets/evidence/10-cross-week-suppression.md)) |
 | Production data and compliance/security | Read-only live IAM, pre-model minimisation, `global` disclosure, protected output screen, IAM-private count-only findings, payload-free audit |
 | Separation of concerns | Runtime Orchestrator, IAM-read Auditor, no-IAM-read Escalation; negative permission proof |
 | Failure-tolerant routing | Lease/reclaim, duplicate collapse, retry/DLQ, malformed response and dependency-outage tests |

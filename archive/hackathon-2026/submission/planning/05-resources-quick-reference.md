@@ -4,12 +4,12 @@
 
 - [Captured official brief](../DEVPOST.md)
 - [Submission checklist](../SUBMISSION.md)
-- [Architecture](../../docs/ARCHITECTURE.md)
-- [Security](../../SECURITY.md)
-- [Data governance](../../docs/DATA_GOVERNANCE.md)
-- [Operations](../../docs/OPERATIONS.md)
-- [ADRs](../../docs/adr/README.md)
-- [Evidence index](../../assets/README.md)
+- [Architecture](../../../../docs/ARCHITECTURE.md)
+- [Security](../../../../SECURITY.md)
+- [Data governance](../../../../docs/DATA_GOVERNANCE.md)
+- [Operations](../../../../docs/OPERATIONS.md)
+- [ADRs](../../../../docs/adr/README.md)
+- [Evidence index](../../../../assets/README.md)
 
 ## Operator entry points
 
@@ -21,9 +21,9 @@
 - `scripts/capture_gcp_state.py` — count-only live inventory
 - `scripts/render_diagrams.py` — SVG variants and GIFs
 - `scripts/redact_evidence.py` — declared masks for promoted PNGs and MP4s; `--check` is the gate
-- `scripts/generate_demo_voiceover.py` — narration, captions, and the measured shot table
-- `scripts/assemble_demo_video.py` — cuts the video from that narration; `--check` reports the plan
-- `scripts/capture_site_hook.mjs` — records the opening beat from the live public console
+- `archive/hackathon-2026/scripts/generate_demo_voiceover.py` — narration, captions, and the measured shot table
+- `archive/hackathon-2026/scripts/assemble_demo_video.py` — cuts the video from that narration; `--check` reports the plan
+- `archive/hackathon-2026/scripts/capture_site_hook.mjs` — records the opening beat from the live public console
 
 ## Fixed versions and regions
 

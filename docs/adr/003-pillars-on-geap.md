@@ -1,7 +1,7 @@
 # ADR-003: Use the managed enterprise agent platform
 
 **Status:** Accepted 2026-08-13; amended 2026-08-15 and verified 2026-08-16  
-**Traces to:** [hackathon brief](../../submission/DEVPOST.md)
+**Traces to:** [hackathon brief](../../archive/hackathon-2026/submission/DEVPOST.md)
 
 ## Decision
 

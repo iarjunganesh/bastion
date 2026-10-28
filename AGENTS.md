@@ -1,14 +1,15 @@
 # AGENTS.md
 
 Canonical repository guidance for Codex, Claude Code, GitHub Copilot, and contributors.
-Read HANDOFF.md next, then BASTION-REPORT-ROADMAP.md and docs/UPGRADE-PLAN.md.
+Read HANDOFF.md next, then docs/research/report-plan.md and docs/UPGRADE-PLAN.md.
 
 ## Shared state and private material
 
 - Update root HANDOFF.md Current state, Next step, and Session log before ending work.
 - Canonical manuscript sources live in report/. Never replace them with private historical copies.
-- .local/ holds private captures, study checkpoints, publication notes, and historical plans.
-  It is ignored, durable, and must never be committed or deleted during routine cleanup.
+- .local/ is the ignored home for private captures, study checkpoints and private values such as
+  the credit record. Never commit it. Its pre-28-October history was archived outside the
+  repository and removed at the maintainer's request; do not recreate it from old copies.
 - Root guidance and roadmaps contain only public-safe project state.
 - The 28 October maintainer request authorizes the ADK upgrade, documentation/site reconciliation,
   and a v0.8.0 release after validation. Preserve report edits uncommitted on the feature branch
@@ -18,7 +19,8 @@ Read HANDOFF.md next, then BASTION-REPORT-ROADMAP.md and docs/UPGRADE-PLAN.md.
 
 ## Project and current state
 
-Bastion is a Fortified Enterprise Fleet submission for the All Things Agentic Hackathon. Three
+Bastion began as a Fortified Enterprise Fleet submission to the All Things Agentic Hackathon and
+now supports a technical report. Three
 Google ADK agents review a real GCP IAM policy from approved asynchronous events: a managed Runtime
 Orchestrator, a read-only Access Auditor, and a no-IAM-read Escalation Agent.
 
@@ -33,28 +35,16 @@ Five of seven observation captures are closed. Current-route IAM provenance, the
 Model Armor refusal, the correlated payload-free audit trail and the Cloud Trace chain were all
 captured on 2026-08-25 (evidence 11, 12, 13). Two remain deliberately open and their claims stay
 narrowed: a managed Gateway refusal of an unregistered caller, and a watched
-timeout/retry/dead-letter sequence. The five Devpost gallery images were composed on
-2026-08-27 from those captures and are all dark; three carry captions narrowed to the panels
-actually captured.
+timeout/retry/dead-letter sequence.
 
-**The demo video is assembled, not edited.** As of 2026-08-29 `assets/demo-video/bastion.mp4`
-exists: **3:53**, twelve beats, built by
-[`scripts/assemble_demo_video.py`](scripts/assemble_demo_video.py) from the committed narration
-rather than from a timeline editor, so the picture cannot drift from the sound. The opening is a
-recording of the live public console; the rest is the redacted console and terminal evidence
-retained as evidence 11, 12 and 13, plus the generated architecture and brand masters. The
-narration therefore says the cut was **captured from the deployed fleet**, not that it happens live
-on camera. It was published on 2026-08-29 at [https://youtu.be/Xpj8YmzFfpk](https://youtu.be/Xpj8YmzFfpk) with the 36-cue
-caption track attached, and any beat can still be upgraded by dropping a screen recording into
-`assets/demo-video/beats/`, which takes precedence automatically — a re-cut means re-uploading,
-since the URL now points at a fixed file.
-
-**The hackathon is over; the Devpost page still reads from `main`.** The entry was submitted on
-2026-08-29 and judging has closed; no award is claimed anywhere. The judging freeze no longer
-applies, but the public project page still embeds the architecture image from
-`raw.githubusercontent.com/.../main/`, so a `scripts/render_diagrams.py` run on `main` silently
-changes that page. Re-render on `main` only as an explicit decision. The video is a fixed YouTube
-upload that cannot be replaced in place. Tag `v0.7.0` is the submission.
+**The hackathon is over and its material is archived.** The entry was submitted on 2026-08-29
+and judging has closed; no award is claimed anywhere. Tag `v0.7.0` is the submission. Devpost
+copy, planning, gallery images, demo video sources and their tooling live, frozen, in
+[archive/hackathon-2026/](archive/hackathon-2026/README.md); the published video is a fixed
+YouTube upload. The Devpost page still embeds the architecture image from
+`raw.githubusercontent.com/.../main/` and links a few files on `main`, so those stay in place, and
+a `scripts/render_diagrams.py` run on `main` silently changes that page. Re-render on `main` only
+as an explicit decision.
 
 **A technical report is in progress** under `report/` (local draft): C1-C3 from the
 August captures plus the separately dated
@@ -74,10 +64,9 @@ Read these before changing architecture or claims:
 | [ADRs](docs/adr/README.md) | Decisions and accepted risks |
 | [Security](SECURITY.md) | Data/credential and enforcement rules |
 | [Data governance](docs/DATA_GOVERNANCE.md) | Field-level processing and sovereignty |
-| [Official brief](submission/DEVPOST.md) | Captured source requirements; do not paraphrase over it |
-| [Submission ledger](submission/SUBMISSION.md) | Engineering proof versus human publication tasks |
-| [P0/P1 ledger](submission/planning/08-audit-remediation-plan.md) | Remediation closure |
-| [Observation backlog](submission/planning/09-capture-backlog.md) | Deployed but not yet observed |
+| [Claim matrix](docs/research/claim-matrix.md) | Bounds every public and report claim |
+| [P0/P1 ledger](docs/research/remediation-ledger.md) | Remediation closure |
+| [Observation backlog](docs/research/observation-backlog.md) | Deployed but not yet observed |
 | [Evidence](assets/README.md) | Redacted observations and their proof boundaries |
 
 ## Non-negotiable architecture
@@ -140,7 +129,10 @@ npx markdownlint-cli2 "**/*.md"
 
 Before a tag only, `python scripts/check_versions.py --check-upstream` may use the network.
 
-Live operator commands require explicit environment values and approved credentials:
+Live operator commands require explicit environment values and approved credentials. The
+author's default `gcloud` project is not Bastion's: pass `--project bastion-fleet-2026` to every
+CLI call, select the same project as each client library's quota project, and check CLI
+authentication as JSON rather than text.
 
 ```powershell
 python -m infrastructure.verify_fleet
@@ -217,9 +209,11 @@ full diff, run offline/live gates appropriate to the change, and verify GitHub A
 ## Credits-only execution condition
 
 No new billable GCP work is authorized unless covered by the allocated credits with
-no credit-card charges. The private numeric ceiling and billing verification are in
-`.local/credit-verification.json`. Paid-account credit spillover and eligibility remain
-unresolved; hold deployment and paid controls. Budget alerts are not billing hard caps.
+no credit-card charges. The private numeric ceiling and billing verification belong in
+`.local/credit-verification.json`. Eligibility was verified on 28 October: all October usage,
+the 27 October study included, was fully offset by credits. There is still no hard cap, so paid
+work runs only as approved, capped chunks with a next-day billing check, and the fleet must reach
+its agreed end state before the credits expire. Budget alerts are not billing hard caps.
 Never change billing linkage, payment methods, IAM or enable paid products to bypass this hold.
 
 ## Report generation order (maintainer correction, 28 October)

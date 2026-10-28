@@ -30,7 +30,7 @@ computed in the browser from the `datetime` attribute `check_site.py` already pi
 the selected count-only snapshot's `captured_utc` — there is no second source and no request, because a page that
 fetched its own freshness would be claiming a liveness this console deliberately does not have. It
 exists to make staleness visible rather than leave a reader to subtract dates. The footer names the
-source version and explicitly marks an unreleased candidate; that string is written in `index.html` and gated against
+source version and its release state; that string is written in `index.html` and gated against
 `pyproject.toml` rather than substituted during the build, so the deployed bytes stay identical to
 the reviewed source and `check_site.py` can keep failing on any drift between them.
 

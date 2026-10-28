@@ -1,7 +1,7 @@
 """Demo narration: text, audio, measured durations, and captions.
 
 **This file is the source of truth for the narration.** The shot table in
-`submission/DEMO_SCRIPT.md`, the MP3s under `assets/demo-voiceover/`, and the caption track are
+`archive/hackathon-2026/submission/DEMO_SCRIPT.md`, the MP3s under `archive/hackathon-2026/assets/demo-voiceover/`, and the caption track are
 all generated from ``NARRATION`` below. Edit the words here, re-run, and paste the emitted table
 back into the shooting script. Editing the table in the doc instead is how a script and its
 committed audio drift apart, which is worse than either being wrong alone: the recording session
@@ -20,15 +20,15 @@ measured, and those real per-sentence durations are scaled to the beat clip's me
 So a cue boundary is a *measurement scaled by a measured ratio*, never a word-count estimate —
 but it is a scaled measurement, not a direct one, and it is written down here rather than implied.
 
-Narration wording is bounded by `submission/planning/11-claim-matrix.md`. Every sentence below
+Narration wording is bounded by `docs/research/claim-matrix.md`. Every sentence below
 must be defensible against a row in that matrix; the two `Partial` rows — managed Gateway refusal
 and retry/dead-letter — are deliberately absent from the script entirely rather than narrowed.
 
 Usage:
-    python scripts/generate_demo_voiceover.py             # synthesise every clip, then captions
-    python scripts/generate_demo_voiceover.py --table     # measure existing clips, print the table
-    python scripts/generate_demo_voiceover.py --clip hook # re-do one beat after a wording change
-    python scripts/generate_demo_voiceover.py --audition  # one line in every candidate voice
+    python archive/hackathon-2026/scripts/generate_demo_voiceover.py             # synthesise every clip, then captions
+    python archive/hackathon-2026/scripts/generate_demo_voiceover.py --table     # measure existing clips, print the table
+    python archive/hackathon-2026/scripts/generate_demo_voiceover.py --clip hook # re-do one beat after a wording change
+    python archive/hackathon-2026/scripts/generate_demo_voiceover.py --audition  # one line in every candidate voice
 """
 
 from __future__ import annotations
@@ -395,7 +395,7 @@ def main() -> int:
     if not arguments.table:
         cues = write_captions(measured)
         print(f"\nwrote {SRT_PATH.relative_to(ROOT).as_posix()} ({cues} cues)")
-    print("\nShot table for submission/DEMO_SCRIPT.md:\n")
+    print("\nShot table for archive/hackathon-2026/submission/DEMO_SCRIPT.md:\n")
     print(shot_table(measured))
     return 0
 

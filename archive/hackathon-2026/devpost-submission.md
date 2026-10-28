@@ -36,7 +36,7 @@ A private fleet of catalogued agents that audits live GCP IAM, remembers human d
 ### Thumbnail
 
 - Required format: JPG, PNG, or GIF; maximum 5 MB; Devpost recommends 3:2.
-- Prepared asset: `assets/brand/devpost-thumbnail-3x2.png`.
+- Prepared asset: `archive/hackathon-2026/assets/brand/devpost-thumbnail-3x2.png`.
 - Alt text: `Bastion: catalogued agents, durable context, and governed production access.`
 - Upload manually only after opening the file and confirming the final crop.
 
@@ -44,7 +44,7 @@ A private fleet of catalogued agents that audits live GCP IAM, remembers human d
 
 ### About the project
 
-Paste the contents of [`submission/DEVPOST_README.md`](submission/DEVPOST_README.md). It is a
+Paste the contents of [`archive/hackathon-2026/submission/DEVPOST_README.md`](./submission/DEVPOST_README.md). It is a
 judge-facing submission narrative, not a mirror of the repository README. The repository README
 remains the engineering source of truth; the Devpost version leads with value, proof, and limits.
 
@@ -81,7 +81,7 @@ the IAM-private production fleet.
 ### Image gallery
 
 Upload only the five final files defined in
-[`submission/CAPTURE_RUNBOOK.md`](submission/CAPTURE_RUNBOOK.md), in this order:
+[`archive/hackathon-2026/submission/CAPTURE_RUNBOOK.md`](./submission/CAPTURE_RUNBOOK.md), in this order:
 
 1. `01-enterprise-fleet-architecture.png`
 2. `02-governed-agent-catalog.png`
@@ -92,7 +92,7 @@ Upload only the five final files defined in
 All five exist as of 2026-08-27, are 1920×1080 dark PNGs under 1 MB each, and pass
 `python scripts/redact_evidence.py --check`. Three carry narrowed captions because the panels they
 originally planned were not captured; the exact wording to use is in
-[`submission/CAPTURE_RUNBOOK.md`](submission/CAPTURE_RUNBOOK.md).
+[`archive/hackathon-2026/submission/CAPTURE_RUNBOOK.md`](./submission/CAPTURE_RUNBOOK.md).
 
 Each must be JPG, PNG, or GIF, no more than 5 MB, readable as a thumbnail, and free of private
 origins, principals, tokens, prompts, responses, and raw IAM policy data.
@@ -105,10 +105,10 @@ https://youtu.be/Xpj8YmzFfpk
 
 Requirements: public, English narration or English subtitles, under four minutes, live behavior,
 and visible proof that the backend runs on Google Cloud. Follow
-[`submission/DEMO_SCRIPT.md`](submission/DEMO_SCRIPT.md).
+[`archive/hackathon-2026/submission/DEMO_SCRIPT.md`](./submission/DEMO_SCRIPT.md).
 
-Published 2026-08-29 from `assets/demo-video/bastion.mp4`: **3:53**, seven seconds inside the
-ceiling, 1920×1080, with the 36-cue caption track at `assets/demo-video/bastion.srt` attached as
+Published 2026-08-29 from `archive/hackathon-2026/assets/demo-video/bastion.mp4`: **3:53**, seven seconds inside the
+ceiling, 1920×1080, with the 36-cue caption track at `archive/hackathon-2026/assets/demo-video/bastion.srt` attached as
 English subtitles. Every frame comes from a source the redaction gate has cleared.
 
 ## Additional Info
@@ -156,7 +156,7 @@ Python 3.12: git clone https://github.com/iarjunganesh/bastion; cd bastion; py -
 ```
 
 The clean-clone measurement and environment notes are in
-[`submission/planning/10-reproducibility.md`](submission/planning/10-reproducibility.md).
+[`archive/hackathon-2026/submission/planning/10-reproducibility.md`](./submission/planning/10-reproducibility.md).
 
 ### Google SDKs used
 
@@ -205,7 +205,7 @@ before submission.
 ### Bonus: public content URL
 
 ```text
-TODO — publish submission/ARTICLE_DRAFT.md, then paste its public URL
+TODO — publish archive/hackathon-2026/submission/ARTICLE_DRAFT.md, then paste its public URL
 ```
 
 The published article must retain the hackathon disclosure in the draft.
@@ -213,7 +213,7 @@ The published article must retain the hackathon disclosure in the draft.
 ### Bonus: social post URL
 
 ```text
-TODO — publish one approved variant from submission/SOCIAL_DRAFT.md, then paste its public URL
+TODO — publish one approved variant from archive/hackathon-2026/submission/SOCIAL_DRAFT.md, then paste its public URL
 ```
 
 The public post must contain `#AllThingsAgenticHackathon` exactly.
@@ -243,7 +243,7 @@ claim.
 - The current snapshot is event-driven and claims no deployed recurring Scheduler job.
 - Two observations remain deliberately open: a managed Gateway refusal of an unregistered caller,
   and a watched timeout/retry/dead-letter sequence. Use the narrower wording in
-  [`submission/planning/11-claim-matrix.md`](submission/planning/11-claim-matrix.md) for both, and
+  [`docs/research/claim-matrix.md`](../../docs/research/claim-matrix.md) for both, and
   never call the instance cap or delivery bound a per-caller rate limit. The agent-mediated Model
   Armor refusal and the current-route Cloud Trace chain closed on 2026-08-25 and may now be stated
   as observed.

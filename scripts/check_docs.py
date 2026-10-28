@@ -138,7 +138,7 @@ def check_model_config() -> None:
         fail("README.md references gemini-3.5-pro, which is unavailable — see ADR-004")
 
 
-BADGE_DOCS = ("README.md", "submission/DEVPOST_README.md")
+BADGE_DOCS = ("README.md", "archive/hackathon-2026/submission/DEVPOST_README.md")
 
 
 def check_badge_versions() -> None:
@@ -220,9 +220,9 @@ def check_no_self_asserted_status_badges() -> None:
 
 def check_unverified_claims() -> None:
     """Claims the submission has not yet earned are not asserted as done."""
-    submission = read("submission/SUBMISSION.md")
-    if "Do not claim until verified" not in submission:
-        fail("submission/SUBMISSION.md lost its 'Do not claim until verified' section")
+    ledger = "archive/hackathon-2026/submission/SUBMISSION.md"
+    if "Do not claim until verified" not in read(ledger):
+        fail(f"{ledger} lost its 'Do not claim until verified' section")
 
 
 def check_retired_deployment_claims() -> None:
@@ -237,10 +237,10 @@ def check_retired_deployment_claims() -> None:
         "CLAUDE.md",
         "AGENTS.md",
         "CONTRIBUTING.md",
-        "submission/SUBMISSION.md",
-        "submission/planning/00-judging-matrix.md",
-        "submission/planning/03-build-plan.md",
-        "submission/planning/04-why-we-win.md",
+        "archive/hackathon-2026/submission/SUBMISSION.md",
+        "archive/hackathon-2026/submission/planning/00-judging-matrix.md",
+        "archive/hackathon-2026/submission/planning/03-build-plan.md",
+        "archive/hackathon-2026/submission/planning/04-why-we-win.md",
     )
     retired = (
         "Managed fleet deployment is still outstanding",
@@ -337,7 +337,7 @@ def check_diagrams_are_grounded() -> None:
 
 MARKDOWN_LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 BACKTICKED_PATH = re.compile(
-    r"`((?:docs|submission|assets|agents|scripts|infrastructure|tests|registry|runtime"
+    r"`((?:archive|docs|submission|assets|agents|scripts|infrastructure|tests|registry|runtime"
     r"|memory|gateway|model_armor|observability)/[\w./-]+\.(?:md|py|sh|json|ya?ml|svg))`"
 )
 SKIP_DIRS = {
@@ -356,7 +356,7 @@ SKIP_DIRS = {
 # A repository path written in prose, with or without backticks. Used on source files,
 # where paths live in docstrings and shell comments that no linter reads.
 PROSE_PATH = re.compile(
-    r"(?<![\w/-])((?:docs|submission|assets|agents|scripts|infrastructure|tests)"
+    r"(?<![\w/-])((?:archive|docs|submission|assets|agents|scripts|infrastructure|tests)"
     r"/[\w./-]+\.(?:md|py|sh|json|ya?ml))"
 )
 

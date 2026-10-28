@@ -2,9 +2,13 @@
 
 Requested 28 October 2026. Execute in the existing `feature/technical-report` branch.
 
+**Sequencing note, 28 October:** the [report master plan](research/report-plan.md) proposes
+decoupling this track from the report (decision D1). Until the maintainer answers D1, do not start
+step 5; the control matrix below is scheduled there as evidence chunks E1–E6.
+
 ## Constraints
 
-- Preserve starting report edits and all `.local/` material; keep manuscript changes uncommitted
+- Preserve starting report edits; keep manuscript changes uncommitted
   as explicitly requested; report sources/build tools are excluded from release commits.
 - Latest stable ADK is 2.13.0 (PyPI/upstream verified 28 October); Python remains 3.12.
 - Resolve required A2A, Google SDK, and telemetry dependencies together; regenerate the lock.
@@ -61,28 +65,18 @@ Production fault injection, policy changes, destructive cleanup, DOI deposits, a
 submission are not routine verification actions. Use the narrowest test surface that proves
 the control and keep actual human approval requirements intact.
 
-## Credits-only execution condition
+## Credits-only execution and report order
 
-No new billable GCP work is authorized unless covered by the allocated credits with
-no credit-card charges. The private numeric ceiling and billing verification are in
-`.local/credit-verification.json`. Paid-account credit spillover and eligibility remain
-unresolved; hold deployment and paid controls. Budget alerts are not billing hard caps.
-Never change billing linkage, payment methods, IAM or enable paid products to bypass this hold.
+Both rules are in [AGENTS.md](../AGENTS.md) and are not repeated here: paid work only within
+allocated credits with no card charges, and one clean report generation after the evidence work.
 
-## Report generation order (maintainer correction, 28 October)
+## Release status
 
-Stop iterative manuscript/PDF amendments and rebuilds. Finish the code, dependency, site,
-deployment and feasible control/evidence work first. Then reconcile the final evidence and
-generate one clean technical report. The current report is an interim local draft; preserve
-it uncommitted. Do not rebuild it as a routine gate during the remaining implementation.
-
-## Current release blockers
-
-The local refreshed runtime passes the full offline core gate, but the dependency audit still
-finds the ADK-constrained OpenTelemetry advisory. See [DEPENDENCY-STATUS.md](DEPENDENCY-STATUS.md).
-Do not tag a Python release while that gate fails. PR #1 was merged on GitHub; dependency
-remediation and an explicit release-pending site stamp are a follow-up. Credits-only paid
-execution remains held independently. No report/PDF work until engineering/evidence are settled.
+v0.8.0 is released as source on 28 October with one accepted, documented advisory; see
+[DEPENDENCY-STATUS.md](DEPENDENCY-STATUS.md) and [issue #3](https://github.com/iarjunganesh/bastion/issues/3) for its removal. It does not
+upgrade production: the fleet still runs its August deployment, and under decision D1 the
+redeploy (step 5) waits until after the report's evidence freeze. The report remains
+uncommitted and excluded from the release.
 
 ## Verified closeout
 
@@ -91,6 +85,6 @@ reviewed source. Desktop/mobile checks pass. The refreshed 150-package environme
 321 core-suite cases at 100% configured coverage and mypy on 40 files. The existing fleet's
 read-only configuration verifier passes with no new events, model calls or deployment.
 
-PR #2 retains the security remediation and the unresolved OpenTelemetry audit. No v0.8.0
-tag/release exists. Paid GCP work remains held by the credits-only condition. The report is
-preserved locally; no further manuscript/PDF edits occurred after the maintainer's correction.
+PR #2 carried the security remediation; the remaining OpenTelemetry advisory was accepted for
+v0.8.0 with a documented single-ID exception. The report is preserved locally; no further
+manuscript/PDF edits occurred after the maintainer's correction.

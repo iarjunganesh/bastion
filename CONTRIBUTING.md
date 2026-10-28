@@ -6,7 +6,7 @@ production change.
 ## Before changing code
 
 Read [architecture](docs/ARCHITECTURE.md), [ADRs](docs/adr/README.md),
-[security](SECURITY.md), and the [submission proof ledger](submission/SUBMISSION.md). Amend an ADR
+[security](SECURITY.md), and the [submission proof ledger](archive/hackathon-2026/submission/SUBMISSION.md). Amend an ADR
 in the same change when implementation reverses a recorded decision.
 
 ## Python 3.12 setup
@@ -21,7 +21,7 @@ gcloud auth application-default login
 
 `py -3.12` resolves only a CPython registered with the Windows launcher. If `py -0p` does not list
 3.12, call that interpreter by its own path, or use `python3.12 -m venv .venv` on macOS and Linux —
-see [10-reproducibility.md](submission/planning/10-reproducibility.md).
+see [10-reproducibility.md](archive/hackathon-2026/submission/planning/10-reproducibility.md).
 
 `GOOGLE_CLOUD_LOCATION=global` is the Gemini endpoint; `GCP_REGION=europe-north2` is workload
 placement. Do not merge them.

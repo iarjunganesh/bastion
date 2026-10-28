@@ -160,4 +160,4 @@ deployment is event-driven and claims no recurring Scheduler job. Those are desi
 boundaries, not capabilities hidden in fine print.
 
 Version note (28 October 2026): this repository draft tracks the upgraded source.
-The submitted Devpost page/video are historical; see [version provenance](../docs/VERSIONS.md).
+The submitted Devpost page/video are historical; see [version provenance](../../../docs/VERSIONS.md).

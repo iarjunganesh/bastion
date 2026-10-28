@@ -4,7 +4,7 @@ This directory holds only the five final, redacted, judge-facing PNGs. Raw conso
 discarded takes stay under ignored `.takes/` and must never be committed.
 
 The required order, captions, sources, redaction rules, and acceptance checks are defined in
-[`submission/CAPTURE_RUNBOOK.md`](../../submission/CAPTURE_RUNBOOK.md).
+[`archive/hackathon-2026/submission/CAPTURE_RUNBOOK.md`](../../submission/CAPTURE_RUNBOOK.md).
 
 Expected files:
 
@@ -23,7 +23,7 @@ Do not add a file until it has passed sensitive-data inspection at 200% zoom.
 1. Keep the original capture unchanged under ignored `.takes/<date>/`.
 2. Crop or compose a separate final copy into this directory.
 3. Inspect the final copy at 200% zoom. Record it in `REDACTIONS` in
-   [`scripts/redact_evidence.py`](../../scripts/redact_evidence.py), using an empty tuple only when
+   [`scripts/redact_evidence.py`](../../../../scripts/redact_evidence.py), using an empty tuple only when
    it genuinely needs no mask.
 4. Run `python scripts/redact_evidence.py` to apply declared masks, then run it again with
    `--check`.
