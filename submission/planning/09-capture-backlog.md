@@ -9,11 +9,11 @@ holds that a pillar closes only when implementation, deployment, and an observab
 and [SUBMISSION.md](../SUBMISSION.md)'s checkbox convention means *observed*, not *built*. A
 capability with code and no capture is deliberately not claimed.
 
-## Carried in from `v0.6.0` — the repository moved and the deployment did not
+## Upgrade verification — source and deployment are separate
 
-**Both surfaces still run the `google-adk` 2.7.1 resolution `v0.4.0` deployed; the repository now
-pins 2.8.0.** This is not an observation gap in the usual sense — the capability is not merely
-unwatched, the deployment is a release behind the tree that describes it. It sits here because the
+**Current source target: Google ADK 2.13.0.** The retained evidence describes the historical
+fleet; upgraded production is unverified until both deployment surfaces pass. See
+[version provenance](../../docs/VERSIONS.md). The
 consequence is observational: redeploying mints new Cloud Run revisions, and
 [evidence 11](../../assets/evidence/11-current-route-correlation.md) and
 [12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md) name
@@ -27,6 +27,12 @@ The alternative is equally acceptable and costs nothing: leave the fleet where i
 which is what every current claim already does.
 
 ## Why this file exists
+
+The [27 October report validation](../../assets/evidence/14-live-validation.md) adds
+20 successful executions and bounded replay/trace observations on unchanged deployment
+metadata. It does not close captures 6 or 7, establish per-message replay delivery, refresh the
+binding census, or freshly enumerate installed package resolution. Its collector pause was
+recovered read-only without rerunning an investigation.
 
 The backlog previously lived only in an untracked scratch file. A record of outstanding work that
 is itself untracked is the failure mode this repository argues against, and one correction below

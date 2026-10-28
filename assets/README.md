@@ -1,4 +1,4 @@
-# Judge-facing assets and evidence
+# Assets and evidence
 
 Bastion's central claim is backed by redacted captures rather than architecture prose alone:
 
@@ -23,6 +23,12 @@ Bastion's central claim is backed by redacted captures rather than architecture 
 | [11 — current-route correlation](evidence/11-current-route-correlation.md) | One fresh investigation completed across Runtime, deployed Auditor and Escalation revisions, and Gemini 3.5 Flash; a companion probe measured 62 bindings, 3 canonical findings, and 2 post-policy deliveries | Payload-free route correlation plus count-only companion measurement; composed into gallery images 03 and 05 on 2026-08-27 |
 | [12 — agent-mediated Model Armor refusal](evidence/12-agent-mediated-model-armor-refusal.md) | The deployed Auditor callback refused the approved injection sample and its A2A task failed before another model or tool call | Direct authenticated Auditor probe, not a durable Runtime investigation; reviewed raw source awaits the IAM-denial composite |
 | [13 — current-route trace](evidence/13-current-route-trace.md) | One connected 22-span Cloud Trace covered the managed Runtime, both A2A workers with their agent-card fetches, the Firestore exception lookup inside the policy step, and the completion gate | Sampled explanatory telemetry with span attributes deliberately unopened; not the retained compliance record and not a latency claim |
+| [14 - bounded live validation](evidence/14-live-validation.md) | 27 Oct: 20 real-IAM investigations completed in one durable attempt each; 560 audit records/60 invocations, 40 model submissions, 40 review records and three delivered finding instances per run | Post-hackathon report supplement, not the submitted demo; one project, documented collector recovery, 5s-poll confirmation timing, bounded replay observations and one time-matched trace; no new binding census, C4 result or historical SLO claim |
+
+The August captures and gallery remain dated publication records. Evidence 14 adds a
+separately dated operational validation and verified data bundle; it does not refresh the
+27 August infrastructure inventory, replace evidence 11's 25 August binding count, or close
+the two unobserved refusal/retry controls.
 
 ## Architecture and brand assets
 
@@ -104,3 +110,7 @@ surface without exposing a principal.
 Supporting captures promoted under `evidence/screenshots/` are covered by the same redaction gate
 as the gallery, because a file promoted to back a written record is likelier to be copied from
 `.takes/` unreviewed.
+
+Current inventory is separately recorded in [evidence 15](evidence/15-fleet-inventory.md):
+28 October count-only census, 21 APIs/39 resources. It does not update the historical
+binding count, prove a framework upgrade, or replace the August architecture masters.

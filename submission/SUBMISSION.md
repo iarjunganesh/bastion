@@ -9,9 +9,16 @@ or a media platform.
 
 ## Pass/fail technology gates
 
+The submitted packet and August observations below remain dated records. A separate
+[post-hackathon report supplement](../assets/evidence/14-live-validation.md), collected
+27 October, records 20 real-IAM executions on unchanged deployment metadata. It is not part
+of the submitted video/gallery and does not close the two partial refusal/retry observations
+or create an award claim. Its method and limits are integrated in the
+local technical report draft (intentionally uncommitted).
+
 - [x] Gemini 3.5 Flash through Vertex AI `global`; live calls captured in
       [evidence 02](../assets/evidence/02-gemini-investigation.md).
-- [x] Google ADK 2.8.0; three ADK agents, A2A workers, plugins, tools, and managed Runtime.
+- [x] Google ADK 2.13.0 source target; three ADK agents, A2A workers, plugins, tools, and managed Runtime.
 - [x] Google Cloud infrastructure; measured deployment in
       [evidence 04](../assets/evidence/04-private-fleet-deployment.md).
 - [x] Fortified Enterprise Fleet brief addressed across Registry, Runtime, Memory, Identity,
@@ -177,7 +184,7 @@ The following claims are deliberately not made:
       only after its release metadata, full gates, pushed commit, and green `main` CI all agree.
 
 - [ ] **Redeploy both surfaces onto the `v0.6.0` dependency resolution and re-verify live.** Until
-      this happens the repository pins `google-adk` 2.8.0 while the fleet runs 2.7.1, and no claim
+      this happens the source targets the upgrade in [version provenance](../docs/VERSIONS.md), and no claim
       may say production runs the newer resolution. Doing it obliges re-capturing evidence 11, 12
       and 13 and recomposing gallery images 03, 04 and 05, because those records name the current
       Cloud Run revisions.

@@ -1,0 +1,11 @@
+{
+  "project": "bastion-fleet-2026",
+  "quota_project": "bastion-fleet-2026",
+  "location": "global",
+  "model": "gemini-3.5-flash",
+  "temperature": 0.2,
+  "max_output_tokens": 8192,
+  "pilot_max_calls": 5,
+  "max_spend_sek": 200,
+  "model_generation_enabled": false
+}

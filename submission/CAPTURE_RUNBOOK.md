@@ -326,3 +326,8 @@ continuity, which remains asserted by
       count are gated against `gcp-state.json` by `scripts/check_docs.py`.
 - [x] No screenshot upgrades a `Partial` claim without an updated evidence record.
 - [ ] A signed-out reviewer can understand the sequence without narration.
+
+Current upgrade boundary (28 October 2026): source targets Google ADK 2.13.0.
+The package resolution and checks recorded above are historical. See
+[version provenance](../docs/VERSIONS.md)
+and the upgrade plan before running new captures.

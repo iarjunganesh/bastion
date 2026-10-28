@@ -97,7 +97,7 @@ def check_agents() -> None:
         fail(f"agent directories missing: {', '.join(missing)}")
 
     count = len(AGENT_DIRS)
-    for doc in ("README.md", "docs/ARCHITECTURE.md", "CLAUDE.md"):
+    for doc in ("README.md", "docs/ARCHITECTURE.md", "AGENTS.md"):
         text = read(doc)
         for wrong in (v for k, v in WORDS.items() if k != count):
             if re.search(rf"\b{wrong} agents\b", text, re.IGNORECASE):
@@ -235,6 +235,7 @@ def check_retired_deployment_claims() -> None:
     documents = (
         "README.md",
         "CLAUDE.md",
+        "AGENTS.md",
         "CONTRIBUTING.md",
         "submission/SUBMISSION.md",
         "submission/planning/00-judging-matrix.md",
@@ -344,6 +345,7 @@ SKIP_DIRS = {
     "venv",
     ".audit-venv",
     ".tmp",
+    ".local",
     "node_modules",
     ".git",
     ".mypy_cache",
@@ -360,7 +362,11 @@ PROSE_PATH = re.compile(
 
 
 def repository_markdown() -> list[Path]:
-    return [path for path in sorted(ROOT.rglob("*.md")) if not SKIP_DIRS.intersection(path.parts)]
+    return [
+        path
+        for path in sorted(ROOT.rglob("*.md"))
+        if not SKIP_DIRS.intersection(path.relative_to(ROOT).parts)
+    ]
 
 
 def repository_sources() -> list[Path]:
@@ -369,7 +375,7 @@ def repository_sources() -> list[Path]:
         path
         for pattern in ("*.py", "*.sh")
         for path in ROOT.rglob(pattern)
-        if not SKIP_DIRS.intersection(path.parts)
+        if not SKIP_DIRS.intersection(path.relative_to(ROOT).parts)
     )
 
 

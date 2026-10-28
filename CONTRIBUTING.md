@@ -14,7 +14,7 @@ in the same change when implementation reverses a recorded decision.
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements-dev.txt
+python -m pip install -r requirements-dev.txt -c requirements.lock
 Copy-Item .env.example .env
 gcloud auth application-default login
 ```

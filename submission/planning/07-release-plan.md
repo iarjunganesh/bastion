@@ -123,7 +123,7 @@ only ever queried the packages a document names, because its purpose was catchin
 had been checked, when ten other pins were behind. The survey added here is the actual fix; the
 bump is the decision it made possible.
 
-**`opentelemetry-api` and `-sdk` did not move**, because `google-adk==2.8.0` caps them at 1.42.1.
+**`opentelemetry-api` and `-sdk` did not move**, because `google-adk` v2.8.0 caps them at 1.42.1.
 "Everything latest" is not a satisfiable resolution while the framework is pinned — the resolver
 settled that, not a judgement call.
 

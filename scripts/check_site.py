@@ -18,7 +18,7 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
-STATE = ROOT / "assets" / "architecture" / "gcp-state.json"
+STATE = ROOT / "assets" / "evidence" / "fleet-inventory-2026-10-28.json"
 CONTENT = SITE / "data" / "site-content.json"
 
 TEXT_SUFFIXES = {".css", ".html", ".js", ".json", ".md", ".mjs", ".svg", ".txt", ".xml"}
@@ -156,10 +156,12 @@ def check_snapshot_alignment() -> list[str]:
     content = json.loads(CONTENT.read_text(encoding="utf-8"))
     captured = state.get("captured_utc")
 
-    if content.get("snapshotSource") != "assets/architecture/gcp-state.json":
+    if content.get("snapshotSource") != STATE.relative_to(ROOT).as_posix():
         failures.append("site content does not name the sanitized committed snapshot as its source")
     if content.get("verifiedAt") != captured:
-        failures.append("site verifiedAt disagrees with gcp-state.json captured_utc")
+        failures.append(
+            "site verifiedAt disagrees with the selected count-only snapshot captured_utc"
+        )
 
     index = (SITE / "index.html").read_text(encoding="utf-8")
     if f'datetime="{captured}"' not in index:

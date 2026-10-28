@@ -161,7 +161,7 @@ function renderVideo(video) {
  *
  * The absolute UTC time stays authoritative and visible; this only says how far away it is, so a
  * reader sees staleness instead of having to compute it. It reads the `datetime` attribute that
- * `check_site.py` already pins to `gcp-state.json`'s `captured_utc` — there is no second source
+ * `check_site.py` already pins to the selected count-only snapshot's `captured_utc` — there is no second source
  * and no network call, because a page that fetched its own freshness would be claiming liveness
  * this console deliberately does not have. */
 function renderVerifiedAge() {

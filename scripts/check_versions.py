@@ -54,7 +54,16 @@ TRACKED: dict[str, tuple[str, ...]] = {
     "google-cloud-modelarmor": (r"google-cloud-modelarmor[=\s]*v?",),
 }
 
-DOC_GLOBS = ("*.md", "docs/**/*.md", "submission/**/*.md")
+DOC_GLOBS = (
+    "*.md",
+    "docs/**/*.md",
+    "submission/**/*.md",
+    "report/*.md",
+    "site/*.md",
+    "assets/**/*.md",
+    "experiments/**/*.md",
+    ".github/*.md",
+)
 
 # Every file holding exact pins. requirements.txt alone drives the document check, because a
 # document names a shipped dependency rather than a linter; the upstream survey reads all of

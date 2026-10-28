@@ -3,8 +3,8 @@ FROM python:3.12-slim
 WORKDIR /app
 RUN useradd --create-home --uid 10001 bastion
 
-COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+COPY requirements.txt requirements.lock /app/
+RUN pip install --no-cache-dir -r /app/requirements.txt -c /app/requirements.lock
 
 COPY agents /app/agents
 COPY gateway /app/gateway

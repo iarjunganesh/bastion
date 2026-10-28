@@ -12,6 +12,7 @@ deterministic code and is neither persisted by Bastion nor sent to Gemini.
 | Human-review request | Private findings API | Count, department, categories, deterministic summary, opaque finding IDs, idempotency key | Firestore `europe-north2` |
 | Exception approval | Private findings API, human caller | Opaque finding ID, bounded expiry, policy version, and the **verified** reviewer principal | Firestore `europe-north2` |
 | Audit event | Cloud Logging | Payload-free event metadata, 365-day log-bucket retention | `europe-west4` |
+| Live-validation supplement | Offline evidence/report preparation | Counts, timings, opaque correlation IDs, version metadata and hashes; no raw IAM or model text | Repository artifact; no model processing during report build |
 | Dead letter | Pub/Sub review subscription | Failed event envelope until operator acknowledgement/retention expiry | `europe-north2` |
 
 ## Boundary rules
@@ -35,5 +36,12 @@ platform-owner policies; Bastion supplies deterministic identifiers and expiry s
 not claim a legal retention basis. The audit bucket is configured for 365 days and remains
 unlocked. Locking it would be irreversible and is outside an automated deployment.
 
-Committed evidence is redacted and count-only. The current measured inventory is
+Committed evidence is redacted and retains counts, timings and opaque correlation metadata,
+never raw policy or principals. The dated measured infrastructure inventory is
 [assets/architecture/gcp-state.json](../assets/architecture/gcp-state.json).
+
+The [27 October validation supplement](../assets/evidence/14-live-validation.md) retains
+opaque investigation/context/invocation/trace identifiers and department-level counts for
+reproducibility, not finding lists or principals. Its 40 real review records remain in
+Firestore under platform-owner retention policy. Publishing metadata or preparing a report
+does not authorize deleting those records, disclosing private origins, or rerunning the fleet.
