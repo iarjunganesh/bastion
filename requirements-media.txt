@@ -1,6 +1,6 @@
 # Judge-facing screenshot and video sanitization. FFmpeg/ffprobe remain system tools because
 # their platform packages provide the codecs used by scripts/redact_evidence.py.
-Pillow==12.3.0
+Pillow==13.0.0
 
 # Demo narration. Chirp3-HD on the same project as the fleet, so the submission's audio does not
 # introduce a vendor the architecture claim does not already account for.

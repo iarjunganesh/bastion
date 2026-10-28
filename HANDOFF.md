@@ -7,11 +7,12 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 ## Current state
 
 - 28 October 2026: branch `feature/technical-report`; starting HEAD `405988a`.
-  Preparing the v0.8.0 source/evidence/site release; no GCP deployment or paid study performed.
+  Candidate code/evidence is in PR #1. Python release is blocked by the dependency audit;
+  static-site correction is being published separately. No GCP deployment or paid study performed.
 - Source pins Google ADK 2.13.0, A2A SDK 1.3.0, AI Platform/Agent Platform 2.6.0,
   and Model Armor 0.7.3. Universal Python 3.12 lock applies to CI, Cloud Run and managed Runtime.
-- Locked offline gates: 321 tests, 100% configured core statement/branch coverage; mypy
-  40 files; Ruff/format; nine experiment checks; six local report checks; docs/versions,
+- Refreshed 150-package environment: 321 tests, 100% configured core coverage; mypy
+  40 files; Ruff/format; nine experiment checks; prior six local report checks; docs/versions,
   diagram/redaction/site checks. See `.local/` logs for machine-local verification output.
 - Report sources/build tools remain **uncommitted locally**, explicitly excluded from release.
   Canonical `report/bastion-technical-report-v1.pdf` rebuilt: 13 pages, 41 HTTPS links,
@@ -32,8 +33,10 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 
 ## Next step
 
-1. Verify/publish the prepared v0.8.0 source/evidence/site tree, excluding `report/`.
-   Confirm GitHub Actions and the public Vercel HTML/JSON against the release source.
+1. Finish verifying the refreshed 150-package environment and separately publish the static
+   console. PR #1 remains open; no tag/merge while the dependency audit fails. See
+   docs/DEPENDENCY-STATUS.md. Do not suppress the OpenTelemetry advisory or force an
+   incompatible resolution to turn the gate green.
 2. Resolve credit usage scope and paid-account spillover protection. Budget alerts are not hard caps. No payment/billing mutation.
 3. Once credits-only coverage is established, deploy both Cloud Run and managed Runtime,
    verify exact package/image/revision provenance and one pilot before any batch.
@@ -58,3 +61,12 @@ Stop iterative manuscript/PDF amendments and rebuilds. Finish the code, dependen
 deployment and feasible control/evidence work first. Then reconcile the final evidence and
 generate one clean technical report. The current report is an interim local draft; preserve
 it uncommitted. Do not rebuild it as a routine gate during the remaining implementation.
+
+### 2026-10-28 / Codex — release audit and read-only fleet verification
+
+- Existing-fleet verifier passed: four governed services, durable DLQ, Registry/Gateway and
+  Model Armor configuration; zero new events/model calls/deployments.
+- CI found vulnerable retained transitive pins. Refreshed the lock, removed evaluation-only
+  fleet extras and raised Pillow to 13.0.0; only the ADK-constrained OpenTelemetry advisory
+  remains. Hold Python release; static console correction is independent.
+- Maintainer stopped iterative report edits/builds; no report change since that correction.

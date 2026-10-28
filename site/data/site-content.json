@@ -8,63 +8,63 @@
       "summary": "Managed Runtime, Gateway, Registry, and IAP are deployed; the retained record contains status and counts, never private origins or identities.",
       "state": "RECORD VERIFIED",
       "accent": "#5b8cff",
-      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/05-runtime-gateway.md"
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/05-runtime-gateway.md"
     },
     {
       "title": "Real cross-department routing",
       "summary": "On 25 August, the current-route companion probe measured 62 live IAM bindings and three deterministic findings across two owning departments; two findings were delivered after policy.",
       "state": "COUNTS ONLY",
       "accent": "#45d3d0",
-      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/11-current-route-correlation.md"
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/11-current-route-correlation.md"
     },
     {
       "title": "Identity-enforced separation",
       "summary": "The deployed Escalation identity was denied the same IAM read that the Access Auditor identity was permitted to perform.",
       "state": "DENIAL OBSERVED",
       "accent": "#f5ad42",
-      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/03-escalation-agent-denied.md"
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/03-escalation-agent-denied.md"
     },
     {
       "title": "Injection refused at the agent boundary",
       "summary": "The deployed Auditor callback refused an approved injection sample on its authenticated A2A surface; the task failed closed and no model or tool call followed.",
       "state": "REFUSAL OBSERVED",
       "accent": "#ef6f6c",
-      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/12-agent-mediated-model-armor-refusal.md"
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/12-agent-mediated-model-armor-refusal.md"
     },
     {
       "title": "Durable human exception",
       "summary": "A human-approved exception suppressed its matching finding three days later on the deployed path without becoming a multi-week claim.",
       "state": "3-DAY OBSERVATION",
       "accent": "#60d394",
-      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/10-cross-week-suppression.md"
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/10-cross-week-suppression.md"
     },
     {
       "title": "Correlated reasoning chain",
       "summary": "The 25 August connected 22-span trace covers managed Runtime, both governed worker hops, the durable exception lookup, and the completion gate. Sampled telemetry, not the compliance record.",
       "state": "CHAIN OBSERVED",
       "accent": "#9bd1ff",
-      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/13-current-route-trace.md"
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/13-current-route-trace.md"
     },
     {
       "title": "Payload-free operations",
       "summary": "Regional audit retention, metrics, alerts, and dashboard configuration are retained without prompts, responses, principals, or finding payloads.",
       "state": "CONFIG VERIFIED",
       "accent": "#a98bff",
-      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/07-observability.md"
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/07-observability.md"
     },
     {
       "title": "27 October live validation",
       "summary": "Twenty real-IAM investigations completed in one durable attempt each: 560 audit records, 60 invocations and two review records per run. One-project repeatability, not an SLO/privacy benchmark; collector recovery and replay/trace limits are retained.",
       "state": "20-RUN OBSERVATION",
       "accent": "#45d3d0",
-      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/14-live-validation.md"
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/14-live-validation.md"
     },
     {
       "title": "28 October fleet inventory",
       "summary": "Read-only count-only census: 21 enabled APIs and 39 resources, including four Cloud Run services, two agent engines and zero Scheduler jobs. Configuration existence, not upgraded-package or control execution proof.",
       "state": "DATED INVENTORY",
       "accent": "#a98bff",
-      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/15-fleet-inventory.md"
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/15-fleet-inventory.md"
     }
   ],
   "video": {

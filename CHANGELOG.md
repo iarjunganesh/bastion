@@ -12,12 +12,15 @@ The current release process is in
 
 ## [Unreleased]
 
-## [0.8.0] - 2026-10-28
+## [0.8.0] - Unreleased candidate (2026-10-28)
 
 ### Changed — ADK source upgrade and shared continuity
 
 - Target Google ADK 2.13.0, A2A SDK 1.3.0, Google Cloud AI Platform/Agent Platform 2.6.0,
-  and Model Armor client 0.7.3; regenerate the universal Python 3.12 dependency lock.
+  and Model Armor client 0.7.3; refresh the universal Python 3.12 dependency lock.
+  Remove unused evaluation-only extras from the shipped fleet and update Pillow to 13.0.0.
+  The audit is reduced to one unresolved OpenTelemetry advisory incompatible with ADK's
+  current upper bound; no audit suppression or production release is claimed.
   Installed production remains the historical cohort until a separate credits-only deployment
   and live verification. This release does not claim an upgraded production fleet.
 - Add root AGENTS.md, HANDOFF.md, report roadmap, upgrade/control plan, and thin Claude/Copilot
@@ -26,7 +29,9 @@ The current release process is in
   docs and the static console. Preserve historical evidence versions and submitted media.
 - Expand version checking to all public Markdown areas and stop the production test-count
   gate from interpreting private collector counts as production-suite claims.
-- The technical report remains a local, uncommitted draft and is not included in this release.
+- The technical report remains a local, uncommitted draft and is excluded from the candidate.
+  The static console is independently deployable; its evidence links use an existing public
+  immutable commit and its footer marks the source version as release pending.
 
 ### Added — separately dated live validation evidence
 

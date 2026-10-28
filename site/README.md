@@ -30,7 +30,7 @@ computed in the browser from the `datetime` attribute `check_site.py` already pi
 the selected count-only snapshot's `captured_utc` — there is no second source and no request, because a page that
 fetched its own freshness would be claiming a liveness this console deliberately does not have. It
 exists to make staleness visible rather than leave a reader to subtract dates. The footer names the
-release it was built from; that string is written in `index.html` and gated against
+source version and explicitly marks an unreleased candidate; that string is written in `index.html` and gated against
 `pyproject.toml` rather than substituted during the build, so the deployed bytes stay identical to
 the reviewed source and `check_site.py` can keep failing on any drift between them.
 
@@ -83,3 +83,7 @@ The release gate was observed on 2026-08-23. The canonical signed-out production
 [`https://bastion.arjunganesh.dev/`](https://bastion.arjunganesh.dev/); HTTPS redirect, headers,
 desktop/mobile layout, theme switching, reduced motion, 404 behavior, and a browser network log
 containing no private GCP request all passed.
+
+The static console may be published independently of a Python fleet release. Evidence URLs
+are pinned to an existing public source commit, so locally withheld reports and an unmerged
+upgrade cannot create missing `main` links. A static-site update does not deploy GCP code.

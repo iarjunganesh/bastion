@@ -24,3 +24,7 @@ replace old version labels with current pins, or infer deployment from a README 
 
 The report's Section 4.1 contains its cohort table. Release/source changes do not upgrade
 the framework version of any measurement already in the report.
+
+The Python v0.8.0 release is currently blocked by the [dependency audit](DEPENDENCY-STATUS.md).
+The static console can publish corrected dated evidence independently, and labels the source
+version as release pending. No production upgrade or released tag is implied.
