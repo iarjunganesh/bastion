@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          pip install -r requirements-dev.txt -c requirements.lock
 
       - name: Ruff check
         run: ruff check .
@@ -67,7 +67,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          pip install -r requirements-dev.txt -c requirements.lock
 
       - name: Mypy
         run: mypy agents gateway identity registry runtime model_armor observability infrastructure
@@ -115,7 +115,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          pip install -r requirements-dev.txt -c requirements.lock
 
       - name: Pytest with coverage gate
         run: >-

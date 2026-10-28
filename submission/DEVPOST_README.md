@@ -7,7 +7,7 @@
 
 [![CI](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml)
 [![Codecov](https://codecov.io/gh/iarjunganesh/bastion/graph/badge.svg)](https://codecov.io/gh/iarjunganesh/bastion)
-[![Google ADK 2.8.0](https://img.shields.io/badge/Google_ADK-2.8.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
+[![Google ADK 2.13.0](https://img.shields.io/badge/Google_ADK-2.13.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/iarjunganesh/bastion/blob/main/LICENSE)
 
@@ -56,7 +56,7 @@ elapsed; the architecture is designed for longer asynchronous work and expiry be
 
 ## How we built it
 
-Bastion uses Google ADK 2.8.0 and A2A for a three-agent graph, Gemini 3.5 Flash through Vertex AI,
+Bastion uses Google ADK 2.13.0 and A2A for a three-agent graph, Gemini 3.5 Flash through Vertex AI,
 and the managed enterprise-agent pillars: Agent Runtime, Registry, Identity, Gateway, Memory Bank,
 Model Armor, and Observability. Cloud Run hosts private worker and receiver surfaces. Pub/Sub and
 Eventarc provide durable event admission. Firestore holds operational continuity. Cloud Asset
@@ -158,3 +158,6 @@ Bastion cannot modify IAM. Gemini uses the Vertex AI `global` endpoint. The audi
 immutable. The observed decision-memory gap is three days, not a literal week. The current
 deployment is event-driven and claims no recurring Scheduler job. Those are design and evidence
 boundaries, not capabilities hidden in fine print.
+
+Version note (28 October 2026): this repository draft tracks the upgraded source.
+The submitted Devpost page/video are historical; see [version provenance](../docs/VERSIONS.md).

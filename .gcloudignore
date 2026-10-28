@@ -18,3 +18,7 @@ coverage.xml
 .tmp/
 .takes/
 *.log
+
+# Private report history and measurement checkpoints must never be uploaded.
+.local/
+report/

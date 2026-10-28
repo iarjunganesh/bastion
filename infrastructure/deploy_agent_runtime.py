@@ -26,6 +26,8 @@ SOURCE_PACKAGES = [
     "registry",
     "runtime",
     "requirements.txt",
+    "requirements.lock",
+    "requirements-runtime.txt",
 ]
 
 # The managed runtime contract needs explicit operation schemas for source deployments. This
@@ -288,7 +290,7 @@ def deploy() -> dict[str, Any]:
         "source_packages": SOURCE_PACKAGES,
         "entrypoint_module": "agents.orchestrator.runtime",
         "entrypoint_object": "app",
-        "requirements_file": "requirements.txt",
+        "requirements_file": "requirements-runtime.txt",
         "class_methods": CLASS_METHODS,
         "env_vars": environment(),
         "identity_type": types.IdentityType.AGENT_IDENTITY,

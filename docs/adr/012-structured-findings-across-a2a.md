@@ -201,7 +201,35 @@ minutes it took to find this. No principal, binding, or credential was in that c
 was still model/tool-adjacent text in a channel this codebase otherwise keeps payload-free by
 construction — an accepted, bounded exception for live incident diagnosis, not a precedent.
 
-## Upstream contribution status (checked live 2026-08-27)
+## Upstream contribution status
+
+### Outcome (checked live 2026-10-27)
+
+- Issue [google/adk-python#6854](https://github.com/google/adk-python/issues/6854): **closed as
+  completed on 2026-10-12**.
+- PR [google/adk-python#6859](https://github.com/google/adk-python/pull/6859), opened by Sylvester
+  Kaczmarek, later carried two commits by Arjun Ganesh: a warning on the legacy response path and
+  an end-to-end test (`test_peer_state_delta_is_logged_and_not_applied`). It was **imported into
+  `main` as commit [`d2cb22e`](https://github.com/google/adk-python/commit/d2cb22e)** ("fix: warn
+  when session state is dropped", Fixes #6854) on 2026-10-12, and the PR was then closed rather
+  than merged through GitHub. The imported commit is attributed to the PR's opener with no
+  co-author line; the end-to-end test is present in the released source.
+- First release containing it:
+  **[`google-adk` v2.12.0](https://github.com/google/adk-python/releases/tag/v2.12.0)**, 2026-10-13.
+- PR #6862: unchanged, closed unmerged on 2026-08-24.
+
+What changed upstream is observability, which is exactly what the surviving ask was: ADK now logs a
+warning when a caller-side state-only event cannot be forwarded and when a remote peer returns a
+non-empty state delta, and documents that session state does not cross A2A in either direction.
+Per-agent session semantics are unchanged. **This decision is unaffected**: the current
+source targets ADK 2.13.0, which includes the warnings; the historical deployed cohort predates
+them. The explicit message contracts and receipt gate remain required. Warnings do not replace
+that contract. See [version provenance](../VERSIONS.md).
+
+The third finding below (attributed-history wrapping and empty failed-task events) was not part of
+that change and remains unfiled.
+
+### Snapshot as of 2026-08-27 (superseded above; kept as the record of that date)
 
 - Issue [google/adk-python#6854](https://github.com/google/adk-python/issues/6854), opened by
   Arjun Ganesh: **open**, seven comments, last updated 2026-08-27. Documents both directions of the
@@ -265,7 +293,8 @@ which emits the identical warning. The deprecation it points at remains the risk
   empty, error-free event — has not been filed upstream. It is a live risk, documented here, not
   yet a reported one.
 
-No item above may be described as accepted, merged, or resolved by Google. Status must be
-re-checked immediately before publication (`gh pr view --repo google/adk-python <number>`, or the
+As of 2026-08-27, no item in this snapshot could be described as accepted, merged, or resolved by
+Google; the outcome section above records what changed on 2026-10-12. Status must be re-checked
+immediately before publication (`gh pr view --repo google/adk-python <number>`, or the
 corresponding issue command); #6862 already changed state once between a documented check and a
 release.

@@ -81,3 +81,6 @@ assets/demo-video/bastion.mp4
 node_modules/
 package-lock.json
 
+
+# Durable private working notes, cloud captures, and report history.
+.local/

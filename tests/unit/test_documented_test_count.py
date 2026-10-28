@@ -12,6 +12,7 @@ with. Inside the suite the collected count is already known, so the check costs 
 
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -23,7 +24,16 @@ ROOT = Path(__file__).resolve().parents[2]
 # and "5 alert policies" cannot be mistaken for a suite total.
 TEST_COUNT_CLAIM = re.compile(r"\b(\d{2,4})\s+(?:\w+\s+)?tests?\b|\b(\d{2,4})\s+passed\b")
 
-SKIP_DIRS = {".git", ".venv", "venv", ".audit-venv", "node_modules", ".tmp", ".mypy_cache"}
+SKIP_DIRS = {
+    ".git",
+    ".venv",
+    "venv",
+    ".audit-venv",
+    "node_modules",
+    ".tmp",
+    ".local",
+    ".mypy_cache",
+}
 
 # Released sections record what was true at their tag. Rewriting them to match today would
 # falsify the release record rather than correct it.
@@ -33,13 +43,17 @@ EXEMPT = {"CHANGELOG.md"}
 def documented_counts() -> list[tuple[str, int, int]]:
     """Return (relative path, line number, claimed count) for every documented suite total."""
     claims: list[tuple[str, int, int]] = []
-    for path in sorted(ROOT.rglob("*.md")):
-        if SKIP_DIRS.intersection(path.parts) or path.name in EXEMPT:
-            continue
-        relative = path.relative_to(ROOT).as_posix()
-        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            for match in TEST_COUNT_CLAIM.finditer(line):
-                claims.append((relative, number, int(match.group(1) or match.group(2))))
+    # Prune private/tooling trees before descending, including the upgrade environment.
+    for directory, dirs, files in os.walk(ROOT):
+        dirs[:] = sorted(name for name in dirs if name not in SKIP_DIRS)
+        for name in sorted(files):
+            if not name.endswith(".md") or name in EXEMPT:
+                continue
+            path = Path(directory) / name
+            relative = path.relative_to(ROOT).as_posix()
+            for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                for match in TEST_COUNT_CLAIM.finditer(line):
+                    claims.append((relative, number, int(match.group(1) or match.group(2))))
     return claims
 
 

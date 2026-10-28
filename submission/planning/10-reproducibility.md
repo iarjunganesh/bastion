@@ -46,7 +46,7 @@ Every gate passed. The output column quotes the tools, not a summary of them.
 |---|---|
 | `git clone` over public HTTPS, unauthenticated | tag `v0.5.1` at `0edd128` |
 | Virtual environment under Python 3.12 | CPython 3.12.12 |
-| `pip install -r requirements-dev.txt` | resolved and installed with no conflict |
+| `pip install -r requirements-dev.txt -c requirements.lock` | resolved and installed with no conflict |
 | `pytest tests --cov --cov-fail-under=100` | 321 passed; 894 statements, 248 branches, 100.00% |
 | `ruff check .` | `All checks passed!` |
 | `ruff format --check .` | `137 files already formatted` |
@@ -105,7 +105,7 @@ Set-Location bastion
 
 py -3.12 -m venv .venv          # any CPython 3.12 works; see README for the fallback
 .\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements-dev.txt
+python -m pip install -r requirements-dev.txt -c requirements.lock
 
 pytest tests --cov --cov-report=term-missing --cov-fail-under=100
 ```
@@ -132,3 +132,8 @@ repository has now shipped four defects that were true of the code and false of 
 — recorded as D1, D6, D8, and D9 in [09-capture-backlog.md](09-capture-backlog.md) — so a green
 clean-clone gate must never be read as evidence that Google Cloud did anything. The live gate is
 separate, needs credentials, and is documented in [OPERATIONS.md](../../docs/OPERATIONS.md).
+
+Current upgrade boundary (28 October 2026): source targets Google ADK 2.13.0.
+The package resolution and checks recorded above are historical. See
+[version provenance](../../docs/VERSIONS.md)
+and the upgrade plan before running new captures.

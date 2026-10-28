@@ -9,7 +9,7 @@ Access Auditor still is. **Amended 2026-08-27** — version raised to 2.8.0 for 
 
 ## Decision
 
-Bastion's three agents are **ADK agents** (`google-adk==2.8.0`). ADK owns the agent
+Bastion's three agents are **ADK agents** (`google-adk==2.13.0`). ADK owns the agent
 definition, the tool-calling loop, and the session and memory service interfaces
 ([ADR-003](003-pillars-on-geap.md)). The GenAI SDK, Antigravity SDK, and Genkit are not used.
 
@@ -60,21 +60,21 @@ any code.
   one choice. `adk deploy` offers `agent_engine`, `cloud_run`, and `gke`; the Cloud Run form
   carries `--trace_to_cloud`, `--a2a`, `--session_service_uri` and `--memory_service_uri`, so
   four pillars are flags rather than modules.
-- **Zero installation risk.** Re-verified 2026-08-27 against `google-adk==2.8.0`, as it was on
+- **Zero installation risk.** Re-verified 2026-08-27 against `google-adk` v2.8.0, as it was on
   2026-08-22 against 2.7.1 and 2026-08-15 against 2.7.0: `google.adk.agents`, `.tools`, `.memory`,
   `.sessions`, `.a2a`, `.plugins` and `vertexai.agent_engines.AdkApp` all import cleanly. Re-run
   rather than
   re-dated — a verification claim that is edited to match a new pin is no longer a verification.
 
-**The Antigravity SDK is not merely undocumented — it cannot be installed alongside this
-stack.** `google-antigravity` 0.1.12 ships protobuf **7** gencode:
+**Historical incompatibility (15 August 2026).** The Antigravity SDK could not be
+installed alongside the then-current stack: `google-antigravity` 0.1.12 ships protobuf **7** gencode:
 
 ```text
 VersionError: Detected incompatible Protobuf Gencode/Runtime versions when loading
 google/antigravity/proto/localharness.proto: gencode 7.35.0 runtime 6.33.6
 ```
 
-while `a2a-sdk` and `google-cloud-aiplatform` both pin `protobuf<7`. Adopting Antigravity
+At that capture, `a2a-sdk` and `google-cloud-aiplatform` both pinned `protobuf<7`. Adopting Antigravity
 means giving up the A2A contract and Agent Engine — the Gateway and Runtime pillars. It was
 installed on 2026-08-15, observed to fail, and uninstalled. Genkit remains JS/Go-first, and
 the GenAI SDK is a model client rather than an agent framework: ADK already depends on
@@ -92,8 +92,9 @@ are what an injected instruction would try to redirect. That is
 [ADR-007](007-tool-poisoning.md), a consequence of this decision rather than an independent
 idea.
 
-ADK holds `opentelemetry-api`/`sdk` at `<=1.42.1`, which is why `requirements.txt` pins
-1.42.1 rather than the newest release. Raise both together when ADK does.
+ADK 2.13.0 accepts `opentelemetry-api`/`sdk` through 1.44. Bastion retains the compatible
+1.42.1 pair during this upgrade. ADK changes its default GenAI trace schema in this release;
+new traces must be reviewed rather than assumed identical to the August captures.
 
 **ADK ships FastAPI, Starlette and uvicorn.** Bastion's Flask surfaces were competing with the
 framework's own server; Flask is removed from `requirements.txt`.
@@ -195,3 +196,10 @@ reads or restates it. `invocation_id` is still recorded, and still groups one ag
 is all it ever did.
 
 `adk deploy cloud_run --a2a` exposes the endpoint; Agent Gateway routes to it.
+
+## 28 October upgrade
+
+The source target is Google ADK 2.13.0 with A2A SDK 1.3.0 and Google Cloud AI Platform
+2.6.0. Local dependency/contract verification and both deployment surfaces must pass before
+claiming the new production resolution. See [VERSIONS.md](../VERSIONS.md) and
+[UPGRADE-PLAN.md](../UPGRADE-PLAN.md). The dated decisions above remain historical records.

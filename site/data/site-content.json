@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "verifiedAt": "2026-08-27T20:41:26Z",
-  "snapshotSource": "assets/architecture/gcp-state.json",
+  "verifiedAt": "2026-10-28T00:39:39Z",
+  "snapshotSource": "assets/evidence/fleet-inventory-2026-10-28.json",
   "evidence": [
     {
       "title": "Governed request path",
@@ -12,7 +12,7 @@
     },
     {
       "title": "Real cross-department routing",
-      "summary": "On the current deployed route, 62 live IAM bindings produced three deterministic findings across two owning departments; policy suppressed an approved exception and two were delivered.",
+      "summary": "On 25 August, the current-route companion probe measured 62 live IAM bindings and three deterministic findings across two owning departments; two findings were delivered after policy.",
       "state": "COUNTS ONLY",
       "accent": "#45d3d0",
       "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/11-current-route-correlation.md"
@@ -40,7 +40,7 @@
     },
     {
       "title": "Correlated reasoning chain",
-      "summary": "One connected 22-span trace covers the managed Runtime, both governed worker hops, the durable exception lookup, and the completion gate. Sampled telemetry, not the compliance record.",
+      "summary": "The 25 August connected 22-span trace covers managed Runtime, both governed worker hops, the durable exception lookup, and the completion gate. Sampled telemetry, not the compliance record.",
       "state": "CHAIN OBSERVED",
       "accent": "#9bd1ff",
       "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/13-current-route-trace.md"
@@ -51,6 +51,20 @@
       "state": "CONFIG VERIFIED",
       "accent": "#a98bff",
       "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/07-observability.md"
+    },
+    {
+      "title": "27 October live validation",
+      "summary": "Twenty real-IAM investigations completed in one durable attempt each: 560 audit records, 60 invocations and two review records per run. One-project repeatability, not an SLO/privacy benchmark; collector recovery and replay/trace limits are retained.",
+      "state": "20-RUN OBSERVATION",
+      "accent": "#45d3d0",
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/14-live-validation.md"
+    },
+    {
+      "title": "28 October fleet inventory",
+      "summary": "Read-only count-only census: 21 enabled APIs and 39 resources, including four Cloud Run services, two agent engines and zero Scheduler jobs. Configuration existence, not upgraded-package or control execution proof.",
+      "state": "DATED INVENTORY",
+      "accent": "#a98bff",
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/main/assets/evidence/15-fleet-inventory.md"
     }
   ],
   "video": {

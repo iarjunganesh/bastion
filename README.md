@@ -25,8 +25,8 @@
 [![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)](https://youtu.be/Xpj8YmzFfpk)
 
 <!-- Row 2 — what Bastion is actually built on, plus the program badge earned before it. -->
-[![Google ADK 2.8.0](https://img.shields.io/badge/Google_ADK-2.8.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
-[![A2A SDK](https://img.shields.io/badge/A2A_SDK-1.1.2-1A73E8)](https://github.com/a2aproject/a2a-python)
+[![Google ADK 2.13.0](https://img.shields.io/badge/Google_ADK-2.13.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
+[![A2A SDK](https://img.shields.io/badge/A2A_SDK-1.3.0-1A73E8)](https://github.com/a2aproject/a2a-python)
 [![Gemini Enterprise Agent Ready](https://img.shields.io/badge/GEAR-Gemini_Enterprise_Agent_Ready-4285F4?logo=google&logoColor=white)](https://developers.google.com/profile/badges/community/gear?u=iarjunganesh)
 
 <!-- Row 3 — the seven GEAP pillars, six of them managed products rather than modules here. -->
@@ -111,7 +111,7 @@ Set-Location bastion
 
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements-dev.txt
+python -m pip install -r requirements-dev.txt -c requirements.lock
 
 # The offline gate — no cloud credentials, no network, no project required.
 pytest tests --cov --cov-report=term-missing --cov-fail-under=100
@@ -170,19 +170,31 @@ Observed production checks include:
 - a Vertex quota failure recorded as a payload-free `model.request=failed`, with the
   investigation left reclaimable rather than cleared.
 
-**One divergence, stated plainly because the badge above would otherwise imply otherwise.** On
-2026-08-27 every pin moved to the newest release the resolver allows, so this repository builds on
-`google-adk` 2.8.0 and the badge reads 2.8.0. **The deployed fleet has not been redeployed onto
-it** and still runs the 2.7.1 resolution `v0.4.0` deployed. Every observation in the evidence set
-therefore describes the older resolution, and remains exactly as true as it was — what is not yet
-true is that the deployment matches the repository. Closing that gap means redeploying both
-surfaces, re-verifying live, and re-capturing the evidence that names the current Cloud Run
-revisions. See [ADR-005](docs/adr/005-adk-as-the-agent-framework.md).
+**Versions and evidence are recorded separately.** The current source targets Google ADK 2.13.0
+and A2A SDK 1.3.0. The August captures and 27 October study describe the earlier deployed
+fleet; they are not measurements of the upgraded source. The October study rechecked unchanged
+worker revisions and Runtime update metadata, without freshly enumerating installed packages.
+[The version/provenance table](docs/VERSIONS.md) records each cohort and deployment status.
+Both Cloud Run and managed Runtime must be updated and re-verified before claiming that
+production runs the new release. Existing evidence stays dated and unchanged.
 
 The retained evidence is indexed in [assets/README.md](assets/README.md). The exact distinction
 between deployed, observed, configured, and still-to-capture lives in
 [submission/SUBMISSION.md](submission/SUBMISSION.md) — those words are used precisely and are not
 interchangeable in this repository.
+
+**Post-hackathon validation, separately dated 2026-10-27.**
+[Evidence 14](assets/evidence/14-live-validation.md) records 20 real-IAM investigations,
+all completed in one durable attempt, with 560 audit records/60 invocations and 40 model
+submissions. Each produced two review records carrying three finding instances. Median client
+completion confirmation was 20.461s with 5s polling; the separate Runtime audit median was
+15.948207s. Five replay publications had unchanged effects observed for 120s, without independent
+per-message delivery confirmation. One collector query-visibility pause was repaired with
+read-only recovery; original data and both collector versions are retained, and no investigation
+was rerun. These are repeated executions on one project, not independent policies, a new binding
+census, a privacy/utility comparison or historical SLO attainment. The
+technical report draft (kept locally in `report/`) includes the method and limitations; the August
+62-binding capture and two open refusal/retry observations remain distinct.
 
 Running against a live fleet rather than a mock is also what surfaced the defects this
 project is most proud of catching. The sharpest: **ADK session state does not cross an A2A
@@ -192,23 +204,27 @@ run and every CI job exercises the working topology, so the failure is invisible
 gate by construction, even at 100% configured core statement and branch coverage. Reported
 upstream with a production reproducer in
 [google/adk-python#6854](https://github.com/google/adk-python/issues/6854) (opened by Arjun
-Ganesh) — where Google has since confirmed the per-session semantics are intended, leaving the
-silence rather than the behaviour as the open ask — and fixed structurally in
+Ganesh) — where Google confirmed the per-session semantics are intended, leaving the silence
+rather than the behaviour as the ask — and fixed structurally in
 [ADR-012](docs/adr/012-structured-findings-across-a2a.md); the full ledger is the
 [observation backlog](submission/planning/09-capture-backlog.md).
 
-Checked live on 2026-08-27: the issue is **open** with seven comments, and community PR
-[google/adk-python#6859](https://github.com/google/adk-python/pull/6859) (Sylvester Kaczmarek) —
-which adds warnings for the outbound state-only-loss and rejected inbound remote-state-delta
-directions — is **open and unmerged**. A complementary PR of my own,
+Checked live on 2026-10-27: the silence is fixed upstream. Community PR
+[google/adk-python#6859](https://github.com/google/adk-python/pull/6859) (opened by Sylvester
+Kaczmarek, later carrying two commits of mine: a legacy-path warning and an end-to-end test) was
+imported into ADK `main` as commit
+[`d2cb22e`](https://github.com/google/adk-python/commit/d2cb22e) on 2026-10-12, closing the issue
+as completed, and first shipped in
+[`google-adk` v2.12.0](https://github.com/google/adk-python/releases/tag/v2.12.0). ADK now logs a
+warning when a state-only hand-off is dropped and when a remote state delta is ignored, and
+documents the boundary; the semantics are unchanged. The PR itself was closed rather than merged
+through GitHub, and the imported commit is attributed to its opener. A complementary PR of my own,
 [google/adk-python#6862](https://github.com/google/adk-python/pull/6862), adding a
 construction-time warning for the adjacent `LlmAgent(output_key) -> RemoteA2aAgent` case, was
-**closed unmerged on 2026-08-24** in favour of #6859. The maintainer's reason is the more useful
-outcome than the patch would have been: *"the session state boundary across A2A is a general
-transport property rather than an issue specific to `SequentialAgent`"*, and it is being addressed
-centrally at the `RemoteA2aAgent` converter rather than in a deprecated component. That is a
-confirmation of the finding and a decision about where the fix belongs — not an accepted fix, and
-not a rejected report. Nothing here is merged.
+**closed unmerged on 2026-08-24** in favour of addressing the boundary centrally, because *"the
+session state boundary across A2A is a general transport property rather than an issue specific to
+`SequentialAgent`"*. The ADK 2.13.0 source target includes those warnings; ADR-012's explicit
+contracts remain the fix.
 
 ## The fleet
 
@@ -466,6 +482,7 @@ assets/                     brand, architecture, and redacted evidence
 docs/                       architecture, governance, operations, and ADRs
 submission/                 Devpost copy, checklist, and planning ledger
 experiments/minimisation/    synthetic offline evaluation; no product or live data path
+report/                     local uncommitted technical-report draft (not in release)
 ```
 
 ## Evidence and decisions
@@ -476,6 +493,8 @@ experiments/minimisation/    synthetic offline evaluation; no product or live da
   [Observation backlog](submission/planning/09-capture-backlog.md) ·
   [Audit remediation ledger](submission/planning/08-audit-remediation-plan.md) ·
   [Captured hackathon brief](submission/DEVPOST.md)
+- Technical report (local draft) ·
+  [27 October validation and verified data](assets/evidence/14-live-validation.md)
 - Architecture decisions — [index](docs/adr/README.md):
   [001 real IAM](docs/adr/001-real-iam-not-mock-data.md) ·
   [002 three agents](docs/adr/002-three-agents.md) ·
@@ -501,5 +520,6 @@ It does not claim immutable audit storage, end-to-end EU model residency, legal 
 historical SLO attainment, or that a wall-clock week elapsed during testing. Those limits are
 part of the topology rather than disclaimers appended to it.
 
-This is a hackathon submission, not supported production software. Licensed under the
+Bastion was built for, and submitted to, the All Things Agentic Hackathon 2026; judging has closed
+and no award is claimed. It is not supported production software. Licensed under the
 [MIT License](LICENSE).

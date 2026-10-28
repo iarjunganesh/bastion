@@ -10,6 +10,56 @@ state known on their date; current proof and limitations are recorded together.
 The current release process is in
 [`submission/planning/07-release-plan.md`](submission/planning/07-release-plan.md).
 
+## [Unreleased]
+
+## [0.8.0] - 2026-10-28
+
+### Changed — ADK source upgrade and shared continuity
+
+- Target Google ADK 2.13.0, A2A SDK 1.3.0, Google Cloud AI Platform/Agent Platform 2.6.0,
+  and Model Armor client 0.7.3; regenerate the universal Python 3.12 dependency lock.
+  Installed production remains the historical cohort until a separate credits-only deployment
+  and live verification. This release does not claim an upgraded production fleet.
+- Add root AGENTS.md, HANDOFF.md, report roadmap, upgrade/control plan, and thin Claude/Copilot
+  entry points. Keep private captures/history in ignored `.local/`; exclude it from cloud uploads.
+- Establish one version/provenance table and reconcile current dependency references across
+  docs and the static console. Preserve historical evidence versions and submitted media.
+- Expand version checking to all public Markdown areas and stop the production test-count
+  gate from interpreting private collector counts as production-suite claims.
+- The technical report remains a local, uncommitted draft and is not included in this release.
+
+### Added — separately dated live validation evidence
+
+- Evidence 14 retains 20 real-IAM investigations completed in one durable attempt each,
+  560 audit records, 60 invocations, 40 model submissions and 40 review records carrying
+  60 finding instances. The verified source/data bundle and summary/CSVs preserve the
+  collector pause/read-only recovery without rerunning or excluding an investigation.
+  Client confirmation median 20.461s (5s polling) is distinct from Runtime audit median
+  15.948207s. Replay observations are bounded, the pilot trace is time-matched, actual cost is
+  unmeasured, and the two partial refusal/retry controls remain open.
+- Current documentation and both site claim surfaces carry that dated supplement without
+  changing the dated August binding census or submitted gallery/video. A separate 28 October
+  read-only inventory again measured 21 APIs and 39 resources; the console uses its fresh date
+  while architecture images retain their historical snapshots.
+- `experiments/minimisation/` scaffolds the deferred C4 study on synthetic policies only.
+  No C4 model calls or results are claimed.
+
+### Changed — upstream ADK outcome and post-hackathon wording
+
+- The A2A session-state silence is fixed upstream. `google/adk-python#6854` closed as completed on
+  2026-10-12 when #6859 was imported into `main` as `d2cb22e`, first released in `google-adk`
+  v2.12.0; the PR carried two commits of mine, and the imported commit is attributed to its opener.
+  ADK now warns in both directions; semantics are unchanged. README and ADR-012 record the outcome,
+  with the 2026-08-27 snapshot kept as the record of that date. The source upgrade is recorded above; deployment remains the historical cohort.
+- The hackathon has closed and no award is claimed. CLAUDE.md drops the pre-submission freeze
+  paragraph but keeps the rule that re-rendering diagrams on `main` changes the public Devpost page.
+
+### Fixed — the public console quoted an earlier binding count
+
+- The console's proof strip read **52** live bindings, the earlier evidence 09 measurement, while
+  the README and console summary quote the current-route **62** from evidence 11. The strip now
+  reads 62, dated 25 Aug, independently of the separately dated resource-inventory timestamp.
+
 ## [0.7.0] — 2026-08-29
 
 ### Added — the demo video is published
@@ -211,7 +261,7 @@ changed, but the resolution the whole fleet is built on did.
   `opentelemetry-exporter-gcp-trace` 1.15.0, `python-dotenv` 1.2.3, `ruff` 0.16.5 and `mypy` 2.3.1,
   with `requirements.lock` regenerated.
 - **`opentelemetry-api` and `opentelemetry-sdk` stay at 1.42.1, and 1.44.0 is unreachable rather
-  than declined.** `google-adk==2.8.0` declares `opentelemetry-api<=1.42.1` and
+  than declined.** `google-adk` v2.8.0 declares `opentelemetry-api<=1.42.1` and
   `opentelemetry-sdk<=1.42.1`, so "everything latest" is not a satisfiable resolution while the
   framework is pinned at all. The resolver said so; this is not a judgement call. One incidental
   benefit: the trace path that

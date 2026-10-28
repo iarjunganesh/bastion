@@ -3,22 +3,40 @@
 - **Reviewed:** 2026-08-24; reconciled 2026-08-27 against release `v0.6.0` after the P0.6-P0.9
   evidence sprint, the gallery composition, and the dependency bump; reconciled again 2026-08-29
   against `v0.7.0`, when the demo was published and the `In demo` column became answerable
+- **Report supplement:** 2026-10-27 live validation, documented 2026-10-28 below; the August
+  capture dates, submitted demo and two `Partial` classifications are preserved.
 - **Purpose:** Internal pre-publication gate before drafting Devpost, article, social, screenshot,
   or demo copy. `Partial` means the public sentence must use the narrower wording in the final
   column; it does not mean the underlying architecture is absent.
 
 | Claim | Implemented | Tested | Deployed | Observed | In demo | Safe to claim? | Evidence boundary and safe wording |
 |---|---:|---:|---:|---:|---:|---:|---|
-| Real IAM read | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 11](../../assets/evidence/11-current-route-correlation.md) is now the current-route proof: a count-only companion probe measured 62 live bindings, 3 deterministic findings, 2 canonical owning departments and 0 raw IAM fields at the model boundary on 2026-08-25. [Evidence 09](../../assets/evidence/09-cross-department-routing.md) records an earlier 52-binding measurement and remains valid for its own date; [evidence 02](../../assets/evidence/02-gemini-investigation.md) is historical pre-Gateway. Say **read-only production IAM**, quote 62 from evidence 11, and never imply raw principals or bindings are retained. |
-| Exact deterministic finding set | Yes | Yes | Yes | Yes | Yes | Yes | P0.1 compares the model report field-by-field with the tool's canonical findings and was deployed before the Aug 23 successful run recorded in [ADR-012](../../docs/adr/012-structured-findings-across-a2a.md). Say the model may write bounded rationale but cannot add, drop, re-score, or redirect a finding. Mutation refusals are test proof; the live observation is the successful enforced path. |
-| Cross-department routing | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 11](../../assets/evidence/11-current-route-correlation.md) now carries this end to end on the current route: 3 canonical findings across 2 departments, of which 2 were delivered to `security-engineering` after policy suppressed the approved `platform-infra` finding, with exactly one durable review record created. [Evidence 09](../../assets/evidence/09-cross-department-routing.md) remains the standalone routing measurement. This pair supports an end-to-end action claim; evidence 09 alone does not. |
-| Human exception continuity | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 10](../../assets/evidence/10-cross-week-suppression.md) observes a real three-day gap across deployments and restarts and re-verifies suppression after P0.1-P0.3. Say **remembered across a real elapsed gap** or **durable asynchronous context**; never say a literal week elapsed or that expiry firing was observed. |
-| Escalation IAM denial | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 03](../../assets/evidence/03-escalation-agent-denied.md) records a successful impersonation followed by a real IAM-read denial, while the Auditor identity succeeds. Say IAM structurally denies the Escalation identity. Disclose that the retained denial was produced by workstation impersonation, not mid-investigation. |
-| Agent-mediated Armor refusal | Yes | Yes | Yes | Yes | Yes | Yes | **Closed 2026-08-25.** [Evidence 12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md) observed the deployed `before_model_callback` refusing the approved injection sample on the Auditor's authenticated A2A surface: benign control completed, sample's task failed closed with `policy_match`, and 0 model submissions, completions or tool calls followed. Describe the threat as a **compromised authorized caller**, not an anonymous attacker. [Evidence 01](../../assets/evidence/01-model-armor-block.md) stays the historical direct-template probe. |
-| Managed Gateway refusal | Yes | Yes | Yes | Partial | No | Partial | [Evidence 05](../../assets/evidence/05-runtime-gateway.md) proves the Runtime is Gateway-bound and the fail-closed policy is configured. Live IAP refusal is observed for a catalogued non-standard Google host, which is residual platform behavior, not the intended unregistered-caller test. Until P0.10, claim the governed route and fail-closed observation; do not claim the planned destination/caller refusal scenarios. |
-| Retry/DLQ behavior | Yes | Yes | Yes | Partial | No | Partial | [Evidence 06](../../assets/evidence/06-durable-findings.md) observes one successful delivery, a dependency failure left failed/reclaimable, idempotent review, and a configured five-attempt DLQ. Until P0.11, say **bounded delivery is configured and retry/idempotency paths are tested**; do not say Eventarc redelivery or the fifth-attempt dead-letter boundary was observed. |
-| Correlated trace/audit | Yes | Yes | Yes | Yes | Yes | Yes | **Closed 2026-08-25.** [Evidence 11](../../assets/evidence/11-current-route-correlation.md) assembles 28 unique payload-free events across 3 invocation ids under one investigation id; [evidence 13](../../assets/evidence/13-current-route-trace.md) adds the connected 22-span Cloud Trace over 1m 5.401s; [evidence 07](../../assets/evidence/07-observability.md) proves the 365-day `europe-west4` retention. Always keep the two artifacts distinct: the trace is sampled and expires, the audit trail is the compliance record. Retention is proven; immutability is not — the bucket is unlocked. |
-| Recurring trigger or event-driven limitation | Yes | Yes | Yes | Yes | Yes | Yes | The deployed Pub/Sub/Eventarc path is event-driven and observed; the measured state has no Scheduler job. Say **triggered by an approved enterprise event source** and explicitly state that this snapshot claims no recurring schedule. Never use `continuous`, `scheduled`, or `on its own` for Bastion's current cadence. |
+| Real IAM read | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 11](../../assets/evidence/11-current-route-correlation.md) is the 25 Aug binding/count proof: 62 live bindings, 3 deterministic findings, 2 canonical owning departments and 0 raw IAM finding-schema fields. [Evidence 14](../../assets/evidence/14-live-validation.md) re-observes 20 IAM-tool/gated execution paths on 27 Oct, without a new binding/pre-policy census. Evidence 09's 52 bindings remain earlier history; evidence 02 remains pre-Gateway. Say **read-only production IAM**, keep census dates explicit, and never imply raw principals/bindings are retained. |
+| Exact deterministic finding set | Yes | Yes | Yes | Yes | Yes | Yes | P0.1 checks model fields against canonical tool findings; [ADR-012](../../docs/adr/012-structured-findings-across-a2a.md) records the Aug 23 successful enforced path. [Evidence 14](../../assets/evidence/14-live-validation.md) adds 20 gated successful paths on 27 Oct, not new mutation probes. The model may write bounded rationale, not alter authoritative fields; mutation refusals remain offline test proof. |
+| Cross-department routing | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 11](../../assets/evidence/11-current-route-correlation.md): 25 Aug, 3 canonical findings/2 departments before policy, 2 delivered findings/1 review record after suppression. [Evidence 14](../../assets/evidence/14-live-validation.md): 27 Oct, 3 delivered instances/2 department records per investigation, across 20 runs. The latter is not a new canonical census or expiry measurement; 60 delivered instances are not 60 distinct risks. |
+| Human exception continuity | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 10](../../assets/evidence/10-cross-week-suppression.md) observes the 19-22 Aug three-day gap, reverified 23 Aug. Not re-probed on 27 Oct. Say **remembered across a real elapsed gap**; do not infer expiry or a literal week from October's delivered counts. |
+| Escalation IAM denial | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 03](../../assets/evidence/03-escalation-agent-denied.md) records successful impersonation then IAM-read denial on 15 Aug, with an Auditor success control. This negative probe was not repeated on 27 Oct; successful Escalation deliveries are not new denial proof. |
+| Agent-mediated Armor refusal | Yes | Yes | Yes | Yes | Yes | Yes | **Closed 2026-08-25:** [evidence 12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md), authenticated Auditor injection refused with no subsequent model/tool call. This models a **compromised authorized caller**, not an anonymous one. October's normal successful path did not repeat the refusal probe; evidence 01 remains the earlier direct-template measurement. |
+| Managed Gateway refusal | Yes | Yes | Yes | Partial | No | Partial | [Evidence 05](../../assets/evidence/05-runtime-gateway.md) retains Gateway binding/fail-closed configuration; the residual IAP denial is not the intended unregistered-caller test. [Evidence 14](../../assets/evidence/14-live-validation.md) adds 20 approved Runtime/worker flows, not a new Registry/IAP decision or refusal probe. P0.10 remains open. |
+| Retry/DLQ behavior | Yes | Yes | Yes | Partial | No | Partial | [Evidence 06](../../assets/evidence/06-durable-findings.md) retains completion/failure-reclaim, receiver idempotency and configured five-attempt DLQ. [Evidence 14](../../assets/evidence/14-live-validation.md) adds 20 one-attempt completions and five replay publications with unchanged effects for 120s; delivery was not confirmed per message. P0.11 remains open: no observed Eventarc redelivery/fifth-attempt dead letter. |
+| Correlated trace/audit | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 11](../../assets/evidence/11-current-route-correlation.md)/[13](../../assets/evidence/13-current-route-trace.md): 25 Aug, 28 events/3 invocations and a 22-span trace. [Evidence 14](../../assets/evidence/14-live-validation.md): 27 Oct, 560 events/60 invocations and one time-matched 22-span trace, not an embedded investigation-ID join. Retention remains dated [evidence 07](../../assets/evidence/07-observability.md) configuration proof; no new retention/immutability claim. |
+| Recurring trigger or event-driven limitation | Yes | Yes | Yes | Yes | Yes | Yes | August snapshot: observed Pub/Sub/Eventarc path, no Scheduler job. [Evidence 14](../../assets/evidence/14-live-validation.md): 20 further Pub/Sub/Eventarc completions on 27 Oct, without a fresh Scheduler census. Say **triggered by an approved enterprise event source**, not recurring/continuous operation. |
+
+## Post-hackathon report validation, 27 October 2026
+
+[Evidence 14](../../assets/evidence/14-live-validation.md) adds 20 one-attempt real-IAM
+executions on one project, 560 correlated audit records/60 invocations, 40 model submissions
+and 40 review records carrying three delivered finding instances per investigation.
+Client confirmation median 20.461s includes 5s polling; Runtime audit median 15.948207s
+measures a different interval. Original source/checkpoint and the collector's read-only
+recovery are retained; no successful investigation was rerun or excluded.
+
+Five replay publications had unchanged effects observed for 120s, not independently
+confirmed per-message Eventarc delivery. The new pilot trace is a unique-name/time-window
+match, not an embedded investigation-ID join. Installed package resolution and actual
+currency cost were not freshly measured. These observations strengthen bounded execution/
+delivery evidence but do not change either `Partial` row, the demo column, the 25 August
+62-binding measurement, exception-expiry proof, or C4's deferred status.
 
 ## Publication rule
 
@@ -53,12 +71,10 @@ metadata, image 04 shows inline screening but not the IAM read split, and image 
 correlation and retention but not cross-week exception continuity. Each underlying claim keeps its
 status here — the narrowing is about what a screenshot proves, not about what is true.
 
-**One claim shape is newly unsafe as of `v0.6.0`:** anything implying the repository's dependency
-versions are the ones running in production. They are not. The repository pins `google-adk` 2.8.0;
-both deployed surfaces still run the 2.7.1 resolution `v0.4.0` deployed. Every observation in the
-evidence set stays true of the fleet it observed, but "we run ADK 2.8.0 in production" is not
-available until a redeploy and live re-verification happen — which will also oblige re-capturing
-evidence 11, 12 and 13 and recomposing gallery images 03, 04 and 05.
+**Version boundary:** the source targets Google ADK 2.13.0; the retained August and
+October cohorts describe the earlier deployment. A source pin does not establish a production
+version. See [the canonical provenance table](../../docs/VERSIONS.md). Fresh captures must name
+new revisions and remain separate from the immutable historical bundles.
 
 Mutable live counts, upstream issue/PR status, public links, official rules, and video availability
 must be refreshed immediately before publication; this review is not authority for facts that can

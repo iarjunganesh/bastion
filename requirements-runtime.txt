@@ -1,0 +1,3 @@
+# Managed source deployment: use the same reviewed transitive pins as Cloud Run.
+-c requirements.lock
+-r requirements.txt

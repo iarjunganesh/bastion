@@ -208,5 +208,13 @@ IAM/idempotency, and retained observability. The count-only machine capture is
 [gcp-state.json](../assets/architecture/gcp-state.json); the evidence index is
 [assets/README.md](../assets/README.md).
 
+The separately dated [27 October validation](../assets/evidence/14-live-validation.md)
+completed 20 investigations on this unchanged route, with 560 correlated audit records and
+confirmed deterministic gate/delivery milestones. Worker revisions and Runtime update metadata
+were unchanged; installed package resolution was not freshly enumerated. The supplement retains
+its collector recovery, timing definitions and bounded replay/trace observations. It does not
+refresh the August infrastructure inventory or binding census, demonstrate a literal week of
+exception continuity, or close the unregistered-caller and watched retry/DLQ captures.
+
 This architecture does not claim automated IAM remediation, immutable audit storage, legal
 compliance certification, end-to-end EU model residency, or historical SLO attainment.

@@ -2,14 +2,14 @@
 
 **Captured:** 2026-08-15
 **Model:** `gemini-3.5-flash` via Vertex AI, `GOOGLE_CLOUD_LOCATION=global`
-**Framework:** `google-adk==2.7.0`, `SequentialAgent` over three `LlmAgent`s
+**Framework:** `google-adk` v2.7.0, `SequentialAgent` over three `LlmAgent`s
 **Guardrail:** Model Armor `bastion-guardrail` (`europe-west4`) on `before_model_callback`
 
 > **Superseded as current-route proof on 2026-08-25.**
 > [Evidence 11](11-current-route-correlation.md) is now the authoritative real-IAM provenance for the
 > deployed route, and [evidence 13](13-current-route-trace.md) its reasoning chain. This file is
 > retained as **historical** and must not be cited for current behaviour: it predates the Gateway,
-> ran three `LlmAgent`s where the fleet now runs one, pins `google-adk==2.7.0` rather than 2.7.1, and
+> ran three `LlmAgent`s where the fleet now runs one, pins `google-adk` v2.7.0 rather than 2.7.1, and
 > reports two findings against a policy that measured 62 bindings and three findings on 2026-08-25.
 
 One investigation, run end to end against the live `bastion-fleet-2026` IAM policy:

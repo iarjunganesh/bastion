@@ -1,0 +1,209 @@
+{
+  "observed_date_utc": "2026-10-27",
+  "final_phase": "completed",
+  "stop_reason": null,
+  "project_count": 1,
+  "input": "Existing real-IAM product path; no retained raw policy snapshots.",
+  "sample_boundary": "Repeated executions on one project, not independent IAM policies, detector accuracy, explanation usefulness, a leakage rate, or historical SLO attainment.",
+  "counts": {
+    "unique_event_publication_attempts": 20,
+    "unique_event_publications_acknowledged": 20,
+    "completed_with_required_evidence": 20,
+    "durable_completed": 20,
+    "unvalidated_attempts": 0,
+    "replay_publication_attempts": 5,
+    "replay_publications_acknowledged": 5,
+    "confirmation_seconds": {
+      "n": 20,
+      "minimum": 20.219,
+      "median": 20.461,
+      "maximum": 116.266
+    },
+    "actual_cost_sek": null,
+    "actual_cost_status": "not_measured_from_payload_free_audit"
+  },
+  "validated_run_audit_events": 560,
+  "all_attempt_audit_events_captured": 560,
+  "validated_run_invocations": 60,
+  "validated_run_review_records": 40,
+  "validated_run_delivered_findings": 60,
+  "model_submissions_captured": {
+    "gemini-3.5-flash": 40
+  },
+  "confirmation_latency_method": "client_publish_start_to_first_completed_poll_monotonic",
+  "poll_interval_seconds": 5,
+  "audit_duration_seconds": {
+    "orchestrator": {
+      "n": 20,
+      "minimum": 13.238595,
+      "median": 15.948206500000001,
+      "maximum": 101.58766
+    },
+    "access_auditor": {
+      "n": 20,
+      "minimum": 9.605821,
+      "median": 12.3822925,
+      "maximum": 36.528981
+    },
+    "policy_step": {
+      "n": 20,
+      "minimum": 0.566178,
+      "median": 0.830735,
+      "maximum": 4.516223
+    },
+    "policy_gate": {
+      "n": 20,
+      "minimum": 0.20831,
+      "median": 0.26581699999999997,
+      "maximum": 50.090787
+    },
+    "escalation_agent": {
+      "n": 20,
+      "minimum": 1.993366,
+      "median": 2.418463,
+      "maximum": 84.206786
+    },
+    "escalation_gate": {
+      "n": 20,
+      "minimum": 0.231543,
+      "median": 0.255909,
+      "maximum": 0.315466
+    }
+  },
+  "replay_boundary": "Pub/Sub publication acknowledged; unchanged durable/review/agent effects observed for a bounded window, not per-message Eventarc delivery proof.",
+  "replays_with_unchanged_effects_observed": 5,
+  "authorization_ceiling_sek": 500,
+  "actual_cost_sek": null,
+  "actual_cost_status": "Not available from the payload-free audit; billing is delayed.",
+  "deployment_provenance": {
+    "observed_at": "2026-10-27T21:53:17.296029+00:00",
+    "project": "bastion-fleet-2026",
+    "run_region": "europe-north2",
+    "runtime_region": "europe-west4",
+    "operator_quota_project": "bastion-fleet-2026",
+    "cloud_run": [
+      {
+        "service": "bastion-access-auditor",
+        "ready_revision": "bastion-access-auditor-00031-sbr",
+        "latest_revision_ready": true
+      },
+      {
+        "service": "bastion-escalation-agent",
+        "ready_revision": "bastion-escalation-agent-00027-nkv",
+        "latest_revision_ready": true
+      },
+      {
+        "service": "bastion-findings-api",
+        "ready_revision": "bastion-findings-api-00020-j7c",
+        "latest_revision_ready": true
+      },
+      {
+        "service": "bastion-orchestrator",
+        "ready_revision": "bastion-orchestrator-00029-ncd",
+        "latest_revision_ready": true
+      }
+    ],
+    "managed_engine_resource_count": 2,
+    "dispatcher_runtime_target_verified": true,
+    "runtime_create_time": "2026-08-15T21:58:45.939272Z",
+    "runtime_update_time": "2026-08-23T20:11:42.255773Z",
+    "source_code_metadata_keys": [
+      "inlineSource",
+      "pythonSpec"
+    ],
+    "package_requirements_reference_present": false,
+    "dependency_resolution_freshly_enumerated": false,
+    "eventarc_expected_path_verified": true,
+    "eventarc_expected_topic_verified": true,
+    "firestore_location_verified": "europe-north2",
+    "transport_ack_deadline_seconds": 600,
+    "configured_max_delivery_attempts": 5,
+    "adc_firestore_read_verified": true,
+    "adc_publish_permission_verified": true,
+    "adc_logging_read_verified": true,
+    "secret_or_environment_values_retained": false
+  },
+  "collector_sha256": "d4f276545e46382977b7b2723781ce5db9c3876b49ae9c778c90ee9b4845530b",
+  "collector_history": [
+    {
+      "sha256": "db6dba87e0d5879139e2c0cb6ef77cca8282381bce529895e1c619e75e84b63e",
+      "source_archive": "initial-stop-collector-v1.zip",
+      "source_archive_sha256": "c555a64e6d15e807b708b992749cbff55dc4abbe7e800b073ab61d8acc42c0b6",
+      "new_events_executed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "sha256": "d4f276545e46382977b7b2723781ce5db9c3876b49ae9c778c90ee9b4845530b",
+      "source_file": "collect.py"
+    }
+  ],
+  "collector_repair": {
+    "approved_by_user": true,
+    "recorded_at": "2026-10-27T22:21:59.860822+00:00",
+    "change": "Wait for both start and completion milestones before computing stage durations.",
+    "deployed_code_or_configuration_changed": false,
+    "original_count_time_and_spending_limits_preserved": true,
+    "paused_seconds_before_recovery": 969.06064
+  },
+  "original_stops_preserved": [
+    {
+      "reason": "missing_audit_duration_boundary",
+      "new_event_count": 7,
+      "last_checkpoint_at": "2026-10-27T22:05:50.800182+00:00",
+      "checkpoint_sha256": "d1aee2bdf6d5b98971ac6432351b441e8638cd459c83483c17354cd5c587968f"
+    }
+  ],
+  "runs_with_readonly_evidence_recovery": 1,
+  "analysis_sha256": "5611b0dd7c099f0e24e00fded03aad5bf71315fe53a0b62ba7616b9237a2ca8d",
+  "protected_shape_check_passed": true,
+  "pilot_trace": {
+    "span_count": 22,
+    "connected_single_tree": true,
+    "five_steps_in_order": true,
+    "correlation_method": "Unique invoke_workflow orchestrator span whose start and end are each within one second of the pilot Runtime audit boundaries.",
+    "embedded_investigation_id_join": false,
+    "span_attributes_requested": false
+  },
+  "runtime_source_provenance": {
+    "observed_at": "2026-10-27T22:32:13.432541+00:00",
+    "runtime_update_time": "2026-08-23T20:11:42.255773Z",
+    "declared_python_version": "3.12",
+    "requirements_file_basename": "requirements.txt",
+    "inline_source_metadata_keys": [],
+    "deployed_adk_pin_freshly_verified": false,
+    "installed_environment_independently_enumerated": false,
+    "dependency_boundary": "No source requirement pin or installed package version is inferred from this metadata. The retained August ADK resolution remains dated historical evidence.",
+    "source_archive_or_environment_contents_saved": false
+  },
+  "deployment_verification": {
+    "observed_at": "2026-10-27T22:37:34.760626+00:00",
+    "unchanged_cloud_run_revisions": true,
+    "all_latest_revisions_ready": true,
+    "unchanged_runtime_update_time": "2026-08-23T20:11:42.255773Z",
+    "expected_correlated_audit_records": 560,
+    "reverified_correlated_audit_records": 560,
+    "unexpected_additional_correlated_audit_records": 0,
+    "all_worker_log_revisions_match_snapshot": true,
+    "investigations_with_both_worker_revisions_verified": 20,
+    "worker_audit_records_by_service": {
+      "bastion-access-auditor": 200,
+      "bastion-escalation-agent": 80
+    },
+    "runtime_audit_records": 280,
+    "runtime_log_target_field_available": true,
+    "all_runtime_log_targets_match_dispatcher": true,
+    "runtime_resource_label_keys_only": [
+      "location",
+      "reasoning_engine_id",
+      "resource_container"
+    ],
+    "raw_resource_identifiers_or_private_origins_exported": false
+  }
+}
