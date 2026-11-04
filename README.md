@@ -173,7 +173,8 @@ Observed production checks include:
 **Versions and evidence are recorded separately.** The current source targets Google ADK 2.13.0
 and A2A SDK 1.3.0. The August captures and 27 October study describe the earlier deployed
 fleet; they are not measurements of the upgraded source. The October study rechecked unchanged
-worker revisions and Runtime update metadata, without freshly enumerating installed packages.
+worker revisions and Runtime update metadata. On 4 November the serving image's installed
+packages were read directly: `google-adk` 2.7.1 and 160 other distributions, built 23 August.
 [The version/provenance table](docs/VERSIONS.md) records each cohort and deployment status.
 Both Cloud Run and managed Runtime must be updated and re-verified before claiming that
 production runs the new release. Existing evidence stays dated and unchanged.

@@ -6,6 +6,11 @@ session state only. [docs/UPGRADE-PLAN.md](../UPGRADE-PLAN.md) covers the ADK/re
 (Track U) only. Private values (credit balances, ceilings, raw captures) go in ignored `.local/`;
 its earlier history, including the old private roadmap, is in the maintainer's out-of-repo archive.
 
+**Status, 4 November:** cohort N is complete (E1–E7b, E5, E6; E8 skipped) and on `main`, as are
+both source fixes (not yet deployed). Phase 1 is done apart from related-work references. Next:
+the 5 November billing recheck, the 8 November freeze, cohort F (8–10 November), the fleet end
+state before 11 November, then the single rewrite.
+
 **Goal:** one coherent, citable technical report (C1–C3) in which every dated claim maps to
 sealed evidence, using the remaining GCP credits in small, pre-registered chunks before expiry.
 
@@ -29,7 +34,7 @@ A read-only census on 28 October (19:23 UTC) replaced several assumptions with o
   Scheduler jobs. Investigations: 57 completed, 4 failed and 2 stale `running` records, all
   failures and stale records dated 15–22 August. 82 human-review records exist.
 - Not readable by API here: credit balances, per-service cost (no billing export), and the
-  installed packages of the deployed image and Runtime.
+  Runtime's installed packages. The image's packages were read on 4 November (E1 below).
 
 - **Report:** one source set in `report/` (untracked by request) assembles a 13-page PDF. Until
   the 28 October cleanup three builds circulated (two in `report/` with different hashes, one
@@ -114,18 +119,22 @@ re-argued in the results:
 
 The maintainer correction stands: no manuscript prose edits and no PDF builds in this phase.
 
-- [ ] Write `report/OUTLINE.md` (uncommitted): target structure, a one-sentence thesis per
+- [x] Write `report/OUTLINE.md` (uncommitted; **drafted 4 Nov** with the "silent success at
+  agent boundaries" thesis, data minimisation as the design; the maintainer may swap the headline): target structure, a one-sentence thesis per
   section, and a claim map (claim ID → section → evidence ID → status: observed, configured,
   offline-tested, partial, stale). Target structure: 1 Introduction; 2 Background and related
   work; 3 Threat model and design goals; 4 System design; 5 Evaluation method (cohorts, metrics,
   timing definitions, data handling); 6 Results (route, repeatability, control probes, cost);
   7 A2A state-boundary case study; 8 Discussion and limitations (each limitation stated once);
   9 Conclusion and future work; Appendix A Reproducibility; Appendix B Evidence ledger; References.
-- [ ] Derive the evidence-gap list from claim-map rows marked partial, stale or unobserved. It
+- [x] Derive the evidence-gap list from claim-map rows marked partial, stale or unobserved. It
   becomes the chunk backlog in Phase 3; a gap with no chunk is reported as a limitation.
-- [ ] O1: rerun the localhost A2A reproduction on ADK 2.13.0 in a fresh Python 3.12 environment
+  **Done 4 Nov** in `report/OUTLINE.md`: the only remaining run is cohort F.
+- [x] O1: rerun the localhost A2A reproduction on ADK 2.13.0 in a fresh Python 3.12 environment
   built from `requirements.lock`; record whether both upstream warnings fire. No model or cloud
-  calls. This replaces "the reproduction was not rerun" in §5.3 with a result.
+  calls. This replaces "the reproduction was not rerun" in §5.3 with a result. **Done 4 Nov**
+  ([evidence 22](../../assets/evidence/22-a2a-state-boundary-reproduction.md)): both
+  directions behave as in August and both upstream warnings fire.
 - [ ] List candidate related-work references; verify each against its primary source before use.
 
 ## Phase 2 — Credits gate (maintainer, about 15 minutes, read-only)
@@ -160,21 +169,27 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
 
 | Chunk | Closes | Surface | Model calls | Creates resources | Target |
 |---|---|---|---|---|---|
-| E1 Census | Fresh binding and pre-policy finding counts; exception-ledger state; retention configuration; deployed package provenance | Read-only APIs | 0 | No | **Done 28 Oct** except image packages |
+| E1 Census | Fresh binding and pre-policy finding counts; exception-ledger state; retention configuration; deployed package provenance | Read-only APIs | 0 | No | **Done 28 Oct**; packages 4 Nov |
 | E2 Negative authorization | Escalation IAM-read denial; findings API missing/wrong token and invalid payload | Impersonation and HTTP probes | 0 | No | **Done 3 Nov** ([evidence 17](../../assets/evidence/17-negative-authorization.md)) |
 | E3 Screening refusal | Agent-mediated Model Armor refusal with a benign control | Direct authenticated Auditor | At most 2 | No | **Done 3 Nov** ([evidence 18](../../assets/evidence/18-model-armor-refusal-reprobe.md)) |
 | E4 Exception lifecycle | Approval, suppression and **expiry firing** (never yet observed); an ID-joined trace; per-run tokens and cost | Production path, maintainer as reviewer | About 6 | One real, self-expiring approval | **Done 3 Nov** ([evidence 16](../../assets/evidence/16-exception-lifecycle.md)) |
-| E5 Gateway refusal (P0.10) | Unregistered-caller refusal at Gateway/Registry/IAP | Design note first | 0 | Possibly a test identity | 2–3 Nov |
-| E6 Retry and dead letter (P0.11) | Watched redelivery and fifth-attempt dead letter | Isolated topic, trigger and service with equivalent policy | 0 | Yes, removed afterwards | 3–4 Nov |
+| E5 Gateway refusal (P0.10) | Gateway refusal of egress it does not match to a registered endpoint (design note below) | Read-only logs | 0 | No | **Done 4 Nov** ([evidence 20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md)) |
+| E6 Retry and dead letter (P0.11) | Watched redelivery and dead letter (design note below) | Production subscription, one synthetic rejected event | 0 | No | **Done 4 Nov** ([evidence 21](../../assets/evidence/21-redelivery-and-dead-letter.md)) |
 | E7 Repeatability | Twenty serial investigations with per-run tokens, attributable cost, ID-joined traces and per-message replay delivery | Production path | About 40 | No | **Done 3 Nov** (E7 stopped at 8; E7b 20/20) |
 | E8 (optional) | C4 automated-metric pilot | Synthetic policies only | Separately budgeted | No | After the 4 Nov gate |
 
 - **E1:** done read-only on 28 October (results under Grounded state; private outputs in
   `.local/measurements/2026-10-28-ground-truth/`). The census used the Auditor's own fetch and
-  detector with a throwaway in-memory ID key, so no production secret was read. Remaining: list
-  the installed packages by pulling the deployed image (tiny billable egress, after Phase 2).
-  The Runtime API does not return its source archive, so its installed resolution stays
-  undeclared; say so rather than infer it.
+  detector with a throwaway in-memory ID key, so no production secret was read. **Packages done
+  4 Nov:** all four Cloud Run services serve one digest (`sha256:dd9853bd…`, built 23 Aug
+  19:59 UTC, Python 3.12.14). Streaming only its `pip install` layer (about 254 MB, never
+  written to disk) gave 161 installed distributions, among them `google-adk` 2.7.1,
+  `a2a-sdk` 1.1.2, `google-cloud-aiplatform` 1.165.1, `google-genai` 2.19.0 and
+  `opentelemetry-api`/`-sdk` 1.42.1. The image's `requirements.txt` is byte-identical to commit
+  `f589b25`'s, and no commit changed it between 22 and 24 August. The Runtime API returns its
+  Python spec (3.12, `requirements.txt`) but not its source archive, so the Runtime's resolution
+  stays undeclared: it was deployed at 20:11 UTC the same evening, from the same requirements file
+  by inference only. Private bundle in `.local/measurements/2026-11-04-E1-packages/`.
 - **E2:** if the maintainer's impersonation right on the Escalation identity no longer exists,
   stop; do not grant it. **Done 3 Nov:** all 15 checks matched their expected outcome: 13
   refusals or denials (approval endpoint, Auditor peer origin, Escalation IAM read) and 2
@@ -184,8 +199,8 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   `policy_match` and nothing ran after it. The refusal audit record carries investigation ID
   `unknown` because the guardrail does not forward it, but it shares its invocation ID with
   records that carry the investigation ID, so it joins in two hops (checked 3 Nov). A
-  single-hop fix is a source change; deploy it only after the freeze (D1). Written 4 Nov,
-  uncommitted, with the completion check below.
+  single-hop fix is a source change; deploy it only after the freeze (D1). Written 4 Nov and
+  merged to `main` (PR #4) with the completion check below; not yet deployed.
 - **E4:** the findings API accepts any future `approved_until` up to 90 days, so expiry can be
   observed within an hour. The approval is a real maintainer decision on a real finding; it is
   the chunk's only state change and it expires by construction. **Done 3 Nov, 19:19–19:46
@@ -194,8 +209,8 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   It did not deliver an ID-joined trace or per-run tokens (see E7).
 - **E5/E6:** each needs a short design note and explicit approval because it may create an
   identity or resources. Production allowlists, retry policy and IAM bindings stay unchanged.
-  E6 results are claimed for an isolated, configuration-equivalent path, not production fault
-  injection.
+  **Done 4 Nov:** E5 was read-only; E6 ran as proposal E6-A on the production subscription
+  with the maintainer's explicit approval for that one synthetic event.
 - **E7:** reuses the October protocol with the instrumentation October lacked. E4 tested that
   instrumentation and two parts failed. The token metric is project-wide and minute-aligned,
   so E7 needs an idle minute between runs to attribute tokens. Audit entries carry no trace
@@ -213,17 +228,150 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   0 false completions, 25/25 Eventarc deliveries, 5/5 replays unchanged, median 20.4 s, 5 runs
   at 136–206 s (pre-Runtime waits with new Runtime instances, and unexplained stalls in
   `policy_step`/`policy_gate`). Recorded in [evidence 19](../../assets/evidence/19-repeatability-and-false-completion.md).
-  Fix written 4 Nov (uncommitted): success requires the completion gate's confirmation in the
-  Runtime stream. **Post-fix cohort F (maintainer-approved 4 Nov):** after the freeze, redeploy
+  Fix written 4 Nov and merged to `main` (PR #4), not yet deployed: success requires the
+  completion gate's confirmation in the Runtime stream. **Post-fix cohort F (maintainer-approved 4 Nov):** after the freeze, redeploy
   and run about 5 investigations 8–10 November, reported separately from cohort N.
-- **Order:** E1 → Phase 2 billing check → E2, E3 → E4 → E7 → E5, E6 → freeze.
+- **Order (as run):** E1 → Phase 2 billing check → E4 → E2, E3 → E7, E7b → E5, E6 → E1
+  packages → freeze → cohort F. All of cohort N is done.
 - **4 November gate: decided 4 Nov, E8 skipped.** Spend is under 1 SEK, but C4 stays deferred
   (D2) and the remaining days go to E5, E6 and cohort F. The report states C4 as future work
   with no results.
 
+## E5 and E6 design notes (4 November, grounded read-only)
+
+Every statement below was checked against the live project on 4 November with read-only calls,
+against Google's Pub/Sub documentation (accessed 4 November), or is marked as something the run
+itself must establish.
+
+### E5: managed Gateway refusal (P0.10)
+
+**Correction to the plan.** Agent Gateway `bastion-egress` is `AGENT_TO_ANYWHERE`: it governs
+the Runtime's outbound calls only. An "unregistered caller" test does not apply to it. Worker
+ingress is protected by the peer credential, which E2 already probed (P1, P2). E5 is therefore
+about **egress the Gateway does not match to a registered endpoint**.
+
+Grounded configuration:
+
+- Gateway bound to one regional Registry (17 entries: 2 Cloud Run workers, the Runtime and 14
+  Google API endpoints); IAP authorization extension with no `failOpen` (fail-closed) and
+  policy version V1; a `CUSTOM` `REQUEST_AUTHZ` policy targeting the Gateway.
+- The Runtime's Agent Identity holds `roles/iap.egressor` project-wide, unconditionally.
+- The Gateway (4 Oct) and its policy (26 Oct) carry later update times, but no admin-activity
+  audit entry exists for the project since 1 September (query verified against 23 August
+  entries). These were platform-side updates, not customer changes.
+
+Already observed, in the IAP data-access log (30-day retention):
+
+- **176 refusals**, all `AuthorizeUser` code 7: permission `iap.webServiceVersions.egressViaIAP`
+  not granted on resource `unregisteredEndpoint`.
+- Every one is the same request: the SDK's Resource Manager `GetProject` call to
+  `cloudresourcemanager.mtls.googleapis.com` over gRPC. The Runtime logged it as
+  `PERMISSION_DENIED: Egress request is not authorized ... unregistered in the Agent Registry`.
+- **12 at each of the 13 Runtime instance starts** on 27 October and 3 November (156), plus
+  20 in pairs during runs. Every investigation in those windows completed regardless.
+- The denial record carries no authenticated principal. No granted decision appears in this log.
+
+**Known since August as defect D2:** the Registry has a gRPC entry for that exact host (created
+18 August), yet IAP resolved the request to `unregisteredEndpoint`. The
+[observation backlog's D2](observation-backlog.md#d2-iap-mediated-egress-cannot-resolve-a-non-standard-google-host)
+recorded the same signature in August, with an inferred cause: non-standard Google hostnames
+are not matched to their Registry entries, and plain `*.googleapis.com` hosts are not
+IAP-checked at all. (Corrected after E5: the first write-up called it unexplained.)
+
+**Proposal E5-A (recommended): read-only, 0 SEK, no test identity.** Collect a count-only
+bundle of these decisions, correlated with the Runtime instance starts, before the 30-day log
+window drops 27 October (about 26 November). Evidence page 20.
+
+- Claim: *the managed Gateway, with fail-closed IAP enforcement, refused every observed egress
+  request it did not match to a registered endpoint (176 decisions across 13 Runtime instance
+  starts), and investigations continued.*
+- Limits: incidental, not a destination chosen by the experimenter; the refused host has a
+  Registry entry, so this shows refusal of *unmatched* egress, not of a known-unregistered
+  destination; no matched allow is visible in the same log.
+
+A deliberate probe to a chosen unregistered host would need new code inside the Runtime, which
+is a production fault switch and a redeploy. Not proposed.
+
+### E6: retry and dead letter (P0.11)
+
+Grounded configuration:
+
+- Eventarc's Pub/Sub push subscription on `bastion-investigations`: ack deadline 600 s,
+  exponential retry 10–600 s, `maxDeliveryAttempts` 5 to `bastion-investigations-dead-letter`,
+  1-day retention, OIDC push to `/apps/orchestrator/trigger/eventarc`.
+- The project's own Pub/Sub service agent holds `pubsub.publisher` on the dead-letter topic
+  and `pubsub.subscriber` on the source subscription. Without both, dead-lettering never
+  happens; both are present.
+- `bastion-dead-letter-review` (pull, 7-day retention) has an empty backlog. The
+  dead-letter-forwarded metric is zero for the whole 40-day metric window, and every push
+  (25 on 27 October, 36 on 3 November) was acknowledged. The boundary has never fired.
+- The deployed ingress (`c81b4af`, unchanged since) validates the event before any state write:
+  a well-formed event with `mock_data: true` is answered HTTP 400 with no Firestore write and no
+  model call.
+
+Documented Pub/Sub behaviour (accessed 4 November 2026):
+
+- [Push subscriptions](https://docs.cloud.google.com/pubsub/docs/push): only 102, 200, 201,
+  202 and 204 acknowledge; "To send a negative acknowledgment for the message, return any other
+  status code." The ingress's HTTP 400 is therefore a negative acknowledgement and is resent.
+  Push backoff, which cannot be turned off, separately pauses delivery for 100 ms to 60 s after
+  negative acknowledgements; "the total delay is the maximum combined value of both."
+- [Retry policy](https://docs.cloud.google.com/pubsub/docs/subscription-retry-policy): after
+  the first failure Pub/Sub waits the minimum backoff (10 s here), adds time for each
+  consecutive failure up to the maximum (600 s), per message, "on a best-effort basis". No
+  exact formula is published, so the intervals are measured, not predicted.
+- [Dead-letter topics](https://docs.cloud.google.com/pubsub/docs/dead-letter-topics): the
+  attempt count is approximate. Pub/Sub "might forward a message after fewer attempts than
+  configured, or it might attempt delivery a few more times before forwarding", and only counts
+  attempts when the dead-letter topic and its service-agent grants are correct (verified
+  above). The forwarded message carries `CloudPubSubDeadLetterSourceDeliveryCount` and the
+  source subscription; `subscription/dead_letter_message_count` counts forwards.
+
+**Proposal E6-A (recommended): the production subscription, one synthetic poison event,
+0 new resources, about 0 SEK.**
+
+1. Preflight (read-only): dead-letter backlog 0; subscription and grants as above; no
+   investigation in flight.
+2. Publish one event with fresh UUIDs and `mock_data: true`, plus a message attribute marking
+   it as the E6 probe.
+3. Observe: the Orchestrator request log (status and time of each delivery to the trigger
+   path), push and dead-letter metrics, and the dead-letter backlog.
+4. When the backlog reaches 1, pull that one message, confirm the probe marker, record
+   `CloudPubSubDeadLetterSourceDeliveryCount` and the source subscription, then acknowledge it
+   so the review queue is empty again.
+5. Confirm no Firestore investigation exists for the probe's event ID.
+
+Stop rules: any 2xx answer to the probe; any Firestore write; a dead-letter backlog not 0 at
+preflight; 30 minutes without dead-lettering (then report the attempts actually observed).
+
+- Claim if it passes: *on the production subscription, a rejected event was delivered N times
+  in total (the first attempt plus N−1 redeliveries) at observed intervals and forwarded to the dead-letter topic, where review found it.* N comes
+  from the request log and the delivery-count attribute; the documentation calls the configured
+  five approximate, so a different N is a result, not a failure.
+- Limits: exercises a permanent rejection (HTTP 400), not a transient dependency failure with
+  reclaim (the August failed-and-reclaimable observation, evidence 06, stays the evidence for
+  that). It is a deliberate poison message on the production topic, so it needs explicit
+  approval under the no-routine-fault-injection rule.
+
+**Result, 4 November 20:35–20:40 UTC:** run as E6-A. Five deliveries, all HTTP 400, at
+start-to-start gaps of 32.3 s (the first response took 18.6 s), 14.0, 17.2 and 22.9 s; forwarded
+with `CloudPubSubDeadLetterSourceDeliveryCount = 5`, pulled 104.7 s after publication, marker
+and `mock_data: true` payload confirmed, acknowledged; no investigation document written; no
+further delivery in a 2-minute quiet period. The first collector crashed on an empty pull
+(`DeadlineExceeded`); the event was not republished and a resume script finished the
+observation (disclosed in evidence 21). Private bundle in `.local/measurements/2026-11-04-E6/`.
+
+**Alternative E6-B (not recommended): isolated copy.** A test topic, subscription, dead-letter
+topic and Cloud Run service with the same policy. It creates and removes resources, and it
+tests a copy rather than the production subscription; only worth it if E6-A is not approved.
+
 ## Phase 4 — Evidence freeze and fleet end state
 
-- [ ] 8 November: evidence freeze. The claim map is final; no new runs.
+- [ ] 8 November: evidence freeze. The claim map is final; no new cohort-N runs.
+- [ ] 8–10 November, cohort F (maintainer-approved 4 Nov; needs a go at deploy time): redeploy
+  `main` (completion confirmation, refusal investigation ID) to all four Cloud Run services and
+  the managed Runtime, verify the fleet, run about 5 investigations, and report them separately.
+  This closes claims B3 and B4 in the outline.
 - [ ] Before 11 November: execute the D4 end state (dry run first). Confirm in Billing that
   nothing continues to accrue once the credits end.
 

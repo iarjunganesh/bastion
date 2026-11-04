@@ -57,8 +57,8 @@ Each needs live GCP credentials and an approved operator workstation. None is a 
 | 3 | ~~One investigation's reasoning chain in Cloud Trace~~ | — | **Closed 2026-08-25** — [evidence 13](../../assets/evidence/13-current-route-trace.md). One connected 22-span trace over 1m 5.401s covers the managed Runtime, both A2A hops with their agent-card fetches, the Firestore exception lookup nested inside `policy_step`, and `escalation_gate`. D2's feared trace impairment did not materialise on this route. |
 | 4 | ~~Structured audit logs correlated by context ID for that same run, **including a refusal**~~ | — | **Closed 2026-08-25, with a stated boundary** — [evidence 11](../../assets/evidence/11-current-route-correlation.md) assembles 28 unique payload-free events across three invocation ids under one investigation id, and [evidence 12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md) supplies a refusal recorded under the same audit contract. The refusal comes from a separate probe, not from the correlated run itself, so the guardrail trail is observed but the two are not one investigation. |
 | 5 | ~~The redacted real-IAM basis for the findings, from the current route~~ | — | **Closed 2026-08-25** — [evidence 11](../../assets/evidence/11-current-route-correlation.md). A count-only companion probe on the current route measured 62 live bindings, 3 deterministic findings, 2 canonical owning departments and 0 raw IAM fields at the model boundary. This supersedes [evidence 02](../../assets/evidence/02-gemini-investigation.md), which stays retained as historical pre-Gateway proof. |
-| 6 | Gateway refusals: unregistered caller, undeclared skill | — | **Two**, not three. The rate-limit refusal was removed by decision below, not deferred; both remaining refusals are asserted offline in `tests/security/test_gateway_policy.py` |
-| 7 | A worker timing out, retrying, then escalating | Deployed Runtime | Retry is deployed and suite-tested; the sequence has not been watched end to end |
+| 6 | Gateway refusals: unregistered caller, undeclared skill | — | **Two**, not three. The rate-limit refusal was removed by decision below, not deferred; both remaining refusals are asserted offline in `tests/security/test_gateway_policy.py`. **Not performed as designed; replaced for the report on 2026-11-04** by [evidence 20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md): the Gateway is egress-only (`AGENT_TO_ANYWHERE`), so an unregistered-*caller* refusal cannot occur there; what was observed is fail-closed refusal of Runtime egress it did not match to a registered endpoint. Neither original probe is claimed and none is planned. |
+| 7 | A worker timing out, retrying, then escalating | Deployed Runtime | Retry is deployed and suite-tested; the sequence has not been watched end to end. **Replaced for the report on 2026-11-04** by [evidence 21](../../assets/evidence/21-redelivery-and-dead-letter.md): one rejected event on the production subscription, delivered five times in all (four redeliveries) and dead-lettered. That is a permanent rejection at the ingress, not a worker timeout; the timeout→retry→escalation sequence remains unobserved and is not claimed. |
 
 ## Scope note on capture 2
 
@@ -114,7 +114,8 @@ rather than fully. A refusal *is* recorded under the audit contract, but it come
 agent-mediated Model Armor probe rather than from the correlated investigation itself, and the
 backlog row says so. D2's predicted consequence — that IAP-mediated egress might impair the
 Runtime's OTel export and cost us capture 3 — did not occur: the trace is complete and connected.
-Captures 6 (Gateway refusals) and 7 (timeout/retry/dead-letter) remain open and unclaimed.
+Captures 6 (Gateway refusals) and 7 (timeout/retry/dead-letter) remained open and unclaimed
+until 2026-11-04, when narrower observations replaced them (see the table above).
 
 ### D1. Deterministic policy enforcement does not run, and does not fail closed
 
@@ -252,6 +253,13 @@ across the managed Runtime and both A2A workers in one tree, recorded in
 [evidence 13](../../assets/evidence/13-current-route-trace.md). D2 remains open as residual
 platform behaviour with, now, a measured absence of consequence on both the request path and the
 telemetry path.
+
+**Re-measured 2026-11-04 (read-only, [evidence 20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md)):
+unchanged.** From 5 October to 4 November, 176 denials with the same signature, all for the
+SDK's Resource Manager project lookup on `cloudresourcemanager.mtls.googleapis.com` (a registered
+gRPC endpoint): 12 at each of 13 Runtime instance starts and 20 during runs. Still no granted
+IAP decision. Investigations completed throughout. The support question above is still
+unasked.
 
 ### D3. An audit trail cannot be assembled into one investigation
 
