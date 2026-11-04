@@ -1,7 +1,8 @@
 # Evidence 17 — negative authorization probes
 
 **Captured:** 3 November 2026, about 20:00 UTC, evidence chunk E2 of cohort N. 15 probes
-against the unchanged August deployment. No model call, no investigation, and no exception
+against the unchanged August deployment: 13 expected refusals or denials and 2 positive
+controls (I1, I4), all with the expected outcome. No model call, no investigation, and no exception
 written. Tokens, service origins and identities stayed in memory; the private bundle records
 status codes and booleans only.
 

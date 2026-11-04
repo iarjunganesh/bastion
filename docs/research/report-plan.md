@@ -176,8 +176,10 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   The Runtime API does not return its source archive, so its installed resolution stays
   undeclared; say so rather than infer it.
 - **E2:** if the maintainer's impersonation right on the Escalation identity no longer exists,
-  stop; do not grant it. **Done 3 Nov:** 15 of 15 probes refused as expected (approval
-  endpoint, Auditor peer origin, Escalation IAM read); the exception ledger was unchanged.
+  stop; do not grant it. **Done 3 Nov:** all 15 checks matched their expected outcome: 13
+  refusals or denials (approval endpoint, Auditor peer origin, Escalation IAM read) and 2
+  positive controls (impersonation works; the Auditor holds the read). The exception ledger
+  was unchanged.
 - **E3: done 3 Nov.** Benign control completed; the injection fixture was refused with
   `policy_match` and nothing ran after it. The refusal audit record carries investigation ID
   `unknown` because the guardrail does not forward it, but it shares its invocation ID with
