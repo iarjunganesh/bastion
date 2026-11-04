@@ -24,8 +24,8 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ### Added — cohort N evidence
 
-- Evidence 16–19 from 3 November: exception approval, suppression and expiry; 15 negative
-  authorization probes; a Model Armor refusal re-probe; a 20-run repeatability batch with
+- Evidence 16–19 from 3 November: exception approval, suppression and expiry; 15
+  authorization checks (13 refusals or denials and 2 positive controls); a Model Armor refusal re-probe; a 20-run repeatability batch with
   per-run tokens and per-message delivery.
 
 ## [0.8.0] - 2026-10-28

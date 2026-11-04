@@ -12,8 +12,9 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
   25/25 deliveries, 5/5 replays unchanged, median 20.4 s with a 136–206 s tail in 5 runs.
   Recorded in [evidence 19](assets/evidence/19-repeatability-and-false-completion.md) and two
   claim-matrix rows. Uncommitted.
-- **3 November 2026, Claude Code: E2 and E3 done.** E2: 15 of 15 negative authorization
-  probes refused as expected, with no ledger write ([evidence 17](assets/evidence/17-negative-authorization.md)).
+- **3 November 2026, Claude Code: E2 and E3 done.** E2: all 15 authorization checks
+  matched their expected outcome (13 refusals or denials, 2 positive controls), with no ledger
+  write ([evidence 17](assets/evidence/17-negative-authorization.md)).
   E3: benign control completed; the injection fixture was refused with `policy_match`, the task
   failed, and nothing ran after it ([evidence 18](assets/evidence/18-model-armor-refusal-reprobe.md)).
   The refusal record lacks the investigation ID but joins it through the shared invocation ID
@@ -183,7 +184,8 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
 - On the maintainer's go: wrote both probes from the E4 collector, passed read-only preflights,
   then ran them once each. E2 made no model call; E3 sent two A2A messages to the Auditor with
   the peer credential held in memory only.
-- E2 passed 15 of 15 with the exception ledger unchanged. E3's control completed and its
+- E2: all 15 checks matched expectations (13 refusals or denials, 2 positive controls), with the
+  exception ledger unchanged. E3's control completed and its
   injection was refused; the refusal record was found by service and time because it lacks
   the investigation ID.
 - Sealed both bundles, wrote evidence 17 and 18, updated the claim matrix and plan. Nothing

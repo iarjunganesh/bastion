@@ -20,8 +20,8 @@ that never ran**. This deployment does not detect it; only the external stop rul
 
 ## E7b: fresh 20-run batch
 
-E7b recorded a false completion and continued (stopping only after three in a row); every other
-check still stopped the batch.
+E7b was set to record a false completion and continue, stopping only after three in a row;
+every other check still stopped the batch. No false completion occurred in E7b.
 
 | Measure | Result |
 |---|---|
