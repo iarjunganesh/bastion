@@ -50,15 +50,14 @@ YouTube upload. The Devpost page still embeds the architecture image from
 a `scripts/render_diagrams.py` run on `main` silently changes that page. Re-render on `main` only
 as an explicit decision.
 
-**A technical report is in progress** under `report/` (local draft): C1-C3 from the
-August captures plus the separately dated
-[27 October live validation](assets/evidence/14-live-validation.md). Twenty real-IAM
-investigations completed in one durable attempt each, with 560 audit records across
-60 invocations; this is one-project repeatability, not 20 independent policies or a privacy/SLO
-benchmark. Preserve the collector-recovery disclosure and replay/trace/cost limits. Quote 62
-bindings only from evidence 11 (25 Aug); no new binding census was exported. Installed package
-resolution was not freshly enumerated, and the fleet was not upgraded for the study. State
-upstream status with its check date and keep the author line "Independent researcher, Stockholm".
+**A technical report is in progress** under `report/` (private, uncommitted). It was rewritten on
+4 November to `report/OUTLINE.md`: the design (C1), the pre-defined November cohort N on the
+unchanged August deployment (C2, evidence 16–23) and silent success at agent boundaries (C3).
+Only cohort F's post-fix results are still placeholders. The 27 October study is the pilot
+(evidence 14). Quote 62 bindings only as 25 August (evidence 11) and 56 only as 28 October
+(evidence 23); one batch is never a reliability rate. Preserve every collection disclosure.
+State upstream status with its check date and keep the author line "Independent researcher,
+Stockholm".
 
 Read these before changing architecture or claims:
 

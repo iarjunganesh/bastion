@@ -377,7 +377,11 @@ tests a copy rather than the production subscription; only worth it if E6-A is n
 
 ## Phase 5 — Write the report once (8–13 November)
 
-- [ ] Restructure sources to the outline: one file per top-level section and one references file.
+- [x] Restructure sources to the outline: one file per top-level section and one references file.
+  **Done 4 Nov** (maintainer's request, ahead of the freeze): `report/sections/`, rewritten from
+  the outline and evidence 16–23; old draft archived in `.local/report-archive-2026-11-04/`.
+  Cohort F, date, `REVISION`, billing and U1–U4 refresh remain as `[[…]]` placeholders. The
+  builder still targets the old layout and is reworked before the one build.
   Drop the legacy `sections-3-5.md` header and editorial source key; update the builder to match.
 - [ ] Pin every repository link to one revision: the commit containing the final evidence. The
   builder's S5/S11 entries still name their `a0e08fc` paths; repoint them to
