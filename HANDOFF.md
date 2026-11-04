@@ -6,6 +6,28 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 
 ## Current state
 
+- **3 November 2026, Claude Code: E7 and E7b done.** E7 stopped at run 8 on a false
+  completion (durable completed, nothing ran; ingress treats the end of the Runtime stream as
+  success). E7b, a fresh batch on the maintainer's go: 20/20 passed, 0 false completions,
+  25/25 deliveries, 5/5 replays unchanged, median 20.4 s with a 136–206 s tail in 5 runs.
+  Recorded in [evidence 19](assets/evidence/19-repeatability-and-false-completion.md) and two
+  claim-matrix rows. Uncommitted.
+- **3 November 2026, Claude Code: E2 and E3 done.** E2: 15 of 15 negative authorization
+  probes refused as expected, with no ledger write ([evidence 17](assets/evidence/17-negative-authorization.md)).
+  E3: benign control completed; the injection fixture was refused with `policy_match`, the task
+  failed, and nothing ran after it ([evidence 18](assets/evidence/18-model-armor-refusal-reprobe.md)).
+  The refusal record lacks the investigation ID but joins it through the shared invocation ID
+  (two hops, verified read-only). Private
+  bundles sealed in `.local/measurements/2026-11-03-E2/` and `-E3/`. Uncommitted.
+- **3 November 2026, Claude Code: E4 done.** The exception lifecycle ran live on the unchanged
+  August fleet from 19:19 to 19:46 UTC. Baseline delivered 1 `platform-infra` + 2
+  `security-engineering`. A 15-minute approval under the maintainer's identity suppressed the
+  `platform-infra` finding (0 + 2), and the same finding returned after expiry (1 + 2). Each run
+  had 28 audit events and no gaps. Recorded in
+  [evidence 16](assets/evidence/16-exception-lifecycle.md) and a new claim-matrix row (both
+  uncommitted); the private bundle is sealed in `.local/measurements/2026-11-03-E4/`. Two
+  instrumentation gaps carry over to E7: per-run tokens need an idle minute between runs, and
+  audit entries carry no trace ID.
 - **28 October 2026, Claude Code:** the report and GCP evidence work follow one sequence,
   [docs/research/report-plan.md](docs/research/report-plan.md) (uncommitted). **D1–D4 are
   decided** (no upgrade coupling, C4 deferred, per-chunk approval, teardown after the 8 November
@@ -16,7 +38,7 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
   findings (1 `platform-infra`, 2 `security-engineering`); the only exception expired
   18 September; `bastion-audit` log bucket 365 days, unlocked; no Scheduler jobs. Private
   outputs: `.local/measurements/2026-10-28-ground-truth/`. Installed packages remain unlisted.
-- **Repository reorganized (uncommitted, branch `feature/technical-report`, HEAD `2b35e6d`):**
+- **Repository reorganized (released in v0.8.0; local branch `feature/technical-report`):**
   hackathon material is frozen in [archive/hackathon-2026/](archive/hackathon-2026/README.md);
   the claim matrix, remediation ledger, observation backlog and report plan are in
   `docs/research/`. Files the Devpost page or public console link on `main` stayed in place.
@@ -29,7 +51,9 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
   core coverage, nine experiment tests, versions (75 documents/18 pins), diagrams, redaction,
   site build/check and Markdownlint pass. `check_docs.py` passes except two historical paths in
   the untracked `report/build_report.py` (S5/S11), deferred to the Phase 5 re-pin.
-- **v0.8.0 released 28 Oct** (PR #2 with the reorganization, merged and tagged). One
+- **v0.8.0 released 28 Oct and verified:** PR #2 (with the reorganization) merged as `4d70b1b`,
+  tag `v0.8.0`, GitHub release published by the release workflow, `main` CI green for the first
+  time since PR #1, and the live console footer reads "v0.8.0, released". One
   OpenTelemetry advisory, CVE-2026-114603, is accepted with a single-ID audit exception because
   every ADK release caps OpenTelemetry below the fix; removal is tracked in [issue #3](https://github.com/iarjunganesh/bastion/issues/3).
   Source pins do not establish deployed pins: the fleet is unchanged since August.
@@ -42,19 +66,21 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 
 ## Next step
 
-Follow [docs/research/report-plan.md](docs/research/report-plan.md); do not start from the older
-sequence in docs/UPGRADE-PLAN.md until D1 is answered.
+Follow [docs/research/report-plan.md](docs/research/report-plan.md). Each chunk still needs the
+maintainer's go (D3); one daily billing check covers spend against the 100 SEK total.
 
-1. Phase 2 passed 28 Oct: October usage fully offset by credits (net 0.00 SEK). Next, pull the
-   deployed image to list installed packages (E1 rest; Docker daemon was not running).
-2. Phase 1, local and free: `report/OUTLINE.md` with the claim map and evidence-gap list, plus
-   the offline A2A reproduction rerun on ADK 2.13.0 (O1). No manuscript prose or PDF builds.
-3. Phase 3 in order E2, E3 → E4 → E7 → E5, E6, each with a pre-registered protocol approved
-   in-session, a pilot, a sealed bundle, a promoted evidence file and a next-day billing check.
-4. Evidence freeze on 8 November; fleet end state (D4) before the first credit expires on
+1. **4 Nov:** billing checked (29 Oct–4 Nov: 0.84 SEK gross, fully offset, 0.00 SEK net; recheck
+   5 Nov for late-posted 3 Nov usage). Maintainer decisions: write the two source fixes now
+   (deploy after the freeze); redeploy and run about 5 post-fix verification investigations
+   8–10 November as a separate cohort; commit cohort-N evidence now on `evidence/cohort-n`.
+   Then the 4 Nov gate (E8 or not).
+2. E5/E6 design notes (5–7 Nov); finish E1's package listing through Artifact Registry;
+   Phase 1 offline work (`report/OUTLINE.md`, O1 reproduction) in parallel.
+3. Evidence freeze on 8 November; fleet end state (D4) before the first credit expires on
    11 November; write and build the report once; publish only with explicit approval.
-5. Track U: when an ADK release admits `opentelemetry-api` 1.45.1, close [issue #3](https://github.com/iarjunganesh/bastion/issues/3)
-   and remove the audit exception. Redeploy only after the evidence freeze (D1).
+4. Track U: when an ADK release admits `opentelemetry-api` 1.45.1, close [issue #3](https://github.com/iarjunganesh/bastion/issues/3)
+   and remove the audit exception. Redeploy only after the evidence freeze (D1). Still
+   blocked on 3 Nov (latest google-adk 2.13.0).
 
 ## Session log
 
@@ -132,3 +158,39 @@ sequence in docs/UPGRADE-PLAN.md until D1 is answered.
   audit exception, documented in docs/DEPENDENCY-STATUS.md and tracked in [issue #3](https://github.com/iarjunganesh/bastion/issues/3).
 - Released the reorganization and PR #2 content as v0.8.0; updated the site footer stamp. The
   fleet was not redeployed and the report stayed uncommitted.
+
+### 2026-11-03 / Claude Code — E4 exception lifecycle
+
+- Built the E4 collector from the October bundle's collector, passed a read-only preflight
+  (fixed the approver impersonation billing to the CLI default quota project), then ran three
+  investigations and one maintainer-authorized, 15-minute exception approval.
+- Every expected count matched; the approval replaced only the exception that had expired
+  18 September. No retries, replays, deployments or IAM changes.
+- Sealed the private bundle (manifest, ZIP, protected-shape scan clean), wrote evidence 16,
+  added the claim-matrix row, and recorded the token and trace gaps for E7. Nothing committed.
+
+### 2026-11-03 / Claude Code — E2 and E3
+
+- On the maintainer's go: wrote both probes from the E4 collector, passed read-only preflights,
+  then ran them once each. E2 made no model call; E3 sent two A2A messages to the Auditor with
+  the peer credential held in memory only.
+- E2 passed 15 of 15 with the exception ledger unchanged. E3's control completed and its
+  injection was refused; the refusal record was found by service and time because it lacks
+  the investigation ID.
+- Sealed both bundles, wrote evidence 17 and 18, updated the claim matrix and plan. Nothing
+  committed.
+
+### 2026-11-03 / Claude Code — E7 stopped
+
+- On the maintainer's request, ran E7 with two-minute idle boundaries for token attribution
+  and per-publish delivery matching (both validated on E4's data first).
+- Stopped at run 8 on `unexpected_delivered_counts`: a false completion with no work done.
+  Diagnosed read-only from Runtime and Orchestrator logs; no rerun. Sealed the bundle and
+  ran the token, delivery and trace reads for the eight runs.
+
+### 2026-11-03 / Claude Code — E7b
+
+- Fresh 20-run batch on the maintainer's go, recording false completions instead of stopping.
+  20/20 passed with no false completion; replays, deliveries and per-run tokens measured.
+- Matched the five slow runs to Runtime instance starts read-only (three coincide, two do not).
+  Sealed the bundle, wrote evidence 19, added two claim-matrix rows. Nothing committed.
