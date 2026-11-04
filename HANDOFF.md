@@ -221,3 +221,14 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
   it; made the check exact and pinned it to the SDK serializer. Suite still 330 at 100%.
 - Recorded the 4 Nov gate: E8 skipped. Reviewed the draft report: substantial rewrite after
   the freeze, with an outline now. Nothing committed for the fixes.
+
+### 2026-11-04 / Claude Code — E5/E6 design, grounded read-only
+
+- Merged PR #4 (cohort N evidence and fixes) and PR #5 (Copilot wording corrections); deleted
+  the merged branches. `main` is current.
+- E5: the Gateway governs Runtime egress only, so the plan's "unregistered caller" framing was
+  wrong. 176 IAP refusals of unmatched egress already exist in the logs (12 per Runtime
+  instance start); the refused host does have a Registry entry, which stays unexplained.
+- E6: dead-letter grants are present and the boundary has never fired. Proposed one synthetic
+  rejected event on the production subscription. Both notes are in the report plan and
+  await the maintainer's go; no live action taken.

@@ -164,8 +164,8 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
 | E2 Negative authorization | Escalation IAM-read denial; findings API missing/wrong token and invalid payload | Impersonation and HTTP probes | 0 | No | **Done 3 Nov** ([evidence 17](../../assets/evidence/17-negative-authorization.md)) |
 | E3 Screening refusal | Agent-mediated Model Armor refusal with a benign control | Direct authenticated Auditor | At most 2 | No | **Done 3 Nov** ([evidence 18](../../assets/evidence/18-model-armor-refusal-reprobe.md)) |
 | E4 Exception lifecycle | Approval, suppression and **expiry firing** (never yet observed); an ID-joined trace; per-run tokens and cost | Production path, maintainer as reviewer | About 6 | One real, self-expiring approval | **Done 3 Nov** ([evidence 16](../../assets/evidence/16-exception-lifecycle.md)) |
-| E5 Gateway refusal (P0.10) | Unregistered-caller refusal at Gateway/Registry/IAP | Design note first | 0 | Possibly a test identity | 2–3 Nov |
-| E6 Retry and dead letter (P0.11) | Watched redelivery and fifth-attempt dead letter | Isolated topic, trigger and service with equivalent policy | 0 | Yes, removed afterwards | 3–4 Nov |
+| E5 Gateway refusal (P0.10) | Gateway refusal of egress it does not match to a registered endpoint (design note below) | Read-only logs | 0 | No | 5 Nov |
+| E6 Retry and dead letter (P0.11) | Watched redelivery and dead letter (design note below) | Production subscription, one synthetic rejected event | 0 | No | 5 Nov |
 | E7 Repeatability | Twenty serial investigations with per-run tokens, attributable cost, ID-joined traces and per-message replay delivery | Production path | About 40 | No | **Done 3 Nov** (E7 stopped at 8; E7b 20/20) |
 | E8 (optional) | C4 automated-metric pilot | Synthetic policies only | Separately budgeted | No | After the 4 Nov gate |
 
@@ -220,6 +220,103 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
 - **4 November gate: decided 4 Nov, E8 skipped.** Spend is under 1 SEK, but C4 stays deferred
   (D2) and the remaining days go to E5, E6 and cohort F. The report states C4 as future work
   with no results.
+
+## E5 and E6 design notes (4 November, grounded read-only)
+
+Every statement below was checked against the live project on 4 November with read-only calls,
+or is marked as something the run itself must establish. Pub/Sub's documented retry semantics
+could not be fetched in this session, so E6 records observed behaviour, not documented behaviour.
+
+### E5: managed Gateway refusal (P0.10)
+
+**Correction to the plan.** Agent Gateway `bastion-egress` is `AGENT_TO_ANYWHERE`: it governs
+the Runtime's outbound calls only. An "unregistered caller" test does not apply to it. Worker
+ingress is protected by the peer credential, which E2 already probed (P1, P2). E5 is therefore
+about **egress the Gateway does not match to a registered endpoint**.
+
+Grounded configuration:
+
+- Gateway bound to one regional Registry (17 entries: 2 Cloud Run workers, the Runtime and 14
+  Google API endpoints); IAP authorization extension with no `failOpen` (fail-closed) and
+  policy version V1; a `CUSTOM` `REQUEST_AUTHZ` policy targeting the Gateway.
+- The Runtime's Agent Identity holds `roles/iap.egressor` project-wide, unconditionally.
+- The Gateway (4 Oct) and its policy (26 Oct) carry later update times, but no admin-activity
+  audit entry exists for the project since 1 September (query verified against 23 August
+  entries). These were platform-side updates, not customer changes.
+
+Already observed, in the IAP data-access log (30-day retention):
+
+- **176 refusals**, all `AuthorizeUser` code 7: permission `iap.webServiceVersions.egressViaIAP`
+  not granted on resource `unregisteredEndpoint`.
+- Every one is the same request: the SDK's Resource Manager `GetProject` call to
+  `cloudresourcemanager.mtls.googleapis.com` over gRPC. The Runtime logged it as
+  `PERMISSION_DENIED: Egress request is not authorized ... unregistered in the Agent Registry`.
+- **12 at each of the 13 Runtime instance starts** on 27 October and 3 November (156), plus
+  20 in pairs during runs. Every investigation in those windows completed regardless.
+- The denial record carries no authenticated principal. No granted decision appears in this log.
+
+**Unexplained, and to be reported as such:** the Registry has a gRPC entry for that exact host
+(created 18 August), yet IAP resolved the request to `unregisteredEndpoint`. The cause of the
+mismatch is not visible from outside the platform.
+
+**Proposal E5-A (recommended): read-only, 0 SEK, no test identity.** Collect a count-only
+bundle of these decisions, correlated with the Runtime instance starts, before the 30-day log
+window drops 27 October (about 26 November). Evidence page 20.
+
+- Claim: *the managed Gateway, with fail-closed IAP enforcement, refused every observed egress
+  request it did not match to a registered endpoint (176 decisions across 13 Runtime instance
+  starts), and investigations continued.*
+- Limits: incidental, not a destination chosen by the experimenter; the refused host has a
+  Registry entry, so this shows refusal of *unmatched* egress, not of a known-unregistered
+  destination; no matched allow is visible in the same log.
+
+A deliberate probe to a chosen unregistered host would need new code inside the Runtime, which
+is a production fault switch and a redeploy. Not proposed.
+
+### E6: retry and dead letter (P0.11)
+
+Grounded configuration:
+
+- Eventarc's Pub/Sub push subscription on `bastion-investigations`: ack deadline 600 s,
+  exponential retry 10–600 s, `maxDeliveryAttempts` 5 to `bastion-investigations-dead-letter`,
+  1-day retention, OIDC push to `/apps/orchestrator/trigger/eventarc`.
+- The project's own Pub/Sub service agent holds `pubsub.publisher` on the dead-letter topic
+  and `pubsub.subscriber` on the source subscription. Without both, dead-lettering never
+  happens; both are present.
+- `bastion-dead-letter-review` (pull, 7-day retention) has an empty backlog. The
+  dead-letter-forwarded metric is zero for the whole 40-day metric window, and every push
+  (25 on 27 October, 36 on 3 November) was acknowledged. The boundary has never fired.
+- The deployed ingress (`c81b4af`, unchanged since) validates the event before any state write:
+  a well-formed event with `mock_data: true` is answered HTTP 400 with no Firestore write and no
+  model call.
+
+**Proposal E6-A (recommended): the production subscription, one synthetic poison event,
+0 new resources, about 0 SEK.**
+
+1. Preflight (read-only): dead-letter backlog 0; subscription and grants as above; no
+   investigation in flight.
+2. Publish one event with fresh UUIDs and `mock_data: true`, plus a message attribute marking
+   it as the E6 probe.
+3. Observe: the Orchestrator request log (status and time of each delivery to the trigger
+   path), push and dead-letter metrics, and the dead-letter backlog.
+4. When the backlog reaches 1, pull that one message, confirm the probe marker and record any
+   delivery-count attribute, then acknowledge it so the review queue is empty again.
+5. Confirm no Firestore investigation exists for the probe's event ID.
+
+Stop rules: any 2xx answer to the probe; any Firestore write; a dead-letter backlog not 0 at
+preflight; 30 minutes without dead-lettering (then report the attempts actually observed).
+
+- Claim if it passes: *on the production subscription, a rejected event was redelivered N times
+  at observed intervals and forwarded to the dead-letter topic, where review found it.* N and
+  the intervals are whatever the run shows; five is the configuration, not an assumption.
+- Limits: exercises a permanent rejection (HTTP 400), not a transient dependency failure with
+  reclaim (the August failed-and-reclaimable observation, evidence 06, stays the evidence for
+  that). It is a deliberate poison message on the production topic, so it needs explicit
+  approval under the no-routine-fault-injection rule.
+
+**Alternative E6-B (not recommended): isolated copy.** A test topic, subscription, dead-letter
+topic and Cloud Run service with the same policy. It creates and removes resources, and it
+tests a copy rather than the production subscription; only worth it if E6-A is not approved.
 
 ## Phase 4 — Evidence freeze and fleet end state
 
