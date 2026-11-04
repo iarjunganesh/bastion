@@ -224,8 +224,8 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
 ## E5 and E6 design notes (4 November, grounded read-only)
 
 Every statement below was checked against the live project on 4 November with read-only calls,
-or is marked as something the run itself must establish. Pub/Sub's documented retry semantics
-could not be fetched in this session, so E6 records observed behaviour, not documented behaviour.
+against Google's Pub/Sub documentation (accessed 4 November), or is marked as something the run
+itself must establish.
 
 ### E5: managed Gateway refusal (P0.10)
 
@@ -290,6 +290,24 @@ Grounded configuration:
   a well-formed event with `mock_data: true` is answered HTTP 400 with no Firestore write and no
   model call.
 
+Documented Pub/Sub behaviour (accessed 4 November 2026):
+
+- [Push subscriptions](https://docs.cloud.google.com/pubsub/docs/push): only 102, 200, 201,
+  202 and 204 acknowledge; "To send a negative acknowledgment for the message, return any other
+  status code." The ingress's HTTP 400 is therefore a negative acknowledgement and is resent.
+  Push backoff, which cannot be turned off, separately pauses delivery for 100 ms to 60 s after
+  negative acknowledgements; "the total delay is the maximum combined value of both."
+- [Retry policy](https://docs.cloud.google.com/pubsub/docs/subscription-retry-policy): after
+  the first failure Pub/Sub waits the minimum backoff (10 s here), adds time for each
+  consecutive failure up to the maximum (600 s), per message, "on a best-effort basis". No
+  exact formula is published, so the intervals are measured, not predicted.
+- [Dead-letter topics](https://docs.cloud.google.com/pubsub/docs/dead-letter-topics): the
+  attempt count is approximate. Pub/Sub "might forward a message after fewer attempts than
+  configured, or it might attempt delivery a few more times before forwarding", and only counts
+  attempts when the dead-letter topic and its service-agent grants are correct (verified
+  above). The forwarded message carries `CloudPubSubDeadLetterSourceDeliveryCount` and the
+  source subscription; `subscription/dead_letter_message_count` counts forwards.
+
 **Proposal E6-A (recommended): the production subscription, one synthetic poison event,
 0 new resources, about 0 SEK.**
 
@@ -299,16 +317,18 @@ Grounded configuration:
    it as the E6 probe.
 3. Observe: the Orchestrator request log (status and time of each delivery to the trigger
    path), push and dead-letter metrics, and the dead-letter backlog.
-4. When the backlog reaches 1, pull that one message, confirm the probe marker and record any
-   delivery-count attribute, then acknowledge it so the review queue is empty again.
+4. When the backlog reaches 1, pull that one message, confirm the probe marker, record
+   `CloudPubSubDeadLetterSourceDeliveryCount` and the source subscription, then acknowledge it
+   so the review queue is empty again.
 5. Confirm no Firestore investigation exists for the probe's event ID.
 
 Stop rules: any 2xx answer to the probe; any Firestore write; a dead-letter backlog not 0 at
 preflight; 30 minutes without dead-lettering (then report the attempts actually observed).
 
 - Claim if it passes: *on the production subscription, a rejected event was redelivered N times
-  at observed intervals and forwarded to the dead-letter topic, where review found it.* N and
-  the intervals are whatever the run shows; five is the configuration, not an assumption.
+  at observed intervals and forwarded to the dead-letter topic, where review found it.* N comes
+  from the request log and the delivery-count attribute; the documentation calls the configured
+  five approximate, so a different N is a result, not a failure.
 - Limits: exercises a permanent rejection (HTTP 400), not a transient dependency failure with
   reclaim (the August failed-and-reclaimable observation, evidence 06, stays the evidence for
   that). It is a deliberate poison message on the production topic, so it needs explicit
