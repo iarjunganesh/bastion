@@ -29,3 +29,7 @@ a schedule is running. ADK 2.13.0 source validation and production upgrade are s
 
 The public console uses this capture for its inventory stamp. The August architecture
 masters, screenshots, video, and sealed October study bundle remain unchanged and dated.
+
+**Follow-up:** the IAM binding census (later on 28 October) and the image's installed packages
+(4 November) were collected separately and are recorded in
+[evidence 23](23-deployment-census.md). This page keeps its original capture unchanged.

@@ -11,7 +11,7 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 
   | Chunk | Result | Evidence |
   |---|---|---|
-  | E1 census + packages | 56 bindings, 3 findings; one image digest (built 23 Aug, `google-adk` 2.7.1, 161 packages) | plan, VERSIONS |
+  | E1 census + packages | 56 bindings, 3 findings; one image digest (built 23 Aug, `google-adk` 2.7.1, 161 packages) | 23 |
   | E4 exception lifecycle | approval suppressed, expiry returned the finding | 16 |
   | E2 negative authorization | 15/15 expected (13 refusals or denials, 2 controls) | 17 |
   | E3 Model Armor re-probe | control completed, injection refused | 18 |
@@ -29,12 +29,14 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 - **Source fixes are merged but not deployed.** `run_managed_runtime` requires the completion
   gate's confirmation, and guardrail refusals carry the investigation ID. Suite: 330 tests at 100%
   configured core coverage. Codecov upload is best-effort (3-minute limit).
-- **Git:** `main` carries PRs #4 and #5. PR #6 (`design/e5-e6`: E5, E6, E1 packages, O1, these
-  doc updates) is open and merges when CI is green. The private bundles are in
+- **Git:** `main` is current with everything above (PRs #4, #5 and #6, merged 4 Nov; no open
+  PRs or feature branches). The private bundles are in
   `.local/measurements/`, sealed with manifests and ZIPs.
-- **Report:** `report/OUTLINE.md` is drafted, uncommitted. Thesis: *silent success at agent
-  boundaries*, with data minimisation as the design; the maintainer may swap the headline. The
-  13-page v1 PDF is the old draft. No prose is edited until after the freeze.
+- **Report:** rewritten on 4 Nov (maintainer's request) to `report/OUTLINE.md`, one file per
+  section in `report/sections/`, private and uncommitted. Thesis: *silent success at agent
+  boundaries*, data minimisation as the design. Only cohort F results, the date, `REVISION`, the
+  billing recheck and the U1–U4 refresh are `[[…]]` placeholders. The 28 Oct draft and PDF are
+  archived in `.local/report-archive-2026-11-04/`. `build_report.py` still targets the old layout.
 - **Unchanged facts:** v0.8.0 is the current release (28 Oct). One OpenTelemetry advisory is
   accepted ([issue #3](https://github.com/iarjunganesh/bastion/issues/3)). The fleet runs the
   23 August build. The public console makes no cohort-N claims yet.
@@ -227,3 +229,12 @@ maintainer's go (D3). Credits only; 100 SEK total cap.
   now say the same.
 - Rewrote this handoff's current state and next steps. Brought the report plan (status line,
   cohort F, order as run), VERSIONS, README, ADR-006 and AGENTS.md up to date.
+
+### 2026-11-04 / Claude Code — report rewrite and evidence 23
+
+- Confirmed PR #6 merged and no feature branches remain.
+- Backed up `report/` (hash-verified ZIP), removed the 28 Oct draft files, and wrote the
+  manuscript to the outline in `report/sections/` (about 5,000 words plus references; citation
+  keys all resolve).
+- Evidence 15 never covered the IAM census or packages (it is a count-only inventory), so both
+  are now evidence 23; evidence 15 gains a pointer only.
