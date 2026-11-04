@@ -8,7 +8,7 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 
 - **3 November 2026, Claude Code: E7 and E7b done.** E7 stopped at run 8 on a false
   completion (durable completed, nothing ran; ingress treats the end of the Runtime stream as
-  success). E7b, a fresh batch on the maintainer's go: 20/20 passed, 0 false completions,
+  success). E7b, a fresh batch on the maintainer's go: all 20 runs passed, 0 false completions,
   25/25 deliveries, 5/5 replays unchanged, median 20.4 s with a 136–206 s tail in 5 runs.
   Recorded in [evidence 19](assets/evidence/19-repeatability-and-false-completion.md) and two
   claim-matrix rows. Uncommitted.
@@ -191,6 +191,6 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
 ### 2026-11-03 / Claude Code — E7b
 
 - Fresh 20-run batch on the maintainer's go, recording false completions instead of stopping.
-  20/20 passed with no false completion; replays, deliveries and per-run tokens measured.
+  all 20 runs passed with no false completion; replays, deliveries and per-run tokens measured.
 - Matched the five slow runs to Runtime instance starts read-only (three coincide, two do not).
   Sealed the bundle, wrote evidence 19, added two claim-matrix rows. Nothing committed.

@@ -206,7 +206,7 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   without checking that an investigation ran. Per-minute token attribution worked (1,336–2,176
   input tokens per run, nothing unattributed); each of the 8 publishes had exactly one Eventarc
   delivery; no trace join key exists (time window only). Private bundle sealed in
-  `.local/measurements/2026-11-03-E7/`. **E7b done 3 Nov** (maintainer's go): 20/20 passed,
+  `.local/measurements/2026-11-03-E7/`. **E7b done 3 Nov** (maintainer's go): all 20 runs passed,
   0 false completions, 25/25 Eventarc deliveries, 5/5 replays unchanged, median 20.4 s, 5 runs
   at 136–206 s (pre-Runtime waits with new Runtime instances, and unexplained stalls in
   `policy_step`/`policy_gate`). Recorded in [evidence 19](../../assets/evidence/19-repeatability-and-false-completion.md).
