@@ -1,10 +1,13 @@
 # ADK 2.13.0 upgrade and v0.8.0 plan
 
-Requested 28 October 2026. Execute in the existing `feature/technical-report` branch.
+Requested 28 October 2026; v0.8.0 was released as source on 28 October. The original feature
+branch is historical; [HANDOFF.md](../HANDOFF.md) records current Git state and next actions.
 
-**Sequencing note, 28 October:** the [report master plan](research/report-plan.md) proposes
-decoupling this track from the report (decision D1). Until the maintainer answers D1, do not start
-step 5; the control matrix below is scheduled there as evidence chunks E1–E6.
+**Sequencing, decided 28 October:** D1 in the [report master plan](research/report-plan.md)
+decouples the report evaluation from this upgrade. Cohort N is complete on the unchanged August
+deployment. Step 5 waits until after the evidence freeze and requires the maintainer's go for
+cohort F; the master plan governs its protocol and budget. The sequence and control matrix below
+retain the original upgrade plan, not a new run authorization.
 
 ## Constraints
 
@@ -24,7 +27,8 @@ step 5; the control matrix below is scheduled there as evidence chunks E1–E6.
 3. Dependencies: resolve production and development requirements on Python 3.12; inspect SDK
    and telemetry changes; run `pip check`, Ruff, mypy, 100%-coverage pytest, report/experiment tests.
 4. Claims: reconcile every current Markdown/config/site reference; label historical versions.
-   Run docs/version/redaction/diagram/site gates and rebuild/review the report.
+   Run docs/version/redaction/diagram/site gates. Reconcile and build the report once in Phase 5
+   of the report master plan, after the remaining evidence work.
 5. Deployment: identify rollback revisions; update all four Cloud Run services and managed
    Runtime; verify readiness, installed resolution, route, private boundaries, and receipts.
 6. Static console: deploy reviewed output separately through Vercel; verify production HTML,

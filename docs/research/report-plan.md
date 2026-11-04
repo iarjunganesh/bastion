@@ -9,7 +9,10 @@ its earlier history, including the old private roadmap, is in the maintainer's o
 **Status, 4 November:** cohort N is complete (E1–E7b, E5, E6; E8 skipped) and on `main`, as are
 both source fixes (not yet deployed). Phase 1 is done apart from related-work references. Next:
 the 5 November billing recheck, the 8 November freeze, cohort F (8–10 November), the fleet end
-state before 11 November, then the single rewrite.
+state before 11 November, then final evidence reconciliation and one report build. The manuscript
+rewrite and the maintainer-approved T1–T3 wording updates are complete locally; sources remain
+uncommitted. The deferred study's config and validator now share D3's 100 SEK total upper bound
+([PR #8](https://github.com/iarjunganesh/bastion/pull/8)); generation remains disabled.
 
 **Goal:** one coherent, citable technical report (C1–C3) in which every dated claim maps to
 sealed evidence, using the remaining GCP credits in small, pre-registered chunks before expiry.
@@ -117,7 +120,9 @@ re-argued in the results:
 
 ## Phase 1 — Paper blueprint and offline evidence (local, no cost)
 
-The maintainer correction stands: no manuscript prose edits and no PDF builds in this phase.
+The maintainer correction stands: no routine manuscript prose edits or PDF builds in this phase.
+The 4 November rewrite and targeted wording updates were explicitly approved exceptions, recorded
+under Phase 5; they authorize no additional report build or live run.
 
 - [x] Write `report/OUTLINE.md` (uncommitted; **drafted 4 Nov** with the "silent success at
   agent boundaries" thesis, data minimisation as the design; the maintainer may swap the headline): target structure, a one-sentence thesis per
@@ -382,7 +387,12 @@ tests a copy rather than the production subscription; only worth it if E6-A is n
   the outline and evidence 16–23; old draft archived in `.local/report-archive-2026-11-04/`.
   Cohort F, date, `REVISION`, billing and U1–U4 refresh remain as `[[…]]` placeholders. The
   builder still targets the old layout and is reworked before the one build.
-  Drop the legacy `sections-3-5.md` header and editorial source key; update the builder to match.
+  The legacy source layout is archived; update the builder to consume `sections/` before building.
+- [x] Apply the maintainer-approved T1–T3 wording updates (**4 Nov**): credit the author's
+  upstream warning and end-to-end test while distinguishing import from GitHub merge; date the
+  August and October censuses and identify E11's companion probe; describe C4 as a matched
+  explanation comparison with fixed findings. Injection cases are prepared; missing-workflow-step
+  cases remain planned. No C4 result, new run or PDF build is implied.
 - [ ] Pin every repository link to one revision: the commit containing the final evidence. The
   builder's S5/S11 entries still name their `a0e08fc` paths; repoint them to
   `docs/research/claim-matrix.md` and `archive/hackathon-2026/submission/ARTICLE_DRAFT.md`

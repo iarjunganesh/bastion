@@ -53,7 +53,11 @@ as an explicit decision.
 **A technical report is in progress** under `report/` (private, uncommitted). It was rewritten on
 4 November to `report/OUTLINE.md`: the design (C1), the pre-defined November cohort N on the
 unchanged August deployment (C2, evidence 16–23) and silent success at agent boundaries (C3).
-Only cohort F's post-fix results are still placeholders. The 27 October study is the pilot
+The maintainer approved targeted wording updates on 4 November: upstream contribution credit,
+dated census provenance and the deferred matched-explanation study. Those updates are complete.
+Remaining placeholders cover cohort F, the publication date and revision, the billing recheck
+and the publication-day upstream refresh. C4 has no results; missing-workflow-step cases remain
+a planned extension. The 27 October study is the pilot
 (evidence 14). Quote 62 bindings only as 25 August (evidence 11) and 56 only as 28 October
 (evidence 23); one batch is never a reliability rate. Preserve every collection disclosure.
 State upstream status with its check date and keep the author line "Independent researcher,

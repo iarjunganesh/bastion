@@ -29,8 +29,11 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 - **Source fixes are merged but not deployed.** `run_managed_runtime` requires the completion
   gate's confirmation, and guardrail refusals carry the investigation ID. Suite: 330 tests at 100%
   configured core coverage. Codecov upload is best-effort (3-minute limit).
-- **Git:** `main` is current with everything above (PRs #4, #5 and #6, merged 4 Nov; no open
-  PRs or feature branches). The private bundles are in
+- **Git:** [PR #8](https://github.com/iarjunganesh/bastion/pull/8) merged 4 Nov after all ten
+  checks passed and both automated reviews completed without open issues. Its post-merge CI and
+  commit statuses passed. The maintainer then authorized folding the handoff/documentation
+  follow-up into that latest `main` commit with a force push. Report sources remain uncommitted.
+  The private bundles are in
   `.local/measurements/`, sealed with manifests and ZIPs.
 - **Report:** rewritten on 4 Nov (maintainer's request) to `report/OUTLINE.md`, one file per
   section in `report/sections/`, private and uncommitted. Thesis: *silent success at agent
@@ -40,8 +43,24 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 - **Unchanged facts:** v0.8.0 is the current release (28 Oct). One OpenTelemetry advisory is
   accepted ([issue #3](https://github.com/iarjunganesh/bastion/issues/3)). The fleet runs the
   23 August build. The public console makes no cohort-N claims yet.
+- **Targeted report wording changes applied on 4 November, with maintainer approval.** T1–T3
+  credit the upstream contribution in §7.2/U2, date the census measurements in §5.1/E11, and
+  clarify §9's deferred matched-explanation study. §8 refers to the dated census rather than
+  repeating an undated binding count. Supporting upstream records were checked read-only on
+  4 November. Report sources stay uncommitted; placeholders, cohort F text and build tools are
+  unchanged. The tracked study config and validator now allow at most D3's 100 SEK total;
+  any future approved budget must fit the remaining allocation. Generation remains disabled.
+- **Temporary validation export cleanup verified:** `.local/validation-study-budget/` is absent.
+- **Documentation reconciled:** AGENTS.md, the report plan, upgrade plan and private report
+  README/outline now record T1–T3 as complete, preserve the pending cohort F and publication work,
+  and remove the obsolete pre-rewrite/undecided-D1 instructions. Manuscript sections and build
+  tools are unchanged by this documentation follow-up.
 
 ## Next step
+
+**Immediate:** wording, documentation and cleanup are complete; resume the dated plan below,
+starting with the 5 November billing recheck. Keep `report/` uncommitted; C4 stays deferred and
+missing-workflow-step cases remain planned. No PDF build or live run is part of this correction.
 
 Follow [docs/research/report-plan.md](docs/research/report-plan.md). Live or paid steps need the
 maintainer's go (D3). Credits only; 100 SEK total cap.
@@ -238,3 +257,49 @@ maintainer's go (D3). Credits only; 100 SEK total cap.
   keys all resolve).
 - Evidence 15 never covered the IAM census or packages (it is a count-only inventory), so both
   are now evidence 23; evidence 15 gains a pointer only.
+
+### 2026-11-04 / Codex — targeted report wording review
+
+- Prepared T1–T3 as current text, proposed replacements and supporting sources for maintainer
+  review. Verified issue #6854, PR #6859's two author commits, import `d2cb22e` and the v2.12.0
+  release record read-only on GitHub.
+- Checked the dated E11/E23 census boundaries and the synthetic study's matched explanation
+  and injection cases. Missing-workflow-step cases remain a planned extension, with no C4 run
+  authorized; the study's configured 200 SEK ceiling still needs reconciliation with D3.
+- Updated this handoff only. No manuscript edit, PDF build, commit, push, deployment or live
+  experiment; proposed wording awaits the maintainer's explicit go.
+
+### 2026-11-04 / Codex — approved wording and study-budget correction
+
+- On the maintainer's go, applied T1–T3 to the uncommitted manuscript and removed §8's undated
+  duplicate census count. Preserved the title, author line, placeholders, cohort F text, disclosure
+  and build tools. No PDF build or live run.
+- Lowered the tracked study config and validator from 200 to 100 SEK, within D3's remaining total;
+  generation remains disabled and C4 remains deferred. Documented missing-workflow-step cases as
+  planned, with no model runner or new spending authorization.
+- The 101 SEK rejection test failed before the fix; all nine offline controls pass after it.
+  Added these controls to CI. Ruff, Markdown lint and the public documentation/version gates pass
+  (the latter in a clean tracked-file export). Local checks still see the pre-existing private
+  report-builder paths and historical-version entry; those stay outside this correction.
+- Merged PR #8 as `ed1d820` after ten successful checks, Codex review with no findings and
+  Copilot review with no open issues. CI confirmed nine offline controls plus 330 core tests
+  at 100% configured statement and branch coverage. Synced local `main`; post-merge CI and
+  commit statuses pass. This final handoff refresh remains local and uncommitted.
+- The temporary tracked-file export remains ignored in `.local/validation-study-budget/`;
+  automatic policy rejected its recursive cleanup. No private capture or report file was removed.
+
+### 2026-11-04 / Codex — cleanup verification
+
+- Confirmed the temporary validation export is now absent after the maintainer's cleanup.
+  Local `main` remains at `ed1d820`; `report/` stays untracked and the handoff refresh uncommitted.
+- Updated Current state and Next step; no further cleanup is needed for this export.
+
+### 2026-11-04 / Codex — documentation continuity reconciliation
+
+- Confirmed T1–T3 and the study documentation were updated, then found stale planning records
+  describing the rewrite as future work and D1 as undecided. Reconciled AGENTS.md, the report
+  plan, upgrade plan and private report README/outline with the completed work and remaining
+  cohort F, billing, reference, builder and publication steps.
+- The maintainer explicitly requested folding these documentation updates into the latest
+  published `main` commit and force-pushing it. Keep report sources uncommitted; preserve a
+  local recovery reference and use a lease pinned to the existing remote head for the push.
