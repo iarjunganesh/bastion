@@ -71,7 +71,7 @@ its results, and each session added caveats instead of restructuring.
 |---|---|---|
 | D1 | Couple the report to the ADK 2.13.0 production upgrade? | **Decided: no.** All new evidence runs on the unchanged August deployment. The upgrade, its redeploy and any repository restructuring wait for Track U after the evidence freeze. |
 | D2 | Include C4 in this report? | **Decided: deferred to v2**, revisited only at the 4 November gate as an automated-metric pilot on synthetic data. |
-| D3 | Paid-run approval model | **Decided: per chunk**, each with its own written cost cap, count limit and stop rules. Read-only chunks need no cost cap. |
+| D3 | Paid-run approval model | **Decided: per chunk**, each with its own written cost cap, count limit and stop rules, within a **100 SEK total** for all remaining chunks (maintainer, 28 October). Read-only chunks need no cost cap. One daily billing check replaces the per-chunk wait. |
 | D4 | Fleet end state before the credits expire | **Decided: teardown after the 8 November freeze, dry run first, before 11 November.** Open sub-choice at the freeze: export, remove or accept the residual storage teardown keeps (Firestore, secrets, Runtime, audit logs). |
 | D5 | Publication reference | Open. Recommendation: a dedicated report tag (for example `report-v1.0`) independent of v0.8.0, archived to Zenodo. |
 
@@ -161,12 +161,12 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
 | Chunk | Closes | Surface | Model calls | Creates resources | Target |
 |---|---|---|---|---|---|
 | E1 Census | Fresh binding and pre-policy finding counts; exception-ledger state; retention configuration; deployed package provenance | Read-only APIs | 0 | No | **Done 28 Oct** except image packages |
-| E2 Negative authorization | Escalation IAM-read denial; findings API missing/wrong token and invalid payload | Impersonation and HTTP probes | 0 | No | 30 Oct |
-| E3 Screening refusal | Agent-mediated Model Armor refusal with a benign control | Direct authenticated Auditor | At most 2 | No | 30 Oct |
-| E4 Exception lifecycle | Approval, suppression and **expiry firing** (never yet observed); an ID-joined trace; per-run tokens and cost | Production path, maintainer as reviewer | About 6 | One real, self-expiring approval | 30–31 Oct |
+| E2 Negative authorization | Escalation IAM-read denial; findings API missing/wrong token and invalid payload | Impersonation and HTTP probes | 0 | No | **Done 3 Nov** ([evidence 17](../../assets/evidence/17-negative-authorization.md)) |
+| E3 Screening refusal | Agent-mediated Model Armor refusal with a benign control | Direct authenticated Auditor | At most 2 | No | **Done 3 Nov** ([evidence 18](../../assets/evidence/18-model-armor-refusal-reprobe.md)) |
+| E4 Exception lifecycle | Approval, suppression and **expiry firing** (never yet observed); an ID-joined trace; per-run tokens and cost | Production path, maintainer as reviewer | About 6 | One real, self-expiring approval | **Done 3 Nov** ([evidence 16](../../assets/evidence/16-exception-lifecycle.md)) |
 | E5 Gateway refusal (P0.10) | Unregistered-caller refusal at Gateway/Registry/IAP | Design note first | 0 | Possibly a test identity | 2–3 Nov |
 | E6 Retry and dead letter (P0.11) | Watched redelivery and fifth-attempt dead letter | Isolated topic, trigger and service with equivalent policy | 0 | Yes, removed afterwards | 3–4 Nov |
-| E7 Repeatability | Twenty serial investigations with per-run tokens, attributable cost, ID-joined traces and per-message replay delivery | Production path | About 40 | No | 31 Oct – 1 Nov |
+| E7 Repeatability | Twenty serial investigations with per-run tokens, attributable cost, ID-joined traces and per-message replay delivery | Production path | About 40 | No | **Done 3 Nov** (E7 stopped at 8; E7b 20/20) |
 | E8 (optional) | C4 automated-metric pilot | Synthetic policies only | Separately budgeted | No | After the 4 Nov gate |
 
 - **E1:** done read-only on 28 October (results under Grounded state; private outputs in
@@ -176,19 +176,48 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   The Runtime API does not return its source archive, so its installed resolution stays
   undeclared; say so rather than infer it.
 - **E2:** if the maintainer's impersonation right on the Escalation identity no longer exists,
-  stop; do not grant it.
+  stop; do not grant it. **Done 3 Nov:** 15 of 15 probes refused as expected (approval
+  endpoint, Auditor peer origin, Escalation IAM read); the exception ledger was unchanged.
+- **E3: done 3 Nov.** Benign control completed; the injection fixture was refused with
+  `policy_match` and nothing ran after it. The refusal audit record carries investigation ID
+  `unknown` because the guardrail does not forward it, but it shares its invocation ID with
+  records that carry the investigation ID, so it joins in two hops (checked 3 Nov). A
+  single-hop fix is a source change; deploy it only after the freeze (D1). Written 4 Nov,
+  uncommitted, with the completion check below.
 - **E4:** the findings API accepts any future `approved_until` up to 90 days, so expiry can be
   observed within an hour. The approval is a real maintainer decision on a real finding; it is
-  the chunk's only state change and it expires by construction.
+  the chunk's only state change and it expires by construction. **Done 3 Nov, 19:19–19:46
+  UTC:** baseline 1+2, inside the window 0+2, after expiry 1+2 with the same finding; 28 audit
+  events and no gaps per run. Private bundle sealed in `.local/measurements/2026-11-03-E4/`.
+  It did not deliver an ID-joined trace or per-run tokens (see E7).
 - **E5/E6:** each needs a short design note and explicit approval because it may create an
   identity or resources. Production allowlists, retry policy and IAM bindings stay unchanged.
   E6 results are claimed for an isolated, configuration-equivalent path, not production fault
   injection.
-- **E7:** reuses the October protocol with the instrumentation October lacked. Validate the
-  token, trace and delivery measurements on E4's runs first.
+- **E7:** reuses the October protocol with the instrumentation October lacked. E4 tested that
+  instrumentation and two parts failed. The token metric is project-wide and minute-aligned,
+  so E7 needs an idle minute between runs to attribute tokens. Audit entries carry no trace
+  ID and Cloud Trace keeps sampled request-level spans only, so E7 can claim time-window
+  trace matches, not ID joins, unless a read-only check finds a join key first.
+  **Stopped 3 Nov at run 8 of 20, by design.** Runs 1–7 passed (expected counts, 28 audit
+  events, 2 model calls each; first run 81 s, then 20–30 s). Run 8 was a **false
+  completion**: the durable record says completed after one attempt, but no audit record,
+  review or model call exists, and two new Runtime instances started mid-run.
+  `run_managed_runtime` marks an investigation completed whenever the Runtime stream ends,
+  without checking that an investigation ran. Per-minute token attribution worked (1,336–2,176
+  input tokens per run, nothing unattributed); each of the 8 publishes had exactly one Eventarc
+  delivery; no trace join key exists (time window only). Private bundle sealed in
+  `.local/measurements/2026-11-03-E7/`. **E7b done 3 Nov** (maintainer's go): all 20 runs passed,
+  0 false completions, 25/25 Eventarc deliveries, 5/5 replays unchanged, median 20.4 s, 5 runs
+  at 136–206 s (pre-Runtime waits with new Runtime instances, and unexplained stalls in
+  `policy_step`/`policy_gate`). Recorded in [evidence 19](../../assets/evidence/19-repeatability-and-false-completion.md).
+  Fix written 4 Nov (uncommitted): success requires the completion gate's confirmation in the
+  Runtime stream. **Post-fix cohort F (maintainer-approved 4 Nov):** after the freeze, redeploy
+  and run about 5 investigations 8–10 November, reported separately from cohort N.
 - **Order:** E1 → Phase 2 billing check → E2, E3 → E4 → E7 → E5, E6 → freeze.
-- **4 November gate:** review spend, remaining days and open claim-map rows; decide E8 or
-  proceed to the freeze.
+- **4 November gate: decided 4 Nov, E8 skipped.** Spend is under 1 SEK, but C4 stays deferred
+  (D2) and the remaining days go to E5, E6 and cohort F. The report states C4 as future work
+  with no results.
 
 ## Phase 4 — Evidence freeze and fleet end state
 

@@ -29,7 +29,7 @@ verification step; see [version provenance](docs/VERSIONS.md). As of 2026-08-25 
 Firestore lifecycle, Agent Runtime/Identity, Memory Bank, Agent Gateway/IAP, Agent Registry, two
 protected Cloud Run A2A workers, Model Armor, an IAM-private findings API, and retained operations
 controls. The count-only capture records 21/21 APIs and 39 resources. The Python 3.12 suite has
-321 tests at 100% configured core statement and branch coverage.
+330 tests at 100% configured core statement and branch coverage.
 
 Five of seven observation captures are closed. Current-route IAM provenance, the agent-mediated
 Model Armor refusal, the correlated payload-free audit trail and the Cloud Trace chain were all

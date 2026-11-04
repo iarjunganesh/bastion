@@ -12,6 +12,22 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ## [Unreleased]
 
+### Fixed — completion is confirmed, not inferred
+
+- Durable ingress records an investigation completed only when the Runtime stream carries the
+  completion gate's confirmation. An empty or cut-off stream now fails the investigation so
+  Eventarc redelivers it. Observed 3 November 2026: one of 28 investigations was recorded
+  completed with no work done ([evidence 19](assets/evidence/19-repeatability-and-false-completion.md)).
+  Source only; the deployed fleet changes after the 8 November evidence freeze.
+- Model Armor and protected-data refusal records carry the forwarded investigation ID, so a
+  refusal joins its investigation in one hop ([evidence 18](assets/evidence/18-model-armor-refusal-reprobe.md)).
+
+### Added — cohort N evidence
+
+- Evidence 16–19 from 3 November: exception approval, suppression and expiry; 15 negative
+  authorization probes; a Model Armor refusal re-probe; a 20-run repeatability batch with
+  per-run tokens and per-message delivery.
+
 ## [0.8.0] - 2026-10-28
 
 ### Changed — repository organized around the technical report

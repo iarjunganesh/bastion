@@ -36,7 +36,7 @@ from google.cloud import modelarmor_v1 as modelarmor
 from google.genai import types
 
 from model_armor.redaction import contains_sensitive
-from observability.audit import _invocation, record
+from observability.audit import _investigation, _invocation, record
 
 # **Model Armor is not available in `europe-north2`.** Verified 2026-08-15 against the live
 # project: europe-north1 and europe-north2 both answer "Location ... is not found", while
@@ -164,6 +164,7 @@ def screen_before_model(
             outcome="refused",
             actor="model-armor",
             invocation_id=_invocation(callback_context),
+            investigation_id=_investigation(callback_context),
             detail={"reason": "configuration_unavailable"},
         )
         return _refusal()
@@ -202,6 +203,7 @@ def screen_before_model(
             outcome="refused",
             actor="model-armor",
             invocation_id=_invocation(callback_context),
+            investigation_id=_investigation(callback_context),
             detail={"reason": "screening_unavailable", **shape},
         )
         return _refusal()
@@ -212,6 +214,7 @@ def screen_before_model(
             outcome="refused",
             actor="model-armor",
             invocation_id=_invocation(callback_context),
+            investigation_id=_investigation(callback_context),
             detail={"reason": "policy_match", **shape},
         )
         return _refusal()
@@ -238,6 +241,7 @@ def screen_after_model(
             outcome="refused",
             actor="protected-data-filter",
             invocation_id=_invocation(callback_context),
+            investigation_id=_investigation(callback_context),
             detail={"reason": "protected_data"},
         )
         return _output_refusal()

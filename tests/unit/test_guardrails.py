@@ -108,6 +108,7 @@ def test_refusals_emit_only_a_bounded_reason():
         outcome="refused",
         actor="model-armor",
         invocation_id="inv-refusal",
+        investigation_id="unknown",
         detail={
             "reason": "policy_match",
             "screened_chars": len(screened),
@@ -217,3 +218,24 @@ def test_a_part_carrying_neither_text_nor_a_tool_result_is_skipped():
     with patch.object(guardrails, "screen_prompt") as screen:
         assert guardrails.screen_before_model(MagicMock(), request) is None
     screen.assert_not_called()
+
+
+def test_a_refusal_carries_the_forwarded_investigation_id():
+    """A refusal must join its investigation in one hop, like every other audit record.
+
+    Observed on 2026-11-03 (evidence 18): the deployed refusal record carried
+    `investigation_id` "unknown" and could only be joined through its invocation ID.
+    """
+    investigation = "3f2504e0-4f89-11d3-9a0c-0305e82c3301"
+    context = SimpleNamespace(
+        invocation_id="inv-joined",
+        run_config=SimpleNamespace(
+            custom_metadata={"a2a_metadata": {"bastion_investigation": investigation}}
+        ),
+    )
+    with (
+        patch.object(guardrails, "screen_prompt", return_value=True),
+        patch.object(guardrails, "record") as record,
+    ):
+        guardrails.screen_before_model(context, _request("some screened text"))
+    assert record.call_args.kwargs["investigation_id"] == investigation
