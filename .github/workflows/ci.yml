@@ -138,6 +138,10 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: always()
+        # A hung upload once held this job for 14 minutes after the tests had passed.
+        # Coverage is already enforced above and kept as an artifact, so the upload is best-effort.
+        timeout-minutes: 3
+        continue-on-error: true
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
