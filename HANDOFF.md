@@ -47,7 +47,7 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 - **Local cleanup:** caches, temporary folders, duplicate report build and `.local/` were removed
   after a verified out-of-repo archive (`C:/ws/.archives/bastion/`, 28 October). `.venv` was
   rebuilt from `requirements.lock` (ADK 2.13.0, A2A 1.3.0, 150 packages); use it for all gates.
-- **Gates on the fresh `.venv`:** Ruff/format, mypy (40 files), 321 tests at 100% configured
+- **Gates on the fresh `.venv`:** Ruff/format, mypy (40 files), the 321-case suite at 100% configured
   core coverage, nine experiment tests, versions (75 documents/18 pins), diagrams, redaction,
   site build/check and Markdownlint pass. `check_docs.py` passes except two historical paths in
   the untracked `report/build_report.py` (S5/S11), deferred to the Phase 5 re-pin.
@@ -73,7 +73,15 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
    5 Nov for late-posted 3 Nov usage). Maintainer decisions: write the two source fixes now
    (deploy after the freeze); redeploy and run about 5 post-fix verification investigations
    8–10 November as a separate cohort; commit cohort-N evidence now on `evidence/cohort-n`.
-   Then the 4 Nov gate (E8 or not).
+   **Done:** evidence committed (`800bac9`, `253d2f7`, not pushed). Both fixes written and
+   **uncommitted** in the working tree: `run_managed_runtime` raises `RuntimeIncompleteError`
+   unless the stream carries the completion gate's confirmation, and guardrail refusals carry
+   the forwarded investigation ID; suite 330 tests at 100% coverage. The count gate now skips
+   the frozen `archive/` and private `report/`. The completion check's event shape was then
+   verified against the SDK source (server `dump_event_for_json`, client `json.loads` per
+   line) and pinned by a test using the SDK serializer; the speculative camelCase fallback
+   was removed. **4 Nov gate: E8 skipped** (C4 stays deferred, D2). Next: E5/E6 design notes,
+   then `report/OUTLINE.md` with the reframed thesis if the maintainer agrees.
 2. E5/E6 design notes (5–7 Nov); finish E1's package listing through Artifact Registry;
    Phase 1 offline work (`report/OUTLINE.md`, O1 reproduction) in parallel.
 3. Evidence freeze on 8 November; fleet end state (D4) before the first credit expires on
@@ -194,3 +202,19 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
   all 20 runs passed with no false completion; replays, deliveries and per-run tokens measured.
 - Matched the five slow runs to Runtime instance starts read-only (three coincide, two do not).
   Sealed the bundle, wrote evidence 19, added two claim-matrix rows. Nothing committed.
+
+### 2026-11-04 / Claude Code — billing, evidence commit and source fixes
+
+- Billing 29 Oct–4 Nov from the maintainer's console: 0.84 SEK gross, fully offset, 0.00 net
+  (3 Nov evening may still be posting). Recorded in the private credit record.
+- Branched `evidence/cohort-n` from `main`; committed evidence 16–19 and the ledgers, then
+  reworded batch pass counts the suite-total gate misread as test totals. Not pushed.
+- Wrote both source fixes with tests (uncommitted, deploy after the freeze). The first run
+  needed pytest's base temp in the scratchpad (sandbox denied the default temp folder).
+
+### 2026-11-04 / Claude Code — completion-check risk closed, E8 skipped
+
+- Verified the Runtime stream's wire shape in the SDK (server and client) instead of assuming
+  it; made the check exact and pinned it to the SDK serializer. Suite still 330 at 100%.
+- Recorded the 4 Nov gate: E8 skipped. Reviewed the draft report: substantial rewrite after
+  the freeze, with an outline now. Nothing committed for the fixes.

@@ -182,7 +182,8 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   `policy_match` and nothing ran after it. The refusal audit record carries investigation ID
   `unknown` because the guardrail does not forward it, but it shares its invocation ID with
   records that carry the investigation ID, so it joins in two hops (checked 3 Nov). A
-  single-hop fix is a source change; deploy it only after the freeze (D1).
+  single-hop fix is a source change; deploy it only after the freeze (D1). Written 4 Nov,
+  uncommitted, with the completion check below.
 - **E4:** the findings API accepts any future `approved_until` up to 90 days, so expiry can be
   observed within an hour. The approval is a real maintainer decision on a real finding; it is
   the chunk's only state change and it expires by construction. **Done 3 Nov, 19:19–19:46
@@ -210,9 +211,13 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   0 false completions, 25/25 Eventarc deliveries, 5/5 replays unchanged, median 20.4 s, 5 runs
   at 136–206 s (pre-Runtime waits with new Runtime instances, and unexplained stalls in
   `policy_step`/`policy_gate`). Recorded in [evidence 19](../../assets/evidence/19-repeatability-and-false-completion.md).
+  Fix written 4 Nov (uncommitted): success requires the completion gate's confirmation in the
+  Runtime stream. **Post-fix cohort F (maintainer-approved 4 Nov):** after the freeze, redeploy
+  and run about 5 investigations 8–10 November, reported separately from cohort N.
 - **Order:** E1 → Phase 2 billing check → E2, E3 → E4 → E7 → E5, E6 → freeze.
-- **4 November gate:** review spend, remaining days and open claim-map rows; decide E8 or
-  proceed to the freeze.
+- **4 November gate: decided 4 Nov, E8 skipped.** Spend is under 1 SEK, but C4 stays deferred
+  (D2) and the remaining days go to E5, E6 and cohort F. The report states C4 as future work
+  with no results.
 
 ## Phase 4 — Evidence freeze and fleet end state
 
