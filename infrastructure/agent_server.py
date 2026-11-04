@@ -153,8 +153,41 @@ def cloud_event_envelope(body: dict[str, Any], headers: dict[str, str]) -> dict[
     return {"id": event_id, "data": body}
 
 
+COMPLETION_AUTHOR = "escalation_gate"
+COMPLETION_KEY = "escalation_confirmed"
+
+
+class RuntimeIncompleteError(RuntimeError):
+    """The Runtime stream ended without the completion gate confirming the investigation."""
+
+
+def _confirms_completion(event: object) -> bool:
+    """True only for the completion gate's own confirmation event.
+
+    The Runtime template yields each ADK event as ``json.loads(event.model_dump_json(
+    exclude_none=True))`` and the client parses each streamed line with ``json.loads``, so the
+    gate's event arrives as ``{"author": ..., "actions": {"state_delta": {...}}}``. A test pins
+    this against the SDK's own serializer; if it ever changes, investigations fail closed and
+    visibly rather than completing falsely.
+    """
+    if not isinstance(event, dict) or event.get("author") != COMPLETION_AUTHOR:
+        return False
+    actions = event.get("actions")
+    if not isinstance(actions, dict):
+        return False
+    delta = actions.get("state_delta")
+    return isinstance(delta, dict) and delta.get(COMPLETION_KEY) is True
+
+
 async def run_managed_runtime(event: InvestigationEvent) -> None:
-    """Dispatch durable Eventarc work into the identity-bearing, Gateway-bound Runtime."""
+    """Dispatch durable Eventarc work into the identity-bearing, Gateway-bound Runtime.
+
+    **The end of the stream is not success.** It was treated as success, and on 2026-11-03
+    (evidence 19) one investigation was recorded completed after the Runtime replaced its
+    instance and the stream ended with no work done: no audit record, no review, no model
+    call. Success now requires the completion gate's confirmation event; anything else raises,
+    the durable record is marked failed, and Eventarc's retry policy redelivers.
+    """
     project = os.environ["GOOGLE_CLOUD_PROJECT"]
     project_number = os.environ["GCP_PROJECT_NUMBER"]
     region = os.environ.get("AGENT_RUNTIME_REGION", "europe-west4")
@@ -168,7 +201,9 @@ async def run_managed_runtime(event: InvestigationEvent) -> None:
     client = Client(project=project, location=region)
     engine = client.agent_engines.get(name=name)
     session = await engine.async_create_session(user_id=event.context_id)
-    async for _event in engine.async_stream_query(
+    streamed = 0
+    confirmed = False
+    async for streamed_event in engine.async_stream_query(
         user_id=event.context_id,
         session_id=session["id"],
         # Structured data, not an imperative sentence. The previous wording -- "Run the
@@ -195,7 +230,12 @@ async def run_managed_runtime(event: InvestigationEvent) -> None:
         # trustworthy because nothing can retype it.
         run_config={"custom_metadata": {INVESTIGATION_METADATA_KEY: event.event_id}},
     ):
-        pass
+        streamed += 1
+        confirmed = confirmed or _confirms_completion(streamed_event)
+    if not confirmed:
+        raise RuntimeIncompleteError(
+            f"Runtime stream ended after {streamed} events without a confirmed completion"
+        )
 
 
 def install_durable_eventarc_route(

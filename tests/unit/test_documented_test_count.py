@@ -33,6 +33,10 @@ SKIP_DIRS = {
     ".tmp",
     ".local",
     ".mypy_cache",
+    # Frozen hackathon records state the suite total at their release; rewriting them would
+    # falsify the archive. The private report drafts are rebuilt once from the final total.
+    "archive",
+    "report",
 }
 
 # Released sections record what was true at their tag. Rewriting them to match today would

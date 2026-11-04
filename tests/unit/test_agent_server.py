@@ -136,6 +136,80 @@ def test_inflight_delivery_is_retried_until_a_stale_lease_can_be_reclaimed():
     runtime_runner.assert_not_awaited()
 
 
+CONFIRMED = {
+    "author": "escalation_gate",
+    "actions": {"state_delta": {"escalation_confirmed": True}},
+}
+
+
+def _stream_runtime(monkeypatch, events):
+    class _Engine:
+        async def async_create_session(self, user_id):
+            return {"id": "session-1"}
+
+        async def async_stream_query(self, **_kwargs):
+            for item in events:
+                yield item
+
+    class _Client:
+        def __init__(self, **_kwargs):
+            self.agent_engines = SimpleNamespace(get=lambda name: _Engine())
+
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "p")
+    monkeypatch.setenv("GCP_PROJECT_NUMBER", "1234567890")
+    monkeypatch.setenv("BASTION_RUNTIME_AGENT_ENGINE_ID", "engine-1")
+    monkeypatch.setattr(agent_server, "Client", _Client)
+    event = InvestigationEvent(
+        event_id="00000000-0000-0000-0000-000000000001", context_id="week-42"
+    )
+    return asyncio.run(agent_server.run_managed_runtime(event))
+
+
+@pytest.mark.parametrize(
+    "events",
+    [
+        [],
+        [{"author": "orchestrator", "content": {}}],
+        [{"author": "escalation_gate", "actions": {"state_delta": {}}}],
+        [{"author": "escalation_gate", "actions": None}],
+        [{"author": "policy_gate", "actions": {"state_delta": {"escalation_confirmed": True}}}],
+        ["not-an-event"],
+    ],
+    ids=["empty", "no-gate", "unconfirmed", "no-actions", "wrong-author", "non-dict"],
+)
+def test_a_stream_that_ends_without_confirmation_is_not_success(monkeypatch, events):
+    """Observed 2026-11-03 (evidence 19): an empty stream was recorded as a completion."""
+    with pytest.raises(agent_server.RuntimeIncompleteError):
+        _stream_runtime(monkeypatch, events)
+
+
+def test_the_completion_gate_confirmation_is_success(monkeypatch):
+    _stream_runtime(monkeypatch, [{"author": "orchestrator"}, CONFIRMED])
+
+
+def test_the_gate_event_as_the_runtime_serializes_it_confirms_completion():
+    """Pin the wire shape to the SDK's serializer, not to a hand-written dictionary.
+
+    The managed Runtime yields `dump_event_for_json(event)` for every ADK event and the client
+    `json.loads` each streamed line. If either side changes the shape, this fails in CI rather
+    than every production investigation failing closed after a deploy.
+    """
+    from agentplatform._genai._runtimes_utils import dump_event_for_json
+    from google.adk.events import Event, EventActions
+
+    from agents.orchestrator.agent import escalation_gate
+
+    gate_event = Event(
+        author=escalation_gate.name,
+        invocation_id="inv-1",
+        actions=EventActions(state_delta={"escalation_confirmed": True}),
+    )
+    wire = json.loads(json.dumps(dump_event_for_json(gate_event)))
+    assert agent_server._confirms_completion(wire)
+    unconfirmed = Event(author=escalation_gate.name, invocation_id="inv-1")
+    assert not agent_server._confirms_completion(dump_event_for_json(unconfirmed))
+
+
 def test_managed_runtime_keeps_client_for_async_session_and_stream(monkeypatch):
     calls: list[tuple[str, object]] = []
 
@@ -146,7 +220,7 @@ def test_managed_runtime_keeps_client_for_async_session_and_stream(monkeypatch):
 
         async def async_stream_query(self, **kwargs):
             calls.append(("stream", kwargs))
-            yield {"event": "complete"}
+            yield CONFIRMED
 
     class FakeAgentEngines:
         def get(self, *, name):
@@ -201,8 +275,7 @@ def test_the_runtime_dispatch_message_is_data_not_an_instruction(monkeypatch):
         async def async_stream_query(self, *, user_id, session_id, message, run_config=None):
             captured["message"] = message
             captured["run_config"] = run_config
-            return
-            yield  # pragma: no cover - generator protocol only
+            yield CONFIRMED
 
     class _Client:
         def __init__(self, **_kwargs):
