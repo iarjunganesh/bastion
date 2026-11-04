@@ -38,7 +38,8 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
   findings (1 `platform-infra`, 2 `security-engineering`); the only exception expired
   18 September; `bastion-audit` log bucket 365 days, unlocked; no Scheduler jobs. Private
   outputs: `.local/measurements/2026-10-28-ground-truth/`. Installed packages remain unlisted.
-- **Repository reorganized (released in v0.8.0; local branch `feature/technical-report`):**
+- **Repository reorganized (released in v0.8.0; the merged `feature/technical-report` branch was
+  deleted 4 Nov; cohort N work is on `evidence/cohort-n`):**
   hackathon material is frozen in [archive/hackathon-2026/](archive/hackathon-2026/README.md);
   the claim matrix, remediation ledger, observation backlog and report plan are in
   `docs/research/`. Files the Devpost page or public console link on `main` stayed in place.
