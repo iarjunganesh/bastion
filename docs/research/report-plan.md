@@ -164,8 +164,8 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
 | E2 Negative authorization | Escalation IAM-read denial; findings API missing/wrong token and invalid payload | Impersonation and HTTP probes | 0 | No | **Done 3 Nov** ([evidence 17](../../assets/evidence/17-negative-authorization.md)) |
 | E3 Screening refusal | Agent-mediated Model Armor refusal with a benign control | Direct authenticated Auditor | At most 2 | No | **Done 3 Nov** ([evidence 18](../../assets/evidence/18-model-armor-refusal-reprobe.md)) |
 | E4 Exception lifecycle | Approval, suppression and **expiry firing** (never yet observed); an ID-joined trace; per-run tokens and cost | Production path, maintainer as reviewer | About 6 | One real, self-expiring approval | **Done 3 Nov** ([evidence 16](../../assets/evidence/16-exception-lifecycle.md)) |
-| E5 Gateway refusal (P0.10) | Gateway refusal of egress it does not match to a registered endpoint (design note below) | Read-only logs | 0 | No | 5 Nov |
-| E6 Retry and dead letter (P0.11) | Watched redelivery and dead letter (design note below) | Production subscription, one synthetic rejected event | 0 | No | 5 Nov |
+| E5 Gateway refusal (P0.10) | Gateway refusal of egress it does not match to a registered endpoint (design note below) | Read-only logs | 0 | No | **Done 4 Nov** ([evidence 20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md)) |
+| E6 Retry and dead letter (P0.11) | Watched redelivery and dead letter (design note below) | Production subscription, one synthetic rejected event | 0 | No | **Done 4 Nov** ([evidence 21](../../assets/evidence/21-redelivery-and-dead-letter.md)) |
 | E7 Repeatability | Twenty serial investigations with per-run tokens, attributable cost, ID-joined traces and per-message replay delivery | Production path | About 40 | No | **Done 3 Nov** (E7 stopped at 8; E7b 20/20) |
 | E8 (optional) | C4 automated-metric pilot | Synthetic policies only | Separately budgeted | No | After the 4 Nov gate |
 
@@ -194,8 +194,8 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   It did not deliver an ID-joined trace or per-run tokens (see E7).
 - **E5/E6:** each needs a short design note and explicit approval because it may create an
   identity or resources. Production allowlists, retry policy and IAM bindings stay unchanged.
-  E6 results are claimed for an isolated, configuration-equivalent path, not production fault
-  injection.
+  **Done 4 Nov:** E5 was read-only; E6 ran as proposal E6-A on the production subscription
+  with the maintainer's explicit approval for that one synthetic event.
 - **E7:** reuses the October protocol with the instrumentation October lacked. E4 tested that
   instrumentation and two parts failed. The token metric is project-wide and minute-aligned,
   so E7 needs an idle minute between runs to attribute tokens. Audit entries carry no trace
@@ -333,6 +333,14 @@ preflight; 30 minutes without dead-lettering (then report the attempts actually 
   reclaim (the August failed-and-reclaimable observation, evidence 06, stays the evidence for
   that). It is a deliberate poison message on the production topic, so it needs explicit
   approval under the no-routine-fault-injection rule.
+
+**Result, 4 November 20:35–20:40 UTC:** run as E6-A. Five deliveries, all HTTP 400, at
+start-to-start gaps of 32.3 s (the first response took 18.6 s), 14.0, 17.2 and 22.9 s; forwarded
+with `CloudPubSubDeadLetterSourceDeliveryCount = 5`, pulled 104.7 s after publication, marker
+and `mock_data: true` payload confirmed, acknowledged; no investigation document written; no
+further delivery in a 2-minute quiet period. The first collector crashed on an empty pull
+(`DeadlineExceeded`); the event was not republished and a resume script finished the
+observation (disclosed in evidence 21). Private bundle in `.local/measurements/2026-11-04-E6/`.
 
 **Alternative E6-B (not recommended): isolated copy.** A test topic, subscription, dead-letter
 topic and Cloud Run service with the same policy. It creates and removes resources, and it

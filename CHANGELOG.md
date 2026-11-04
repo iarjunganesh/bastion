@@ -27,6 +27,9 @@ hackathon-era release plan is archived with the rest of the submission material.
 - Evidence 16–19 from 3 November: exception approval, suppression and expiry; 15
   authorization checks (13 refusals or denials and 2 positive controls); a Model Armor refusal re-probe; a 20-run repeatability batch with
   per-run tokens and per-message delivery.
+- Evidence 20–21 from 4 November: the managed Gateway's fail-closed refusals of egress it did
+  not match to a registered endpoint (read-only, from retained logs), and one rejected event
+  redelivered five times and dead-lettered on the production subscription.
 
 ## [0.8.0] - 2026-10-28
 

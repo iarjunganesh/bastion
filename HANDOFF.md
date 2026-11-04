@@ -84,8 +84,13 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
    line) and pinned by a test using the SDK serializer; the speculative camelCase fallback
    was removed. **4 Nov gate: E8 skipped** (C4 stays deferred, D2). Next: E5/E6 design notes,
    then `report/OUTLINE.md` with the reframed thesis if the maintainer agrees.
-2. E5/E6 design notes (5–7 Nov); finish E1's package listing through Artifact Registry;
-   Phase 1 offline work (`report/OUTLINE.md`, O1 reproduction) in parallel.
+2. **E5 and E6 done 4 Nov**, both 0 SEK: [evidence 20](assets/evidence/20-gateway-unmatched-egress-refusal.md)
+   (176 fail-closed refusals of unmatched egress; narrowed wording, Registry mismatch
+   unexplained) and [evidence 21](assets/evidence/21-redelivery-and-dead-letter.md) (one
+   rejected event, 5 deliveries, dead-lettered with delivery count 5, cleared, no state).
+   P0.10 and P0.11 closed in the claim matrix. Committed on `design/e5-e6`; push, PR and merge
+   next. Then: finish E1's package listing through Artifact Registry; `report/OUTLINE.md`
+   (thesis choice pending); O1 reproduction.
 3. Evidence freeze on 8 November; fleet end state (D4) before the first credit expires on
    11 November; write and build the report once; publish only with explicit approval.
 4. Track U: when an ADK release admits `opentelemetry-api` 1.45.1, close [issue #3](https://github.com/iarjunganesh/bastion/issues/3)
@@ -232,3 +237,13 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
 - E6: dead-letter grants are present and the boundary has never fired. Proposed one synthetic
   rejected event on the production subscription. Both notes are in the report plan and
   await the maintainer's go; no live action taken.
+
+### 2026-11-04 / Claude Code — E5 and E6 executed
+
+- E5 (read-only): configuration, 176 IAP decisions, 13 instance starts and investigation
+  counts collected and sealed in `.local/measurements/2026-11-04-E5/`; evidence 20.
+- E6 (approved fault injection): one `mock_data: true` event published 20:35:51 UTC; five
+  HTTP 400 deliveries, dead-lettered with delivery count 5, pulled by marker and acknowledged;
+  0 investigation documents. The first collector crashed on an empty pull; resumed without
+  republishing, disclosed in evidence 21 and kept in the bundle.
+- Claim matrix: Gateway and Retry/DLQ rows now `Yes` with their stated wording.
