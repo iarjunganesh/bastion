@@ -4,101 +4,60 @@ Read [AGENTS.md](AGENTS.md), this file, then the [report plan](docs/research/rep
 and [upgrade plan](docs/UPGRADE-PLAN.md). This is the shared session record for Codex,
 Claude Code, and GitHub Copilot. Update Current state, Next step, and Session log before stopping.
 
-## Current state
+## Current state (4 November 2026, evening)
 
-- **3 November 2026, Claude Code: E7 and E7b done.** E7 stopped at run 8 on a false
-  completion (durable completed, nothing ran; ingress treats the end of the Runtime stream as
-  success). E7b, a fresh batch on the maintainer's go: all 20 runs passed, 0 false completions,
-  25/25 deliveries, 5/5 replays unchanged, median 20.4 s with a 136–206 s tail in 5 runs.
-  Recorded in [evidence 19](assets/evidence/19-repeatability-and-false-completion.md) and two
-  claim-matrix rows. Uncommitted.
-- **3 November 2026, Claude Code: E2 and E3 done.** E2: all 15 authorization checks
-  matched their expected outcome (13 refusals or denials, 2 positive controls), with no ledger
-  write ([evidence 17](assets/evidence/17-negative-authorization.md)).
-  E3: benign control completed; the injection fixture was refused with `policy_match`, the task
-  failed, and nothing ran after it ([evidence 18](assets/evidence/18-model-armor-refusal-reprobe.md)).
-  The refusal record lacks the investigation ID but joins it through the shared invocation ID
-  (two hops, verified read-only). Private
-  bundles sealed in `.local/measurements/2026-11-03-E2/` and `-E3/`. Uncommitted.
-- **3 November 2026, Claude Code: E4 done.** The exception lifecycle ran live on the unchanged
-  August fleet from 19:19 to 19:46 UTC. Baseline delivered 1 `platform-infra` + 2
-  `security-engineering`. A 15-minute approval under the maintainer's identity suppressed the
-  `platform-infra` finding (0 + 2), and the same finding returned after expiry (1 + 2). Each run
-  had 28 audit events and no gaps. Recorded in
-  [evidence 16](assets/evidence/16-exception-lifecycle.md) and a new claim-matrix row (both
-  uncommitted); the private bundle is sealed in `.local/measurements/2026-11-03-E4/`. Two
-  instrumentation gaps carry over to E7: per-run tokens need an idle minute between runs, and
-  audit entries carry no trace ID.
-- **28 October 2026, Claude Code:** the report and GCP evidence work follow one sequence,
-  [docs/research/report-plan.md](docs/research/report-plan.md) (uncommitted). **D1–D4 are
-  decided** (no upgrade coupling, C4 deferred, per-chunk approval, teardown after the 8 November
-  freeze); D5 is open. The report evaluates one primary cohort, N (November), on the unchanged
-  August deployment; August and 27 October become provenance and pilot, not results.
-- **E1 census done read-only (28 Oct 19:23 UTC):** fleet verifier passes; one image digest built
-  23 August serves all four services; Runtime updated 23 August; **56** IAM bindings, three
-  findings (1 `platform-infra`, 2 `security-engineering`); the only exception expired
-  18 September; `bastion-audit` log bucket 365 days, unlocked; no Scheduler jobs. Private
-  outputs: `.local/measurements/2026-10-28-ground-truth/`. Installed packages remain unlisted.
-- **Repository reorganized (released in v0.8.0; the merged `feature/technical-report` branch was
-  deleted 4 Nov; cohort N work is on `evidence/cohort-n`):**
-  hackathon material is frozen in [archive/hackathon-2026/](archive/hackathon-2026/README.md);
-  the claim matrix, remediation ledger, observation backlog and report plan are in
-  `docs/research/`. Files the Devpost page or public console link on `main` stayed in place.
-  CI, `check_docs.py`, `check_versions.py`, the redaction gate, Makefile and `.gitignore` follow
-  the new paths; demo-video Make targets were retired; Ruff skips the frozen archive scripts.
-- **Local cleanup:** caches, temporary folders, duplicate report build and `.local/` were removed
-  after a verified out-of-repo archive (`C:/ws/.archives/bastion/`, 28 October). `.venv` was
-  rebuilt from `requirements.lock` (ADK 2.13.0, A2A 1.3.0, 150 packages); use it for all gates.
-- **Gates on the fresh `.venv`:** Ruff/format, mypy (40 files), the 321-case suite at 100% configured
-  core coverage, nine experiment tests, versions (75 documents/18 pins), diagrams, redaction,
-  site build/check and Markdownlint pass. `check_docs.py` passes except two historical paths in
-  the untracked `report/build_report.py` (S5/S11), deferred to the Phase 5 re-pin.
-- **v0.8.0 released 28 Oct and verified:** PR #2 (with the reorganization) merged as `4d70b1b`,
-  tag `v0.8.0`, GitHub release published by the release workflow, `main` CI green for the first
-  time since PR #1, and the live console footer reads "v0.8.0, released". One
-  OpenTelemetry advisory, CVE-2026-114603, is accepted with a single-ID audit exception because
-  every ADK release caps OpenTelemetry below the fix; removal is tracked in [issue #3](https://github.com/iarjunganesh/bastion/issues/3).
-  Source pins do not establish deployed pins: the fleet is unchanged since August.
-- Report sources stay **uncommitted** in `report/`, excluded from release; only the interim
-  13-page `report/bastion-technical-report-v1.pdf` remains. No manuscript prose was edited; the
-  editorial source key in `sections-3-5.md` was repointed to the moved files.
-- **Paid execution held** until the Phase 2 billing check: allocated credits only, no card
-  charges; the private credit record is recreated in `.local/credit-verification.json` then.
-- The report remains a draft; no DOI/arXiv deposit or author approval is implied by a code release.
+- **Cohort N is complete and recorded.** All chunks ran on the unchanged August deployment and
+  are written up as evidence 16–22:
+
+  | Chunk | Result | Evidence |
+  |---|---|---|
+  | E1 census + packages | 56 bindings, 3 findings; one image digest (built 23 Aug, `google-adk` 2.7.1, 161 packages) | plan, VERSIONS |
+  | E4 exception lifecycle | approval suppressed, expiry returned the finding | 16 |
+  | E2 negative authorization | 15/15 expected (13 refusals or denials, 2 controls) | 17 |
+  | E3 Model Armor re-probe | control completed, injection refused | 18 |
+  | E7 / E7b repeatability | E7 stopped on a false completion; E7b 20/20 | 19 |
+  | E5 Gateway (read-only) | 176 fail-closed IAP denials; the same as the August defect D2 | 20 |
+  | E6 retry and dead letter | 5 deliveries, dead-lettered with count 5, no state written | 21 |
+  | O1 offline A2A repro | boundary unchanged on 2.13.0; both upstream warnings fire | 22 |
+
+  E8 was skipped (C4 deferred, decision D2). Cohort N spend was under 1 SEK, fully offset by
+  credits (billing to 4 Nov: 0.84 SEK gross, 0.00 net).
+- **Claim matrix reconciled.** The August `Partial` rows (Gateway, retry/DLQ) closed with
+  narrowed wording. *Durable completion integrity* stays not-safe-to-claim until cohort F. The
+  Gateway wording must say the refused host is registered (defect D2), never "unregistered
+  destination".
+- **Source fixes are merged but not deployed.** `run_managed_runtime` requires the completion
+  gate's confirmation, and guardrail refusals carry the investigation ID. Suite: 330 tests at 100%
+  configured core coverage. Codecov upload is best-effort (3-minute limit).
+- **Git:** `main` carries PRs #4 and #5. PR #6 (`design/e5-e6`: E5, E6, E1 packages, O1, these
+  doc updates) is open and merges when CI is green. The private bundles are in
+  `.local/measurements/`, sealed with manifests and ZIPs.
+- **Report:** `report/OUTLINE.md` is drafted, uncommitted. Thesis: *silent success at agent
+  boundaries*, with data minimisation as the design; the maintainer may swap the headline. The
+  13-page v1 PDF is the old draft. No prose is edited until after the freeze.
+- **Unchanged facts:** v0.8.0 is the current release (28 Oct). One OpenTelemetry advisory is
+  accepted ([issue #3](https://github.com/iarjunganesh/bastion/issues/3)). The fleet runs the
+  23 August build. The public console makes no cohort-N claims yet.
 
 ## Next step
 
-Follow [docs/research/report-plan.md](docs/research/report-plan.md). Each chunk still needs the
-maintainer's go (D3); one daily billing check covers spend against the 100 SEK total.
+Follow [docs/research/report-plan.md](docs/research/report-plan.md). Live or paid steps need the
+maintainer's go (D3). Credits only; 100 SEK total cap.
 
-1. **4 Nov:** billing checked (29 Oct–4 Nov: 0.84 SEK gross, fully offset, 0.00 SEK net; recheck
-   5 Nov for late-posted 3 Nov usage). Maintainer decisions: write the two source fixes now
-   (deploy after the freeze); redeploy and run about 5 post-fix verification investigations
-   8–10 November as a separate cohort; commit cohort-N evidence now on `evidence/cohort-n`.
-   **Done:** evidence committed (`800bac9`, `253d2f7`, not pushed). Both fixes written and
-   **uncommitted** in the working tree: `run_managed_runtime` raises `RuntimeIncompleteError`
-   unless the stream carries the completion gate's confirmation, and guardrail refusals carry
-   the forwarded investigation ID; suite 330 tests at 100% coverage. The count gate now skips
-   the frozen `archive/` and private `report/`. The completion check's event shape was then
-   verified against the SDK source (server `dump_event_for_json`, client `json.loads` per
-   line) and pinned by a test using the SDK serializer; the speculative camelCase fallback
-   was removed. **4 Nov gate: E8 skipped** (C4 stays deferred, D2). Next: E5/E6 design notes,
-   then `report/OUTLINE.md` with the reframed thesis if the maintainer agrees.
-2. **E5 and E6 done 4 Nov**, both 0 SEK: [evidence 20](assets/evidence/20-gateway-unmatched-egress-refusal.md)
-   (176 fail-closed IAP denial decisions from 88 unmatched-egress lookups; narrowed wording, Registry mismatch
-   unexplained) and [evidence 21](assets/evidence/21-redelivery-and-dead-letter.md) (one
-   rejected event, 5 deliveries, dead-lettered with delivery count 5, cleared, no state).
-   P0.10 and P0.11 closed in the claim matrix; AGENTS.md and the observation backlog now say
-   the original probes were replaced, not performed. Also 4 Nov: E1 packages (one image digest,
-   161 distributions, `google-adk` 2.7.1); O1 re-run on 2.13.0 ([evidence 22](assets/evidence/22-a2a-state-boundary-reproduction.md),
-   both warnings fire); `report/OUTLINE.md` drafted (thesis: silent success at agent
-   boundaries; swappable). Codecov upload is now best-effort (3-minute limit). All via PR #6.
-   Remaining before the freeze: billing recheck 5 Nov; related-work references.
-3. Evidence freeze on 8 November; fleet end state (D4) before the first credit expires on
-   11 November; write and build the report once; publish only with explicit approval.
-4. Track U: when an ADK release admits `opentelemetry-api` 1.45.1, close [issue #3](https://github.com/iarjunganesh/bastion/issues/3)
-   and remove the audit exception. Redeploy only after the evidence freeze (D1). Still
-   blocked on 3 Nov (latest google-adk 2.13.0).
+1. **5 Nov:** billing recheck for late-posted 3–4 Nov usage. Verify related-work references
+   against their primary sources (offline).
+2. **8 Nov:** evidence freeze.
+3. **8–10 Nov, cohort F** (needs a go at deploy time): redeploy `main` to the four Cloud Run
+   services and the managed Runtime, verify the fleet, run about 5 investigations, and report
+   them separately. Note that this also moves the fleet from `google-adk` 2.7.1 to 2.13.0, so
+   F measures the fixes and the upgrade together.
+4. **Before 11 Nov:** fleet end state D4, dry run first. The maintainer chooses the residual
+   storage; Firestore, secrets and audit state are never deleted.
+5. **8–13 Nov:** write the report once from the outline. **14–16 Nov:** publish with explicit
+   approval (tag, release, Zenodo DOI, site update).
+6. Track U: when an ADK release admits `opentelemetry-api` 1.45.1, close issue #3 (still blocked
+   on 2.13.0).
+7. Optional: ask Google Cloud support the D2 question in the observation backlog.
 
 ## Session log
 
@@ -259,3 +218,12 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
   upstream warnings fire; evidence 22.
 - Codex review on PR #6: reconciled AGENTS.md and the observation backlog. The public site makes
   no Gateway-refusal or dead-letter claim; cohort N evidence reaches it with the report (D5).
+
+### 2026-11-04 / Claude Code — documentation reconciliation
+
+- Corrected evidence 20: its "unexplained mismatch" is the August defect D2, recorded with the
+  same signature and an inferred cause. Also removed Model Armor and Vertex AI from the Runtime's
+  egress list (the Runtime calls neither). The claim matrix, report plan, backlog and outline
+  now say the same.
+- Rewrote this handoff's current state and next steps. Brought the report plan (status line,
+  cohort F, order as run), VERSIONS, README, ADR-006 and AGENTS.md up to date.

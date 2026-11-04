@@ -6,6 +6,11 @@ session state only. [docs/UPGRADE-PLAN.md](../UPGRADE-PLAN.md) covers the ADK/re
 (Track U) only. Private values (credit balances, ceilings, raw captures) go in ignored `.local/`;
 its earlier history, including the old private roadmap, is in the maintainer's out-of-repo archive.
 
+**Status, 4 November:** cohort N is complete (E1–E7b, E5, E6; E8 skipped) and on `main`, as are
+both source fixes (not yet deployed). Phase 1 is done apart from related-work references. Next:
+the 5 November billing recheck, the 8 November freeze, cohort F (8–10 November), the fleet end
+state before 11 November, then the single rewrite.
+
 **Goal:** one coherent, citable technical report (C1–C3) in which every dated claim maps to
 sealed evidence, using the remaining GCP credits in small, pre-registered chunks before expiry.
 
@@ -122,8 +127,9 @@ The maintainer correction stands: no manuscript prose edits and no PDF builds in
   timing definitions, data handling); 6 Results (route, repeatability, control probes, cost);
   7 A2A state-boundary case study; 8 Discussion and limitations (each limitation stated once);
   9 Conclusion and future work; Appendix A Reproducibility; Appendix B Evidence ledger; References.
-- [ ] Derive the evidence-gap list from claim-map rows marked partial, stale or unobserved. It
+- [x] Derive the evidence-gap list from claim-map rows marked partial, stale or unobserved. It
   becomes the chunk backlog in Phase 3; a gap with no chunk is reported as a limitation.
+  **Done 4 Nov** in `report/OUTLINE.md`: the only remaining run is cohort F.
 - [x] O1: rerun the localhost A2A reproduction on ADK 2.13.0 in a fresh Python 3.12 environment
   built from `requirements.lock`; record whether both upstream warnings fire. No model or cloud
   calls. This replaces "the reproduction was not rerun" in §5.3 with a result. **Done 4 Nov**
@@ -193,8 +199,8 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   `policy_match` and nothing ran after it. The refusal audit record carries investigation ID
   `unknown` because the guardrail does not forward it, but it shares its invocation ID with
   records that carry the investigation ID, so it joins in two hops (checked 3 Nov). A
-  single-hop fix is a source change; deploy it only after the freeze (D1). Written 4 Nov,
-  uncommitted, with the completion check below.
+  single-hop fix is a source change; deploy it only after the freeze (D1). Written 4 Nov and
+  merged to `main` (PR #4) with the completion check below; not yet deployed.
 - **E4:** the findings API accepts any future `approved_until` up to 90 days, so expiry can be
   observed within an hour. The approval is a real maintainer decision on a real finding; it is
   the chunk's only state change and it expires by construction. **Done 3 Nov, 19:19–19:46
@@ -222,10 +228,11 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
   0 false completions, 25/25 Eventarc deliveries, 5/5 replays unchanged, median 20.4 s, 5 runs
   at 136–206 s (pre-Runtime waits with new Runtime instances, and unexplained stalls in
   `policy_step`/`policy_gate`). Recorded in [evidence 19](../../assets/evidence/19-repeatability-and-false-completion.md).
-  Fix written 4 Nov (uncommitted): success requires the completion gate's confirmation in the
-  Runtime stream. **Post-fix cohort F (maintainer-approved 4 Nov):** after the freeze, redeploy
+  Fix written 4 Nov and merged to `main` (PR #4), not yet deployed: success requires the
+  completion gate's confirmation in the Runtime stream. **Post-fix cohort F (maintainer-approved 4 Nov):** after the freeze, redeploy
   and run about 5 investigations 8–10 November, reported separately from cohort N.
-- **Order:** E1 → Phase 2 billing check → E2, E3 → E4 → E7 → E5, E6 → freeze.
+- **Order (as run):** E1 → Phase 2 billing check → E4 → E2, E3 → E7, E7b → E5, E6 → E1
+  packages → freeze → cohort F. All of cohort N is done.
 - **4 November gate: decided 4 Nov, E8 skipped.** Spend is under 1 SEK, but C4 stays deferred
   (D2) and the remaining days go to E5, E6 and cohort F. The report states C4 as future work
   with no results.
@@ -264,9 +271,12 @@ Already observed, in the IAP data-access log (30-day retention):
   20 in pairs during runs. Every investigation in those windows completed regardless.
 - The denial record carries no authenticated principal. No granted decision appears in this log.
 
-**Unexplained, and to be reported as such:** the Registry has a gRPC entry for that exact host
-(created 18 August), yet IAP resolved the request to `unregisteredEndpoint`. The cause of the
-mismatch is not visible from outside the platform.
+**Known since August as defect D2:** the Registry has a gRPC entry for that exact host (created
+18 August), yet IAP resolved the request to `unregisteredEndpoint`. The
+[observation backlog's D2](observation-backlog.md#d2-iap-mediated-egress-cannot-resolve-a-non-standard-google-host)
+recorded the same signature in August, with an inferred cause: non-standard Google hostnames
+are not matched to their Registry entries, and plain `*.googleapis.com` hosts are not
+IAP-checked at all. (Corrected after E5: the first write-up called it unexplained.)
 
 **Proposal E5-A (recommended): read-only, 0 SEK, no test identity.** Collect a count-only
 bundle of these decisions, correlated with the Runtime instance starts, before the 30-day log
@@ -357,7 +367,11 @@ tests a copy rather than the production subscription; only worth it if E6-A is n
 
 ## Phase 4 — Evidence freeze and fleet end state
 
-- [ ] 8 November: evidence freeze. The claim map is final; no new runs.
+- [ ] 8 November: evidence freeze. The claim map is final; no new cohort-N runs.
+- [ ] 8–10 November, cohort F (maintainer-approved 4 Nov; needs a go at deploy time): redeploy
+  `main` (completion confirmation, refusal investigation ID) to all four Cloud Run services and
+  the managed Runtime, verify the fleet, run about 5 investigations, and report them separately.
+  This closes claims B3 and B4 in the outline.
 - [ ] Before 11 November: execute the D4 end state (dry run first). Confirm in Billing that
   nothing continues to accrue once the credits end.
 

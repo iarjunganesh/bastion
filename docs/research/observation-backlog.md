@@ -114,7 +114,8 @@ rather than fully. A refusal *is* recorded under the audit contract, but it come
 agent-mediated Model Armor probe rather than from the correlated investigation itself, and the
 backlog row says so. D2's predicted consequence — that IAP-mediated egress might impair the
 Runtime's OTel export and cost us capture 3 — did not occur: the trace is complete and connected.
-Captures 6 (Gateway refusals) and 7 (timeout/retry/dead-letter) remain open and unclaimed.
+Captures 6 (Gateway refusals) and 7 (timeout/retry/dead-letter) remained open and unclaimed
+until 2026-11-04, when narrower observations replaced them (see the table above).
 
 ### D1. Deterministic policy enforcement does not run, and does not fail closed
 
@@ -252,6 +253,13 @@ across the managed Runtime and both A2A workers in one tree, recorded in
 [evidence 13](../../assets/evidence/13-current-route-trace.md). D2 remains open as residual
 platform behaviour with, now, a measured absence of consequence on both the request path and the
 telemetry path.
+
+**Re-measured 2026-11-04 (read-only, [evidence 20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md)):
+unchanged.** From 5 October to 4 November, 176 denials with the same signature, all for the
+SDK's Resource Manager project lookup on `cloudresourcemanager.mtls.googleapis.com` (a registered
+gRPC endpoint): 12 at each of 13 Runtime instance starts and 20 during runs. Still no granted
+IAP decision. Investigations completed throughout. The support question above is still
+unasked.
 
 ### D3. An audit trail cannot be assembled into one investigation
 

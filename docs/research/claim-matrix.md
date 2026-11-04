@@ -4,7 +4,10 @@
   evidence sprint, the gallery composition, and the dependency bump; reconciled again 2026-08-29
   against `v0.7.0`, when the demo was published and the `In demo` column became answerable
 - **Report supplement:** 2026-10-27 live validation, documented 2026-10-28 below; the August
-  capture dates, submitted demo and two `Partial` classifications are preserved.
+  capture dates and submitted demo are preserved.
+- **Cohort N:** reconciled 2026-11-04 against evidence 16–22. The two August `Partial` rows
+  (Gateway refusal, retry/DLQ) closed with narrowed wording. One new row, durable completion
+  integrity, is not safe to claim until cohort F verifies the fix.
 - **Purpose:** Internal pre-publication gate before drafting Devpost, article, social, screenshot,
   or demo copy. `Partial` means the public sentence must use the narrower wording in the final
   column; it does not mean the underlying architecture is absent.
@@ -19,7 +22,7 @@
 | Escalation IAM denial | Yes | Yes | Yes | Yes | Yes | Yes | [Evidence 03](../../assets/evidence/03-escalation-agent-denied.md) records successful impersonation then IAM-read denial on 15 Aug, with an Auditor success control. Re-probed 3 Nov in [evidence 17](../../assets/evidence/17-negative-authorization.md): impersonation succeeded, `getIamPolicy` returned `PERMISSION_DENIED`, and a permission test showed the Auditor holds the read the Escalation identity lacks. |
 | Exception approval authorization | Yes | Yes | Yes | Yes | No | Yes | [Evidence 17](../../assets/evidence/17-negative-authorization.md), 3 Nov: missing, malformed, wrong-service and maintainer-user tokens refused (401/403); four invalid approver payloads refused (400) and one schema error (422); the ledger was unchanged. Single probes, not fuzzing. |
 | Agent-mediated Armor refusal | Yes | Yes | Yes | Yes | Yes | Yes | **Closed 2026-08-25:** [evidence 12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md), authenticated Auditor injection refused with no subsequent model/tool call. This models a **compromised authorized caller**, not an anonymous one. Re-probed 3 Nov in [evidence 18](../../assets/evidence/18-model-armor-refusal-reprobe.md) with a completed benign control: same 141-character fixture, `policy_match`, task failed, nothing logged after the refusal. The refusal record carries no investigation ID; it joins its investigation in two hops through the shared invocation ID. Evidence 01 remains the earlier direct-template measurement. |
-| Managed Gateway refusal | Yes | Yes | Yes | Yes | No | Yes | [Evidence 20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md), 4 Nov (read-only): with fail-closed IAP enforcement IAP made 176 denial decisions on Runtime egress it resolved to `unregisteredEndpoint`, from 88 failed project lookups by the SDK (Resource Manager): 156 decisions within 90 s of the 13 instance starts (12 each) and 20 during runs; investigations continued. Say **refused egress it did not match to a registered endpoint**, not "refused an unregistered destination": the host has a Registry entry and the mismatch is unexplained. Incidental, not an experimenter-chosen destination. The Gateway governs egress only; caller checks at the workers are evidence 17. P0.10 closed with this wording. |
+| Managed Gateway refusal | Yes | Yes | Yes | Yes | No | Yes | [Evidence 20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md), 4 Nov (read-only): with fail-closed IAP enforcement IAP made 176 denial decisions on Runtime egress it resolved to `unregisteredEndpoint`, from 88 failed project lookups by the SDK (Resource Manager): 156 decisions within 90 s of the 13 instance starts (12 each) and 20 during runs; investigations continued. Say **refused egress it did not match to a registered endpoint**, never "refused an unregistered destination": the refused host is registered. This is the August defect D2 ([observation backlog](observation-backlog.md#d2-iap-mediated-egress-cannot-resolve-a-non-standard-google-host)), unchanged: IAP misclassifies non-standard Google hostnames, plain `*.googleapis.com` egress is not IAP-checked, and no IAP grant has ever been logged. So this shows fail-closed handling of unmatched traffic, not registered-versus-unregistered discrimination. Incidental, not an experimenter-chosen destination. The Gateway governs egress only; caller checks at the workers are evidence 17. P0.10 closed with this wording. |
 | Durable completion integrity | Partial | No | Yes | Yes | No | No | [Evidence 19](../../assets/evidence/19-repeatability-and-false-completion.md), 3 Nov: E7 run 8 was recorded completed (one attempt) with no audit record, review or model call; ingress treats the end of the Runtime stream as success. 1 of 28 investigations across E7/E7b. Never say **completed means the investigation ran**; report the count with its denominator. Fix is source-only until after the freeze. |
 | Repeatability, latency and tokens | Yes | Yes | Yes | Yes | No | Yes | [Evidence 19](../../assets/evidence/19-repeatability-and-false-completion.md), E7b: all 20 runs passed, 1 attempt each, 25/25 Eventarc deliveries, 5/5 replays unchanged; median 20.4 s with 5 of 20 runs at 136–206 s; median 1,788 input / 1,600 output tokens per run. One batch, not a reliability rate. |
 | Retry/DLQ behavior | Yes | Yes | Yes | Yes | No | Yes | [Evidence 21](../../assets/evidence/21-redelivery-and-dead-letter.md), 4 Nov: one synthetic `mock_data: true` event on the production subscription was rejected (HTTP 400) on 5 deliveries at growing intervals (about 14 s to 23 s), then forwarded to the dead-letter topic with `CloudPubSubDeadLetterSourceDeliveryCount = 5`, found and cleared in review; no investigation state written. Say **a rejected event is redelivered with backoff and dead-lettered after the configured five attempts**; one event, a permanent rejection. Transient failure and reclaim stay [evidence 06](../../assets/evidence/06-durable-findings.md); Google documents the attempt count as approximate. P0.11 is closed with this wording. |
@@ -56,16 +59,18 @@ boundary. A `Partial` row must keep the narrower wording
 above until its named capture closes and the evidence ledger, submission handoff, site, and this
 matrix are updated together.
 
-Two rows remain `Partial`, and they are exactly the two captures still open in
+Until 4 November two rows were `Partial`, exactly the two captures then open in
 [09-capture-backlog.md](observation-backlog.md): managed Gateway refusals (capture 6) and
-timeout/retry/dead-letter (capture 7). Until those close, public copy says **bounded delivery is
+timeout/retry/dead-letter (capture 7). Until then, public copy said **bounded delivery is
 configured and retry/idempotency paths are tested** and claims only the governed route and its
 fail-closed observation — never an observed Eventarc redelivery, an observed fifth-attempt
-dead-letter, or the planned unregistered-caller refusal. Per-caller rate limiting is never claimed
-at all; it does not exist.
+dead-letter, or the planned unregistered-caller refusal. The unregistered-caller refusal and a
+worker timeout sequence are still never claimed. Per-caller rate limiting is never claimed at
+all; it does not exist.
 
 **4 November 2026:** both captures are now closed for the report, by evidence
-[20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md) (Gateway, narrowed wording) and
+[20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md) (Gateway, narrowed wording;
+the refusals are defect D2's misclassification of a registered host) and
 [21](../../assets/evidence/21-redelivery-and-dead-letter.md) (redelivery and dead letter). The
 published demo still claims neither, so its `In demo` column stays `No`.
 

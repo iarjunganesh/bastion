@@ -12,8 +12,8 @@ Read HANDOFF.md next, then docs/research/report-plan.md and docs/UPGRADE-PLAN.md
   repository and removed at the maintainer's request; do not recreate it from old copies.
 - Root guidance and roadmaps contain only public-safe project state.
 - The 28 October maintainer request authorizes the ADK upgrade, documentation/site reconciliation,
-  and a v0.8.0 release after validation. Preserve report edits uncommitted on the feature branch
-  as explicitly requested; exclude report sources/build tools from release commits.
+  and a v0.8.0 release after validation (released 28 October). Keep report sources uncommitted
+  in `report/` as explicitly requested; exclude report sources/build tools from release commits.
 - Prepare the control matrix before paid execution; record a numeric study budget and stop rules.
   Credit availability alone is not a per-run spending cap. Previous study authorization is spent.
 

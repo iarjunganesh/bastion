@@ -45,18 +45,33 @@ decision appears in this log, so it shows refusals but not the matched allows.
 Say **the managed Gateway, with fail-closed IAP enforcement, refused every observed egress
 request it did not match to a registered endpoint: 176 IAP denial decisions from 88 failed
 project lookups, 156 of them within 90 s of the 13 Runtime instance starts and 20 during runs,
-while investigations continued.**
+while investigations continued.** Always pair it with the next section: the unmatched host was
+a registered one, known since August as defect D2.
+
+## Prior record: this is defect D2, still present
+
+These refusals are not new. The [observation backlog's defect D2](../../docs/research/observation-backlog.md#d2-iap-mediated-egress-cannot-resolve-a-non-standard-google-host)
+recorded the same signature in August: denials of `egressViaIAP` on `unregisteredEndpoint` with
+an empty `authenticationInfo`, clustered at Runtime start-up (12 in one 1.2-second burst on
+25 August), with no consequence for the investigation that followed. D2's inferred cause is that
+IAP does not match a registered destination on a non-standard Google hostname
+(`*.mtls.googleapis.com`, `*.rep.googleapis.com`) to its Registry entry. D2 also records that
+plain `*.googleapis.com` destinations are never IAP-checked at all, and that no IAP grant has
+ever been logged. Re-registering globally, switching from gRPC to HTTP/JSON bindings,
+redeploying and IAM changes were all tried in August and did not fix it. E5 shows D2 unchanged
+from 5 October to 4 November.
 
 ## What this does not show
 
-- **A destination we chose.** The refused request is incidental, made by the SDK, not a probe
-  aimed at a known-unregistered host. A deliberate probe would need new code in the Runtime.
-- **That the host is unregistered.** The Registry has a gRPC entry for
-  `https://cloudresourcemanager.mtls.googleapis.com`, created 18 August, yet IAP resolved the
-  request to `unregisteredEndpoint`. A missing grant is ruled out, because the Agent Identity
-  holds `roles/iap.egressor`. Why the Gateway did not match this entry is not visible from
-  outside the platform. Report it as an unexplained mismatch between the Registry catalog and
-  the Gateway's classification.
-- **Matched allows.** Approved egress (Model Armor, Vertex AI, Firestore, the two workers)
-  succeeded in every investigation that actually ran (E7's false completion ran nothing), but
-  no granted IAP decision was logged to confirm the allow side directly.
+- **Discrimination between registered and unregistered destinations.** The refused host *is*
+  registered (gRPC entry for `https://cloudresourcemanager.mtls.googleapis.com`, created
+  18 August), and the Agent Identity holds `roles/iap.egressor`. What is observed is fail-closed
+  behaviour when IAP cannot match a request, here a misclassified registered host. The cause is
+  D2's inference, not something confirmed by Google.
+- **A destination we chose.** The refused request is incidental, made by the SDK. A deliberate
+  probe would need new code in the Runtime.
+- **An allow path through IAP.** No granted IAP decision has been logged, in August or in this
+  window. The Runtime's approved egress (managed sessions, Firestore, the two workers) succeeded
+  in every investigation that ran (E7's false completion ran nothing). For plain Google API hosts,
+  D2 records that this traffic is not IAP-checked at all. The Runtime makes no model call and no
+  Model Armor call, so neither is part of this egress.
