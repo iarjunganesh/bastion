@@ -43,8 +43,9 @@ unregistered in the Agent Registry`, fell back, and the investigations completed
 decision appears in this log, so it shows refusals but not the matched allows.
 
 Say **the managed Gateway, with fail-closed IAP enforcement, refused every observed egress
-request it did not match to a registered endpoint: 176 decisions across 13 Runtime instance
-starts, while investigations continued.**
+request it did not match to a registered endpoint: 176 IAP denial decisions from 88 failed
+project lookups, 156 of them within 90 s of the 13 Runtime instance starts and 20 during runs,
+while investigations continued.**
 
 ## What this does not show
 

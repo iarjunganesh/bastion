@@ -334,8 +334,8 @@ Documented Pub/Sub behaviour (accessed 4 November 2026):
 Stop rules: any 2xx answer to the probe; any Firestore write; a dead-letter backlog not 0 at
 preflight; 30 minutes without dead-lettering (then report the attempts actually observed).
 
-- Claim if it passes: *on the production subscription, a rejected event was redelivered N times
-  at observed intervals and forwarded to the dead-letter topic, where review found it.* N comes
+- Claim if it passes: *on the production subscription, a rejected event was delivered N times
+  in total (the first attempt plus N−1 redeliveries) at observed intervals and forwarded to the dead-letter topic, where review found it.* N comes
   from the request log and the delivery-count attribute; the documentation calls the configured
   five approximate, so a different N is a result, not a failure.
 - Limits: exercises a permanent rejection (HTTP 400), not a transient dependency failure with

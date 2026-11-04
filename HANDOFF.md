@@ -85,7 +85,7 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
    was removed. **4 Nov gate: E8 skipped** (C4 stays deferred, D2). Next: E5/E6 design notes,
    then `report/OUTLINE.md` with the reframed thesis if the maintainer agrees.
 2. **E5 and E6 done 4 Nov**, both 0 SEK: [evidence 20](assets/evidence/20-gateway-unmatched-egress-refusal.md)
-   (176 fail-closed refusals of unmatched egress; narrowed wording, Registry mismatch
+   (176 fail-closed IAP denial decisions from 88 unmatched-egress lookups; narrowed wording, Registry mismatch
    unexplained) and [evidence 21](assets/evidence/21-redelivery-and-dead-letter.md) (one
    rejected event, 5 deliveries, dead-lettered with delivery count 5, cleared, no state).
    P0.10 and P0.11 closed in the claim matrix; AGENTS.md and the observation backlog now say

@@ -29,7 +29,8 @@ hackathon-era release plan is archived with the rest of the submission material.
   per-run tokens and per-message delivery.
 - Evidence 20–21 from 4 November: the managed Gateway's fail-closed refusals of egress it did
   not match to a registered endpoint (read-only, from retained logs), and one rejected event
-  redelivered five times and dead-lettered on the production subscription.
+  delivered five times in all (four redeliveries) and dead-lettered on the production
+  subscription.
 - Evidence 22: the A2A state boundary reproduced offline on the locked stack (`google-adk`
   2.13.0); both upstream warnings now fire.
 

@@ -48,9 +48,10 @@ Pub/Sub's own metrics agree: the push-request count shows five `remote_server_4x
 and the dead-letter count shows one forwarded message from the source subscription, both
 between 20:37 and 20:39.
 
-Say **on the production subscription, an event the ingress rejected was redelivered with
-growing backoff, five times as configured, then forwarded to the dead-letter topic, where
-review found and cleared it, and no investigation state was written.**
+Say **on the production subscription, an event the ingress rejected was delivered five times in
+all, as configured (the first attempt and four redeliveries, with growing backoff), then
+forwarded to the dead-letter topic, where review found and cleared it, and no investigation
+state was written.**
 
 ## What this does not show
 
