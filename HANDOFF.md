@@ -88,9 +88,12 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
    (176 fail-closed refusals of unmatched egress; narrowed wording, Registry mismatch
    unexplained) and [evidence 21](assets/evidence/21-redelivery-and-dead-letter.md) (one
    rejected event, 5 deliveries, dead-lettered with delivery count 5, cleared, no state).
-   P0.10 and P0.11 closed in the claim matrix. Committed on `design/e5-e6`; push, PR and merge
-   next. Then: finish E1's package listing through Artifact Registry; `report/OUTLINE.md`
-   (thesis choice pending); O1 reproduction.
+   P0.10 and P0.11 closed in the claim matrix; AGENTS.md and the observation backlog now say
+   the original probes were replaced, not performed. Also 4 Nov: E1 packages (one image digest,
+   161 distributions, `google-adk` 2.7.1); O1 re-run on 2.13.0 ([evidence 22](assets/evidence/22-a2a-state-boundary-reproduction.md),
+   both warnings fire); `report/OUTLINE.md` drafted (thesis: silent success at agent
+   boundaries; swappable). Codecov upload is now best-effort (3-minute limit). All via PR #6.
+   Remaining before the freeze: billing recheck 5 Nov; related-work references.
 3. Evidence freeze on 8 November; fleet end state (D4) before the first credit expires on
    11 November; write and build the report once; publish only with explicit approval.
 4. Track U: when an ADK release admits `opentelemetry-api` 1.45.1, close [issue #3](https://github.com/iarjunganesh/bastion/issues/3)
@@ -247,3 +250,12 @@ maintainer's go (D3); one daily billing check covers spend against the 100 SEK t
   0 investigation documents. The first collector crashed on an empty pull; resumed without
   republishing, disclosed in evidence 21 and kept in the bundle.
 - Claim matrix: Gateway and Retry/DLQ rows now `Yes` with their stated wording.
+
+### 2026-11-04 / Claude Code — E1 packages, O1, outline, PR #6
+
+- E1: streamed the serving image's pip layer (no disk write): 161 distributions, Python 3.12.14,
+  requirements identical to `f589b25`. The Runtime returns no source archive; stated, not inferred.
+- O1: fresh 3.12 env from the lock; original repro and an extended both-directions run; both
+  upstream warnings fire; evidence 22.
+- Codex review on PR #6: reconciled AGENTS.md and the observation backlog. The public site makes
+  no Gateway-refusal or dead-letter claim; cohort N evidence reaches it with the report (D5).

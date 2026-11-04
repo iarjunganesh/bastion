@@ -31,11 +31,15 @@ protected Cloud Run A2A workers, Model Armor, an IAM-private findings API, and r
 controls. The count-only capture records 21/21 APIs and 39 resources. The Python 3.12 suite has
 330 tests at 100% configured core statement and branch coverage.
 
-Five of seven observation captures are closed. Current-route IAM provenance, the agent-mediated
-Model Armor refusal, the correlated payload-free audit trail and the Cloud Trace chain were all
-captured on 2026-08-25 (evidence 11, 12, 13). Two remain deliberately open and their claims stay
-narrowed: a managed Gateway refusal of an unregistered caller, and a watched
-timeout/retry/dead-letter sequence.
+Five of seven observation captures closed in August. Current-route IAM provenance, the
+agent-mediated Model Armor refusal, the correlated payload-free audit trail and the Cloud Trace
+chain were all captured on 2026-08-25 (evidence 11, 12, 13). The other two were never performed
+as originally designed, and those forms are still not claimed: a Gateway refusal of an
+unregistered *caller* (the Gateway governs egress only) and a worker timeout→retry→escalation
+sequence. On 2026-11-04 the report closed narrower, different observations in their place: the
+Gateway's fail-closed refusal of egress it did not match to a registered endpoint (evidence 20)
+and a rejected event's redelivery and dead letter on the production subscription (evidence 21).
+No further live work is planned for either; see the claim matrix for the exact wording.
 
 **The hackathon is over and its material is archived.** The entry was submitted on 2026-08-29
 and judging has closed; no award is claimed anywhere. Tag `v0.7.0` is the submission. Devpost

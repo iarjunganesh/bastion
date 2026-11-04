@@ -29,7 +29,7 @@ A read-only census on 28 October (19:23 UTC) replaced several assumptions with o
   Scheduler jobs. Investigations: 57 completed, 4 failed and 2 stale `running` records, all
   failures and stale records dated 15–22 August. 82 human-review records exist.
 - Not readable by API here: credit balances, per-service cost (no billing export), and the
-  installed packages of the deployed image and Runtime.
+  Runtime's installed packages. The image's packages were read on 4 November (E1 below).
 
 - **Report:** one source set in `report/` (untracked by request) assembles a 13-page PDF. Until
   the 28 October cleanup three builds circulated (two in `report/` with different hashes, one
@@ -114,7 +114,8 @@ re-argued in the results:
 
 The maintainer correction stands: no manuscript prose edits and no PDF builds in this phase.
 
-- [ ] Write `report/OUTLINE.md` (uncommitted): target structure, a one-sentence thesis per
+- [x] Write `report/OUTLINE.md` (uncommitted; **drafted 4 Nov** with the "silent success at
+  agent boundaries" thesis, data minimisation as the design; the maintainer may swap the headline): target structure, a one-sentence thesis per
   section, and a claim map (claim ID → section → evidence ID → status: observed, configured,
   offline-tested, partial, stale). Target structure: 1 Introduction; 2 Background and related
   work; 3 Threat model and design goals; 4 System design; 5 Evaluation method (cohorts, metrics,
@@ -123,9 +124,11 @@ The maintainer correction stands: no manuscript prose edits and no PDF builds in
   9 Conclusion and future work; Appendix A Reproducibility; Appendix B Evidence ledger; References.
 - [ ] Derive the evidence-gap list from claim-map rows marked partial, stale or unobserved. It
   becomes the chunk backlog in Phase 3; a gap with no chunk is reported as a limitation.
-- [ ] O1: rerun the localhost A2A reproduction on ADK 2.13.0 in a fresh Python 3.12 environment
+- [x] O1: rerun the localhost A2A reproduction on ADK 2.13.0 in a fresh Python 3.12 environment
   built from `requirements.lock`; record whether both upstream warnings fire. No model or cloud
-  calls. This replaces "the reproduction was not rerun" in §5.3 with a result.
+  calls. This replaces "the reproduction was not rerun" in §5.3 with a result. **Done 4 Nov**
+  ([evidence 22](../../assets/evidence/22-a2a-state-boundary-reproduction.md)): both
+  directions behave as in August and both upstream warnings fire.
 - [ ] List candidate related-work references; verify each against its primary source before use.
 
 ## Phase 2 — Credits gate (maintainer, about 15 minutes, read-only)
@@ -160,7 +163,7 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
 
 | Chunk | Closes | Surface | Model calls | Creates resources | Target |
 |---|---|---|---|---|---|
-| E1 Census | Fresh binding and pre-policy finding counts; exception-ledger state; retention configuration; deployed package provenance | Read-only APIs | 0 | No | **Done 28 Oct** except image packages |
+| E1 Census | Fresh binding and pre-policy finding counts; exception-ledger state; retention configuration; deployed package provenance | Read-only APIs | 0 | No | **Done 28 Oct**; packages 4 Nov |
 | E2 Negative authorization | Escalation IAM-read denial; findings API missing/wrong token and invalid payload | Impersonation and HTTP probes | 0 | No | **Done 3 Nov** ([evidence 17](../../assets/evidence/17-negative-authorization.md)) |
 | E3 Screening refusal | Agent-mediated Model Armor refusal with a benign control | Direct authenticated Auditor | At most 2 | No | **Done 3 Nov** ([evidence 18](../../assets/evidence/18-model-armor-refusal-reprobe.md)) |
 | E4 Exception lifecycle | Approval, suppression and **expiry firing** (never yet observed); an ID-joined trace; per-run tokens and cost | Production path, maintainer as reviewer | About 6 | One real, self-expiring approval | **Done 3 Nov** ([evidence 16](../../assets/evidence/16-exception-lifecycle.md)) |
@@ -171,10 +174,16 @@ Every chunk follows one protocol, and the protocol file is the approval artifact
 
 - **E1:** done read-only on 28 October (results under Grounded state; private outputs in
   `.local/measurements/2026-10-28-ground-truth/`). The census used the Auditor's own fetch and
-  detector with a throwaway in-memory ID key, so no production secret was read. Remaining: list
-  the installed packages by pulling the deployed image (tiny billable egress, after Phase 2).
-  The Runtime API does not return its source archive, so its installed resolution stays
-  undeclared; say so rather than infer it.
+  detector with a throwaway in-memory ID key, so no production secret was read. **Packages done
+  4 Nov:** all four Cloud Run services serve one digest (`sha256:dd9853bd…`, built 23 Aug
+  19:59 UTC, Python 3.12.14). Streaming only its `pip install` layer (about 254 MB, never
+  written to disk) gave 161 installed distributions, among them `google-adk` 2.7.1,
+  `a2a-sdk` 1.1.2, `google-cloud-aiplatform` 1.165.1, `google-genai` 2.19.0 and
+  `opentelemetry-api`/`-sdk` 1.42.1. The image's `requirements.txt` is byte-identical to commit
+  `f589b25`'s, and no commit changed it between 22 and 24 August. The Runtime API returns its
+  Python spec (3.12, `requirements.txt`) but not its source archive, so the Runtime's resolution
+  stays undeclared: it was deployed at 20:11 UTC the same evening, from the same requirements file
+  by inference only. Private bundle in `.local/measurements/2026-11-04-E1-packages/`.
 - **E2:** if the maintainer's impersonation right on the Escalation identity no longer exists,
   stop; do not grant it. **Done 3 Nov:** all 15 checks matched their expected outcome: 13
   refusals or denials (approval endpoint, Auditor peer origin, Escalation IAM read) and 2
