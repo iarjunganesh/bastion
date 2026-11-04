@@ -120,6 +120,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt -c requirements.lock
 
+      - name: Offline minimisation preparation controls
+        run: python -m unittest discover -s experiments/minimisation -p "test_*.py" -v
+
       - name: Pytest with coverage gate
         run: >-
           pytest tests

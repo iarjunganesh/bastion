@@ -29,8 +29,9 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 - **Source fixes are merged but not deployed.** `run_managed_runtime` requires the completion
   gate's confirmation, and guardrail refusals carry the investigation ID. Suite: 330 tests at 100%
   configured core coverage. Codecov upload is best-effort (3-minute limit).
-- **Git:** `main` is current with everything above (PRs #4, #5 and #6, merged 4 Nov; no open
-  PRs or feature branches). The private bundles are in
+- **Git:** the base `main` includes PRs #4–#7 (merged 4 Nov). The active branch is
+  `fix/study-budget-and-report-notes`, preparing the tracked study-budget correction and handoff.
+  The private bundles are in
   `.local/measurements/`, sealed with manifests and ZIPs.
 - **Report:** rewritten on 4 Nov (maintainer's request) to `report/OUTLINE.md`, one file per
   section in `report/sections/`, private and uncommitted. Thesis: *silent success at agent
@@ -40,8 +41,19 @@ Claude Code, and GitHub Copilot. Update Current state, Next step, and Session lo
 - **Unchanged facts:** v0.8.0 is the current release (28 Oct). One OpenTelemetry advisory is
   accepted ([issue #3](https://github.com/iarjunganesh/bastion/issues/3)). The fleet runs the
   23 August build. The public console makes no cohort-N claims yet.
+- **Targeted report wording changes applied on 4 November, with maintainer approval.** T1–T3
+  credit the upstream contribution in §7.2/U2, date the census measurements in §5.1/E11, and
+  clarify §9's deferred matched-explanation study. §8 refers to the dated census rather than
+  repeating an undated binding count. Supporting upstream records were checked read-only on
+  4 November. Report sources stay uncommitted; placeholders, cohort F text and build tools are
+  unchanged. The tracked study config and validator now allow at most D3's 100 SEK total;
+  any future approved budget must fit the remaining allocation. Generation remains disabled.
 
 ## Next step
+
+**Immediate:** validate and merge the tracked study-budget correction through a PR, as authorized
+by the maintainer. Keep `report/` uncommitted; C4 stays deferred and missing-workflow-step cases
+remain planned. No PDF build or live run is part of this wording/budget correction.
 
 Follow [docs/research/report-plan.md](docs/research/report-plan.md). Live or paid steps need the
 maintainer's go (D3). Credits only; 100 SEK total cap.
@@ -238,3 +250,27 @@ maintainer's go (D3). Credits only; 100 SEK total cap.
   keys all resolve).
 - Evidence 15 never covered the IAM census or packages (it is a count-only inventory), so both
   are now evidence 23; evidence 15 gains a pointer only.
+
+### 2026-11-04 / Codex — targeted report wording review
+
+- Prepared T1–T3 as current text, proposed replacements and supporting sources for maintainer
+  review. Verified issue #6854, PR #6859's two author commits, import `d2cb22e` and the v2.12.0
+  release record read-only on GitHub.
+- Checked the dated E11/E23 census boundaries and the synthetic study's matched explanation
+  and injection cases. Missing-workflow-step cases remain a planned extension, with no C4 run
+  authorized; the study's configured 200 SEK ceiling still needs reconciliation with D3.
+- Updated this handoff only. No manuscript edit, PDF build, commit, push, deployment or live
+  experiment; proposed wording awaits the maintainer's explicit go.
+
+### 2026-11-04 / Codex — approved wording and study-budget correction
+
+- On the maintainer's go, applied T1–T3 to the uncommitted manuscript and removed §8's undated
+  duplicate census count. Preserved the title, author line, placeholders, cohort F text, disclosure
+  and build tools. No PDF build or live run.
+- Lowered the tracked study config and validator from 200 to 100 SEK, within D3's remaining total;
+  generation remains disabled and C4 remains deferred. Documented missing-workflow-step cases as
+  planned, with no model runner or new spending authorization.
+- The 101 SEK rejection test failed before the fix; all nine offline controls pass after it.
+  Added these controls to CI. Ruff, Markdown lint and the public documentation/version gates pass
+  (the latter in a clean tracked-file export). Local checks still see the pre-existing private
+  report-builder paths and historical-version entry; those stay outside this correction.

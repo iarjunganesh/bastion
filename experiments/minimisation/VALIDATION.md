@@ -3,7 +3,10 @@
 Later local update: nine tests now pass, including wrong-project/quota-project
 rejection, in-memory credential selection and strict response validation controls.
 Ruff check/format remain passing. Global gcloud/saved ADC unchanged; no model call.
-`config.json` records a 200 SEK ceiling but the paid runner/cost limiter is not built.
+The 11 October configuration recorded a 200 SEK ceiling; on 4 November the config
+and validator were lowered to 100 SEK to match D3's total upper bound. The paid
+runner/cost limiter is not built, generation remains disabled and C4 has no paid
+run authorization. A future approved budget must fit within D3's remaining total.
 Batch ingestion/aggregation, human ratings and paid adapter remain next work.
 
 Branch: `feature/bastion-report-local`, base `a0e08fc`, uncommitted local changes.

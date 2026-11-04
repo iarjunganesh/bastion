@@ -6,6 +6,6 @@
   "temperature": 0.2,
   "max_output_tokens": 8192,
   "pilot_max_calls": 5,
-  "max_spend_sek": 200,
+  "max_spend_sek": 100,
   "model_generation_enabled": false
 }

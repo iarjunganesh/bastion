@@ -69,7 +69,7 @@ class ResponseTests(unittest.TestCase):
             ("project", "jnanasagara"),
             ("quota_project", "jnanasagara"),
             ("model_generation_enabled", True),
-            ("max_spend_sek", 201),
+            ("max_spend_sek", 101),
         ):
             changed = dict(settings, **{key: value})
             with tempfile.TemporaryDirectory() as directory:

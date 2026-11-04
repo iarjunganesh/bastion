@@ -29,7 +29,7 @@ def load_config(path: Path = CONFIG) -> dict[str, Any]:
             raise ValueError(f"{key} must explicitly select bastion-fleet-2026")
     if settings["location"] != "global" or settings["model"] != "gemini-3.5-flash":
         raise ValueError("Model/location change requires method review")
-    for key, upper in (("max_output_tokens", 8192), ("pilot_max_calls", 5), ("max_spend_sek", 200)):
+    for key, upper in (("max_output_tokens", 8192), ("pilot_max_calls", 5), ("max_spend_sek", 100)):
         if type(settings[key]) is not int or not 0 < settings[key] <= upper:
             raise ValueError(f"Invalid {key}")
     if type(settings["temperature"]) not in (int, float) or not 0 <= settings["temperature"] <= 2:

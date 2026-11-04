@@ -37,6 +37,9 @@ python experiments/minimisation/study.py --output .tmp/minimisation-preparation
   paired minimised input is identical to its benign version because that label
   is absent. This tests label exclusion, not all injection placements or the live
   fetch path. Model refusal/drift effects remain unmeasured.
+- Planned extension: paired missing-workflow-step cases are not implemented in
+  the current harness. Define their protocol and expected behaviour before any
+  model evaluation; no results are claimed.
 - Three replicate IDs per model condition: 750 request envelopes prepared, zero
   dispatched. Replicates are identifiers, not claims of model seed support.
 - Structural fidelity compares IDs, duplicate detection, deterministic fields,
@@ -55,7 +58,11 @@ credential override in memory; it never modifies saved ADC or gcloud configurati
 `responses.py` now strictly parses model response JSON and records structural
 invalidity/refusals/errors without turning them into valid empty answers. Nine
 tests pass. No SDK client, model dispatch or reliable cost enforcement exists yet;
-the configured 200 SEK ceiling alone is not a working spend limiter.
+the configured 100 SEK ceiling alone is not a working spend limiter. The config
+and validator use D3's 100 SEK total as their upper bound, not a fresh allocation
+for C4. Any future run needs a separately approved budget within the remaining
+total in the [report plan](../../docs/research/report-plan.md#decisions-for-the-maintainer).
+C4 remains deferred under D2; generation stays disabled and no paid run is authorized.
 
 1. Finish batch ingestion and per-condition aggregation around the completed
    strict parser/evaluator. Join all planned trials, explicitly represent missing
@@ -69,7 +76,9 @@ the configured 200 SEK ceiling alone is not a working spend limiter.
    omission rates differ from attack success; pair benign/injected cases.
 4. Add a separately authorized model adapter with exact model/version/date,
    generation settings, token usage, latency, retries and actual cost accounting.
-   Fail before dispatch without a verified spend budget; hard cap 200 SEK.
+   Fail before dispatch without a verified, separately approved spend budget
+   within D3's remaining total. Enforce that run's cap in the future runner;
+   the configuration ceiling alone does not enforce spending.
 5. Analyze paired effects with uncertainty bootstrapped over policy, keeping its
    replicates together. No statistical results exist from this preparation.
 
