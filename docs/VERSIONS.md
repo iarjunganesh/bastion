@@ -5,7 +5,7 @@ This table separates the source target from measured deployments. Updated 6 Nove
 
 | Scope | Framework / revision | What the evidence establishes |
 |---|---|---|
-| Release v0.8.0 (current source) | Google ADK 2.13.0; A2A SDK 1.3.0; Python 3.12 | Locked offline suite (321 cases at release), 100% core coverage; production upgrade not established |
+| Released v0.8.0, 28 October | Tag `v0.8.0` at `4d70b1ba81b0c37b5cbd55223b93f651855de0d9`; Google ADK 2.13.0, A2A SDK 1.3.0, Python 3.12 | Source release, with 321 cases at release and 100% core coverage. The tag itself did not deploy production; the 5 November descendants and overlays are recorded separately below |
 | Submitted v0.7.0 tree | `google-adk` v2.8.0 source pin | Historical submission source, distinct from its deployed resolution |
 | August deployment provenance | Evidence 11–13 identify code revision `c81b4af`; E23 later measures the Cloud Run image's `google-adk` 2.7.1 resolution | Dated route observations; the managed Runtime's installed packages were not read back |
 | 27 October study | Same worker revisions and Runtime update metadata as August | 20 completed investigations; installed packages were not freshly inventoried |

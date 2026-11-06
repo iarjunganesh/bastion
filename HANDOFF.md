@@ -19,7 +19,8 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   its refusal join uses a read-only addendum after a collector false positive
   ([E25](assets/evidence/25-corrected-cohort-F-verification.md)). Runtime stayed unchanged in recovery.
   Preserve the raw collector stop, incomplete X1 and unresolved drain receipt. No further F run.
-- **Versions:** the current image asserted ADK 2.13.0/A2A 1.3.0/SDK 2.6.0; Runtime installed
+- **Versions:** the released v0.8.0 tag is `4d70b1b`; the November deployments use later
+  descendants plus SDK/parser fixes. The current image asserted ADK 2.13.0/A2A 1.3.0/SDK 2.6.0; Runtime installed
   packages remain unreadable. [VERSIONS](docs/VERSIONS.md) is authoritative. Core validation
   passed 336 cases at 100% configured coverage in the final sweep; Ruff/format, mypy and
   all docs/version/site/diagram/redaction/Markdown gates passed.
@@ -30,14 +31,15 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 - **End state:** D4 remains 8–10 November, dry run first, before 11 November. Retained
   Firestore, secrets, Runtime/Memory and audit state need an owner decision; none was deleted.
 - **Git and public surfaces:** `docs/evidence-audit-reconciliation`, base `d7d6a99`.
-  Public cleanup is recorded in the latest local commit; no push, tag or publication.
+  Public cleanup is recorded in local commit `2a12f5f`; later doc corrections follow locally.
+  No push, tag change or publication.
   The site snapshot remains the
   28 October inventory. Frozen gallery/video/architecture assets retain their dates and bytes.
 - **Report:** canonical `report/sections/` now incorporates the prepared audit corrections,
   separate E24/E25 populations, bounded billing and verified primary references. The 14-page PDF is generated and visually reviewed, with
-  37 clickable references, no unresolved
+  38 clickable references, no unresolved
   placeholders or automated layout findings. Twelve report integrity checks passed; the
-  canonical sources/build inputs and cited files have a 57-file snapshot. The figure is unchanged.
+  canonical sources/build inputs and cited files have a 58-file snapshot. The figure is unchanged.
   No reliability rate, C4 result, universal privacy proof or completed shutdown is claimed.
 
 ## Next step
@@ -89,3 +91,13 @@ documentation, evidence and site-source changes in a local commit after an expli
 staging check. `report/` and `.local/` were excluded. The completed PDF/source snapshot retain
 their original bytes and base-revision provenance; Git housekeeping does not rebuild the report.
 No push, tag, cloud action or publication.
+
+### 6 November — explicit release/deployment provenance
+
+Added the missing v0.8.0 release row and commit to Appendix A, retaining the distinction from
+the later deployed image/source overlays. Verified GitHub release/tag metadata and local Git
+ancestry. Pinned the report's public-link base so unpublished local commits cannot silently
+replace it. The 14-page PDF has 38 clickable references and a 58-file source snapshot; twelve
+report checks, automated layout checks and changed-page visual review passed. Version-ledger
+and handoff corrections are committed locally; report sources/output remain uncommitted.
+No push, retag, deployment or new probe.
