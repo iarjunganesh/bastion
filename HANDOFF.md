@@ -7,8 +7,8 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 - **Final sweep and local PDF complete.** The maintainer requested whole-repo drift cleanup,
   careful simplification and the final technical-report PDF. This supersedes the earlier report
-  build hold. Keep `report/` uncommitted; no cloud mutation, Git publication or site deployment
-  follows from the request.
+  build hold. Keep `report/` uncommitted. The later request authorizes public branch publication
+  and integration into `main` after hosted CI; GCP deployment and paid probes remain separate.
 - **Preservation:** before editing, 45 dirty/report files were backed up in
   `.local/sweeps/2026-11-06-final-report/before-sweep.zip` with a manifest. Both F capture seals
   and ZIPs are recorded separately. That snapshot retains the full previous handoff/session log.
@@ -30,9 +30,10 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   Values and both full chunk reservations stay in `.local/credit-verification.json`.
 - **End state:** D4 remains 8–10 November, dry run first, before 11 November. Retained
   Firestore, secrets, Runtime/Memory and audit state need an owner decision; none was deleted.
-- **Git and public surfaces:** `docs/evidence-audit-reconciliation`, base `d7d6a99`.
-  Public cleanup is recorded in local commit `2a12f5f`; later doc corrections follow locally.
-  No push, tag change or publication.
+- **Git and public surfaces:** public cleanup (`2a12f5f`) and release-provenance correction
+  (`289577d`) are published through [PR #9](https://github.com/iarjunganesh/bastion/pull/9),
+  from `docs/evidence-audit-reconciliation` into `main`. The PR records hosted CI and merge status.
+  Integration preserves commit history and excludes `report/` and `.local/`; no release tag changes.
   The site snapshot remains the
   28 October inventory. Frozen gallery/video/architecture assets retain their dates and bytes.
 - **Report:** canonical `report/sections/` now incorporates the prepared audit corrections,
@@ -44,9 +45,9 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Next step
 
-1. Maintainer review of the completed local PDF at `report/bastion-technical-report-v1.pdf`
-   and the local public-source cleanup commit. Report sources/output remain uncommitted;
-   no Git publication was done.
+1. Maintainer review of the completed local PDF at `report/bastion-technical-report-v1.pdf`.
+   Public source integration is tracked in [PR #9](https://github.com/iarjunganesh/bastion/pull/9);
+   report sources/output remain uncommitted and unpublished.
 2. Keep `report/source-manifest.json`, `source-snapshot.zip` and `qa/checks.json` with the PDF.
    Unchanged citations use the base commit; changed/unpublished records use the local snapshot.
 3. Resume D4 in the agreed 8–10 November window with an owner-reviewed dry run and residual-cost
@@ -101,3 +102,13 @@ replace it. The 14-page PDF has 38 clickable references and a 58-file source sna
 report checks, automated layout checks and changed-page visual review passed. Version-ledger
 and handoff corrections are committed locally; report sources/output remain uncommitted.
 No push, retag, deployment or new probe.
+
+### 6 November — public source integration
+
+The maintainer requested branch publication and merge into `main`. Published the two public
+commits and opened [PR #9](https://github.com/iarjunganesh/bastion/pull/9); integration requires
+passing hosted CI on the final head and uses a merge commit to preserve history. The final
+local rerun passed 336 tests at 100% configured coverage after using a writable pytest temporary
+directory. Public guidance now records this authorization separately from report publication.
+The report/PDF bytes and private captures are preserved; no rebuild, retag, GCP deployment,
+paid probe or shutdown is part of this integration. The GCP deploy workflow remains manual-only.

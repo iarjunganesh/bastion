@@ -29,8 +29,9 @@ deployed resolution; [VERSIONS.md](VERSIONS.md) is the canonical provenance tabl
    the earlier report build hold; generation is part of this final pass, not a routine code gate.
 4. Follow D4's existing 8–10 November dry-run-first end-state window and residual-resource decision
    in the [report plan](research/report-plan.md). Do not broaden deletion targets.
-5. Site deployment and report publication remain separate actions. Source alignment/build checks
-   are local; they do not verify deployed Vercel bytes or publish E24/E25.
+5. Public code, documentation and E24/E25 are published through
+   [PR #9](https://github.com/iarjunganesh/bastion/pull/9), with merge authorized after hosted CI.
+   Site build checks do not verify deployed Vercel bytes; report publication remains separate.
 
 ## Boundaries for any later upgrade
 
@@ -43,5 +44,5 @@ event/call/time limits and stop rules. Start with a pilot and stop on missing ev
 retry, protected-data exposure or estimated exhaustion. Credit balances and budget alerts are
 not hard caps. Preserve all older captures with their actual versions.
 
-The source-only v0.8.0 closeout and earlier static-site publication are dated release history,
-not evidence that today's working tree has been committed, pushed or deployed.
+The source-only v0.8.0 closeout and earlier static-site publication are dated release history.
+PR #9 records the current source integration; it does not perform another GCP deployment.

@@ -30,7 +30,7 @@ collection disclosures bound the report; a passing batch is not a reliability ra
 | D2 | Defer C4 to a later study. Injection fixtures exist; missing-workflow-step cases remain planned |
 | D3 | Per-chunk approval with a written cost/count cap and stop rules, within the 100 SEK total upper bound. One daily billing check replaces a per-chunk overnight wait. Reserve unposted prior chunks conservatively |
 | D4 | Reach the agreed fleet end state on 8–10 Nov, before 11 Nov. Dry run first; owner chooses export/removal/accepted costs for residual resources |
-| D5 | Public publication reference, report tag/DOI and release remain open; each external action needs its own authorization |
+| D5 | Report publication reference, tag/DOI and release remain open. Public source integration is authorized on 6 Nov via [PR #9](https://github.com/iarjunganesh/bastion/pull/9) |
 
 Credits are shared, scoped and expiring; availability is not a hard spending cap. Card charges
 remain unauthorized. Numeric balances, reservations and billing receipts belong in ignored
@@ -38,7 +38,8 @@ remain unauthorized. Numeric balances, reservations and billing receipts belong 
 
 ## Remaining sequence
 
-1. Maintainer reviews the completed local PDF and local public-source cleanup commit.
+1. Maintainer reviews the completed local PDF; public source integration proceeds through
+   [PR #9](https://github.com/iarjunganesh/bastion/pull/9) after hosted CI passes.
    The offline sweep, primary-source refresh and source/builder reconciliation passed their checks.
 2. Keep report sources/output uncommitted and retain the manifest, source snapshot and QA receipt.
    Validation corrected table widths and generated Markdown spacing; do not restart iterative drafting.
@@ -46,7 +47,7 @@ remain unauthorized. Numeric balances, reservations and billing receipts belong 
    before applying it. Firestore, secrets, Runtime/Memory and audit state are retained by default;
    nothing here authorizes their deletion or an irreversible bucket lock.
 4. At publication, refresh upstream status and public links, select the immutable reference,
-   and obtain approval for GitHub/Zenodo/site actions. This local edition does not claim publication
+   and obtain approval for report release/Zenodo/site actions. This local edition does not claim publication
    or a completed shutdown.
 
 ## Evidence and manuscript rules
