@@ -67,6 +67,8 @@ Raw members, roles, resources and bindings stay inside the Auditor's determinist
 The minimised schema carries opaque IDs, departments, categories and scores, not an anonymity
 or general zero-leakage guarantee.
 
+<a id="the-fleet"></a>
+
 ## Request path
 
 <p align="center">
@@ -126,6 +128,8 @@ Sylvester Kaczmarek and including Arjun Ganesh's legacy-path warning and end-to-
 imported as [d2cb22e](https://github.com/google/adk-python/commit/d2cb22e) on 12 October.
 The GitHub PR was closed after import, not merged through GitHub. Both warnings first shipped in
 [v2.12.0](https://github.com/google/adk-python/releases/tag/v2.12.0); the state boundary remains.
+
+<a id="quality-gates"></a>
 
 ## Offline setup and checks
 
