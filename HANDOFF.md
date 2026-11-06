@@ -31,8 +31,9 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 - **End state:** D4 remains 8–10 November, dry run first, before 11 November. Retained
   Firestore, secrets, Runtime/Memory and audit state need an owner decision; none was deleted.
 - **Git and public surfaces:** public cleanup (`2a12f5f`) and release-provenance correction
-  (`289577d`) are published through [PR #9](https://github.com/iarjunganesh/bastion/pull/9),
-  from `docs/evidence-audit-reconciliation` into `main`. The PR records hosted CI and merge status.
+  (`289577d`) were merged through [PR #9](https://github.com/iarjunganesh/bastion/pull/9)
+  at `6c1c832`. All eight CI jobs passed before and after merge. A follow-up restores the
+  README anchors still used by generated Agent Cards and the frozen submission.
   Integration preserves commit history and excludes `report/` and `.local/`; no release tag changes.
   The site snapshot remains the
   28 October inventory. Frozen gallery/video/architecture assets retain their dates and bytes.
@@ -46,8 +47,9 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 ## Next step
 
 1. Maintainer review of the completed local PDF at `report/bastion-technical-report-v1.pdf`.
-   Public source integration is tracked in [PR #9](https://github.com/iarjunganesh/bastion/pull/9);
-   report sources/output remain uncommitted and unpublished.
+   Public source integration is recorded in [PR #9](https://github.com/iarjunganesh/bastion/pull/9);
+   review against the published source while preserving this edition's dated snapshot.
+   Report sources/output remain uncommitted and unpublished.
 2. Keep `report/source-manifest.json`, `source-snapshot.zip` and `qa/checks.json` with the PDF.
    Unchanged citations use the base commit; changed/unpublished records use the local snapshot.
 3. Resume D4 in the agreed 8–10 November window with an owner-reviewed dry run and residual-cost
@@ -112,3 +114,11 @@ local rerun passed 336 tests at 100% configured coverage after using a writable 
 directory. Public guidance now records this authorization separately from report publication.
 The report/PDF bytes and private captures are preserved; no rebuild, retag, GCP deployment,
 paid probe or shutdown is part of this integration. The GCP deploy workflow remains manual-only.
+
+### 6 November — late link review
+
+PR #9 merged with history preserved; all eight post-merge CI jobs passed. An automated review
+arrived after merge and identified removed README anchors still advertised by the Agent Card
+and frozen submission. Verified both references and restored `the-fleet` and `quality-gates`
+beside the replacement sections. Runtime metadata and archived files need no changes.
+Report sources/output remain uncommitted and byte-identical; no report rebuild or cloud action.
