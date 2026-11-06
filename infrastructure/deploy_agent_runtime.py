@@ -271,6 +271,13 @@ def environment() -> dict[str, Any]:
         "BASTION_ESCALATION_CARD_URL": (card_url("bastion-escalation-agent", "escalation_agent")),
         "ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS": "false",
         "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "NO_CONTENT",
+        # The SDK adds this value to every public create/update when it is absent ("default-on
+        # telemetry"), so it is declared here to state what a canonical deploy sends. With
+        # `enable_tracing=True` the template reads "unspecified" like an unset value: tracing
+        # stays on and log export stays off; ADK adds its telemetry user-agent header. The
+        # 5 November Runtime update used an operator path that removed this SDK addition, so the
+        # Runtime deployed then does not carry it; the next canonical deploy will.
+        "GOOGLE_CLOUD_AGENT_ENGINE_ENABLE_TELEMETRY": "unspecified",
     }
 
 

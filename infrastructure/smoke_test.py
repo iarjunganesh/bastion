@@ -17,6 +17,7 @@ import httpx
 from agentplatform import Client
 from google.cloud import firestore
 
+from infrastructure.agent_server import _confirms_completion
 from infrastructure.verify_fleet import main as verify_fleet
 from observability.audit import INVESTIGATION_METADATA_KEY
 from runtime.events import new_investigation_payload
@@ -137,7 +138,8 @@ async def verify_runtime() -> None:
     investigation_id = str(uuid4())
     session = await engine.async_create_session(user_id=user)
     count = 0
-    async for _event in engine.async_stream_query(
+    confirmed = False
+    async for event in engine.async_stream_query(
         user_id=user,
         session_id=session["id"],
         message=json.dumps(
@@ -147,8 +149,16 @@ async def verify_runtime() -> None:
         run_config={"custom_metadata": {INVESTIGATION_METADATA_KEY: investigation_id}},
     ):
         count += 1
+        confirmed = confirmed or _confirms_completion(event)
     if count == 0:
         raise RuntimeError("managed Agent Runtime returned no streamed events")
+    # Any streamed event is not success: evidence 19 recorded a completed investigation whose
+    # stream carried no work. The smoke path requires the same completion-gate confirmation the
+    # durable ingress does, so it cannot pass on a run that never reached the gate.
+    if not confirmed:
+        raise RuntimeError(
+            f"managed Agent Runtime streamed {count} events without a confirmed completion"
+        )
 
 
 def main() -> None:

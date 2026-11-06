@@ -42,9 +42,29 @@ def _memory_service() -> VertexAiMemoryBankService:
     )
 
 
+# Written, never read: restored after the template overwrites it.
+SPAN_CONTENT_SETTING = "ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS"
+
+
+class GovernedAdkApp(AdkApp):
+    """`AdkApp` that keeps trace export but keeps message content out of ADK's spans.
+
+    The managed template treats `enable_tracing=True` as its legacy opt-in for span content, and
+    its `set_up()` overwrites `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS` with "true" -- replacing the
+    "false" that `infrastructure/deploy_agent_runtime.py` deploys. ADK reads the variable each time
+    it traces a model or tool call, which would put requests, responses and tool values on spans.
+    This graph makes no model or tool call in the Runtime today, so no content reached a span;
+    restoring the deployed value keeps that true if a step ever does. Tracing stays enabled.
+    """
+
+    def set_up(self) -> None:
+        super().set_up()  # type: ignore[no-untyped-call]  # template method is untyped
+        os.environ[SPAN_CONTENT_SETTING] = "false"
+
+
 # Builders defer ADC and client construction until the managed process starts. AuditPlugin is
 # registered once at the Runner seam, covering every agent/model/tool event in the sequence.
-app = AdkApp(
+app = GovernedAdkApp(
     agent=root_agent,
     plugins=[AuditPlugin()],
     enable_tracing=True,

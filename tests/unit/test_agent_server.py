@@ -188,15 +188,24 @@ def test_the_completion_gate_confirmation_is_success(monkeypatch):
     _stream_runtime(monkeypatch, [{"author": "orchestrator"}, CONFIRMED])
 
 
-def test_the_gate_event_as_the_runtime_serializes_it_confirms_completion():
+@pytest.mark.parametrize(
+    "serializer_module",
+    # The deployed `AdkApp` template (`vertexai.agent_engines`) yields its own copy; the client
+    # SDK carries another. Both are pinned so a divergence in either fails here.
+    ["vertexai.agent_engines._utils", "agentplatform._genai._runtimes_utils"],
+)
+def test_the_gate_event_as_the_runtime_serializes_it_confirms_completion(serializer_module):
     """Pin the wire shape to the SDK's serializer, not to a hand-written dictionary.
 
     The managed Runtime yields `dump_event_for_json(event)` for every ADK event and the client
     `json.loads` each streamed line. If either side changes the shape, this fails in CI rather
     than every production investigation failing closed after a deploy.
     """
-    from agentplatform._genai._runtimes_utils import dump_event_for_json
+    import importlib
+
     from google.adk.events import Event, EventActions
+
+    dump_event_for_json = importlib.import_module(serializer_module).dump_event_for_json
 
     from agents.orchestrator.agent import escalation_gate
 

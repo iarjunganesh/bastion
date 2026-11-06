@@ -110,7 +110,7 @@ No push, retag, deployment or new probe.
 The maintainer requested branch publication and merge into `main`. Published the two public
 commits and opened [PR #9](https://github.com/iarjunganesh/bastion/pull/9); integration requires
 passing hosted CI on the final head and uses a merge commit to preserve history. The final
-local rerun passed 336 tests at 100% configured coverage after using a writable pytest temporary
+local rerun passed 336 cases at 100% configured coverage after using a writable pytest temporary
 directory. Public guidance now records this authorization separately from report publication.
 The report/PDF bytes and private captures are preserved; no rebuild, retag, GCP deployment,
 paid probe or shutdown is part of this integration. The GCP deploy workflow remains manual-only.
