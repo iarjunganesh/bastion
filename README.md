@@ -114,7 +114,8 @@ The [claim matrix](docs/research/claim-matrix.md) bounds each claim; the
 
 The technical report is local in `report/`, uncommitted and outside the release. The final
 14-page local edition and cited-source snapshot were prepared on 6 November. The agreed fleet end state remains 8–10 November,
-dry run first; publication and site deployment are separate actions.
+dry run first. Report publication is a separate action. The public console redeploys from
+`main`: merging a PR publishes its `site/` changes (observed after PR #9 on 6 November).
 
 ## A boundary failure worth testing
 

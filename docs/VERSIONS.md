@@ -5,7 +5,7 @@ This table separates the source target from measured deployments. Updated 6 Nove
 
 | Scope | Framework / revision | What the evidence establishes |
 |---|---|---|
-| Released v0.8.0, 28 October | Tag `v0.8.0` at `4d70b1ba81b0c37b5cbd55223b93f651855de0d9`; Google ADK 2.13.0, A2A SDK 1.3.0, Python 3.12 | Source release, with 321 cases at release and 100% core coverage. The tag itself did not deploy production; the 5 November descendants and overlays are recorded separately below |
+| Released v0.8.0, 28 October | Tag `v0.8.0` at `4d70b1ba81b0c37b5cbd55223b93f651855de0d9`; Google ADK 2.13.0, A2A SDK 1.3.0, Python 3.12 | Source release, with 321 cases at release and 100% core coverage. Not deployable as tagged: its dispatcher, Runtime deploy/configure and smoke paths call `Client.agent_engines`, absent from its pinned `google-cloud-agentplatform` 2.6.0, and a test double hid this (known issue recorded 7 November in the changelog). The tag itself did not deploy production; the 5 November descendants and overlays are recorded separately below |
 | Submitted v0.7.0 tree | `google-adk` v2.8.0 source pin | Historical submission source, distinct from its deployed resolution |
 | August deployment provenance | Evidence 11–13 identify code revision `c81b4af`; E23 later measures the Cloud Run image's `google-adk` 2.7.1 resolution | Dated route observations; the managed Runtime's installed packages were not read back |
 | 27 October study | Same worker revisions and Runtime update metadata as August | 20 completed investigations; installed packages were not freshly inventoried |
@@ -24,6 +24,15 @@ explicit message/receipt contracts remain necessary.
 Historical evidence files, release notes, and incident reproductions retain their actual
 versions. New validation belongs in a separate dated cohort. Never edit old bundle bytes,
 replace old version labels with current pins, or infer deployment from a README badge.
+
+Both 5 November candidates start from `d7d6a99`, the maintainer-authorized amendment of
+GitHub's PR #8 merge commit `ed1d820`, force-pushed to `main` on 4 November. The two differ only
+in documentation (`AGENTS.md`, `HANDOFF.md`, the upgrade plan and report plan), so their deployable
+files are identical; the PR page still names `ed1d820`.
+
+Source changes made after the corrected recovery (7 November: routing provenance, Runtime span
+content, smoke confirmation and SDK-surface tests) are not deployed. No deployment row above
+includes them.
 
 The report's Section 5 contains its cohort method; Appendix A records version provenance. Release/source changes do not upgrade
 the framework version of any measurement already in the report.

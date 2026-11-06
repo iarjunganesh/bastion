@@ -64,3 +64,9 @@ One batch of 20 is not a reliability rate. Together E7 and E7b give 28 investiga
 false completion; report that count with its denominator, not as a percentage. Traces are
 sampled request-level spans with no investigation or invocation ID, so audit-to-trace
 correlation is by time window only.
+
+**Follow-up (7 November 2026):** the table's *median 20.4 s* is the collector's lower-middle
+`p50` (20.422 s). The conventional median of the 20 runs is 20.594 s (20.6 s), from the middle
+values 20.422 s and 20.766 s; see the
+[retained-evidence audit](../../docs/research/evidence-audit-2026-11-04.md#e19-median-correction).
+This page's table and the retained data are unchanged.

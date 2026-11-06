@@ -32,6 +32,9 @@ deployed resolution; [VERSIONS.md](VERSIONS.md) is the canonical provenance tabl
 5. Public code, documentation and E24/E25 are published through
    [PR #9](https://github.com/iarjunganesh/bastion/pull/9), with merge authorized after hosted CI.
    Site build checks do not verify deployed Vercel bytes; report publication remains separate.
+   Vercel redeploys the console from `main`, so the PR #9 merge published its site changes: on
+   7 November the live footer matched commit `2a12f5f`. Treat every merge to `main` as a site
+   deployment.
 
 ## Boundaries for any later upgrade
 

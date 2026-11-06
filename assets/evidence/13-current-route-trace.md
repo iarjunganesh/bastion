@@ -72,3 +72,12 @@ Service/workload column, so no partial workload id appears there.
 - The trace shows that a request reached each worker. It does not show what the Auditor read, what
   the model returned, or which findings were routed; those are established by evidence 11 and 12.
 - It is not a Gateway authorization result, a Model Armor refusal, or a retry/dead-letter proof.
+
+**Follow-up (7 November 2026):** the data-minimisation check above names an incomplete control.
+`OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT` governs GenAI semantic-convention content;
+ADK's own spans follow `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS`, which the managed `AdkApp` template
+sets to "true" when `enable_tracing=True`, overriding the deployed "false". The conclusion held
+for this trace: on the traced revision the Runtime graph made no model or tool call, and only
+those spans carry content, while the Cloud Run workers that run the model and IAM tool deploy with
+both settings off (`infrastructure/deploy.sh`). Span attributes were not opened, so this remains a
+configuration inference. A source fix restores the setting after set-up; it is not deployed.

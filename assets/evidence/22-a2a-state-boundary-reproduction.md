@@ -44,3 +44,10 @@ gate, not on these warnings.
 The same run printed `SequentialAgent`'s deprecation warning unchanged: *"Workflow cannot yet be
 used as an LlmAgent sub-agent."* The migration trigger in
 [ADR-005](../../docs/adr/005-adk-as-the-agent-framework.md) is therefore still unmet on 2.13.0.
+
+**Follow-up (7 November 2026):** *production still runs `google-adk` 2.7.1* was true on 4 November.
+On 5 November both deployment surfaces were updated to source pinned at 2.13.0
+([evidence 24](24-upgraded-deployment-and-stopped-pilot.md),
+[evidence 25](25-corrected-cohort-F-verification.md)); the Cloud Run image asserted 2.13.0, and
+the Runtime's installed packages remain unreadable. The quoted-content wrapping recorded above is
+the format the first post-upgrade pilot then failed to parse. This offline result is unchanged.

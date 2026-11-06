@@ -108,6 +108,13 @@ answer without the required call ([ADR-012](adr/012-structured-findings-across-a
 only opaque identifiers, categories, score, and department, and sends count-only human-review
 records to a Bastion-owned findings API. It has no IAM or Asset read capability.
 
+The deployed worker validates the envelope's shape, department catalog membership, opaque-ID
+form and counts. It does not authenticate the envelope's author: it took the first relayed part
+carrying `departments`, and ADK relays the Auditor's model-written reply before the policy
+step's. Since 7 November the source acts only on bare JSON or routing attributed to
+`policy_step` (the latest wins), and the Auditor refuses fields outside its report schema. That
+change is not deployed ([observation backlog](research/observation-backlog.md#review-findings-7-november--fixed-in-source-not-deployed)).
+
 ## Catalog and cross-department reuse
 
 The regional Agent Registry contains three Bastion agent entries: the managed Orchestrator and

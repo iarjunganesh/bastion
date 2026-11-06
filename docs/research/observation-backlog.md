@@ -44,6 +44,24 @@ The recovery collector's final refusal check falsely counted a pre-refusal plugi
 the original stop is preserved with a separate reviewed read-only temporal/ID-join addendum.
 No further Gateway or original worker-timeout experiment is added by this follow-up.
 
+### Review findings, 7 November — fixed in source, not deployed
+
+An independent review of the retained code and evidence found two gaps that tests at 100%
+configured coverage did not exercise. Neither was observed causing a wrong outcome, and no live
+probe was run for either. Both fixes are source-only; the deployed fleet keeps the behaviour below.
+
+- **Routing provenance.** The deployed Escalation worker took the first relayed part carrying
+  `departments` from any attributed agent. ADK 2.13 relays the Auditor's model-written reply before
+  the policy step's, `AuditReport` ignores unknown keys, and the completion gate compares only
+  departments and counts. An Auditor answer with an extra top-level `departments` would therefore
+  have replaced the deterministic routing, a same-count finding substitution included. An offline
+  reproduction with ADK's own message builder confirmed the selection. Gemini's schema-constrained
+  output makes the extra key unlikely, but that is model behaviour, not a deterministic control.
+- **Runtime span content.** With `enable_tracing=True`, the managed `AdkApp` template's `set_up()`
+  sets `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS=true`, overriding the deployed "false". ADK puts
+  model requests, responses and tool values on spans only for model or tool calls, and the Runtime
+  graph makes none, so no content reached a Runtime span. Evidence 13 carries a dated follow-up.
+
 ## Why this file exists
 
 The [27 October report validation](../../assets/evidence/14-live-validation.md) adds

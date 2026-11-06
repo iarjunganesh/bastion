@@ -12,15 +12,50 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ## [Unreleased]
 
-### Fixed — completion is confirmed, not inferred
+### Fixed — completion is confirmed, not inferred (deployed 5 November)
 
 - Durable ingress records an investigation completed only when the Runtime stream carries the
   completion gate's confirmation. An empty or cut-off stream now fails the investigation so
   Eventarc redelivers it. Observed 3 November 2026: one of 28 investigations was recorded
   completed with no work done ([evidence 19](assets/evidence/19-repeatability-and-false-completion.md)).
-  Source only; the deployed fleet changes after the 8 November evidence freeze.
+  Deployed on 5 November with the upgraded fleet: the first pilot failed closed
+  ([evidence 24](assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)) and the
+  separately corrected recovery passed its bounded controls
+  ([evidence 25](assets/evidence/25-corrected-cohort-F-verification.md)).
 - Model Armor and protected-data refusal records carry the forwarded investigation ID, so a
-  refusal joins its investigation in one hop ([evidence 18](assets/evidence/18-model-armor-refusal-reprobe.md)).
+  refusal joins its investigation in one hop. Deployed on 5 November; evidence 25 verifies the
+  direct join through a read-only addendum ([evidence 18](assets/evidence/18-model-armor-refusal-reprobe.md)
+  keeps the earlier two-hop join).
+
+### Fixed — upgraded SDK compatibility (deployed 5 November)
+
+- Operator and dispatcher code uses the Agent Platform SDK's `Client.runtimes` surface. The
+  v0.8.0 tag called `Client.agent_engines`, which its own pinned `google-cloud-agentplatform`
+  2.6.0 does not provide (see the 0.8.0 known issue below).
+- The Escalation Agent accepts one exact, complete ADK 2.13 quoted-content block after the
+  attribution, then applies the unchanged deterministic envelope validation. Its absence stopped
+  the first post-upgrade pilot (evidence 24); the corrected recovery deployed only this change.
+
+### Fixed — source only, after the final deployment (not deployed)
+
+- The Escalation Agent acts only on bare JSON or routing attributed to `policy_step`, taking the
+  latest. ADK relays the Auditor's model-written reply first, and the worker previously took the
+  first part carrying `departments` from any author. The Auditor's fidelity callback now refuses
+  fields outside `AuditReport`. The deployed worker validates shape, catalog membership and
+  counts, not provenance.
+- The Runtime app restores `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS=false` after the managed
+  template's set-up, which turns span content on whenever `enable_tracing=True`. The deployed
+  Runtime makes no model or tool call, so no content reached a span.
+- The smoke Runtime check requires the completion gate's confirmation instead of any streamed
+  event. Operator scripts are tested against the real SDK `Client`; the deploy environment
+  declares the SDK's implicit telemetry variable.
+
+### Added — cohort F, audit and provenance
+
+- Evidence 23: the 28 October census and the August image's installed packages.
+- Evidence 24 and 25: the upgraded deployment and stopped pilot, and the separately corrected
+  recovery with its collector false positive and read-only refusal addendum.
+- The 4–5 November retained-evidence audit, including the E19 median correction.
 
 ### Added — cohort N evidence
 
@@ -102,6 +137,15 @@ hackathon-era release plan is archived with the rest of the submission material.
 - The console's proof strip read **52** live bindings, the earlier evidence 09 measurement, while
   the README and console summary quote the current-route **62** from evidence 11. The strip now
   reads 62, dated 25 Aug, independently of the separately dated resource-inventory timestamp.
+
+### Known issue — recorded 7 November 2026
+
+- The tag is a source snapshot and is not deployable as tagged. Its dispatcher, Runtime deploy,
+  Runtime configuration and smoke paths call `Client.agent_engines`, which its pinned
+  `google-cloud-agentplatform` 2.6.0 does not provide; each raises `AttributeError`. Its tests
+  passed because a hand-written client double supplied the attribute, and strict mypy treats the
+  untyped `Client` as `Any`. The 5 November deployments used later source with the corrected
+  `Client.runtimes` calls ([version provenance](docs/VERSIONS.md)).
 
 ## [0.7.0] — 2026-08-29
 

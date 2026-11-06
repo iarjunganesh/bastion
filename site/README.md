@@ -8,7 +8,8 @@ or production API requests. Removing the console does not change the fleet.
 `data/site-content.json` supplies the evidence cards. Each card is bounded by its linked dated
 record; an older record cannot substantiate a later deployment. `verifiedAt` refers only to
 the 28 October count-only inventory, not liveness or package resolution. Architecture images,
-submitted gallery and fixed video keep their historical dates. Local edits are not deployment.
+submitted gallery and fixed video keep their historical dates. Local edits are not deployment,
+but a merge to `main` is: the Vercel project deploys production from `main`.
 
 ## Build and preview
 
@@ -36,6 +37,8 @@ Deploy only after reviewing the generated output and obtaining the required auth
    and a browser network log containing no private GCP requests.
 
 The canonical [public console](https://bastion.arjunganesh.dev/) passed that publication check
-on 23 August; subsequent source alignment is not a fresh deployed-byte verification. Published
-record URLs pin existing public commits. Withheld report/new evidence sources remain local
+on 23 August; subsequent source alignment is not a fresh deployed-byte verification. The PR #9
+merge redeployed it on 6 November; on 7 November the live footer matched commit `2a12f5f`, a
+content comparison rather than a repeat of the full publication check. Published record URLs
+pin existing public commits. Withheld report/new evidence sources remain local
 until their separate publication step. See the [report plan](../docs/research/report-plan.md).
