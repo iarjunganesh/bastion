@@ -171,6 +171,12 @@ def _parse_json_object(text: str) -> Any:
     stripped = _SAID_PREFIX.sub("", text, count=1)
     if stripped == text:
         return None
+    # ADK 2.13 quotes relayed text as data. Recover only an exact, complete block;
+    # the deterministic envelope validator still controls every delivery field.
+    begin = "<<<BEGIN_QUOTED_AGENT_CONTENT>>>\n"
+    end = "\n<<<END_QUOTED_AGENT_CONTENT>>>"
+    if stripped.startswith(begin) and stripped.endswith(end):
+        stripped = stripped[len(begin) : -len(end)]
     try:
         return json.loads(stripped)
     except ValueError:

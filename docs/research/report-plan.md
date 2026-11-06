@@ -1,417 +1,76 @@
-# Bastion technical report — master plan
-
-Proposed 28 October 2026 by Claude Code; **D1–D4 decided 28 October, D5 open**. This is the
-single sequence for the report and its GCP evidence runs. [HANDOFF.md](../../HANDOFF.md) records
-session state only. [docs/UPGRADE-PLAN.md](../UPGRADE-PLAN.md) covers the ADK/release track
-(Track U) only. Private values (credit balances, ceilings, raw captures) go in ignored `.local/`;
-its earlier history, including the old private roadmap, is in the maintainer's out-of-repo archive.
-
-**Status, 4 November:** cohort N is complete (E1–E7b, E5, E6; E8 skipped) and on `main`, as are
-both source fixes (not yet deployed). Phase 1 is done apart from related-work references. Next:
-the 5 November billing recheck, the 8 November freeze, cohort F (8–10 November), the fleet end
-state before 11 November, then final evidence reconciliation and one report build. The manuscript
-rewrite and the maintainer-approved T1–T3 wording updates are complete locally; sources remain
-uncommitted. The deferred study's config and validator now share D3's 100 SEK total upper bound
-([PR #8](https://github.com/iarjunganesh/bastion/pull/8)); generation remains disabled.
-
-**Goal:** one coherent, citable technical report (C1–C3) in which every dated claim maps to
-sealed evidence, using the remaining GCP credits in small, pre-registered chunks before expiry.
-
-[AGENTS.md](../../AGENTS.md) governs everything else: three agents, read-only real IAM, payload-free
-audit, the sensitive-output rule, dated cohorts never relabelled, the 62-binding figure dated
-25 August, the author line, and the credits-only condition. This plan neither adds to nor relaxes
-those rules.
-
-## Grounded state, 28 October
-
-A read-only census on 28 October (19:23 UTC) replaced several assumptions with observations:
-
-- The fleet is the August deployment: all four Cloud Run services serve one image digest built
-  23 August (same Auditor/Escalation revisions as evidence 11), the dispatcher's Runtime was last
-  updated 23 August, and the repository's fleet verifier passes.
-- The IAM policy changed: **56** bindings scanned (62 on 25 August), still three deterministic
-  findings (`platform-infra` 1, `security-engineering` 2).
-- The only human exception expired on **18 September**, which is consistent with October
-  delivering three findings where August delivered two (not yet proven to be the same finding).
-- Audit logs go to the `bastion-audit` log bucket: europe-west4, 365 days, unlocked. No
-  Scheduler jobs. Investigations: 57 completed, 4 failed and 2 stale `running` records, all
-  failures and stale records dated 15–22 August. 82 human-review records exist.
-- Not readable by API here: credit balances, per-service cost (no billing export), and the
-  Runtime's installed packages. The image's packages were read on 4 November (E1 below).
-
-- **Report:** one source set in `report/` (untracked by request) assembles a 13-page PDF. Until
-  the 28 October cleanup three builds circulated (two in `report/` with different hashes, one
-  frozen private copy); only `report/bastion-technical-report-v1.pdf` remains.
-- **Evidence:** E01–E13 (August), E14 (27 October 20-run repeatability study) and E15
-  (28 October count-only inventory). E14 and E15 are on `main` since PR #1 (`75ab108`).
-- **Code:** ADK 2.13.0 source upgrade released as v0.8.0 on 28 October, with one accepted
-  OpenTelemetry advisory that every ADK release's version cap prevents fixing ([issue #3](https://github.com/iarjunganesh/bastion/issues/3)).
-- **Fleet:** unchanged since August (same worker revisions, Runtime updated 23 August). No GCP
-  work since the 27 October study. Credits expire 11–12 November.
-
-## Why progress stalled
-
-New GCP runs sat behind three chained gates: credit eligibility, then an upgraded deployment
-(UPGRADE-PLAN step 5 precedes the controls in step 7), then a release blocked by an upstream
-advisory. Only the first gate matters for the report. Meanwhile the manuscript grew by accretion:
-the October study was attached as a "supplementary" §4.4 after a §4.3 table that already used
-its results, and each session added caveats instead of restructuring.
-
-## Structural problems the final report must fix
-
-1. **Results before method.** §4.3 reports October results; the October method is in §4.4. There
-   is no single evaluation-method section or cohort definition.
-2. **Repetition.** The same caveats recur in three to five places ("60 instances are not 60
-   distinct risks"; version provenance in §4.1, §6.2, A.1 and A.3; replay/trace limits in §4.3,
-   §4.4 and §6.2). About 120 manuscript lines contain "not"; it reads as an audit ledger.
-3. **Stale facts.** E14 is described as lacking an immutable reference but is on `main`.
-   Repository links pin `a0e08fc` while E14/E15 live at later commits, so the report cites two
-   revisions. "No fresh Scheduler census" is stale after E15. The version table names a v0.8.0
-   target that does not exist.
-4. **Source layout follows drafting history.** `sections-3-5.md` still carries its own title
-   block, draft date and an editorial source key that the builder strips at assembly.
-5. **Thin framing.** The threat model is folded into §3.1; related work has five references.
-6. **Process narrative in results.** The collector pause and recovery occupy a results paragraph.
-
-## Decisions for the maintainer
-
-| ID | Decision | Status |
-|---|---|---|
-| D1 | Couple the report to the ADK 2.13.0 production upgrade? | **Decided: no.** All new evidence runs on the unchanged August deployment. The upgrade, its redeploy and any repository restructuring wait for Track U after the evidence freeze. |
-| D2 | Include C4 in this report? | **Decided: deferred to v2**, revisited only at the 4 November gate as an automated-metric pilot on synthetic data. |
-| D3 | Paid-run approval model | **Decided: per chunk**, each with its own written cost cap, count limit and stop rules, within a **100 SEK total** for all remaining chunks (maintainer, 28 October). Read-only chunks need no cost cap. One daily billing check replaces the per-chunk wait. |
-| D4 | Fleet end state before the credits expire | **Decided: teardown after the 8 November freeze, dry run first, before 11 November.** Open sub-choice at the freeze: export, remove or accept the residual storage teardown keeps (Firestore, secrets, Runtime, audit logs). |
-| D5 | Publication reference | Open. Recommendation: a dedicated report tag (for example `report-v1.0`) independent of v0.8.0, archived to Zenodo. |
-
-## Evaluation design: one primary cohort
-
-The report evaluates **one primary cohort, N (November 2026)**, collected under the protocols
-below on the unchanged deployment, with every metric defined before collection: census, negative
-controls, refusal, exception lifecycle with expiry, a repeatability batch with token, cost and
-ID-joined trace measurement, and the two formerly partial controls. Earlier observations are not
-re-argued in the results:
-
-- **August** appears only where it cannot be replaced: the deployment's provenance (built
-  15–23 August, unchanged since) and the A2A state-loss incident behind C3, which is now
-  re-demonstrated offline by O1 rather than narrated from retained evidence.
-- **27 October** is cited once as the pilot that shaped cohort N's protocol, with its collector
-  recovery disclosed in the appendix.
-
-## Single source of truth
-
-| What | Canonical | Everything else |
-|---|---|---|
-| Sequence | This file | Older private roadmaps are archived history |
-| Session state | `HANDOFF.md` | Older private handoffs are archived history |
-| Manuscript | `report/` sources | Archived private copies are never edited or cited |
-| PDF | `report/bastion-technical-report-v1.pdf`, built once in Phase 5 | No other builds |
-| Claims | Claim matrix plus the report claim map from Phase 1 | — |
-| Evidence | `assets/evidence/NN-*.md` and sealed bundles | `.local/measurements/` until promoted |
-
-## Phase 0 — Consolidate (today, local, no cost)
-
-- [x] D1–D4 decided (28 October); D5 open until publication.
-- [x] Delete the duplicate build, caches and temporary folders; archive `.local/` outside the
-  repository; rebuild `.venv` from `requirements.lock` (28 October).
-- [x] Archive the hackathon material under `archive/hackathon-2026/`; move the live ledgers and
-  this plan to `docs/research/` (28 October).
-- [x] Keep the "Report generation order" and "Credits-only" rules in AGENTS.md only; the copies
-  in HANDOFF.md and docs/UPGRADE-PLAN.md are now pointers.
-
-## Phase 1 — Paper blueprint and offline evidence (local, no cost)
-
-The maintainer correction stands: no routine manuscript prose edits or PDF builds in this phase.
-The 4 November rewrite and targeted wording updates were explicitly approved exceptions, recorded
-under Phase 5; they authorize no additional report build or live run.
-
-- [x] Write `report/OUTLINE.md` (uncommitted; **drafted 4 Nov** with the "silent success at
-  agent boundaries" thesis, data minimisation as the design; the maintainer may swap the headline): target structure, a one-sentence thesis per
-  section, and a claim map (claim ID → section → evidence ID → status: observed, configured,
-  offline-tested, partial, stale). Target structure: 1 Introduction; 2 Background and related
-  work; 3 Threat model and design goals; 4 System design; 5 Evaluation method (cohorts, metrics,
-  timing definitions, data handling); 6 Results (route, repeatability, control probes, cost);
-  7 A2A state-boundary case study; 8 Discussion and limitations (each limitation stated once);
-  9 Conclusion and future work; Appendix A Reproducibility; Appendix B Evidence ledger; References.
-- [x] Derive the evidence-gap list from claim-map rows marked partial, stale or unobserved. It
-  becomes the chunk backlog in Phase 3; a gap with no chunk is reported as a limitation.
-  **Done 4 Nov** in `report/OUTLINE.md`: the only remaining run is cohort F.
-- [x] O1: rerun the localhost A2A reproduction on ADK 2.13.0 in a fresh Python 3.12 environment
-  built from `requirements.lock`; record whether both upstream warnings fire. No model or cloud
-  calls. This replaces "the reproduction was not rerun" in §5.3 with a result. **Done 4 Nov**
-  ([evidence 22](../../assets/evidence/22-a2a-state-boundary-reproduction.md)): both
-  directions behave as in August and both upstream warnings fire.
-- [ ] List candidate related-work references; verify each against its primary source before use.
-
-## Phase 2 — Credits gate (maintainer, about 15 minutes, read-only)
-
-**Passed 28 October:** all October Bastion usage, the 27 October study included, was fully
-offset by credits (net 0.00 SEK). Gross October usage was a little over 10 SEK, so the idle
-fleet costs well under 1 SEK a day. Values are recorded privately in `.local/`.
-
-- [x] In Cloud Billing Reports for `bastion-fleet-2026`, last 30 days, grouped by service and SKU
-  with credits shown: confirm that the 27 October study day was fully offset by credits and note
-  which credit applied. This establishes eligibility empirically for the services the fleet uses.
-- [x] Note the idle fleet's standing daily cost.
-- [x] Check the credit balance at billing-account level: credits are shared by every project
-  on the same billing account, not reserved for this one.
-- [x] Record both in `.local/credit-verification.json`. If any service shows a net charge, stop;
-  no paid chunk runs until it is resolved.
-
-Budget alerts notify; they do not cap. Billing data lags about a day, so every paid chunk is
-followed by a next-day billing check before the next paid chunk starts.
-
-## Phase 3 — Evidence chunks on GCP
-
-Every chunk follows one protocol, and the protocol file is the approval artifact:
-
-1. Pre-register `.local/measurements/<date>-<chunk>/protocol.json`: claim-map rows it closes,
-   exact calls, count limit, cost cap, wall-clock limit, stop rules and cleanup targets.
-2. The maintainer approves that protocol in-session. Earlier authorizations do not carry over.
-3. Run one pilot unit; continue only if it passes.
-4. Seal payload-free outputs with a hash manifest and ZIP; run the protected-shape scan.
-5. Promote a redacted `assets/evidence/NN-*.md` (numbering continues at 16); update the claim map.
-6. Next day, record the chunk's cost by SKU, net of credits.
-
-| Chunk | Closes | Surface | Model calls | Creates resources | Target |
-|---|---|---|---|---|---|
-| E1 Census | Fresh binding and pre-policy finding counts; exception-ledger state; retention configuration; deployed package provenance | Read-only APIs | 0 | No | **Done 28 Oct**; packages 4 Nov |
-| E2 Negative authorization | Escalation IAM-read denial; findings API missing/wrong token and invalid payload | Impersonation and HTTP probes | 0 | No | **Done 3 Nov** ([evidence 17](../../assets/evidence/17-negative-authorization.md)) |
-| E3 Screening refusal | Agent-mediated Model Armor refusal with a benign control | Direct authenticated Auditor | At most 2 | No | **Done 3 Nov** ([evidence 18](../../assets/evidence/18-model-armor-refusal-reprobe.md)) |
-| E4 Exception lifecycle | Approval, suppression and **expiry firing** (never yet observed); an ID-joined trace; per-run tokens and cost | Production path, maintainer as reviewer | About 6 | One real, self-expiring approval | **Done 3 Nov** ([evidence 16](../../assets/evidence/16-exception-lifecycle.md)) |
-| E5 Gateway refusal (P0.10) | Gateway refusal of egress it does not match to a registered endpoint (design note below) | Read-only logs | 0 | No | **Done 4 Nov** ([evidence 20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md)) |
-| E6 Retry and dead letter (P0.11) | Watched redelivery and dead letter (design note below) | Production subscription, one synthetic rejected event | 0 | No | **Done 4 Nov** ([evidence 21](../../assets/evidence/21-redelivery-and-dead-letter.md)) |
-| E7 Repeatability | Twenty serial investigations with per-run tokens, attributable cost, ID-joined traces and per-message replay delivery | Production path | About 40 | No | **Done 3 Nov** (E7 stopped at 8; E7b 20/20) |
-| E8 (optional) | C4 automated-metric pilot | Synthetic policies only | Separately budgeted | No | After the 4 Nov gate |
-
-- **E1:** done read-only on 28 October (results under Grounded state; private outputs in
-  `.local/measurements/2026-10-28-ground-truth/`). The census used the Auditor's own fetch and
-  detector with a throwaway in-memory ID key, so no production secret was read. **Packages done
-  4 Nov:** all four Cloud Run services serve one digest (`sha256:dd9853bd…`, built 23 Aug
-  19:59 UTC, Python 3.12.14). Streaming only its `pip install` layer (about 254 MB, never
-  written to disk) gave 161 installed distributions, among them `google-adk` 2.7.1,
-  `a2a-sdk` 1.1.2, `google-cloud-aiplatform` 1.165.1, `google-genai` 2.19.0 and
-  `opentelemetry-api`/`-sdk` 1.42.1. The image's `requirements.txt` is byte-identical to commit
-  `f589b25`'s, and no commit changed it between 22 and 24 August. The Runtime API returns its
-  Python spec (3.12, `requirements.txt`) but not its source archive, so the Runtime's resolution
-  stays undeclared: it was deployed at 20:11 UTC the same evening, from the same requirements file
-  by inference only. Private bundle in `.local/measurements/2026-11-04-E1-packages/`.
-- **E2:** if the maintainer's impersonation right on the Escalation identity no longer exists,
-  stop; do not grant it. **Done 3 Nov:** all 15 checks matched their expected outcome: 13
-  refusals or denials (approval endpoint, Auditor peer origin, Escalation IAM read) and 2
-  positive controls (impersonation works; the Auditor holds the read). The exception ledger
-  was unchanged.
-- **E3: done 3 Nov.** Benign control completed; the injection fixture was refused with
-  `policy_match` and nothing ran after it. The refusal audit record carries investigation ID
-  `unknown` because the guardrail does not forward it, but it shares its invocation ID with
-  records that carry the investigation ID, so it joins in two hops (checked 3 Nov). A
-  single-hop fix is a source change; deploy it only after the freeze (D1). Written 4 Nov and
-  merged to `main` (PR #4) with the completion check below; not yet deployed.
-- **E4:** the findings API accepts any future `approved_until` up to 90 days, so expiry can be
-  observed within an hour. The approval is a real maintainer decision on a real finding; it is
-  the chunk's only state change and it expires by construction. **Done 3 Nov, 19:19–19:46
-  UTC:** baseline 1+2, inside the window 0+2, after expiry 1+2 with the same finding; 28 audit
-  events and no gaps per run. Private bundle sealed in `.local/measurements/2026-11-03-E4/`.
-  It did not deliver an ID-joined trace or per-run tokens (see E7).
-- **E5/E6:** each needs a short design note and explicit approval because it may create an
-  identity or resources. Production allowlists, retry policy and IAM bindings stay unchanged.
-  **Done 4 Nov:** E5 was read-only; E6 ran as proposal E6-A on the production subscription
-  with the maintainer's explicit approval for that one synthetic event.
-- **E7:** reuses the October protocol with the instrumentation October lacked. E4 tested that
-  instrumentation and two parts failed. The token metric is project-wide and minute-aligned,
-  so E7 needs an idle minute between runs to attribute tokens. Audit entries carry no trace
-  ID and Cloud Trace keeps sampled request-level spans only, so E7 can claim time-window
-  trace matches, not ID joins, unless a read-only check finds a join key first.
-  **Stopped 3 Nov at run 8 of 20, by design.** Runs 1–7 passed (expected counts, 28 audit
-  events, 2 model calls each; first run 81 s, then 20–30 s). Run 8 was a **false
-  completion**: the durable record says completed after one attempt, but no audit record,
-  review or model call exists, and two new Runtime instances started mid-run.
-  `run_managed_runtime` marks an investigation completed whenever the Runtime stream ends,
-  without checking that an investigation ran. Per-minute token attribution worked (1,336–2,176
-  input tokens per run, nothing unattributed); each of the 8 publishes had exactly one Eventarc
-  delivery; no trace join key exists (time window only). Private bundle sealed in
-  `.local/measurements/2026-11-03-E7/`. **E7b done 3 Nov** (maintainer's go): all 20 runs passed,
-  0 false completions, 25/25 Eventarc deliveries, 5/5 replays unchanged, median 20.4 s, 5 runs
-  at 136–206 s (pre-Runtime waits with new Runtime instances, and unexplained stalls in
-  `policy_step`/`policy_gate`). Recorded in [evidence 19](../../assets/evidence/19-repeatability-and-false-completion.md).
-  Fix written 4 Nov and merged to `main` (PR #4), not yet deployed: success requires the
-  completion gate's confirmation in the Runtime stream. **Post-fix cohort F (maintainer-approved 4 Nov):** after the freeze, redeploy
-  and run about 5 investigations 8–10 November, reported separately from cohort N.
-- **Order (as run):** E1 → Phase 2 billing check → E4 → E2, E3 → E7, E7b → E5, E6 → E1
-  packages → freeze → cohort F. All of cohort N is done.
-- **4 November gate: decided 4 Nov, E8 skipped.** Spend is under 1 SEK, but C4 stays deferred
-  (D2) and the remaining days go to E5, E6 and cohort F. The report states C4 as future work
-  with no results.
-
-## E5 and E6 design notes (4 November, grounded read-only)
-
-Every statement below was checked against the live project on 4 November with read-only calls,
-against Google's Pub/Sub documentation (accessed 4 November), or is marked as something the run
-itself must establish.
-
-### E5: managed Gateway refusal (P0.10)
-
-**Correction to the plan.** Agent Gateway `bastion-egress` is `AGENT_TO_ANYWHERE`: it governs
-the Runtime's outbound calls only. An "unregistered caller" test does not apply to it. Worker
-ingress is protected by the peer credential, which E2 already probed (P1, P2). E5 is therefore
-about **egress the Gateway does not match to a registered endpoint**.
-
-Grounded configuration:
-
-- Gateway bound to one regional Registry (17 entries: 2 Cloud Run workers, the Runtime and 14
-  Google API endpoints); IAP authorization extension with no `failOpen` (fail-closed) and
-  policy version V1; a `CUSTOM` `REQUEST_AUTHZ` policy targeting the Gateway.
-- The Runtime's Agent Identity holds `roles/iap.egressor` project-wide, unconditionally.
-- The Gateway (4 Oct) and its policy (26 Oct) carry later update times, but no admin-activity
-  audit entry exists for the project since 1 September (query verified against 23 August
-  entries). These were platform-side updates, not customer changes.
-
-Already observed, in the IAP data-access log (30-day retention):
-
-- **176 refusals**, all `AuthorizeUser` code 7: permission `iap.webServiceVersions.egressViaIAP`
-  not granted on resource `unregisteredEndpoint`.
-- Every one is the same request: the SDK's Resource Manager `GetProject` call to
-  `cloudresourcemanager.mtls.googleapis.com` over gRPC. The Runtime logged it as
-  `PERMISSION_DENIED: Egress request is not authorized ... unregistered in the Agent Registry`.
-- **12 at each of the 13 Runtime instance starts** on 27 October and 3 November (156), plus
-  20 in pairs during runs. Every investigation in those windows completed regardless.
-- The denial record carries no authenticated principal. No granted decision appears in this log.
-
-**Known since August as defect D2:** the Registry has a gRPC entry for that exact host (created
-18 August), yet IAP resolved the request to `unregisteredEndpoint`. The
-[observation backlog's D2](observation-backlog.md#d2-iap-mediated-egress-cannot-resolve-a-non-standard-google-host)
-recorded the same signature in August, with an inferred cause: non-standard Google hostnames
-are not matched to their Registry entries, and plain `*.googleapis.com` hosts are not
-IAP-checked at all. (Corrected after E5: the first write-up called it unexplained.)
-
-**Proposal E5-A (recommended): read-only, 0 SEK, no test identity.** Collect a count-only
-bundle of these decisions, correlated with the Runtime instance starts, before the 30-day log
-window drops 27 October (about 26 November). Evidence page 20.
-
-- Claim: *the managed Gateway, with fail-closed IAP enforcement, refused every observed egress
-  request it did not match to a registered endpoint (176 decisions across 13 Runtime instance
-  starts), and investigations continued.*
-- Limits: incidental, not a destination chosen by the experimenter; the refused host has a
-  Registry entry, so this shows refusal of *unmatched* egress, not of a known-unregistered
-  destination; no matched allow is visible in the same log.
-
-A deliberate probe to a chosen unregistered host would need new code inside the Runtime, which
-is a production fault switch and a redeploy. Not proposed.
-
-### E6: retry and dead letter (P0.11)
-
-Grounded configuration:
-
-- Eventarc's Pub/Sub push subscription on `bastion-investigations`: ack deadline 600 s,
-  exponential retry 10–600 s, `maxDeliveryAttempts` 5 to `bastion-investigations-dead-letter`,
-  1-day retention, OIDC push to `/apps/orchestrator/trigger/eventarc`.
-- The project's own Pub/Sub service agent holds `pubsub.publisher` on the dead-letter topic
-  and `pubsub.subscriber` on the source subscription. Without both, dead-lettering never
-  happens; both are present.
-- `bastion-dead-letter-review` (pull, 7-day retention) has an empty backlog. The
-  dead-letter-forwarded metric is zero for the whole 40-day metric window, and every push
-  (25 on 27 October, 36 on 3 November) was acknowledged. The boundary has never fired.
-- The deployed ingress (`c81b4af`, unchanged since) validates the event before any state write:
-  a well-formed event with `mock_data: true` is answered HTTP 400 with no Firestore write and no
-  model call.
-
-Documented Pub/Sub behaviour (accessed 4 November 2026):
-
-- [Push subscriptions](https://docs.cloud.google.com/pubsub/docs/push): only 102, 200, 201,
-  202 and 204 acknowledge; "To send a negative acknowledgment for the message, return any other
-  status code." The ingress's HTTP 400 is therefore a negative acknowledgement and is resent.
-  Push backoff, which cannot be turned off, separately pauses delivery for 100 ms to 60 s after
-  negative acknowledgements; "the total delay is the maximum combined value of both."
-- [Retry policy](https://docs.cloud.google.com/pubsub/docs/subscription-retry-policy): after
-  the first failure Pub/Sub waits the minimum backoff (10 s here), adds time for each
-  consecutive failure up to the maximum (600 s), per message, "on a best-effort basis". No
-  exact formula is published, so the intervals are measured, not predicted.
-- [Dead-letter topics](https://docs.cloud.google.com/pubsub/docs/dead-letter-topics): the
-  attempt count is approximate. Pub/Sub "might forward a message after fewer attempts than
-  configured, or it might attempt delivery a few more times before forwarding", and only counts
-  attempts when the dead-letter topic and its service-agent grants are correct (verified
-  above). The forwarded message carries `CloudPubSubDeadLetterSourceDeliveryCount` and the
-  source subscription; `subscription/dead_letter_message_count` counts forwards.
-
-**Proposal E6-A (recommended): the production subscription, one synthetic poison event,
-0 new resources, about 0 SEK.**
-
-1. Preflight (read-only): dead-letter backlog 0; subscription and grants as above; no
-   investigation in flight.
-2. Publish one event with fresh UUIDs and `mock_data: true`, plus a message attribute marking
-   it as the E6 probe.
-3. Observe: the Orchestrator request log (status and time of each delivery to the trigger
-   path), push and dead-letter metrics, and the dead-letter backlog.
-4. When the backlog reaches 1, pull that one message, confirm the probe marker, record
-   `CloudPubSubDeadLetterSourceDeliveryCount` and the source subscription, then acknowledge it
-   so the review queue is empty again.
-5. Confirm no Firestore investigation exists for the probe's event ID.
-
-Stop rules: any 2xx answer to the probe; any Firestore write; a dead-letter backlog not 0 at
-preflight; 30 minutes without dead-lettering (then report the attempts actually observed).
-
-- Claim if it passes: *on the production subscription, a rejected event was delivered N times
-  in total (the first attempt plus N−1 redeliveries) at observed intervals and forwarded to the dead-letter topic, where review found it.* N comes
-  from the request log and the delivery-count attribute; the documentation calls the configured
-  five approximate, so a different N is a result, not a failure.
-- Limits: exercises a permanent rejection (HTTP 400), not a transient dependency failure with
-  reclaim (the August failed-and-reclaimable observation, evidence 06, stays the evidence for
-  that). It is a deliberate poison message on the production topic, so it needs explicit
-  approval under the no-routine-fault-injection rule.
-
-**Result, 4 November 20:35–20:40 UTC:** run as E6-A. Five deliveries, all HTTP 400, at
-start-to-start gaps of 32.3 s (the first response took 18.6 s), 14.0, 17.2 and 22.9 s; forwarded
-with `CloudPubSubDeadLetterSourceDeliveryCount = 5`, pulled 104.7 s after publication, marker
-and `mock_data: true` payload confirmed, acknowledged; no investigation document written; no
-further delivery in a 2-minute quiet period. The first collector crashed on an empty pull
-(`DeadlineExceeded`); the event was not republished and a resume script finished the
-observation (disclosed in evidence 21). Private bundle in `.local/measurements/2026-11-04-E6/`.
-
-**Alternative E6-B (not recommended): isolated copy.** A test topic, subscription, dead-letter
-topic and Cloud Run service with the same policy. It creates and removes resources, and it
-tests a copy rather than the production subscription; only worth it if E6-A is not approved.
-
-## Phase 4 — Evidence freeze and fleet end state
-
-- [ ] 8 November: evidence freeze. The claim map is final; no new cohort-N runs.
-- [ ] 8–10 November, cohort F (maintainer-approved 4 Nov; needs a go at deploy time): redeploy
-  `main` (completion confirmation, refusal investigation ID) to all four Cloud Run services and
-  the managed Runtime, verify the fleet, run about 5 investigations, and report them separately.
-  This closes claims B3 and B4 in the outline.
-- [ ] Before 11 November: execute the D4 end state (dry run first). Confirm in Billing that
-  nothing continues to accrue once the credits end.
-
-## Phase 5 — Write the report once (8–13 November)
-
-- [x] Restructure sources to the outline: one file per top-level section and one references file.
-  **Done 4 Nov** (maintainer's request, ahead of the freeze): `report/sections/`, rewritten from
-  the outline and evidence 16–23; old draft archived in `.local/report-archive-2026-11-04/`.
-  Cohort F, date, `REVISION`, billing and U1–U4 refresh remain as `[[…]]` placeholders. The
-  builder still targets the old layout and is reworked before the one build.
-  The legacy source layout is archived; update the builder to consume `sections/` before building.
-- [x] Apply the maintainer-approved T1–T3 wording updates (**4 Nov**): credit the author's
-  upstream warning and end-to-end test while distinguishing import from GitHub merge; date the
-  August and October censuses and identify E11's companion probe; describe C4 as a matched
-  explanation comparison with fixed findings. Injection cases are prepared; missing-workflow-step
-  cases remain planned. No C4 result, new run or PDF build is implied.
-- [ ] Pin every repository link to one revision: the commit containing the final evidence. The
-  builder's S5/S11 entries still name their `a0e08fc` paths; repoint them to
-  `docs/research/claim-matrix.md` and `archive/hackathon-2026/submission/ARTICLE_DRAFT.md`
-  in the same change (until then `check_docs.py` reports those two paths locally).
-- [ ] Writing rules: each limitation once (§8), cited elsewhere by section; each dated number in
-  exactly one results table; cohort and version provenance once (§5); process narrative such as
-  collector recovery in Appendix A; abstract at most 200 words with at most four numbers.
-- [ ] Build once; run integrity, citation and layout checks; review visually; maintainer reads
-  the whole draft. Batch revisions into one rebuild rather than rebuilding per comment.
-
-## Phase 6 — Publish (14–16 November; every step needs explicit approval)
-
-- [ ] Commit report sources and final evidence on a branch; open a PR; merge.
-- [ ] Tag per D5; create the GitHub release with the PDF; mint the Zenodo DOI.
-- [ ] On publication day, refresh U1–U4 and public links.
-
-## Track U — ADK 2.13.0 and v0.8.0
-
-v0.8.0 was released as source on 28 October with one accepted OpenTelemetry advisory, whose
-removal is tracked in [issue #3](https://github.com/iarjunganesh/bastion/issues/3). Under D1 the fleet redeploy, the ADK bump that closes
-issue #3 and any per-agent restructuring all come after the evidence freeze, so the report keeps
-measuring one unchanged deployment.
+# Technical report plan
+
+Updated 6 November 2026. [HANDOFF.md](../../HANDOFF.md) records current session state;
+[AGENTS.md](../../AGENTS.md) governs architecture, privacy and operator authorization.
+
+## Scope and current state
+
+The report covers the minimisation design (C1), the pre-defined November evaluation (C2),
+and silent success at agent boundaries (C3). C4's matched-explanation comparison is deferred;
+the synthetic harness has no results and generation remains disabled.
+
+| Record | State and boundary |
+|---|---|
+| Cohort N, 3–4 Nov | Complete and frozen on the unchanged August deployment: [E16–E23](../../assets/README.md) |
+| Original F, 5 Nov | Both surfaces updated; one pilot failed closed on a routing-parser incompatibility ([E24](../../assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)) |
+| Separate corrected recovery, 5 Nov | Five normal cases, direct confirmation control and two replays passed; refusal join verified read-only after a collector false positive ([E25](../../assets/evidence/25-corrected-cohort-F-verification.md)) |
+| Billing, 6 Nov | Daily reported-usage check passed, corroborated by the supplied CSV; balances/expiry refreshed privately. Final per-chunk cost and late postings remain bounded |
+| Report, 6 Nov | Authorized final reconciliation and simplification complete; 14-page local PDF generated and visually reviewed. The earlier build hold is superseded; keep `report/` uncommitted |
+| Fleet end state | Still scheduled for 8–10 Nov, dry run first, before 11 Nov; no shutdown has been claimed |
+
+The original F failure, recovery and N remain separate. Runtime did not change during recovery;
+its installed package resolution remains unreadable. The claim matrix, version ledger and
+collection disclosures bound the report; a passing batch is not a reliability rate.
+
+## Maintainer decisions
+
+| ID | Decision |
+|---|---|
+| D1 | Freeze primary cohort N before the upgrade; report post-upgrade F separately |
+| D2 | Defer C4 to a later study. Injection fixtures exist; missing-workflow-step cases remain planned |
+| D3 | Per-chunk approval with a written cost/count cap and stop rules, within the 100 SEK total upper bound. One daily billing check replaces a per-chunk overnight wait. Reserve unposted prior chunks conservatively |
+| D4 | Reach the agreed fleet end state on 8–10 Nov, before 11 Nov. Dry run first; owner chooses export/removal/accepted costs for residual resources |
+| D5 | Public publication reference, report tag/DOI and release remain open; each external action needs its own authorization |
+
+Credits are shared, scoped and expiring; availability is not a hard spending cap. Card charges
+remain unauthorized. Numeric balances, reservations and billing receipts belong in ignored
+`.local/credit-verification.json`. No further F probe is planned or authorized.
+
+## Remaining sequence
+
+1. Maintainer reviews the completed local PDF and local public-source cleanup commit.
+   The offline sweep, primary-source refresh and source/builder reconciliation passed their checks.
+2. Keep report sources/output uncommitted and retain the manifest, source snapshot and QA receipt.
+   Validation corrected table widths and generated Markdown spacing; do not restart iterative drafting.
+3. In the existing 8–10 Nov window, review the D4 dry run and agree residual-resource handling
+   before applying it. Firestore, secrets, Runtime/Memory and audit state are retained by default;
+   nothing here authorizes their deletion or an irreversible bucket lock.
+4. At publication, refresh upstream status and public links, select the immutable reference,
+   and obtain approval for GitHub/Zenodo/site actions. This local edition does not claim publication
+   or a completed shutdown.
+
+## Evidence and manuscript rules
+
+- Each claim maps to the [claim matrix](claim-matrix.md) and a dated record in the
+  [evidence index](../../assets/README.md). Source, deployment and observation are distinct.
+- Apply the [4–5 November audit](evidence-audit-2026-11-04.md): conventional E19 median,
+  tail grouping, missing census seal, separate E3 addendum and configured-versus-observed alerts.
+- Retain the original F stop and recovery's raw X1/collector stop. The refusal addendum is a
+  later exact-ID query, not continuous monitoring or directly measured provider transport.
+- Current sources are `report/sections/`; the builder reads them in an explicit order.
+  The local cited-source snapshot records working-tree content without inventing public links
+  under a commit that lacks it. Report publication remains a separate step.
+- Keep the author line “Independent researcher, Stockholm”; no award, universal privacy result,
+  end-to-end EU model residency, immutable retention or historical SLO claim.
+
+## Retained protocol history
+
+The completed N protocols and E5/E6 design notes remain in the
+[pre-sweep source plan](https://github.com/iarjunganesh/bastion/blob/d7d6a99a5f1534f835235e21f95a0413f5027ecc/docs/research/report-plan.md).
+The exact F/recovery protocols, approval/admission receipts and collector sources are sealed
+separately under `.local/measurements/`. The full pre-sweep dirty tree/report snapshot is retained
+privately; shortening this active plan does not retroactively change an executed protocol.
+
+v0.8.0 remains the 28 October source release. Dependency acceptance and later production
+provenance are recorded once in [DEPENDENCY-STATUS](../DEPENDENCY-STATUS.md) and
+[VERSIONS](../VERSIONS.md); the [upgrade plan](../UPGRADE-PLAN.md) is its closeout checklist.

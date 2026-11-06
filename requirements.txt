@@ -23,7 +23,7 @@ google-cloud-aiplatform==2.6.0
 # Imported directly by managed Runtime deployment and dispatcher clients.
 google-cloud-agentplatform[agent-engines]==2.6.0
 
-# The governance data sources — see docs/adr/006-gcp-service-surface.md.
+# The governance data sources — see docs/adr/006-pillar-coverage.md.
 # Cloud Asset Inventory is how the Access Auditor reads the live IAM policy: `gcloud` is not
 # present in a Cloud Run image, so a subprocess call to it cannot be the read path.
 google-cloud-asset==4.4.0

@@ -264,6 +264,75 @@ def test_parse_json_object_strips_the_said_attribution_prefix():
     assert escalation._parse_json_object('[policy_step] said: {"a": 1}') == {"a": 1}
 
 
+def test_routing_envelope_accepts_the_actual_sdk_quoted_agent_message():
+    """The 5 Nov pilot failed because the SDK fences the canonical JSON as data."""
+    from google.adk.events import Event
+    from google.adk.flows.llm_flows.context._fencing import _present_other_agent_message
+    from google.genai import types
+
+    routing = {
+        "departments": [
+            {
+                "department": "platform-infra",
+                "finding_count": 1,
+                "finding_ids": [FINDING_IDS[0]],
+                "reasons": ["overly_broad_role"],
+            }
+        ]
+    }
+    event = Event(
+        author="policy_step",
+        invocation_id="synthetic",
+        content=types.Content(role="model", parts=[types.Part(text=json.dumps(routing))]),
+    )
+    quoted = _present_other_agent_message(event)
+    ctx = SimpleNamespace(session=SimpleNamespace(state={}, events=[]), user_content=quoted.content)
+    recovered = escalation._routing_envelope(ctx)
+    assert recovered == routing
+    assert escalation._validate_departments(recovered) == routing["departments"]
+
+
+def test_quoted_empty_routing_remains_a_valid_no_delivery_outcome():
+    text = (
+        '[policy_step] said: <<<BEGIN_QUOTED_AGENT_CONTENT>>>\n{"departments":[]}'
+        "\n<<<END_QUOTED_AGENT_CONTENT>>>"
+    )
+    assert escalation._validate_departments(escalation._parse_json_object(text)) == []
+
+
+def test_quoted_routing_keeps_count_validation_before_delivery():
+    routing = {
+        "departments": [
+            {
+                "department": "platform-infra",
+                "finding_count": 2,
+                "finding_ids": [FINDING_IDS[0]],
+                "reasons": ["overly_broad_role"],
+            }
+        ]
+    }
+    text = (
+        "[policy_step] said: <<<BEGIN_QUOTED_AGENT_CONTENT>>>\n"
+        + json.dumps(routing)
+        + "\n<<<END_QUOTED_AGENT_CONTENT>>>"
+    )
+    with pytest.raises(escalation.RoutingEnvelopeError, match="count_mismatch"):
+        escalation._validate_departments(escalation._parse_json_object(text))
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        '[policy_step] said: <<<BEGIN_QUOTED_AGENT_CONTENT>>>\n{"a":1}',
+        '[policy_step] said: <<<BEGIN_QUOTED_AGENT_CONTENT>>>\n{"a":1}'
+        "\n<<<END_QUOTED_AGENT_CONTENT>>> trailing",
+        "[policy_step] said: not JSON\n<<<END_QUOTED_AGENT_CONTENT>>>",
+    ],
+)
+def test_quoted_routing_rejects_incomplete_or_mixed_content(text):
+    assert escalation._parse_json_object(text) is None
+
+
 def test_parse_json_object_rejects_text_that_is_neither():
     assert escalation._parse_json_object("For context:") is None
     assert escalation._parse_json_object("[policy_step] said: not json") is None

@@ -77,9 +77,10 @@ the suite would assert a refusal production does not make — and this project h
 three defects of precisely that shape, each true of the code and false of the deployed system,
 each found by watching the fleet rather than by running the tests.
 
-So the pillar claims two Gateway refusals rather than three, because two are enforced. Throughput
-is bounded by `BASTION_MAX_INSTANCES` and by Eventarc's five-attempt dead-letter policy; both are
-real and observable, and both are described as a concurrency cap and a delivery bound rather than
-as rate limiting, because that is what they are.
+So the pillar claims two Gateway refusals rather than three, because two are enforced.
+`BASTION_MAX_INSTANCES` caps Cloud Run scaling; the Eventarc subscription targets five delivery
+attempts before dead-letter forwarding. **Clarified 4 November:** Pub/Sub's attempt count is
+approximate, not a strict delivery cap. These controls are not per-caller rate limiting; the
+single observed five-delivery result is [evidence 21](../../assets/evidence/21-redelivery-and-dead-letter.md).
 
 If the managed Gateway later gains the control, it is configuration and a capture, not code.

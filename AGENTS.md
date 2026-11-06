@@ -19,49 +19,28 @@ Read HANDOFF.md next, then docs/research/report-plan.md and docs/UPGRADE-PLAN.md
 
 ## Project and current state
 
-Bastion began as a Fortified Enterprise Fleet submission to the All Things Agentic Hackathon and
-now supports a technical report. Three
-Google ADK agents review a real GCP IAM policy from approved asynchronous events: a managed Runtime
-Orchestrator, a read-only Access Auditor, and a no-IAM-read Escalation Agent.
+Bastion is a three-agent, read-only GCP IAM-review fleet and technical-report case study.
+The source pins Google ADK 2.13.0/A2A SDK 1.3.0 on Python 3.12. The core suite has
+336 tests with 100% configured statement and branch coverage. [VERSIONS](docs/VERSIONS.md)
+separates source pins, measured/asserted Cloud Run packages and unreadable Runtime resolution.
 
-The source targets Google ADK 2.13.0 and A2A SDK 1.3.0. Deployment remains a separate
-verification step; see [version provenance](docs/VERSIONS.md). As of 2026-08-25 the production path is deployed and verified: Pub/Sub/Eventarc durable ingress,
-Firestore lifecycle, Agent Runtime/Identity, Memory Bank, Agent Gateway/IAP, Agent Registry, two
-protected Cloud Run A2A workers, Model Armor, an IAM-private findings API, and retained operations
-controls. The count-only capture records 21/21 APIs and 39 resources. The Python 3.12 suite has
-330 tests at 100% configured core statement and branch coverage.
+Cohort N is frozen on the August deployment. On 5 November both surfaces were updated, but F's
+first pilot failed closed on an Escalation parser incompatibility ([E24](assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)).
+Separate corrected recovery passed its bounded controls; the refusal join uses a read-only
+addendum after a collector false positive ([E25](assets/evidence/25-corrected-cohort-F-verification.md)).
+Runtime stayed unchanged during recovery. Daily reported-usage billing passed on 6 November;
+private values, late-posting and attribution limits stay in the credit record. No F rerun is planned.
 
-Five of seven observation captures closed in August. Current-route IAM provenance, the
-agent-mediated Model Armor refusal, the correlated payload-free audit trail and the Cloud Trace
-chain were all captured on 2026-08-25 (evidence 11, 12, 13). The other two were never performed
-as originally designed, and those forms are still not claimed: a Gateway refusal of an
-unregistered *caller* (the Gateway governs egress only) and a worker timeout→retry→escalation
-sequence. On 2026-11-04 the report closed narrower, different observations in their place: the
-Gateway's fail-closed refusal of egress it did not match to a registered endpoint (evidence 20)
-and a rejected event's redelivery and dead letter on the production subscription (evidence 21).
-No further live work is planned for either; see the claim matrix for the exact wording.
+Report sources are canonical in `report/` and remain uncommitted. The 6 November request
+authorizes final reconciliation, careful documentation simplification and one local PDF,
+superseding the earlier build hold. C1–C3 have results; C4 is deferred with no results.
+Keep the author line “Independent researcher, Stockholm”, dated counts (62 bindings on
+25 August, 56 on 28 October), upstream contribution credit and every collection disclosure.
 
-**The hackathon is over and its material is archived.** The entry was submitted on 2026-08-29
-and judging has closed; no award is claimed anywhere. Tag `v0.7.0` is the submission. Devpost
-copy, planning, gallery images, demo video sources and their tooling live, frozen, in
-[archive/hackathon-2026/](archive/hackathon-2026/README.md); the published video is a fixed
-YouTube upload. The Devpost page still embeds the architecture image from
-`raw.githubusercontent.com/.../main/` and links a few files on `main`, so those stay in place, and
-a `scripts/render_diagrams.py` run on `main` silently changes that page. Re-render on `main` only
-as an explicit decision.
-
-**A technical report is in progress** under `report/` (private, uncommitted). It was rewritten on
-4 November to `report/OUTLINE.md`: the design (C1), the pre-defined November cohort N on the
-unchanged August deployment (C2, evidence 16–23) and silent success at agent boundaries (C3).
-The maintainer approved targeted wording updates on 4 November: upstream contribution credit,
-dated census provenance and the deferred matched-explanation study. Those updates are complete.
-Remaining placeholders cover cohort F, the publication date and revision, the billing recheck
-and the publication-day upstream refresh. C4 has no results; missing-workflow-step cases remain
-a planned extension. The 27 October study is the pilot
-(evidence 14). Quote 62 bindings only as 25 August (evidence 11) and 56 only as 28 October
-(evidence 23); one batch is never a reliability rate. Preserve every collection disclosure.
-State upstream status with its check date and keep the author line "Independent researcher,
-Stockholm".
+The hackathon is over. Tag `v0.7.0` is the 29 August submission; no award is claimed.
+[The archive](archive/hackathon-2026/README.md), gallery and fixed video remain frozen.
+Devpost embeds architecture images from `main`: render diagrams only by an explicit decision,
+otherwise use `--check`. Do not regenerate those publication assets during a routine sweep.
 
 Read these before changing architecture or claims:
 
@@ -225,7 +204,7 @@ Never change billing linkage, payment methods, IAM or enable paid products to by
 
 ## Report generation order (maintainer correction, 28 October)
 
-Stop iterative manuscript/PDF amendments and rebuilds. Finish the code, dependency, site,
-deployment and feasible control/evidence work first. Then reconcile the final evidence and
-generate one clean technical report. The current report is an interim local draft; preserve
-it uncommitted. Do not rebuild it as a routine gate during the remaining implementation.
+The original order was code/dependencies/site, deployment and feasible evidence first, then
+one clean report. The maintainer explicitly authorized the final source/builder reconciliation
+and local PDF on 6 November. Keep `report/` uncommitted, validate and review before building,
+and avoid iterative rebuilds. Publication, site deployment and the D4 end state remain separate.

@@ -199,7 +199,7 @@ async def run_managed_runtime(event: InvestigationEvent) -> None:
     # delegates to the client's aiohttp connector; constructing Client as a temporary lets CPython
     # finalize that connector between ``get`` and ``async_create_session`` under Cloud Run load.
     client = Client(project=project, location=region)
-    engine = client.agent_engines.get(name=name)
+    engine = client.runtimes.get(name=name)
     session = await engine.async_create_session(user_id=event.context_id)
     streamed = 0
     confirmed = False

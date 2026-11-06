@@ -5,7 +5,7 @@
   "evidence": [
     {
       "title": "Governed request path",
-      "summary": "Managed Runtime, Gateway, Registry, and IAP are deployed; the retained record contains status and counts, never private origins or identities.",
+      "summary": "The 16 August record verifies a managed Runtime bound to governed Gateway/Registry egress and protected A2A workers. It is a dated route observation, not a verification of later deployment changes.",
       "state": "RECORD VERIFIED",
       "accent": "#5b8cff",
       "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/05-runtime-gateway.md"

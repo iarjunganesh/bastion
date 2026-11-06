@@ -43,7 +43,7 @@ def call(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
 
 def runtime_resource() -> Any:
     name = f"projects/{PROJECT_NUMBER}/locations/{REGION}/reasoningEngines/{ENGINE_ID}"
-    resource = Client(project=PROJECT, location=REGION).agent_engines.get(name=name).api_resource
+    resource = Client(project=PROJECT, location=REGION).runtimes.get(name=name).api_resource
     if resource is None:
         raise RuntimeError(f"Agent Runtime resource is absent: {name}")
     return resource

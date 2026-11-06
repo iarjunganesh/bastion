@@ -12,19 +12,37 @@ capability with code and no capture is deliberately not claimed.
 ## Upgrade verification — source and deployment are separate
 
 **Current source target: Google ADK 2.13.0.** The retained evidence describes the historical
-fleet; upgraded production is unverified until both deployment surfaces pass. See
+fleet. Both surfaces were updated on 5 November, but the F pilot failed on a quoted-routing
+parser incompatibility; [evidence 24](../../assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)
+records the deployment and fail-closed outcome. The separate corrected recovery
+([evidence 25](../../assets/evidence/25-corrected-cohort-F-verification.md)) then passed five normal
+cases, one direct confirmation control, two replays and the direct refusal join. The worker
+parser correction is deployed; Runtime stayed unchanged during recovery. See
 [version provenance](../VERSIONS.md). The
 consequence is observational: redeploying mints new Cloud Run revisions, and
 [evidence 11](../../assets/evidence/11-current-route-correlation.md) and
 [12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md) name
 `bastion-access-auditor-00031-sbr` and `bastion-escalation-agent-00027-nkv` explicitly.
 
-Closing it therefore means, in order: redeploy both surfaces, re-verify live, re-run the
-investigation, re-capture evidence 11, 12 and 13, and recompose gallery images 03, 04 and 05 from
-the new captures. Nothing may claim production runs the newer resolution until that is done.
+Fresh verification must identify the new revisions and retain their own capture dates;
+it cannot relabel evidence 11, 12 or 13. The 5 November deployment is recorded separately
+in evidence 24, with its unsuccessful pilot. The archived hackathon gallery and published
+video stay frozen; recomposing them is not outstanding report work. Installed Cloud Run
+package assertions and declared Runtime requirements retain their different proof boundaries.
 
-The alternative is equally acceptable and costs nothing: leave the fleet where it is and say so,
-which is what every current claim already does.
+### F pilot follow-up, 5 November
+
+The stopped pilot is retained separately: one publication, five automatic attempts, ten
+completed model audit records and no reviews. The source queue subsequently drained; one
+message remains in the dead-letter review queue, untouched. Those aggregate queue observations
+are not a per-message payload join. The separate capped recovery protocol received the
+maintainer's go on 5 November and same-day admission under D3's daily billing cadence.
+The separate recovery completed and is sealed as evidence 25. The earlier failed cohort
+and untouched review message remain retained. The 6 November reported-usage billing check
+passed; final per-chunk currency attribution and late postings remain bounded.
+The recovery collector's final refusal check falsely counted a pre-refusal plugin entry;
+the original stop is preserved with a separate reviewed read-only temporal/ID-join addendum.
+No further Gateway or original worker-timeout experiment is added by this follow-up.
 
 ## Why this file exists
 
@@ -46,9 +64,10 @@ held in the `bastion_exceptions` collection — see `runtime/firestore.py` and t
 `agents/orchestrator/runtime.py` backs managed *session* memory, which is a different store.
 Seeding Memory Bank would produce a capture that proves nothing about suppression.
 
-## Open captures
+## Capture status
 
-Each needs live GCP credentials and an approved operator workstation. None is a build task.
+The table retains original capture definitions and their dated, sometimes narrower closure.
+No further live capture is planned; current claim wording is in the [matrix](claim-matrix.md).
 
 | # | Capture | Depends on | Note |
 |---|---|---|---|
@@ -85,16 +104,17 @@ Two free-text routes were identified. The first still exists; the second is hist
    reached the former policy model inside a tool result. D4 added inbound tool-result screening,
    and the current policy step is model-free, so this route no longer reaches a model. See D4.
 
-**What must be said plainly when capture 2 is written up:** every refusal observed in the deployed
+**Historical pre-capture note, 22 August:** every refusal then observed in the deployed
 fleet so far has been a false positive on the fleet's own traffic (`policy_match` on internal
 orchestration text, `screening_unavailable` on the D2 egress denial). No refusal of a real
-injection has been observed. Route 1 makes one obtainable; until it is captured, it is not claimed.
+injection had then been observed. This gap closed on 25 August in [E12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md),
+with the authenticated-caller limitation retained.
 
 ## Blocking defects observed in the deployed fleet
 
 Found 2026-08-19/22 while attempting captures 1-4. Each was watched in the deployed system, not
 inferred from code. They are recorded here because every capture then outstanding sat behind them;
-captures 1-5 have since closed and only 6 and 7 remain.
+the table above records their later closure, including the narrowed November observations.
 
 **Status at 2026-08-22:** D1, D3, D4, D5, D6, D7 and D8 are fixed. D1-D7 shipped in 0.2.0;
 D8 is fixed after it and ships in 0.2.1. Only D2 remains open, and it is no longer blocking.
@@ -351,10 +371,10 @@ with production, would be the least defensible version of that mistake.
 a rate limit, and none will.
 
 **What does bound throughput, described as what it is.** `BASTION_MAX_INSTANCES` caps Cloud
-Run concurrency and Eventarc delivery is bounded to five attempts before a message reaches the
-dead-letter subscription. Those are real, deployed and observable — and they are a concurrency
-cap and a delivery bound, not a per-caller rate limit. Calling them one would be the same
-category error in prose that option 3 would be in code.
+Run concurrency; the Eventarc subscription targets five delivery attempts before dead-letter
+forwarding. **Clarified 4 November:** Pub/Sub applies that attempt count approximately; it is
+not a strict five-delivery cap. Evidence 21 observed five deliveries once. Neither this policy
+nor the Cloud Run scaling cap is a per-caller rate limit.
 
 Recorded as an amendment to [ADR-003](../adr/003-pillars-on-geap.md), which is the
 record this reasoning applies.

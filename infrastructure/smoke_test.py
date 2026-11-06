@@ -125,14 +125,14 @@ async def verify_runtime() -> None:
     the audit trail must be able to name this run without a model reading the id.
     """
     name = f"projects/{PROJECT_NUMBER}/locations/{RUNTIME_REGION}/reasoningEngines/{RUNTIME_ID}"
-    # The client must outlive the engine handle. `Client(...).agent_engines.get(...)` leaves the
+    # The client must outlive the engine handle. `Client(...).runtimes.get(...)` leaves the
     # client unreferenced, so it can be collected mid-stream; its aiohttp session closes with it
     # and the next request trips `assert self._connector is not None` deep inside aiohttp — an
     # error that names nothing about ownership and reads like a fleet fault. `agent_server` learned
     # this already, which is what `test_managed_runtime_keeps_client_for_async_session_and_stream`
     # pins; the smoke path simply never had the lesson applied to it.
     client = Client(project=PROJECT, location=RUNTIME_REGION)
-    engine = client.agent_engines.get(name=name)
+    engine = client.runtimes.get(name=name)
     user = f"bastion-smoke-{uuid4()}"
     investigation_id = str(uuid4())
     session = await engine.async_create_session(user_id=user)

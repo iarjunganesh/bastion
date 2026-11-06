@@ -92,9 +92,9 @@ are what an injected instruction would try to redirect. That is
 [ADR-007](007-tool-poisoning.md), a consequence of this decision rather than an independent
 idea.
 
-ADK 2.13.0 accepts `opentelemetry-api`/`sdk` through 1.44. The current candidate uses
-the 1.44.0 pair; its unresolved security advisory blocks the Python release (see
-[dependency status](../DEPENDENCY-STATUS.md)). ADK changes its default GenAI trace schema in this release;
+ADK 2.13.0 accepts `opentelemetry-api`/`sdk` through 1.44. v0.8.0 uses the 1.44.0 pair
+with the explicitly accepted advisory in [dependency status](../DEPENDENCY-STATUS.md).
+ADK changes its default GenAI trace schema in this release;
 new traces must be reviewed rather than assumed identical to the August captures.
 
 **ADK ships FastAPI, Starlette and uvicorn.** Bastion's Flask surfaces were competing with the
@@ -129,7 +129,7 @@ migration trigger is explicit: **when `Workflow` can be an `LlmAgent` sub-agent,
 `scripts/check_versions.py --check-upstream` runs before every tag, so a release that changes
 this will not pass unnoticed.
 
-### 2.8.0 was reviewed, declined, then taken
+### Historical source/deployment split, 27 August 2026
 
 `--check-upstream` failed before the `v0.6.0` tag: PyPI carried a newer release than this ADR's
 pin. The first decision was to decline it, on the grounds that the migration trigger had not
@@ -143,7 +143,7 @@ the one condition this ADR commits to acting on remains unmet and the compositio
 unchanged.
 
 **What was verified before the pin moved.** The full suite passes on the new resolution — 321
-tests at 100% statement and branch coverage — along with Ruff, the type checker, and every
+cases at 100% statement and branch coverage — along with Ruff, the type checker, and every
 documentation gate. The import claim above was re-run rather than re-dated. A local A2A
 round-trip was exercised end to end: a `SequentialAgent` calling a `RemoteA2aAgent` served over
 HTTP, agent card resolved, remote executed.
@@ -154,7 +154,7 @@ native task mode to `RemoteA2aAgent` and a Model Armor guardrail plugin, which a
 [ADR-009](009-model-armor-threshold.md)'s fail-closed callback and both A2A worker hops occupy.
 A passing local suite is not a live fleet.
 
-**So the repository and the deployment now disagree, deliberately and temporarily.** The managed
+**At that August release, source and deployment deliberately differed.** The managed
 Agent Runtime and both Cloud Run workers are still running the resolution `v0.4.0` deployed.
 Until both surfaces are redeployed and re-verified live, every "deployed and verified" claim in
 the evidence set describes the older resolution, and redeploying will mint new Cloud Run

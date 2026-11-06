@@ -77,6 +77,21 @@ Both gates live in the Orchestrator rather than inside the workers they check, b
 workers are remote. A guard that travels over A2A is a guard the caller must trust the callee to
 run, which is not a trust boundary this design has anywhere else.
 
+**Observed limits:** the older durable ingress can record completion when the Runtime stream
+ends without any investigation running ([evidence 19](../assets/evidence/19-repeatability-and-false-completion.md)).
+The confirmation check was deployed on both surfaces on 5 November. The separate cohort F
+pilot failed on an Escalation routing-parser incompatibility with ADK's quoted-content format;
+the ingress recorded `RuntimeIncompleteError` instead of false completion
+([evidence 24](../assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)). A separate
+corrected recovery then passed five normal cases, a direct true-confirmation control and two
+replays; its direct refusal join was verified through a read-only addendum after a collector
+temporal false positive ([evidence 25](../assets/evidence/25-corrected-cohort-F-verification.md)).
+This is bounded functional verification, not a reliability guarantee or live forced-empty-stream test.
+Gateway defect D2 also prevents claiming complete registered-versus-
+unregistered destination discrimination: a registered host was unmatched and refused, plain Google
+API hosts were not IAP-checked, and no matched allow was logged
+([evidence 20](../assets/evidence/20-gateway-unmatched-egress-refusal.md)).
+
 ### Access Auditor
 
 The Auditor reads the live project policy under read-only roles. Deterministic code—not Gemini—
@@ -122,7 +137,8 @@ absent -> received -> running(lease, attempt) -> completed
 - an expired lease is reclaimable after a crashed worker;
 - a failed dependency records the exception class and remains retryable;
 - a completed replay is acknowledged without repeating work;
-- Eventarc delivers at most five attempts before the dead-letter review subscription.
+- the Eventarc subscription targets five attempts before dead-letter forwarding; Pub/Sub's count
+  is approximate, with five observed once in [evidence 21](../assets/evidence/21-redelivery-and-dead-letter.md).
 
 Notification is independently idempotent with
 `sha256(investigation_id:department)`. The findings API creates a Firestore record once and
@@ -136,10 +152,13 @@ stateDiagram-v2
     running --> failed: dependency or policy failure
     running --> received: lease expires after process loss
     failed --> running: Eventarc retry reclaims
-    failed --> dead_letter: fifth failed delivery
+    failed --> dead_letter: forwarding near configured attempt target
     completed --> completed: duplicate acknowledged
     dead_letter --> [*]: operator review
 ```
+
+Here `dead_letter` is a Pub/Sub transport outcome, not a Firestore status. An event rejected
+before admission can be dead-lettered without any investigation document, as evidence 21 observed.
 
 ## Context across weeks
 
@@ -150,7 +169,9 @@ the deterministic policy suppresses the same finding while the exception is curr
 it after expiry. A live exception approved on 2026-08-19 suppressed its matching finding on
 2026-08-22 across deployments and restarts, re-confirmed 2026-08-23 after the
 deterministic-delivery rewrite ([evidence 10](../assets/evidence/10-cross-week-suppression.md)).
-The observed gap is three days, not a literal week; expiry firing remains test-only.
+The observed gap is three days, not a literal week. Expiry was observed separately on 3 November:
+a 15-minute approval suppressed one finding and the same finding returned after expiry
+([evidence 16](../assets/evidence/16-exception-lifecycle.md)); one lifecycle, not a rate.
 
 ## Model and data boundary
 
