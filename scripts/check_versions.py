@@ -58,7 +58,7 @@ DOC_GLOBS = (
     "*.md",
     "docs/**/*.md",
     "archive/**/*.md",
-    "report/*.md",
+    "report/**/*.md",
     "site/*.md",
     "assets/**/*.md",
     "experiments/**/*.md",

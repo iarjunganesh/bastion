@@ -22,7 +22,8 @@ deterministic code and is neither persisted by Bastion nor sent to Gemini.
 - Model output is untrusted until the deterministic protected-data screen passes.
 - Notification fields and categories are allowlisted; free-form destinations and binding data
   are not part of the tool contract. Opaque finding IDs are carried so a human can approve a
-  specific finding; they are validated to the Auditor's exact HMAC shape and reveal nothing.
+  specific finding; they are validated to the Auditor's exact HMAC shape and omit the raw policy
+  fields. They remain linkable across reviews, so pseudonymisation is not a zero-leakage guarantee.
 - The reviewer on an approved exception is the verified caller identity, never a request field.
   It is deliberately retained in the durable ledger for accountability and never enters model
   state, audit logs, or committed evidence.

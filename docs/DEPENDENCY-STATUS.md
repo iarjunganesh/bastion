@@ -15,12 +15,14 @@ describes excessive CPU use while parsing malformed inbound `tracestate` headers
 
 - **Availability only.** The flaw cannot expose data, change findings or touch IAM, which
   Bastion can only read.
-- **Authenticated callers only.** The dispatcher has internal-only ingress and every Cloud Run
-  service requires an identity token (fleet verifier, 28 October); the managed Runtime is reached
-  only through the dispatcher. Bastion's own code configures no inbound trace propagation, but
+- **Protected application ingress.** The dispatcher is internal and IAM-protected; the
+  findings API uses IAM. A2A workers validate the origin credential before processing
+  application requests ([security boundaries](../SECURITY.md)); they do not all require
+  a Cloud Run identity token. Bastion configures no inbound trace propagation, but
   ADK and A2A internals were not proven never to parse the header.
-- **No new exposure from this release.** v0.8.0 changes source and the public console only. The
-  deployed fleet still runs its August image, whose older OpenTelemetry is also below the fix.
+- **Dated deployment boundary.** v0.8.0 was source-only on 28 October. Both production
+  surfaces were subsequently updated on 5 November, with separate parser recovery.
+  [VERSIONS](VERSIONS.md) records the image assertions and unreadable Runtime resolution.
 - A stalled worker delays an investigation; the durable lifecycle retries it rather than
   completing it without receipts.
 

@@ -305,9 +305,9 @@ def deploy() -> dict[str, Any]:
     existing_id = os.environ.get("BASTION_RUNTIME_AGENT_ENGINE_ID")
     if existing_id:
         name = f"projects/{PROJECT_NUMBER}/locations/{REGION}/reasoningEngines/{existing_id}"
-        engine = client.agent_engines.update(name=name, config=config)
+        engine = client.runtimes.update(name=name, config=config)
     else:
-        engine = client.agent_engines.create(config=config)
+        engine = client.runtimes.create(config=config)
     resource = engine.api_resource
     if resource is None:
         raise RuntimeError("Agent Runtime deployment returned no resource")

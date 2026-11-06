@@ -32,7 +32,7 @@ rewriting history.
 | Model authority | Missing/invalid risk fails closed. The risk threshold and the department catalog are applied by a step that holds no model at all, and a gate refuses to escalate findings that step did not score. The Auditor's model can write only the bounded rationale field — its finding id, department, reason, and score are checked against the tool's own canonical output and rejected on any mismatch. The Escalation Agent is itself a model-free worker, and a second gate refuses to report an investigation complete unless every routed department's delivery was confirmed. The model cannot score or route a finding, decide whether or which department is notified, create an exception, modify IAM, choose an endpoint, expand a tool schema, or clear an investigation. |
 | Exception approval | Creating an exception is a human act on the IAM-private findings API, not an agent tool. The reviewer is taken from the verified caller ID token rather than the request body, the expiry is capped at 90 days, and the finding id must match the Auditor's opaque shape. `tests/security/test_tool_surface.py` fails if any agent ever declares an approval tool. |
 | Audit trail | `AuditPlugin` covers run, agent, model, tool, refusal, and error seams. Records include an investigation id that survives the A2A boundary, an invocation id that groups one agent run, argument names, and exception classes, never values, prompts, responses, or exception messages. |
-| Durability | Firestore owns admission, leases, attempts, terminal state, exceptions, and notification idempotency. Eventarc has a five-attempt dead-letter policy and review subscription. |
+| Durability | Firestore owns admission, leases, attempts, terminal state, exceptions, and notification idempotency. Eventarc has an approximate five-attempt dead-letter target and review subscription. |
 | Retention | Payload-free audit logs route to a `europe-west4` analytics bucket with 365-day retention. The bucket is intentionally not locked because locking is irreversible. |
 
 The two worker services carry an `allUsers` Cloud Run invoker binding only because Cloud Run IAM
@@ -45,9 +45,10 @@ private findings API uses ordinary Cloud Run IAM and has no `allUsers` binding.
 
 - Gemini 3.5 Flash uses Vertex AI `global`; Bastion therefore makes no regional-residency claim
   for model processing. Data minimisation is the boundary control.
-- ADK 2.7 `RemoteA2aAgent` is experimental, and `SequentialAgent` is deprecated while `Workflow`
-  cannot yet serve as an `LlmAgent` sub-agent. Versions are pinned and covered by local and live
-  gates; [ADR-005](docs/adr/005-adk-as-the-agent-framework.md) records acceptance.
+- Framework lifecycle and A2A boundary semantics require explicit transport controls.
+  [ADR-005](docs/adr/005-adk-as-the-agent-framework.md) records the dated framework decisions;
+  [VERSIONS](docs/VERSIONS.md) distinguishes current pins, image assertions and unreadable
+  Runtime installed packages.
 - `RemoteA2aAgent` converts a failed remote A2A task into an ordinary, contentless, error-free
   event rather than surfacing it as a Python exception. A deterministic gate immediately
   downstream of each remote worker step (`policy_gate`, `escalation_gate`) is the control that
@@ -56,4 +57,6 @@ private findings API uses ordinary Cloud Run IAM and has no `allUsers` binding.
 - Audit retention is configured but not WORM/immutable. Locking the bucket requires a separate,
   explicit platform-owner decision.
 
-The grounded deployment and evidence ledger is [archive/hackathon-2026/submission/SUBMISSION.md](archive/hackathon-2026/submission/SUBMISSION.md).
+Current claims are bounded by the [claim matrix](docs/research/claim-matrix.md) and
+[evidence index](assets/README.md). The [hackathon archive](archive/hackathon-2026/README.md)
+is historical.

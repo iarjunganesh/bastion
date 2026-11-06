@@ -12,6 +12,7 @@ from unittest.mock import AsyncMock
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from google.auth.credentials import AnonymousCredentials
 
 from infrastructure import agent_server
 from infrastructure.agent_server import EVENTARC_PATH, install_durable_eventarc_route
@@ -153,7 +154,7 @@ def _stream_runtime(monkeypatch, events):
 
     class _Client:
         def __init__(self, **_kwargs):
-            self.agent_engines = SimpleNamespace(get=lambda name: _Engine())
+            self.runtimes = SimpleNamespace(get=lambda name: _Engine())
 
     monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "p")
     monkeypatch.setenv("GCP_PROJECT_NUMBER", "1234567890")
@@ -211,6 +212,7 @@ def test_the_gate_event_as_the_runtime_serializes_it_confirms_completion():
 
 
 def test_managed_runtime_keeps_client_for_async_session_and_stream(monkeypatch):
+    """Use the installed SDK's actual client surface; a fabricated proxy hid an API rename."""
     calls: list[tuple[str, object]] = []
 
     class FakeEngine:
@@ -222,17 +224,22 @@ def test_managed_runtime_keeps_client_for_async_session_and_stream(monkeypatch):
             calls.append(("stream", kwargs))
             yield CONFIRMED
 
-    class FakeAgentEngines:
-        def get(self, *, name):
-            calls.append(("get", name))
-            return FakeEngine()
+    client = agent_server.Client(
+        project="bastion-test-project",
+        location="europe-west4",
+        credentials=AnonymousCredentials(),
+    )
 
-    class FakeClient:
-        def __init__(self, *, project, location):
-            calls.append(("client", (project, location)))
-            self.agent_engines = FakeAgentEngines()
+    def get_runtime(self, *, name):
+        calls.append(("get", name))
+        return FakeEngine()
 
-    monkeypatch.setattr(agent_server, "Client", FakeClient)
+    def client_factory(*, project, location):
+        calls.append(("client", (project, location)))
+        return client
+
+    monkeypatch.setattr(type(client.runtimes), "get", get_runtime)
+    monkeypatch.setattr(agent_server, "Client", client_factory)
     monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "bastion-test-project")
     monkeypatch.setenv("GCP_PROJECT_NUMBER", "123")
     monkeypatch.setenv("AGENT_RUNTIME_REGION", "europe-west4")
@@ -279,7 +286,7 @@ def test_the_runtime_dispatch_message_is_data_not_an_instruction(monkeypatch):
 
     class _Client:
         def __init__(self, **_kwargs):
-            self.agent_engines = SimpleNamespace(get=lambda name: _Engine())
+            self.runtimes = SimpleNamespace(get=lambda name: _Engine())
 
     monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "p")
     monkeypatch.setenv("GCP_PROJECT_NUMBER", "1234567890")

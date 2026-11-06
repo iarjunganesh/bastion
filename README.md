@@ -58,29 +58,16 @@
 
 ---
 
-## The problem
+## What it does
 
-Access review is quarterly work performed on continuously changing permissions. Automating the
-scan is the easy part. An institutional agent has to do four harder things: remember decisions a
-human made weeks ago, survive asynchronous retries without duplicating a page to a team, prove
-why it acted long after it acted, and remain structurally unable to turn a suspicious permission
-into a privileged write.
+Bastion reviews the real IAM policy of the GCP project that runs it, using read-only Cloud Asset
+Inventory. Deterministic code flags Owner/Editor grants, scores them, applies human exceptions
+and routes reviews. Gemini writes a bounded rationale; it does not decide risk or delivery.
+Raw members, roles, resources and bindings stay inside the Auditor's deterministic tool.
+The minimised schema carries opaque IDs, departments, categories and scores, not an anonymity
+or general zero-leakage guarantee.
 
-Most "AI for security" demos fail the fourth one quietly, because they hand the model the
-production data and hope the prompt holds.
-
-## What Bastion does
-
-Bastion performs read-only IAM review against the live GCP project that runs it — including its
-own service identities. Deterministic code detects, scores, and routes every finding. Gemini
-writes the sentence explaining an already-minimized risk and decides no part of it. Humans
-receive counts and allowlisted categories, never bindings.
-
-**The load-bearing claim is not residency, it is minimisation.** Raw members, roles, resources
-and bindings stop inside the deterministic Auditor tool and are discarded there. What crosses the
-model boundary is an opaque HMAC identifier, a risk category, an owning department, and a bounded
-score. There is no prompt from which a principal could be recovered, because no principal was
-ever in one.
+## Request path
 
 <p align="center">
   <picture>
@@ -91,341 +78,64 @@ ever in one.
   </picture>
 </p>
 
-There is no production in-process fallback. The Cloud Run Orchestrator is only the durable
-Eventarc admission and dispatch boundary; it invokes the identity-bearing managed Runtime and
-**never invokes a worker**. The Runtime discovers two worker agents through reviewed Agent Cards
-and its Gateway-bound Registry allowlist.
+Approved event → Pub/Sub/Eventarc → IAM-protected durable dispatcher → managed Agent Runtime →
+Gateway/Registry/IAP → Access Auditor → deterministic policy step and gate → model-free
+Escalation Agent → completion gate.
 
-## Run one investigation in 60 seconds
+There are three institutional agents; the policy steps and gates are internal deterministic
+steps. The dispatcher has no local agent graph or direct worker path. A2A workers validate the
+deployment-owned origin credential; the findings API uses Cloud Run IAM. There is no public
+agent demo endpoint. The separate [evidence console](https://bastion.arjunganesh.dev/) serves
+static sanitised records and makes no request to the private fleet.
 
-There is deliberately **no public agent endpoint**. Every operational service is IAM-private, and
-exposing an agent purely to produce a shareable URL would contradict the submission. A separate
-dependency-free evidence console is live at
-[`bastion.arjunganesh.dev`](https://bastion.arjunganesh.dev/) from the source under
-[`site/`](site/README.md). It serves only sanitized committed artifacts and makes no request to the
-private fleet. The fleet itself remains reproducible:
+## Evidence and current state
+
+The [claim matrix](docs/research/claim-matrix.md) bounds each claim; the
+[evidence index](assets/README.md) records measurements and their limits.
+
+- The dated August captures establish the governed route, identity separation, minimised real-IAM
+  findings, screening, audit and trace observations. The inventory records 21 APIs and 39 resources;
+  it is not a current health check.
+- The [27 October pilot](assets/evidence/14-live-validation.md) shaped the pre-defined November
+  cohort N. N ran on the unchanged August deployment and retained its false completion alongside
+  a successful batch. It is not a reliability rate.
+- On 5 November, both deployment surfaces were updated. The first F pilot failed closed on an
+  Escalation routing parser ([E24](assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)).
+  Separately corrected recovery passed five normal cases, a direct confirmation control and two
+  replays; the refusal join was verified read-only after a collector false positive
+  ([E25](assets/evidence/25-corrected-cohort-F-verification.md)). The original stop is retained.
+- The 6 November daily billing check passed for currently reported usage; exact per-chunk currency
+  attribution and late postings remain bounded. Current balances and reservations stay private.
+- [Version provenance](docs/VERSIONS.md) separates source pins, image assertions and unreadable
+  Runtime installed packages. v0.8.0 remains the 28 October source release with its
+  [accepted dependency advisory](docs/DEPENDENCY-STATUS.md).
+
+The technical report is local in `report/`, uncommitted and outside the release. The final
+14-page local edition and cited-source snapshot were prepared on 6 November. The agreed fleet end state remains 8–10 November,
+dry run first; publication and site deployment are separate actions.
+
+## A boundary failure worth testing
+
+ADK session state does not cross A2A in either direction. Bastion therefore carries findings and
+routing decisions as explicit message content and requires confirmation from the step that did
+the work ([ADR-012](docs/adr/012-structured-findings-across-a2a.md)).
+
+Checked 6 November: [issue #6854](https://github.com/google/adk-python/issues/6854) is closed
+as completed. Community [PR #6859](https://github.com/google/adk-python/pull/6859), opened by
+Sylvester Kaczmarek and including Arjun Ganesh's legacy-path warning and end-to-end test, was
+imported as [d2cb22e](https://github.com/google/adk-python/commit/d2cb22e) on 12 October.
+The GitHub PR was closed after import, not merged through GitHub. Both warnings first shipped in
+[v2.12.0](https://github.com/google/adk-python/releases/tag/v2.12.0); the state boundary remains.
+
+## Offline setup and checks
+
+Use CPython 3.12; on Windows the launcher must know that interpreter, otherwise invoke its full
+path. No GCP credentials are needed for the offline suite.
 
 ```powershell
-git clone https://github.com/iarjunganesh/bastion.git
-Set-Location bastion
-
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements-dev.txt -c requirements.lock
-
-# The offline gate — no cloud credentials, no network, no project required.
-pytest tests --cov --cov-report=term-missing --cov-fail-under=100
-```
-
-`py -3.12` resolves only a CPython registered with the Windows launcher, which the python.org
-installer does and uv, pyenv-win, conda and the Microsoft Store do not. If `py -0p` does not list
-3.12, call that interpreter by its own path instead — `& "C:\path\to\python3.12.exe" -m venv .venv`
-— or on macOS and Linux use `python3.12 -m venv .venv`. Any CPython 3.12 works; the launcher is a
-convenience, not a requirement. The gate above is verified from a fresh public clone in
-[10-reproducibility.md](archive/hackathon-2026/submission/planning/10-reproducibility.md).
-
-That runs the unit, integration, security and load suites against the real agent graph with the
-cloud seams faked at their boundaries. To point it at a live project instead:
-
-```powershell
-Copy-Item .env.example .env
-gcloud auth application-default login
-python -m dotenv run -- adk run --in_memory agents/orchestrator `
-  "Run one read-only Bastion access-review investigation."
-```
-
-`GOOGLE_CLOUD_LOCATION=global` is the model location. It must not be replaced by
-`GCP_REGION=europe-north2`; doing so sends Gemini to an unavailable regional endpoint and
-produces a 404 that reads like a missing model — see
-[ADR-004](docs/adr/004-flash-only-global-endpoint.md).
-
-## What is live
-
-The committed [GCP measurement](assets/architecture/gcp-state.json) is generated from the live
-project by `scripts/capture_gcp_state.py` and contains counts only — never a principal, an email,
-or a policy binding:
-
-- 21/21 named Google Cloud APIs enabled and 39 deployed resources measured;
-- four Cloud Run services in `europe-north2`;
-- a managed Agent Runtime and a separate durable Memory Bank in `europe-west4`;
-- one Agent-to-Anywhere Gateway, IAP authorization extension, and fail-closed auth policy;
-- a governed Agent Registry catalog containing the Runtime, two A2A workers, and every approved
-  Google API egress destination;
-- Firestore durable state, Pub/Sub/Eventarc delivery, a five-attempt dead-letter route, and a
-  review subscription;
-- a regional Model Armor template and two Secret Manager secrets;
-- a 365-day regional audit bucket, four log-based metrics, five enabled alert policies, and the
-  **Bastion Fleet Operations** dashboard.
-
-Observed production checks include:
-
-- a managed Runtime session traversing the Gateway and returning two streamed events;
-- Pub/Sub → Eventarc → Firestore completion with one durable attempt;
-- an unauthenticated findings request denied with `403`;
-- the real Escalation Agent identity creating one redacted review record, followed by the same
-  idempotency key being accepted without creating a duplicate;
-- an exception a human approved on one day suppressing a matching finding three days later,
-  across deployments and restarts — the owning team received **no** notification, not an empty
-  one ([evidence 10](assets/evidence/10-cross-week-suppression.md));
-- a Vertex quota failure recorded as a payload-free `model.request=failed`, with the
-  investigation left reclaimable rather than cleared.
-
-**Versions and evidence are recorded separately.** The current source targets Google ADK 2.13.0
-and A2A SDK 1.3.0. The August captures and 27 October study describe the earlier deployed
-fleet; they are not measurements of the upgraded source. The October study rechecked unchanged
-worker revisions and Runtime update metadata. On 4 November the serving image's installed
-packages were read directly: `google-adk` 2.7.1 and 160 other distributions, built 23 August.
-[The version/provenance table](docs/VERSIONS.md) records each cohort and deployment status.
-Both Cloud Run and managed Runtime must be updated and re-verified before claiming that
-production runs the new release. Existing evidence stays dated and unchanged.
-
-The retained evidence is indexed in [assets/README.md](assets/README.md). The exact distinction
-between deployed, observed, configured, and still-to-capture lives in
-[archive/hackathon-2026/submission/SUBMISSION.md](archive/hackathon-2026/submission/SUBMISSION.md) — those words are used precisely and are not
-interchangeable in this repository.
-
-**Post-hackathon validation, separately dated 2026-10-27.**
-[Evidence 14](assets/evidence/14-live-validation.md) records 20 real-IAM investigations,
-all completed in one durable attempt, with 560 audit records/60 invocations and 40 model
-submissions. Each produced two review records carrying three finding instances. Median client
-completion confirmation was 20.461s with 5s polling; the separate Runtime audit median was
-15.948207s. Five replay publications had unchanged effects observed for 120s, without independent
-per-message delivery confirmation. One collector query-visibility pause was repaired with
-read-only recovery; original data and both collector versions are retained, and no investigation
-was rerun. These are repeated executions on one project, not independent policies, a new binding
-census, a privacy/utility comparison or historical SLO attainment. The
-technical report draft (kept locally in `report/`) includes the method and limitations; the August
-62-binding capture and two open refusal/retry observations remain distinct.
-
-Running against a live fleet rather than a mock is also what surfaced the defects this
-project is most proud of catching. The sharpest: **ADK session state does not cross an A2A
-boundary, in either direction, and nothing warns you** — `output_key` writes into the session
-of the agent that *declares* it, which is shared in-process and separate over A2A. Every local
-run and every CI job exercises the working topology, so the failure is invisible to an offline
-gate by construction, even at 100% configured core statement and branch coverage. Reported
-upstream with a production reproducer in
-[google/adk-python#6854](https://github.com/google/adk-python/issues/6854) (opened by Arjun
-Ganesh) — where Google confirmed the per-session semantics are intended, leaving the silence
-rather than the behaviour as the ask — and fixed structurally in
-[ADR-012](docs/adr/012-structured-findings-across-a2a.md); the full ledger is the
-[observation backlog](docs/research/observation-backlog.md).
-
-Checked live on 2026-10-27: the silence is fixed upstream. Community PR
-[google/adk-python#6859](https://github.com/google/adk-python/pull/6859) (opened by Sylvester
-Kaczmarek, later carrying two commits of mine: a legacy-path warning and an end-to-end test) was
-imported into ADK `main` as commit
-[`d2cb22e`](https://github.com/google/adk-python/commit/d2cb22e) on 2026-10-12, closing the issue
-as completed, and first shipped in
-[`google-adk` v2.12.0](https://github.com/google/adk-python/releases/tag/v2.12.0). ADK now logs a
-warning when a state-only hand-off is dropped and when a remote state delta is ignored, and
-documents the boundary; the semantics are unchanged. The PR itself was closed rather than merged
-through GitHub, and the imported commit is attributed to its opener. A complementary PR of my own,
-[google/adk-python#6862](https://github.com/google/adk-python/pull/6862), adding a
-construction-time warning for the adjacent `LlmAgent(output_key) -> RemoteA2aAgent` case, was
-**closed unmerged on 2026-08-24** in favour of addressing the boundary centrally, because *"the
-session state boundary across A2A is a general transport property rather than an issue specific to
-`SequentialAgent`"*. The ADK 2.13.0 source target includes those warnings; ADR-012's explicit
-contracts remain the fix.
-
-## The fleet
-
-| Agent | Institutional responsibility | Enforced capability |
-|---|---|---|
-| **Orchestrator** | Own investigation lifecycle, policy, routing, and escalation | Managed Agent Identity; Registry/Gateway egress; Firestore state |
-| **Access Auditor** | Read the live policy and produce opaque, deterministic findings | Read-only IAM, Asset Inventory, and Recommender access |
-| **Escalation Agent** | Deliver a validated count to the owning department | Findings API invocation; **no IAM or Asset read role** |
-
-The Cloud Run services expose two security shapes deliberately:
-
-- worker [A2A origins on Cloud Run](https://docs.cloud.google.com/run/docs/ai/a2a-agents) are
-  network-reachable because the cross-region managed Gateway is not
-  classified as Cloud Run internal traffic; every non-health request still requires a
-  Secret-Manager-backed origin credential, while Agent Identity is admitted per destination by
-  IAP at the Gateway;
-- the findings endpoint is network-reachable but IAM-private. Only
-  `escalation-agent-sa` has `roles/run.invoker`; anonymous traffic is rejected by Cloud Run.
-
-## Deterministic safety boundary
-
-Bastion does not ask a model to decide whether a permission is safe.
-
-1. The Auditor reads production IAM under a read-only identity.
-2. Deterministic rules produce an opaque finding ID, category, department, and bounded score.
-3. Those findings cross the A2A boundary as a validated schema, not as prose a model retypes.
-4. The threshold and the department catalog are applied by a step that holds no model at all, and
-   a gate refuses to escalate anything that step did not score.
-5. Missing or invalid risk is rejected; it can never become a quiet clear.
-6. A current, human-approved exception may suppress the same opaque finding until expiry.
-7. The Escalation Agent is itself a model-free worker: it delivers to every routed department and
-   only those, and a second gate refuses to report the investigation complete unless that
-   delivery was confirmed.
-8. Model Armor screens input — including tool results, not only prompts — and fails closed when
-   unavailable.
-9. A deterministic post-model screen blocks principal, role, resource, and PII shapes.
-10. The receiver accepts only an allowlisted department, categories, deterministic summary, and
-    SHA-256 idempotency key.
-
-`AuditPlugin` is registered at every supported Runner seam — never called from inside an agent,
-so there is no audit call site to forget or bypass. It records run, agent, model, and tool
-starts/completions/failures plus Model Armor refusals. Records contain event type, outcome,
-actor, investigation ID, invocation ID, argument **names**, model name, and exception
-**class** — never argument values, prompts, responses, principal IDs, or exception messages.
-
-The two ids answer different questions. `invocation_id` groups one agent run; ADK mints a fresh
-one per run, so it stops at the A2A boundary. `investigation_id` is the durable event id, carried
-to each worker as request metadata rather than as message content, so no model reads or restates
-it — it is what makes a single investigation reconstructable across all three hops. It is
-re-validated as a UUID where it is recorded, because it arrives from a peer.
-
-Tool surfaces are fixed and repository-owned; no external text is ever interpolated into a tool
-declaration ([ADR-007](docs/adr/007-tool-poisoning.md)), and the Model Armor threshold is an
-explicit decision rather than a default ([ADR-009](docs/adr/009-model-armor-threshold.md)).
-
-## What "scalable network" means here
-
-The track asks for a *scalable network of institutional agents*. Bastion's scaling axis is
-deliberately **not** more agents — [ADR-002](docs/adr/002-three-agents.md) fixes the fleet at
-three, because a fourth agent with the same data access proves nothing that a third does not.
-The network scales on the axes that actually matter in an institution:
-
-| Axis | How it grows | Cost of growth |
-|---|---|---|
-| **Owning departments** | A row in the catalog with its principal patterns; routing picks it up with no code change | One catalog entry |
-| **Throughput** | Bounded Cloud Run autoscaling behind durable Eventarc delivery, with leases, retry, and a five-attempt dead letter | Configuration |
-| **A new institutional agent** | A Registry Agent Card, an approved Gateway destination, an Agent Identity, **and** a deliberate change to `agents/orchestrator/agent.py`'s `SequentialAgent` to invoke it | Governance, not automatic discovery |
-
-The third axis is deliberately the expensive one. Nothing in `build_sub_agents()` discovers or
-invokes a newly registered agent on its own — a fourth agent requires the same review as the
-three that exist today: Registry, Gateway policy, and identity, plus code review of exactly what
-it can reach. That is the fixed trust boundary [ADR-007](docs/adr/007-tool-poisoning.md) depends
-on working as intended, not a scalability gap.
-
-The measured proof that the first axis is real rather than decorative is
-[evidence 11](assets/evidence/11-current-route-correlation.md): on 2026-08-25 the deployed route
-read **62 live IAM bindings**, produced 3 deterministic findings across **2 owning departments**,
-and delivered 2 of them after policy suppressed an approved exception — without a model deciding
-who owns what, and with zero raw IAM fields crossing the model boundary. The binding count moves
-as the project's own IAM changes; [evidence 09](assets/evidence/09-cross-department-routing.md)
-recorded 52 on an earlier date and is retained as that measurement rather than overwritten.
-
-Instance caps are deliberate. `BASTION_MAX_INSTANCES=3` follows the organizers' own cost
-guidance; it is a budget ceiling, not an architectural one. Bastion claims **two** Gateway
-refusals rather than three, because two are what the managed control actually enforces — the
-reasoning is recorded in [ADR-003](docs/adr/003-pillars-on-geap.md) rather than quietly dropped.
-
-## How the track requirements are answered
-
-| Track requirement | Bastion evidence |
-|---|---|
-| Agents cataloged for cross-department use | Versioned Agent Cards publish owner, department, purpose, skill, classification, policy version, approval state, and health metadata. `route_by_department()` turns ownership into an enforced routing decision. |
-| Context maintained across weeks of asynchronous work | Stable event/context IDs, Firestore inbox and leases, managed sessions and Memory Bank, expiring human-approved exceptions, retry/dead-letter handling, and idempotent notification keys. Observed across a real three-day gap spanning deployments and restarts. |
-| Production data without violating compliance, sovereignty, or security policy | Read-only Cloud Asset Inventory. **No raw member, role, resource, or binding ever crosses the model boundary** — only opaque IDs, categories, departments, and bounded scores — so sovereign data is not merely kept in-region, it never leaves the process. Model Armor fails closed, output is screened before notification, logs carry no payload values, identities are separated, and state stays in the EU. |
-
-## Architecture
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/architecture/enterprise-fleet-overview-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="assets/architecture/enterprise-fleet-overview-light.svg">
-    <img width="1000" src="assets/architecture/enterprise-fleet-overview-light.svg"
-         alt="Bastion enterprise fleet overview: catalogued agents maintain durable context, inspect governed production data, and route minimized findings across departments."/>
-  </picture>
-</p>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/architecture/enterprise-fleet-architecture-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="assets/architecture/enterprise-fleet-architecture-light.svg">
-    <img width="1000" src="assets/architecture/enterprise-fleet-architecture-light.svg"
-         alt="Bastion enterprise fleet architecture: three catalogued agents use durable context, authenticated A2A routing, isolated identities, Model Armor, and payload-free audit to inspect production IAM safely."/>
-  </picture>
-</p>
-
-All three diagrams are generated from one reviewed master each by `scripts/render_diagrams.py`,
-which emits the light and dark variants and an animated GIF. The masters are gated: every
-resource count in every diagram must equal the live capture, retired deployment claims are
-blocked, and no animated packet may cross a component it is not entering or leaving. A diagram
-that disagrees with the fleet fails CI. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for
-trust-boundary detail and [ADR-006](docs/adr/006-pillar-coverage.md) for what counts as observed.
-
-## Durability and failure tolerance
-
-The Eventarc boundary atomically admits an event before work starts. A running event owns a
-bounded lease; concurrent duplicates receive `503` so Eventarc retains delivery. A dead worker's
-expired lease can be reclaimed. Completed events are acknowledged without rerunning. Failed
-events remain retryable. Delivery is capped at five attempts before the separate dead-letter
-review subscription receives it.
-
-Human escalation is independently idempotent. The tool derives
-`sha256(investigation_id:department)` and the private receiver creates the document exactly once.
-The same authorized request returns success with `accepted=false` on replay.
-
-Operational objectives and alert mappings are in [docs/OPERATIONS.md](docs/OPERATIONS.md).
-
-## Data sovereignty
-
-**Sovereign data never reaches the model at all.** Residency keeps regulated data inside a
-region; Bastion does something stronger with the part that matters. That is why the deterministic
-pre-pass exists: `find_anomalies()` decides what is a finding, and Gemini only writes the
-sentence explaining one. A compliance product cannot answer *"why was this flagged?"* with *"the
-model thought so"*, and it cannot leak a binding it was never given —
-[ADR-001](docs/adr/001-real-iam-not-mock-data.md) and
-[ADR-005](docs/adr/005-adk-as-the-agent-framework.md) record why real data and this framework,
-and what each cost.
-
-Where the infrastructure runs:
-
-- Cloud Run, Firestore, Pub/Sub, and Eventarc run in `europe-north2`.
-- Agent Runtime, Memory Bank, Gateway, Registry, Model Armor, and the retained audit bucket run
-  in `europe-west4`.
-- Gemini 3.5 Flash uses Vertex AI `global`. **Global is not a regional-residency claim**, and
-  Bastion does not make one. The minimisation above is the control; the region is not asked to be.
-
-The field-level inventory, retention, deletion, and processor boundaries are in
-[docs/DATA_GOVERNANCE.md](docs/DATA_GOVERNANCE.md).
-
-## Deploy
-
-Requirements: Python 3.12, Google Cloud CLI, Application Default Credentials, and a project with
-the documented APIs and a Model Armor template.
-
-The idempotent bootstrap accepts explicit regions and existing Memory/Runtime IDs, creates
-missing generated secrets without printing them, provisions identities and durable resources,
-builds one image, deploys the fleet, configures Gateway/Registry/Runtime, provisions
-observability, verifies the inventory, and runs the production smoke test.
-
-```powershell
-.\infrastructure\bootstrap.ps1 `
-  -Project 'YOUR_PROJECT_ID' `
-  -MemoryAgentEngineId 'YOUR_MEMORY_ENGINE_ID' `
-  -RuntimeAgentEngineId 'YOUR_RUNTIME_ENGINE_ID'
-```
-
-The prerequisite and least-privilege role list is in
-[infrastructure/REQUIRED_GCP_ACCESS.md](infrastructure/REQUIRED_GCP_ACCESS.md).
-
-Useful independent gates:
-
-```powershell
-$env:GCP_PROJECT_ID = 'YOUR_PROJECT_ID'
-$env:GCP_REGION = 'europe-north2'
-$env:AGENT_RUNTIME_REGION = 'europe-west4'
-$env:BASTION_RUNTIME_AGENT_ENGINE_ID = 'YOUR_RUNTIME_ENGINE_ID'
-
-python -m infrastructure.verify_fleet
-python -m infrastructure.provision_observability
-python -m infrastructure.smoke_test
-python -m infrastructure.rollback       # dry-run candidates only
-python -m infrastructure.teardown       # dry-run plan only
-```
-
-Applying rollback requires an exact service and one of its two newest safe revisions. Applying
-teardown additionally requires `--confirm-project`; by design it preserves Firestore, secrets,
-Agent Runtime, and retained compliance logs.
-
-## Quality gates
-
-```powershell
 ruff check .
 ruff format --check .
 mypy agents gateway identity registry runtime model_armor observability infrastructure
@@ -436,67 +146,54 @@ python scripts/render_diagrams.py --check
 python scripts/redact_evidence.py --check
 node site/build.mjs
 python scripts/check_site.py
+npx markdownlint-cli2 "**/*.md"
 ```
 
-`check_docs.py` is not a linter. It fails the build when a document disagrees with the
-repository: a wrong pillar or agent count, an ADR that exists but is unindexed, a badge quoting a
-version that is not pinned, a hand-written status badge that would go stale, a retired deployment
-claim, a diagram whose numbers no longer match the live capture, or an animated packet drawn
-through a component. Every one of those rules exists because that exact mistake was made here
-once.
+The Python core suite has **336 tests** and 100% configured statement/branch coverage.
+Offline synthetic experiments and report tooling are outside that production core scope.
 
-CI holds no GCP **key**, and never will: `infrastructure/provision_wif.sh` federates GitHub
-Actions through Workload Identity, so a short-lived OIDC token is exchanged for a short-lived
-Google one. There is nothing to leak and nothing to rotate. The provider pins
-`assertion.repository` to one repository — Google accepts any token GitHub's issuer signs, and
-GitHub signs one for every repository on the platform, so that condition is the entire boundary.
+## Deployment and operations
 
-The federated identity may deploy **code** and may not change **authority**: `run.developer`
-rather than `run.admin`, and no role that can create a binding or alter Eventarc, Pub/Sub, the
-Agent Registry, Firestore, Secret Manager, or the audit bucket. It may act as the three workload
-identities and not as the approver identity, so a pipeline cannot approve the suppression of a
-finding. The Deploy workflow is `workflow_dispatch` only, because deploying a live
-access-governance fleet is a decision someone should make rather than a consequence of merging.
+Live work requires approved credentials, explicit project/quota values and the credits-only
+conditions in [AGENTS.md](AGENTS.md). The operator's default CLI project is not Bastion's.
+The [access prerequisites](infrastructure/REQUIRED_GCP_ACCESS.md) describe the required roles.
 
-**Configured 2026-08-22, not yet exercised.** The pool, provider and grants exist, and the
-boundary is verified twice over: the provider admits only `assertion.repository ==` this
-repository, and impersonation is bound to that same repository's `principalSet` rather than
-to the pool, so an error in either is caught by the other. The deployer holds the five roles
-above and cannot act as the approver identity. No deploy has run through this path yet, so
-nothing here is claimed as observed.
-
-## Repository map
-
-```text
-agents/                     three ADK agent definitions and managed Runtime entrypoint
-gateway/                    local policy contract and Cloud Run origin authentication
-identity/                   least-privilege workload manifest
-model_armor/                fail-closed input and deterministic output screening
-observability/              payload-free ADK audit plugin
-registry/                   department routing policy
-runtime/                    durable SQLite contract and Firestore production adapter
-infrastructure/             bootstrap, deploy, Gateway, Runtime, smoke, rollback, teardown
-scripts/                    live-state capture, docs/version/media gates, diagram renderer
-site/                       static public evidence console; no operational backend or GCP calls
-tests/                      unit, integration, security, and load suites
-assets/                     brand, architecture, and redacted evidence
-docs/                       architecture, governance, operations, ADRs; research/ holds the
-                            report plan, claim matrix and evidence ledgers
-experiments/minimisation/    synthetic offline evaluation; no product or live data path
-report/                     local uncommitted technical-report draft (not in release)
-archive/hackathon-2026/     frozen hackathon submission, demo media and their tooling
+```powershell
+.\infrastructure\bootstrap.ps1 `
+  -Project 'YOUR_PROJECT_ID' `
+  -MemoryAgentEngineId 'YOUR_MEMORY_ENGINE_ID' `
+  -RuntimeAgentEngineId 'YOUR_RUNTIME_ENGINE_ID'
 ```
 
-## Evidence and decisions
+Bootstrap provisions and deploys infrastructure and runs a live smoke test; it is not an
+offline verification command. A code-only Orchestrator update requires both Cloud Run
+(`infrastructure/deploy.sh`) and `python -m infrastructure.deploy_agent_runtime`.
 
-- [Architecture](docs/ARCHITECTURE.md) · [Data governance](docs/DATA_GOVERNANCE.md) ·
-  [Operations](docs/OPERATIONS.md) · [Security](SECURITY.md)
-- [Evidence index](assets/README.md) · [Claim matrix](docs/research/claim-matrix.md) ·
-  [Observation backlog](docs/research/observation-backlog.md) ·
-  [Audit remediation ledger](docs/research/remediation-ledger.md) ·
-  [Hackathon archive](archive/hackathon-2026/README.md)
-- Technical report (local draft) ·
-  [27 October validation and verified data](assets/evidence/14-live-validation.md)
+Cloud Run/data transport use `europe-north2`; managed agent services, screening and audit use
+`europe-west4`; Gemini uses Vertex AI `global`. Model processing has no end-to-end EU residency
+claim. Field handling and retention are in [Data governance](docs/DATA_GOVERNANCE.md).
+
+Firestore owns admission, leases, attempts and idempotency. Completed replays do not repeat work;
+failed attempts remain retryable. Pub/Sub's five-attempt dead-letter target is approximate:
+[E21](assets/evidence/21-redelivery-and-dead-letter.md) records one rejected event's five deliveries,
+not a guaranteed maximum or worker-timeout sequence. Cloud Run max instances is a scaling limit,
+not a monetary cap.
+
+[Operations](docs/OPERATIONS.md) documents objectives and dry-run-first rollback/teardown.
+Teardown preserves Firestore, secrets, Runtime/Memory and audit state by default. Residual
+resources and costs need an owner decision before applying the agreed end state.
+
+GitHub deployment uses Workload Identity Federation, no long-lived GCP key, and a manually
+dispatched workflow. Its configured authorization boundary is distinct from an observed
+deployment through that CI path; no such successful CI deployment is claimed here.
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md), [Security](SECURITY.md), [Data governance](docs/DATA_GOVERNANCE.md)
+- [Report plan](docs/research/report-plan.md), [claim matrix](docs/research/claim-matrix.md),
+  [audit](docs/research/evidence-audit-2026-11-04.md), [remediation ledger](docs/research/remediation-ledger.md)
+- [Observation/defect history](docs/research/observation-backlog.md), [evidence](assets/README.md),
+  [site instructions](site/README.md)
 - Architecture decisions — [index](docs/adr/README.md):
   [001 real IAM](docs/adr/001-real-iam-not-mock-data.md) ·
   [002 three agents](docs/adr/002-three-agents.md) ·
@@ -511,17 +208,14 @@ archive/hackathon-2026/     frozen hackathon submission, demo media and their to
   [011 inbound screening covers tool results](docs/adr/011-inbound-screening-covers-tool-results.md) ·
   [012 structured findings across A2A](docs/adr/012-structured-findings-across-a2a.md)
 
-## Trust statement
+## Limits and archive
 
-Bastion is read-only with respect to IAM. It can identify, explain, suppress under a current
-human exception, and request review; it cannot modify or revoke a binding. Raw production policy
-dumps, credentials, endpoint secrets, and unredacted findings are prohibited from Git and
-published evidence.
+Bastion can request review but cannot change IAM. It makes no legal-certification, immutable
+audit-storage, historical SLO or wall-clock-week-test claim. The audit bucket is retained but
+unlocked; configured alerts are not proof of delivered paging.
 
-It does not claim immutable audit storage, end-to-end EU model residency, legal certification,
-historical SLO attainment, or that a wall-clock week elapsed during testing. Those limits are
-part of the topology rather than disclaimers appended to it.
+The [hackathon archive](archive/hackathon-2026/README.md), gallery and fixed
+[video](https://youtu.be/Xpj8YmzFfpk) retain their submission dates. No award is claimed.
+Do not re-render embedded architecture assets during routine cleanup.
 
-Bastion was built for, and submitted to, the All Things Agentic Hackathon 2026; judging has closed
-and no award is claimed. It is not supported production software. Licensed under the
-[MIT License](LICENSE).
+Personal research software, without a support or patch SLA. [MIT License](LICENSE).

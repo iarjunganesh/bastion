@@ -18,8 +18,10 @@ attainment claims.
 ## Release procedure
 
 1. Run the Python 3.12 quality gates from the README.
-2. Deploy one immutable image to the four Cloud Run services.
-3. Configure Registry, Gateway, Runtime, IAM, DLQ, audit routing, metrics, alerts, and dashboard.
+2. Deploy one immutable image to the four Cloud Run services and update managed Runtime
+   separately when its graph/runtime source changes; `deploy.sh` alone does not do both.
+3. Verify the existing Registry, Gateway, Runtime, IAM, DLQ, audit and alert configuration;
+   reprovision authority only under an approved infrastructure change.
 4. Run `python -m infrastructure.verify_fleet` and `python -m infrastructure.smoke_test`.
 5. Capture only redacted counts/statuses in `assets/evidence/`.
 
@@ -31,5 +33,7 @@ secrets, managed Runtime/Memory, and audit logs. Applying teardown requires the 
 
 A handler admits an event before execution, owns a bounded lease, returns `503` for a concurrent
 or failed attempt so Eventarc retains delivery, and acknowledges an already-completed replay.
-Expired leases are reclaimable. Delivery stops after five attempts at the dead-letter review
-subscription. Dependency errors are audited by class without leaking response content.
+Expired leases are reclaimable. The dead-letter policy targets approximately five delivery
+attempts; it is not a hard cap. One rejected event was observed reaching review after five
+deliveries ([E21](../assets/evidence/21-redelivery-and-dead-letter.md)). Dependency errors
+are audited by class without leaking response content.

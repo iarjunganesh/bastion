@@ -61,7 +61,7 @@ tests pass. No SDK client, model dispatch or reliable cost enforcement exists ye
 the configured 100 SEK ceiling alone is not a working spend limiter. The config
 and validator use D3's 100 SEK total as their upper bound, not a fresh allocation
 for C4. Any future run needs a separately approved budget within the remaining
-total in the [report plan](../../docs/research/report-plan.md#decisions-for-the-maintainer).
+total in the [report plan](../../docs/research/report-plan.md#maintainer-decisions).
 C4 remains deferred under D2; generation stays disabled and no paid run is authorized.
 
 1. Finish batch ingestion and per-condition aggregation around the completed
