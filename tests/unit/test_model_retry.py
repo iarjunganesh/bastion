@@ -180,7 +180,7 @@ def test_the_access_auditor_uses_the_retrying_model():
 
 
 @pytest.mark.asyncio
-async def test_through_the_audited_runner_a_retry_is_attributed_and_screening_runs_once(
+async def test_through_the_audited_runner_a_retry_is_attributed_and_paired_once(
     monkeypatch, emitted, waits
 ):
     """End to end through ADK: the retry record carries the call's actor, invocation and
@@ -206,3 +206,146 @@ async def test_through_the_audited_runner_a_retry_is_attributed_and_screening_ru
     assert retry["actor"] == "probe"
     assert retry["investigation_id"] == investigation
     assert retry["invocation_id"] == model_records[0]["invocation_id"] != "unknown"
+
+
+# --- the production callbacks across a retry -------------------------------------------------
+
+
+def _counted(callback, calls: dict[str, int]):
+    """Wrap a production callback so the test can count how often ADK invokes it."""
+
+    def wrapper(*args, **kwargs):
+        calls[callback.__name__] = calls.get(callback.__name__, 0) + 1
+        return callback(*args, **kwargs)
+
+    return wrapper
+
+
+def _guarded_auditor(calls: dict[str, int]) -> LlmAgent:
+    """An agent wired with the Access Auditor's own screening and fidelity callbacks."""
+    from agents.access_auditor import agent as auditor
+    from model_armor import guardrails
+
+    return LlmAgent(
+        name="access_auditor",
+        model=model_retry.RetryingGemini(model="gemini-3.5-flash"),
+        before_model_callback=_counted(guardrails.screen_before_model, calls),
+        after_model_callback=[
+            _counted(guardrails.screen_after_model, calls),
+            _counted(auditor.validate_auditor_fidelity, calls),
+        ],
+    )
+
+
+async def _run(agent: LlmAgent) -> list:
+    runner = build_runner(agent)
+    session = await runner.session_service.create_session(app_name="bastion", user_id="u")
+    return [
+        event
+        async for event in runner.run_async(
+            user_id="u",
+            session_id=session.id,
+            new_message=types.Content(role="user", parts=[types.Part(text="audit the policy")]),
+        )
+    ]
+
+
+def _texts(events: list) -> list[str]:
+    return [
+        part.text
+        for event in events
+        if event.content and event.content.parts
+        for part in event.content.parts
+        if part.text
+    ]
+
+
+@pytest.fixture
+def armor(monkeypatch):
+    """Model Armor configured, with the screening call stubbed and its verdicts recorded."""
+    from model_armor import guardrails
+
+    monkeypatch.setenv("GCP_PROJECT_ID", "bastion-test-project")
+    monkeypatch.setenv("MODEL_ARMOR_TEMPLATE_ID", "bastion-guardrail")
+    verdicts: list[bool] = []
+
+    def screen(text, *, project_id, template_id):
+        return verdicts.pop(0) if verdicts else False
+
+    monkeypatch.setattr(guardrails, "screen_prompt", screen)
+    return verdicts
+
+
+@pytest.mark.asyncio
+async def test_screening_and_fidelity_run_once_across_a_recovered_retry(
+    monkeypatch, emitted, waits, armor
+):
+    seen = _script(monkeypatch, [_error(429), _answer("A broad role needs review.")])
+    calls: dict[str, int] = {}
+    events = await _run(_guarded_auditor(calls))
+    assert len(seen) == 2, "one rejected attempt, one recovered attempt"
+    assert calls == {
+        "screen_before_model": 1,
+        "screen_after_model": 1,
+        "validate_auditor_fidelity": 1,
+    }
+    assert "A broad role needs review." in _texts(events)
+    outcomes = [r["outcome"] for r in emitted() if r["event"] == "model.request"]
+    assert outcomes == ["submitted", "retrying", "completed"]
+
+
+@pytest.mark.asyncio
+async def test_blocked_input_makes_no_model_attempt(monkeypatch, emitted, waits, armor):
+    from model_armor import guardrails
+
+    armor.append(True)
+    seen = _script(monkeypatch, [_error(429), _answer()])
+    calls: dict[str, int] = {}
+    events = await _run(_guarded_auditor(calls))
+    assert seen == [] and waits == []
+    assert guardrails.BLOCKED_MESSAGE in _texts(events)
+    assert not any(r["outcome"] == "retrying" for r in emitted())
+
+
+@pytest.mark.asyncio
+async def test_a_blocked_response_stays_blocked_after_retry_recovery(
+    monkeypatch, emitted, waits, armor
+):
+    from model_armor import guardrails
+
+    leaked = "user:a.lee@example.com holds roles/owner"
+    _script(monkeypatch, [_error(503), _answer(leaked)])
+    calls: dict[str, int] = {}
+    events = await _run(_guarded_auditor(calls))
+    texts = _texts(events)
+    assert guardrails.BLOCKED_OUTPUT_MESSAGE in texts
+    assert not any("a.lee@example.com" in text for text in texts)
+    assert calls["screen_after_model"] == 1
+    assert "validate_auditor_fidelity" not in calls, "a withheld response has nothing to check"
+
+
+@pytest.mark.asyncio
+async def test_a_fabricated_report_is_still_rejected_after_retry_recovery(
+    monkeypatch, emitted, waits, armor
+):
+    from agents.access_auditor import agent as auditor
+
+    fabricated = json.dumps(
+        {
+            "findings": [
+                {
+                    "finding_id": "a" * 24,
+                    "department": "platform-infra",
+                    "reason": "broad_role",
+                    "risk_score": 9,
+                    "rationale": "Invented.",
+                }
+            ],
+            "count": 1,
+        }
+    )
+    _script(monkeypatch, [_error(429), _answer(fabricated)])
+    calls: dict[str, int] = {}
+    with pytest.raises(auditor.AuditorFidelityError):
+        await _run(_guarded_auditor(calls))
+    assert calls["validate_auditor_fidelity"] == 1

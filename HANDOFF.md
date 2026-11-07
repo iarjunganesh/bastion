@@ -29,7 +29,7 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   the template's set-up; the smoke Runtime check requires the completion confirmation; operator
   scripts are tested against the real SDK `Client`; receipts name their finding IDs and the
   completion gate compares them (deploy worker and Runtime together); a suite-wide isolation
-  guard refuses child processes and non-loopback network. 369 tests at 100% configured coverage. The
+  guard refuses child processes and non-loopback network. 373 tests at 100% configured coverage. The
   deployed fleet keeps the earlier behaviour; no GCP redeploy is planned or authorized.
 - **Documentation:** CHANGELOG `[Unreleased]` corrected (the completion fix was deployed on
   5 November) with a dated v0.8.0 known issue: the tag calls `Client.agent_engines`, absent from
@@ -142,6 +142,6 @@ override variable name; both failed and nothing changed. A suite-wide isolation 
 child processes and non-loopback network or DNS in every test (the suite needed no exemption).
 Receipts now name their finding IDs and the completion gate compares them; deploy both surfaces
 together.
-Gates: Ruff/format, mypy (41 files), 369 tests at 100% configured coverage, docs, versions, site,
+Gates: Ruff/format, mypy (41 files), 373 tests at 100% configured coverage, docs, versions, site,
 diagram, redaction, Markdown lint, 9 study cases and 16 report checks. No push, merge, deployment,
 paid probe, PDF rebuild or publication.
