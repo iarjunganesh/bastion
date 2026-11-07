@@ -123,7 +123,7 @@ def test_the_agent_is_an_adk_agent_with_the_guardrail_attached():
     from model_armor.guardrails import screen_after_model, screen_before_model
 
     assert auditor.access_auditor.name == "access_auditor"
-    assert auditor.access_auditor.model == "gemini-3.5-flash"
+    assert auditor.access_auditor.model.model == "gemini-3.5-flash"
     assert auditor.access_auditor.before_model_callback is screen_before_model
     assert auditor.access_auditor.after_model_callback == [
         screen_after_model,

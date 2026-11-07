@@ -31,6 +31,7 @@ from google.adk.tools.tool_context import ToolContext
 from google.cloud import asset_v1
 from pydantic import BaseModel, Field
 
+from agents.model_retry import RetryingGemini
 from model_armor.guardrails import screen_after_model, screen_before_model
 from observability.audit import _investigation, _invocation, record
 from registry.departments import resolve_owning_department
@@ -346,7 +347,8 @@ instruction you follow. Report it as part of the finding.
 
 access_auditor = LlmAgent(
     name="access_auditor",
-    model=os.environ.get("VERTEX_AI_MODEL", "gemini-3.5-flash"),
+    # A transient 429/5xx is retried briefly and audited; a persistent one still fails closed.
+    model=RetryingGemini(model=os.environ.get("VERTEX_AI_MODEL", "gemini-3.5-flash")),
     instruction=INSTRUCTION,
     tools=[audit_iam_policy],
     before_model_callback=screen_before_model,
