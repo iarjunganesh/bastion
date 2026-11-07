@@ -75,7 +75,7 @@ frozenlist==1.8.0
     # via
     #   aiohttp
     #   aiosignal
-google-adk==2.13.0
+google-adk==2.14.0
     # via -r requirements.txt
 google-api-core==2.43.0
     # via
@@ -379,7 +379,7 @@ mypy==2.3.1
     # via -r requirements-dev.txt
 mypy-extensions==1.1.0
     # via mypy
-opentelemetry-api==1.44.0
+opentelemetry-api==1.45.2
     # via
     #   -r requirements.txt
     #   fastapi
@@ -393,6 +393,7 @@ opentelemetry-api==1.44.0
     #   opentelemetry-exporter-gcp-logging
     #   opentelemetry-exporter-gcp-monitoring
     #   opentelemetry-exporter-gcp-trace
+    #   opentelemetry-exporter-http-transport
     #   opentelemetry-exporter-otlp-proto-http
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-google-genai
@@ -412,13 +413,17 @@ opentelemetry-exporter-gcp-trace==1.15.0
     # via
     #   -r requirements.txt
     #   google-adk
-opentelemetry-exporter-otlp-proto-common==1.44.0
+opentelemetry-exporter-http-transport==0.66b2
     # via opentelemetry-exporter-otlp-proto-http
-opentelemetry-exporter-otlp-proto-http==1.44.0
+opentelemetry-exporter-otlp-common==0.66b2
+    # via opentelemetry-exporter-otlp-proto-http
+opentelemetry-exporter-otlp-proto-common==1.45.2
+    # via opentelemetry-exporter-otlp-proto-http
+opentelemetry-exporter-otlp-proto-http==1.45.2
     # via
     #   google-adk
     #   google-cloud-agentplatform
-opentelemetry-instrumentation==0.65b0
+opentelemetry-instrumentation==0.66b2
     # via
     #   opentelemetry-instrumentation-google-genai
     #   opentelemetry-instrumentation-grpc
@@ -428,11 +433,11 @@ opentelemetry-instrumentation-google-genai==1.3b0
     # via
     #   google-adk
     #   google-cloud-agentplatform
-opentelemetry-instrumentation-grpc==0.65b0
+opentelemetry-instrumentation-grpc==0.66b2
     # via google-adk
-opentelemetry-instrumentation-httpx==0.65b0
+opentelemetry-instrumentation-httpx==0.66b2
     # via google-adk
-opentelemetry-proto==1.44.0
+opentelemetry-proto==1.45.2
     # via
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-http
@@ -443,7 +448,7 @@ opentelemetry-resourcedetector-gcp==1.14.0
     #   opentelemetry-exporter-gcp-logging
     #   opentelemetry-exporter-gcp-monitoring
     #   opentelemetry-exporter-gcp-trace
-opentelemetry-sdk==1.44.0
+opentelemetry-sdk==1.45.2
     # via
     #   -r requirements.txt
     #   google-adk
@@ -454,9 +459,10 @@ opentelemetry-sdk==1.44.0
     #   opentelemetry-exporter-gcp-logging
     #   opentelemetry-exporter-gcp-monitoring
     #   opentelemetry-exporter-gcp-trace
+    #   opentelemetry-exporter-otlp-common
     #   opentelemetry-exporter-otlp-proto-http
     #   opentelemetry-resourcedetector-gcp
-opentelemetry-semantic-conventions==0.65b0
+opentelemetry-semantic-conventions==0.66b2
     # via
     #   google-cloud-spanner
     #   opentelemetry-instrumentation
@@ -467,7 +473,7 @@ opentelemetry-semantic-conventions==0.65b0
     #   opentelemetry-util-genai
 opentelemetry-util-genai==1.3b0
     # via opentelemetry-instrumentation-google-genai
-opentelemetry-util-http==0.65b0
+opentelemetry-util-http==0.66b2
     # via opentelemetry-instrumentation-httpx
 packaging==26.3
     # via
@@ -621,6 +627,7 @@ requests==2.34.2
     #   google-cloud-bigquery
     #   google-cloud-storage
     #   google-genai
+    #   opentelemetry-exporter-http-transport
     #   opentelemetry-exporter-otlp-proto-http
     #   opentelemetry-resourcedetector-gcp
 rpds-py==2026.9.1

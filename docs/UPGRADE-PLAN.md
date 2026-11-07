@@ -1,12 +1,14 @@
 # ADK upgrade closeout
 
-Updated 6 November 2026. v0.8.0 was released as source on 28 October with one accepted
-OpenTelemetry advisory ([dependency status](DEPENDENCY-STATUS.md)). Source pins do not prove a
+Updated 7 November 2026. v0.8.0 was released as source on 28 October with one accepted
+OpenTelemetry advisory; v0.9.0 moves to ADK 2.14.0 and OpenTelemetry 1.45.2, which resolves it
+([dependency status](DEPENDENCY-STATUS.md)). Source pins do not prove a
 deployed resolution; [VERSIONS.md](VERSIONS.md) is the canonical provenance table.
 
 ## Completed
 
-- Dependency/contract validation targets Python 3.12, Google ADK 2.13.0 and A2A SDK 1.3.0.
+- Dependency/contract validation targets Python 3.12, Google ADK 2.14.0 and A2A SDK 1.3.0
+  (v0.9.0; the 5 November deployments ran `google-adk` 2.13.0).
 - Cohort N remained on the August deployment and was frozen before the upgrade.
 - On 5 November, one image updated four existing Cloud Run services and managed Runtime was
   updated separately. Image package assertions and configuration checks passed; the F pilot
@@ -20,7 +22,8 @@ deployed resolution; [VERSIONS.md](VERSIONS.md) is the canonical provenance tabl
 
 ## Current verification and remaining work
 
-1. The authorized documentation/site/report reconciliation and 14-page local PDF are complete.
+1. The 6 November reconciliation and local PDF are superseded by the 7 November review
+   remediation; the report's v0.9.0 edition is rebuilt once after cohort G.
    Preserve the audit corrections, collection disclosures and both separately sealed F records.
 2. The final offline gates passed; commands remain in [AGENTS.md](../AGENTS.md): core coverage, Ruff, mypy, docs/version,
    evidence redaction, diagram freshness, static site and Markdown checks. Check diagrams only;
@@ -32,6 +35,9 @@ deployed resolution; [VERSIONS.md](VERSIONS.md) is the canonical provenance tabl
 5. Public code, documentation and E24/E25 are published through
    [PR #9](https://github.com/iarjunganesh/bastion/pull/9), with merge authorized after hosted CI.
    Site build checks do not verify deployed Vercel bytes; report publication remains separate.
+   Vercel redeploys the console from `main`, so the PR #9 merge published its site changes: on
+   7 November the live footer matched commit `2a12f5f`. Treat every merge to `main` as a site
+   deployment; the maintainer kept this auto-deploy on 7 November.
 
 ## Boundaries for any later upgrade
 

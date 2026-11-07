@@ -138,7 +138,7 @@ def check_model_config() -> None:
         fail("README.md references gemini-3.5-pro, which is unavailable — see ADR-004")
 
 
-BADGE_DOCS = ("README.md", "archive/hackathon-2026/submission/DEVPOST_README.md")
+BADGE_DOCS = ("README.md",)
 
 
 def check_badge_versions() -> None:
@@ -148,10 +148,9 @@ def check_badge_versions() -> None:
     so a badge reading `Flask-3.1.3` over a requirements file pinning something else is
     exactly the small dishonesty this project cannot afford.
 
-    Both documents that carry badges are checked. `DEVPOST_README.md` is pasted verbatim into
-    the public Devpost description, so a stale version badge there is read by judges rather than
-    by contributors — the surface where being wrong costs the most, and the one nobody would
-    think to re-check.
+    The README's badges are current claims and are checked. The archived `DEVPOST_README.md` was
+    pasted into the Devpost description while judging was open; judging has closed, the archive is
+    frozen, and its badges record the 28 October state, so it is no longer held to today's pins.
     """
     pins = read("requirements.txt") + read("requirements-dev.txt")
     for document in BADGE_DOCS:

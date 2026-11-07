@@ -1,8 +1,14 @@
-# Dependency status — 28 October 2026
+# Dependency status — 7 November 2026
 
-v0.8.0 is released with **one accepted advisory**. Every other known vulnerability in the locked
-graph is fixed, and the CI audit fails on any new one. Removal is tracked in
+v0.9.0 has **no accepted advisory**. `google-adk` 2.14.0, published 7 November, admits
+`opentelemetry-api`/`sdk` 1.45.2, which fixes CVE-2026-114603. The lock moved only `google-adk`
+and the OpenTelemetry family; `pip-audit` reports no known vulnerability without any exception,
+and the CI audit and `make audit-dependencies` no longer skip an ID. This closes
 [issue #3](https://github.com/iarjunganesh/bastion/issues/3).
+
+## v0.8.0 acceptance (28 October 2026, superseded)
+
+v0.8.0 was released with **one accepted advisory**:
 
 | Package | Locked | Advisory | Fixed in | Why it stays |
 |---|---|---|---|---|
@@ -32,7 +38,7 @@ then relock and re-audit; check again before any redeploy of the fleet.
 
 ## How the lock got here
 
-The first CI audit of the ADK 2.13.0 upgrade found several vulnerable transitive packages. The
+The first CI audit of the `google-adk` 2.13.0 upgrade found several vulnerable transitive packages. The
 refreshed universal Python 3.12 lock updated them, removed unused ADK evaluation extras from the
 shipped fleet and raised the media dependency to Pillow 13.0.0, leaving only the advisory above.
 No requirement metadata was edited, no `--no-deps` install was used and no incompatible resolver

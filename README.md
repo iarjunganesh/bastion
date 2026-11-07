@@ -25,7 +25,7 @@
 [![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)](https://youtu.be/Xpj8YmzFfpk)
 
 <!-- Row 2 — what Bastion is actually built on, plus the program badge earned before it. -->
-[![Google ADK 2.13.0](https://img.shields.io/badge/Google_ADK-2.13.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
+[![Google ADK 2.14.0](https://img.shields.io/badge/Google_ADK-2.14.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
 [![A2A SDK](https://img.shields.io/badge/A2A_SDK-1.3.0-1A73E8)](https://github.com/a2aproject/a2a-python)
 [![Gemini Enterprise Agent Ready](https://img.shields.io/badge/GEAR-Gemini_Enterprise_Agent_Ready-4285F4?logo=google&logoColor=white)](https://developers.google.com/profile/badges/community/gear?u=iarjunganesh)
 
@@ -109,12 +109,13 @@ The [claim matrix](docs/research/claim-matrix.md) bounds each claim; the
 - The 6 November daily billing check passed for currently reported usage; exact per-chunk currency
   attribution and late postings remain bounded. Current balances and reservations stay private.
 - [Version provenance](docs/VERSIONS.md) separates source pins, image assertions and unreadable
-  Runtime installed packages. v0.8.0 remains the 28 October source release with its
-  [accepted dependency advisory](docs/DEPENDENCY-STATUS.md).
+  Runtime installed packages. v0.9.0 is the 7 November source release on ADK 2.14.0, which
+  resolves the advisory accepted at v0.8.0 ([dependency status](docs/DEPENDENCY-STATUS.md)).
 
-The technical report is local in `report/`, uncommitted and outside the release. The final
-14-page local edition and cited-source snapshot were prepared on 6 November. The agreed fleet end state remains 8–10 November,
-dry run first; publication and site deployment are separate actions.
+The technical report is local in `report/`, uncommitted and outside the release. Its v0.9.0
+edition is rebuilt once after cohort G. The agreed fleet end state remains 8–10 November,
+dry run first. Report publication is a separate action. The public console redeploys from
+`main`, by maintainer decision: merging a PR publishes its `site/` changes.
 
 ## A boundary failure worth testing
 
@@ -153,7 +154,7 @@ python scripts/check_site.py
 npx markdownlint-cli2 "**/*.md"
 ```
 
-The Python core suite has **336 tests** and 100% configured statement/branch coverage.
+The Python core suite has **360 tests** and 100% configured statement/branch coverage.
 Offline synthetic experiments and report tooling are outside that production core scope.
 
 ## Deployment and operations

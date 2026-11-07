@@ -240,6 +240,23 @@ def _fidelity_mismatch(canonical: Any, reported: list[Any], reported_count: Any)
     return None
 
 
+# `AuditReport` ignores unknown keys, and the relayed answer is the model's raw text rather than
+# the validated object. An extra key is therefore carried verbatim into the next A2A hop, where
+# a top-level `departments` would look like routing to the Escalation Agent. Refuse it here.
+_REPORT_FIELDS = frozenset(AuditReport.model_fields)
+_FINDING_FIELDS = frozenset(StructuredFinding.model_fields)
+
+
+def _has_unexpected_field(report: dict[str, Any]) -> bool:
+    """Whether the answer carries a key `AuditReport` does not define, at either level."""
+    if set(report) - _REPORT_FIELDS:
+        return True
+    return any(
+        isinstance(finding, dict) and bool(set(finding) - _FINDING_FIELDS)
+        for finding in report["findings"]
+    )
+
+
 class AuditorFidelityError(RuntimeError):
     """Raised when the Auditor's structured answer does not match the tool's findings.
 
@@ -287,8 +304,12 @@ def validate_auditor_fidelity(
     if not isinstance(data, dict) or not isinstance(data.get("findings"), list):
         return None
 
-    reason = _fidelity_mismatch(
-        callback_context.state.get(CANONICAL_FINDINGS_KEY), data["findings"], data.get("count")
+    reason = (
+        "unexpected_field"
+        if _has_unexpected_field(data)
+        else _fidelity_mismatch(
+            callback_context.state.get(CANONICAL_FINDINGS_KEY), data["findings"], data.get("count")
+        )
     )
     if reason is None:
         return None

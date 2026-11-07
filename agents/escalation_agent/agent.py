@@ -159,19 +159,28 @@ class RoutingEnvelopeError(RuntimeError):
 # the routing JSON, but wrapped in this prefix, so a bare `json.loads` on the raw text silently
 # failed and was swallowed as "not JSON, skip". Stripped before parsing, not worked around by
 # looking somewhere else -- the content channel was always the right one.
-_SAID_PREFIX = re.compile(r"\A\[[^\]\n]*\]\s*said:\s*", re.DOTALL)
+_SAID_PREFIX = re.compile(r"\A\[([^\]\n]*)\]\s*said:\s*", re.DOTALL)
+
+# The one Orchestrator step whose attributed routing this worker may act on
+# (`agents/orchestrator/agent.py` `policy_step`). Duplicated as a literal for the same reason as
+# `POLICY_ROUTING_KEY`. The relayed history also carries the Access Auditor's model-written reply,
+# *before* the policy step's; shape validation alone cannot tell the two apart, so attribution
+# does. Bare JSON is still accepted: in a relayed history only the caller's own `user` turn is
+# unattributed, and a direct caller is bounded by the worker-origin credential, not by this text.
+POLICY_STEP_AUTHOR = "policy_step"
 
 
 def _parse_json_object(text: str) -> Any:
-    """Parse `text` as JSON, tolerating ADK's `"[agent] said: <json>"` history wrapping."""
+    """Parse bare JSON, or JSON the policy step said; refuse anything another agent said."""
     try:
         return json.loads(text)
     except ValueError:
         pass
-    stripped = _SAID_PREFIX.sub("", text, count=1)
-    if stripped == text:
+    attribution = _SAID_PREFIX.match(text)
+    if attribution is None or attribution.group(1) != POLICY_STEP_AUTHOR:
         return None
-    # ADK 2.13 quotes relayed text as data. Recover only an exact, complete block;
+    stripped = text[attribution.end() :]
+    # ADK 2.13+ quotes relayed text as data. Recover only an exact, complete block;
     # the deterministic envelope validator still controls every delivery field.
     begin = "<<<BEGIN_QUOTED_AGENT_CONTENT>>>\n"
     end = "\n<<<END_QUOTED_AGENT_CONTENT>>>"
@@ -184,8 +193,12 @@ def _parse_json_object(text: str) -> Any:
 
 
 def _content_json(content: Any) -> Any:
-    """A JSON object with a `"departments"` key out of one `Content`'s text parts, or `None`."""
-    for part in getattr(content, "parts", None) or []:
+    """The latest JSON object with a `"departments"` key in one `Content`'s text parts, or `None`.
+
+    Latest, not first: the relayed history is chronological, and the routing decision is the
+    policy step's most recent word on this investigation.
+    """
+    for part in reversed(getattr(content, "parts", None) or []):
         text = getattr(part, "text", None)
         if not text:
             continue
@@ -313,6 +326,9 @@ class EscalationAgent(BaseAgent):
                 {
                     "department": department["department"],
                     "accepted_count": department["finding_count"],
+                    # Which findings, not only how many: the completion gate compares these with
+                    # the routing it computed, so a same-count substitution cannot confirm.
+                    "finding_ids": department["finding_ids"],
                     "outcome": "delivered" if result.get("delivered") else "skipped",
                 }
             )

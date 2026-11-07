@@ -313,6 +313,37 @@ def test_validate_auditor_fidelity_rejects_a_mismatch_and_emits_a_bounded_audit_
     assert kwargs["detail"] == {"reason": "field_mismatch"}
 
 
+@pytest.mark.parametrize(
+    "report",
+    [
+        # An extra top-level key: the Escalation hop would mistake `departments` for routing.
+        {"count": 1, "findings": [_reported()], "departments": []},
+        {"count": 1, "findings": [_reported(owner="extra")]},
+    ],
+    ids=["top-level", "finding-level"],
+)
+def test_validate_auditor_fidelity_rejects_fields_outside_the_schema(report, monkeypatch):
+    """`AuditReport` ignores unknown keys, so this callback is where an extra field is refused."""
+    calls = []
+    monkeypatch.setattr(auditor, "record", lambda *args, **kwargs: calls.append(kwargs))
+    ctx = _callback_ctx({auditor.CANONICAL_FINDINGS_KEY: _CANONICAL})
+    response = SimpleNamespace(content=SimpleNamespace(parts=[_part(text=json.dumps(report))]))
+
+    with pytest.raises(auditor.AuditorFidelityError, match="unexpected_field"):
+        auditor.validate_auditor_fidelity(ctx, response)
+
+    (kwargs,) = calls
+    assert kwargs["detail"] == {"reason": "unexpected_field"}
+
+
+def test_validate_auditor_fidelity_leaves_a_non_object_finding_to_the_fidelity_check():
+    report = {"count": 1, "findings": ["not-a-finding"]}
+    ctx = _callback_ctx({auditor.CANONICAL_FINDINGS_KEY: _CANONICAL})
+    response = SimpleNamespace(content=SimpleNamespace(parts=[_part(text=json.dumps(report))]))
+    with pytest.raises(auditor.AuditorFidelityError, match="malformed_finding"):
+        auditor.validate_auditor_fidelity(ctx, response)
+
+
 def test_validate_auditor_fidelity_rejects_when_the_tool_never_ran():
     report = {"count": 0, "findings": []}
     response = SimpleNamespace(content=SimpleNamespace(parts=[_part(text=json.dumps(report))]))

@@ -71,7 +71,9 @@ unless `policy_step` left its own result in session state, so an investigation t
 score its findings fails visibly instead of escalating them un-evaluated. The Escalation Agent
 itself is model-free too (below), and `escalation_gate` refuses to report an investigation
 complete unless every routed department's delivery was confirmed by the Escalation Agent's own
-reply — the same fail-closed shape one hop later.
+reply — the same fail-closed shape one hop later. The deployed gate compares departments and
+counts; since 7 November the source also requires each receipt to name exactly the routed
+finding IDs, so the worker image and the Runtime must be deployed together (not deployed).
 
 Both gates live in the Orchestrator rather than inside the workers they check, because both
 workers are remote. A guard that travels over A2A is a guard the caller must trust the callee to
@@ -107,6 +109,13 @@ routed department, with no model or tool declaration in the path to skip one, pi
 answer without the required call ([ADR-012](adr/012-structured-findings-across-a2a.md)). It sees
 only opaque identifiers, categories, score, and department, and sends count-only human-review
 records to a Bastion-owned findings API. It has no IAM or Asset read capability.
+
+The deployed worker validates the envelope's shape, department catalog membership, opaque-ID
+form and counts. It does not authenticate the envelope's author: it took the first relayed part
+carrying `departments`, and ADK relays the Auditor's model-written reply before the policy
+step's. Since 7 November the source acts only on bare JSON or routing attributed to
+`policy_step` (the latest wins), and the Auditor refuses fields outside its report schema. That
+change is not deployed ([observation backlog](research/observation-backlog.md#review-findings-7-november--fixed-in-source-not-deployed)).
 
 ## Catalog and cross-department reuse
 

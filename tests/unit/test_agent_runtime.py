@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock
+import os
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -42,3 +43,43 @@ def test_runtime_registers_the_agent_and_audit_plugin():
     assert template["agent"] is runtime.root_agent
     assert template["plugins"][0].name == "bastion-audit"
     assert template["enable_tracing"] is True
+    assert isinstance(runtime.app, runtime.GovernedAdkApp)
+
+
+def _set_up_offline(app, monkeypatch) -> None:
+    """Run the installed template's real `set_up()` with only its network edges replaced."""
+    from vertexai.agent_engines.templates import adk as template
+
+    monkeypatch.setattr(template, "_warn_if_telemetry_api_disabled", lambda: None)
+    monkeypatch.setattr(template, "_default_instrumentor_builder", lambda *a, **k: None)
+    monkeypatch.setattr(runtime, "VertexAiSessionService", MagicMock())
+    monkeypatch.setattr(runtime, "VertexAiMemoryBankService", MagicMock())
+    app.set_up()
+
+
+def test_runtime_tracing_keeps_message_content_out_of_spans(monkeypatch):
+    """The stock template turns span content on with `enable_tracing=True`; ours turns it off.
+
+    The deployment sets `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS=false`, but the template's
+    `set_up()` overwrote it with "true" because `enable_tracing=True` is its legacy content
+    opt-in. ADK reads the variable whenever it traces a model or tool call, so the override was
+    effective. Tracing itself must stay on (evidence 13 and 19 rely on sampled traces).
+    """
+    from vertexai.agent_engines import AdkApp
+
+    environment = {
+        "GOOGLE_CLOUD_PROJECT": "bastion-test-project",
+        "AGENT_RUNTIME_REGION": "europe-west4",
+        "BASTION_MEMORY_AGENT_ENGINE_ID": "memory-engine-1",
+        "ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS": "false",
+    }
+    with patch.dict(os.environ, environment):
+        stock = AdkApp(agent=runtime.root_agent, enable_tracing=True)
+        _set_up_offline(stock, monkeypatch)
+        assert os.environ["ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS"] == "true"
+
+        governed = runtime.app.clone()
+        assert isinstance(governed, runtime.GovernedAdkApp)
+        _set_up_offline(governed, monkeypatch)
+        assert os.environ["ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS"] == "false"
+        assert governed._tracing_enabled() is True

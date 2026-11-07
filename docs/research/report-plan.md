@@ -1,6 +1,6 @@
 # Technical report plan
 
-Updated 6 November 2026. [HANDOFF.md](../../HANDOFF.md) records current session state;
+Updated 7 November 2026. [HANDOFF.md](../../HANDOFF.md) records current session state;
 [AGENTS.md](../../AGENTS.md) governs architecture, privacy and operator authorization.
 
 ## Scope and current state
@@ -15,7 +15,7 @@ the synthetic harness has no results and generation remains disabled.
 | Original F, 5 Nov | Both surfaces updated; one pilot failed closed on a routing-parser incompatibility ([E24](../../assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)) |
 | Separate corrected recovery, 5 Nov | Five normal cases, direct confirmation control and two replays passed; refusal join verified read-only after a collector false positive ([E25](../../assets/evidence/25-corrected-cohort-F-verification.md)) |
 | Billing, 6 Nov | Daily reported-usage check passed, corroborated by the supplied CSV; balances/expiry refreshed privately. Final per-chunk cost and late postings remain bounded |
-| Report, 6 Nov | Authorized final reconciliation and simplification complete; 14-page local PDF generated and visually reviewed. The earlier build hold is superseded; keep `report/` uncommitted |
+| Report, 6–7 Nov | Authorized final reconciliation complete; 14-page local PDF generated on 6 Nov. The 7 Nov independent review's corrections are applied to the sources; one rebuild follows the remediation merge. Keep `report/` uncommitted |
 | Fleet end state | Still scheduled for 8–10 Nov, dry run first, before 11 Nov; no shutdown has been claimed |
 
 The original F failure, recovery and N remain separate. Runtime did not change during recovery;
@@ -28,7 +28,7 @@ collection disclosures bound the report; a passing batch is not a reliability ra
 |---|---|
 | D1 | Freeze primary cohort N before the upgrade; report post-upgrade F separately |
 | D2 | Defer C4 to a later study. Injection fixtures exist; missing-workflow-step cases remain planned |
-| D3 | Per-chunk approval with a written cost/count cap and stop rules, within the 100 SEK total upper bound. One daily billing check replaces a per-chunk overnight wait. Reserve unposted prior chunks conservatively |
+| D3 | Per-chunk approval with a written cost/count cap and stop rules, within the total upper bound: 100 SEK, raised to 400 SEK on 7 Nov for cohort G (200 SEK chunk cap). One daily billing check replaces a per-chunk overnight wait. Reserve unposted prior chunks conservatively |
 | D4 | Reach the agreed fleet end state on 8–10 Nov, before 11 Nov. Dry run first; owner chooses export/removal/accepted costs for residual resources |
 | D5 | Report publication reference, tag/DOI and release remain open. Public source integration is authorized on 6 Nov via [PR #9](https://github.com/iarjunganesh/bastion/pull/9) |
 
@@ -72,6 +72,6 @@ The exact F/recovery protocols, approval/admission receipts and collector source
 separately under `.local/measurements/`. The full pre-sweep dirty tree/report snapshot is retained
 privately; shortening this active plan does not retroactively change an executed protocol.
 
-v0.8.0 remains the 28 October source release. Dependency acceptance and later production
+v0.8.0 is the 28 October source release; v0.9.0 is the 7 November release that cohort G deploys. Dependency acceptance and later production
 provenance are recorded once in [DEPENDENCY-STATUS](../DEPENDENCY-STATUS.md) and
 [VERSIONS](../VERSIONS.md); the [upgrade plan](../UPGRADE-PLAN.md) is its closeout checklist.

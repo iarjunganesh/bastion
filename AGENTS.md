@@ -16,12 +16,17 @@ Read HANDOFF.md next, then docs/research/report-plan.md and docs/UPGRADE-PLAN.md
   in `report/` as explicitly requested; exclude report sources/build tools from release commits.
 - Prepare the control matrix before paid execution; record a numeric study budget and stop rules.
   Credit availability alone is not a per-run spending cap. Previous study authorization is spent.
+- The 7 November maintainer decisions authorize the review remediation, the `google-adk`
+  2.14.0/OpenTelemetry 1.45.2 bump, release v0.9.0 (merge with a merge commit, then tag), keeping
+  Vercel's auto-deploy from `main`, and cohort G on the v0.9.0 tag under a written protocol: a
+  200 SEK credits-only chunk cap within a D3 total raised to 400 SEK. GitHub repository settings
+  (branch protection, auto-delete, merge methods) stay unchanged.
 
 ## Project and current state
 
 Bastion is a three-agent, read-only GCP IAM-review fleet and technical-report case study.
-The source pins Google ADK 2.13.0/A2A SDK 1.3.0 on Python 3.12. The core suite has
-336 tests with 100% configured statement and branch coverage. [VERSIONS](docs/VERSIONS.md)
+The source pins Google ADK 2.14.0/A2A SDK 1.3.0 on Python 3.12. The core suite has
+360 tests with 100% configured statement and branch coverage. [VERSIONS](docs/VERSIONS.md)
 separates source pins, measured/asserted Cloud Run packages and unreadable Runtime resolution.
 
 Cohort N is frozen on the August deployment. On 5 November both surfaces were updated, but F's
@@ -29,7 +34,8 @@ first pilot failed closed on an Escalation parser incompatibility ([E24](assets/
 Separate corrected recovery passed its bounded controls; the refusal join uses a read-only
 addendum after a collector false positive ([E25](assets/evidence/25-corrected-cohort-F-verification.md)).
 Runtime stayed unchanged during recovery. Daily reported-usage billing passed on 6 November;
-private values, late-posting and attribution limits stay in the credit record. No F rerun is planned.
+private values, late-posting and attribution limits stay in the credit record. No F rerun is planned;
+cohort G on the v0.9.0 tag is a separate, separately approved cohort.
 
 Report sources are canonical in `report/` and remain uncommitted. The 6 November request
 authorizes final reconciliation, careful documentation simplification and one local PDF,
@@ -79,7 +85,7 @@ The study is outside shipped runtime code, core coverage and mypy scope.
 ## Regions and versions
 
 - Python 3.12 everywhere: CI, release, Docker, Runtime, commands, and docs.
-- Google ADK 2.13.0 and A2A SDK 1.3.0 are pinned. Historical captures retain their
+- Google ADK 2.14.0 and A2A SDK 1.3.0 are pinned. Historical captures retain their
   actual package versions. Only fresh verification of both deployment surfaces can
   establish an upgraded-production claim; see docs/VERSIONS.md.
 - `GCP_REGION=europe-north2` for Cloud Run/data transport.
@@ -136,7 +142,10 @@ a separate deployment surface updated only by `python -m infrastructure.deploy_a
 (idempotent against the existing `BASTION_RUNTIME_AGENT_ENGINE_ID`). Observed 2026-08-23: changing
 `build_sub_agents()` to add a fifth step and redeploying only via `deploy.sh` left the Runtime
 silently running the old four-step graph — no error, `investigation.run` still reported
-`completed`. After any change to `agents/orchestrator/agent.py` or `runtime.py`, run both:
+`completed`. After any change to `agents/orchestrator/agent.py` or `runtime.py`, run both.
+Since 7 November the Escalation worker's receipts and the completion gate share a contract
+(each receipt names its routed finding IDs): a worker or Runtime deployed without the other
+fails every investigation closed, so deploy both surfaces together:
 
 ```powershell
 bash infrastructure/deploy.sh

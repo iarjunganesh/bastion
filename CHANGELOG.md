@@ -12,15 +12,76 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ## [Unreleased]
 
-### Fixed — completion is confirmed, not inferred
+## [0.9.0] - 2026-11-07
+
+Source release after an independent review. It carries the completion and parser fixes
+deployed on 5 November, the review's source-only hardening and the move to ADK 2.14.0, which
+resolves the advisory accepted at v0.8.0. The tag is not itself a deployment: cohort G deploys
+this exact tag and records its own evidence. The 5 November deployments ran `google-adk` 2.13.0.
+
+### Fixed — completion is confirmed, not inferred (deployed 5 November)
 
 - Durable ingress records an investigation completed only when the Runtime stream carries the
   completion gate's confirmation. An empty or cut-off stream now fails the investigation so
   Eventarc redelivers it. Observed 3 November 2026: one of 28 investigations was recorded
   completed with no work done ([evidence 19](assets/evidence/19-repeatability-and-false-completion.md)).
-  Source only; the deployed fleet changes after the 8 November evidence freeze.
+  Deployed on 5 November with the upgraded fleet: the first pilot failed closed
+  ([evidence 24](assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)) and the
+  separately corrected recovery passed its bounded controls
+  ([evidence 25](assets/evidence/25-corrected-cohort-F-verification.md)).
 - Model Armor and protected-data refusal records carry the forwarded investigation ID, so a
-  refusal joins its investigation in one hop ([evidence 18](assets/evidence/18-model-armor-refusal-reprobe.md)).
+  refusal joins its investigation in one hop. Deployed on 5 November; evidence 25 verifies the
+  direct join through a read-only addendum ([evidence 18](assets/evidence/18-model-armor-refusal-reprobe.md)
+  keeps the earlier two-hop join).
+
+### Fixed — upgraded SDK compatibility (deployed 5 November)
+
+- Operator and dispatcher code uses the Agent Platform SDK's `Client.runtimes` surface. The
+  v0.8.0 tag called `Client.agent_engines`, which its own pinned `google-cloud-agentplatform`
+  2.6.0 does not provide (see the 0.8.0 known issue below).
+- The Escalation Agent accepts one exact, complete ADK 2.13 quoted-content block after the
+  attribution, then applies the unchanged deterministic envelope validation. Its absence stopped
+  the first post-upgrade pilot (evidence 24); the corrected recovery deployed only this change.
+
+### Fixed — source only, after the final deployment (not deployed)
+
+- The Escalation Agent acts only on bare JSON or routing attributed to `policy_step`, taking the
+  latest. ADK relays the Auditor's model-written reply first, and the worker previously took the
+  first part carrying `departments` from any author. The Auditor's fidelity callback now refuses
+  fields outside `AuditReport`. The deployed worker validates shape, catalog membership and
+  counts, not provenance.
+- The Runtime app restores `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS=false` after the managed
+  template's set-up, which turns span content on whenever `enable_tracing=True`. The deployed
+  Runtime makes no model or tool call, so no content reached a span.
+- The smoke Runtime check requires the completion gate's confirmation instead of any streamed
+  event. Operator scripts are tested against the real SDK `Client`; the deploy environment
+  declares the SDK's implicit telemetry variable.
+- Escalation receipts name the finding IDs delivered per department, and the completion gate
+  requires them to equal the routed IDs, so a same-count substitution cannot confirm. A worker
+  or Runtime deployed without the other fails closed; deploy both surfaces together.
+
+### Changed — test isolation
+
+- A suite-wide guard refuses child processes and non-loopback network or DNS and fails the test
+  that tried. On 7 November a new test with a wrong override variable let an operator module run
+  two read-only `gcloud run services describe` calls for a non-existent project; both failed and
+  nothing changed. The suite needed no exemption.
+
+### Changed — ADK 2.14.0 resolves the accepted advisory
+
+- `google-adk` moves to 2.14.0 (published 7 November), which admits OpenTelemetry 1.45.2, the
+  fix for CVE-2026-114603. Only `google-adk` and the OpenTelemetry family moved in the lock;
+  `pip-audit` reports no known vulnerability, so the audit exception is removed. Release-note
+  breaking changes were checked against Bastion's path ([ADR-005](docs/adr/005-adk-as-the-agent-framework.md)).
+- The version gate no longer requires dated records (the frozen archive, evidence pages and
+  the generated manuscript) to name today's pins.
+
+### Added — cohort F, audit and provenance
+
+- Evidence 23: the 28 October census and the August image's installed packages.
+- Evidence 24 and 25: the upgraded deployment and stopped pilot, and the separately corrected
+  recovery with its collector false positive and read-only refusal addendum.
+- The 4–5 November retained-evidence audit, including the E19 median correction.
 
 ### Added — cohort N evidence
 
@@ -52,7 +113,7 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ### Changed — ADK source upgrade and shared continuity
 
-- Target Google ADK 2.13.0, A2A SDK 1.3.0, Google Cloud AI Platform/Agent Platform 2.6.0,
+- Target `google-adk` 2.13.0, A2A SDK 1.3.0, Google Cloud AI Platform/Agent Platform 2.6.0,
   and Model Armor client 0.7.3; refresh the universal Python 3.12 dependency lock.
   Remove unused evaluation-only extras from the shipped fleet and update Pillow to 13.0.0.
   One OpenTelemetry advisory (CVE-2026-114603) remains because every ADK release caps
@@ -102,6 +163,15 @@ hackathon-era release plan is archived with the rest of the submission material.
 - The console's proof strip read **52** live bindings, the earlier evidence 09 measurement, while
   the README and console summary quote the current-route **62** from evidence 11. The strip now
   reads 62, dated 25 Aug, independently of the separately dated resource-inventory timestamp.
+
+### Known issue — recorded 7 November 2026
+
+- The tag is a source snapshot and is not deployable as tagged. Its dispatcher, Runtime deploy,
+  Runtime configuration and smoke paths call `Client.agent_engines`, which its pinned
+  `google-cloud-agentplatform` 2.6.0 does not provide; each raises `AttributeError`. Its tests
+  passed because a hand-written client double supplied the attribute, and strict mypy treats the
+  untyped `Client` as `Any`. The 5 November deployments used later source with the corrected
+  `Client.runtimes` calls ([version provenance](docs/VERSIONS.md)).
 
 ## [0.7.0] — 2026-08-29
 

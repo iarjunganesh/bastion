@@ -9,7 +9,7 @@ Access Auditor still is. **Amended 2026-08-27** — version raised to 2.8.0 for 
 
 ## Decision
 
-Bastion's three agents are **ADK agents** (`google-adk==2.13.0`). ADK owns the agent
+Bastion's three agents are **ADK agents** (`google-adk==2.14.0`). ADK owns the agent
 definition, the tool-calling loop, and the session and memory service interfaces
 ([ADR-003](003-pillars-on-geap.md)). The GenAI SDK, Antigravity SDK, and Genkit are not used.
 
@@ -92,9 +92,9 @@ are what an injected instruction would try to redirect. That is
 [ADR-007](007-tool-poisoning.md), a consequence of this decision rather than an independent
 idea.
 
-ADK 2.13.0 accepts `opentelemetry-api`/`sdk` through 1.44. v0.8.0 uses the 1.44.0 pair
-with the explicitly accepted advisory in [dependency status](../DEPENDENCY-STATUS.md).
-ADK changes its default GenAI trace schema in this release;
+ADK 2.14.0 accepts `opentelemetry-api`/`sdk` through 1.45.2. v0.9.0 uses the 1.45.2 pair,
+which fixes the advisory v0.8.0 accepted on the 1.44.0 pair ([dependency status](../DEPENDENCY-STATUS.md)).
+ADK changed its default GenAI trace schema at 2.13.0;
 new traces must be reviewed rather than assumed identical to the August captures.
 
 **ADK ships FastAPI, Starlette and uvicorn.** Bastion's Flask surfaces were competing with the
@@ -200,7 +200,18 @@ is all it ever did.
 
 ## 28 October upgrade
 
-The source target is Google ADK 2.13.0 with A2A SDK 1.3.0 and Google Cloud AI Platform
+The source target was `google-adk` 2.13.0 with A2A SDK 1.3.0 and Google Cloud AI Platform
 2.6.0. Local dependency/contract verification and both deployment surfaces must pass before
 claiming the new production resolution. See [VERSIONS.md](../VERSIONS.md) and
 [UPGRADE-PLAN.md](../UPGRADE-PLAN.md). The dated decisions above remain historical records.
+
+## 7 November upgrade
+
+The source target is Google ADK 2.14.0 (published 7 November) with OpenTelemetry 1.45.2; A2A SDK
+1.3.0 and Agent Platform/AI Platform 2.6.0 are unchanged. The lock moved only `google-adk` and the
+OpenTelemetry family. The release notes' breaking changes were checked against Bastion's path: the
+Runtime template calls `VertexAiSessionService.create_session` with `app_name`, `user_id`,
+`session_id` and `state` only; the Auditor's `output_schema` agent has its own tool, so the
+`set_model_response` change does not apply; no tool takes an `Enum` argument. The full suite passed
+unchanged, including the tests that use ADK's real quoted-content fencing, A2A message builder,
+event serializers and plugin callback order. Cohort G is the first deployment of this version.
