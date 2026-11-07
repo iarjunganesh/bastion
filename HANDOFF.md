@@ -5,6 +5,16 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Current state — 7 November 2026
 
+- **Night of 7 November (uncommitted; records in `.local/measurements/2026-11-07-G` and `-H`):**
+  cohort G deployed v0.9.0 (one build, amendment A1 for a stale keep-alive resume) and stopped at
+  G5 on an observation-read failure (`collector_RetryError`; 4 validated). Cohort H reused G's fleet
+  with bounded read retries (none were needed) and stopped at H28 (`unexpected_retry_or_failure`;
+  27 validated): the Access Auditor's model call got `429 RESOURCE_EXHAUSTED`, the Orchestrator
+  failed closed (`PolicyNotEnforcedError`), and Pub/Sub redelivery completed attempt 2. Both are
+  stopped with no rerun and not pooled. The maintainer chose (7 November, 23:2x local) to fix this
+  the production way: v0.9.1 adds a bounded, audited retry of transient model errors to the
+  Access Auditor, and cohort I deploys v0.9.1 and repeats the design with model retries counted,
+  not stops. Then E26, one docs PR, the 8 November billing check, the report edition, and D4.
 - **v0.9.0 release prepared** on branch `fix/review-remediation-2026-11-07`: the review
   remediation, `google-adk` 2.14.0 with OpenTelemetry 1.45.2 (the v0.8.0 advisory is resolved;
   `pip-audit` clean with no exception) and the full documentation sweep. The maintainer approved,
@@ -19,7 +29,7 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   the template's set-up; the smoke Runtime check requires the completion confirmation; operator
   scripts are tested against the real SDK `Client`; receipts name their finding IDs and the
   completion gate compares them (deploy worker and Runtime together); a suite-wide isolation
-  guard refuses child processes and non-loopback network. 360 tests at 100% configured coverage. The
+  guard refuses child processes and non-loopback network. 369 tests at 100% configured coverage. The
   deployed fleet keeps the earlier behaviour; no GCP redeploy is planned or authorized.
 - **Documentation:** CHANGELOG `[Unreleased]` corrected (the completion fix was deployed on
   5 November) with a dated v0.8.0 known issue: the tag calls `Client.agent_engines`, absent from
@@ -132,6 +142,6 @@ override variable name; both failed and nothing changed. A suite-wide isolation 
 child processes and non-loopback network or DNS in every test (the suite needed no exemption).
 Receipts now name their finding IDs and the completion gate compares them; deploy both surfaces
 together.
-Gates: Ruff/format, mypy (40 files), 360 tests at 100% configured coverage, docs, versions, site,
+Gates: Ruff/format, mypy (41 files), 369 tests at 100% configured coverage, docs, versions, site,
 diagram, redaction, Markdown lint, 9 study cases and 16 report checks. No push, merge, deployment,
 paid probe, PDF rebuild or publication.

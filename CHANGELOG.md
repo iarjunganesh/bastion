@@ -12,6 +12,12 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-11-07
+
+Patch release after cohort H. The Access Auditor retries a transient model-service rejection
+briefly, audits every retry, and still fails closed when the service stays unavailable. The tag
+is not itself a deployment: cohort I deploys this exact tag and records its own evidence.
+
 ### Fixed — a transient model rejection no longer fails a whole investigation
 
 - The Access Auditor's model client retries a transient model-service error (429 and 5xx)
