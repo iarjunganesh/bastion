@@ -40,6 +40,9 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Next step
 
+0. Paused 7 November ~01:00 at the maintainer's request. Resume from the
+   "Morning resume" checklist in `.local/prompts/review-remediation-2026-11-07.md`: the v0.9.0
+   release sweep, an optional cohort G decision before the D4 window, then the approvals below.
 1. Maintainer decisions: push this branch and open a PR; merge with a merge commit after CI
    (the merge redeploys the console); optional receipts that echo finding IDs (deploy-order
    hazard); keep or disable Vercel auto-deploy; the v0.8.0 GitHub release-note addition; the
