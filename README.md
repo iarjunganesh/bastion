@@ -154,7 +154,7 @@ python scripts/check_site.py
 npx markdownlint-cli2 "**/*.md"
 ```
 
-The Python core suite has **360 tests** and 100% configured statement/branch coverage.
+The Python core suite has **373 tests** and 100% configured statement/branch coverage.
 Offline synthetic experiments and report tooling are outside that production core scope.
 
 ## Deployment and operations

@@ -12,6 +12,26 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-11-07
+
+Patch release after cohort H. The Access Auditor retries a transient model-service rejection
+briefly, audits every retry, and still fails closed when the service stays unavailable. The tag
+is not itself a deployment: cohort I deploys this exact tag and records its own evidence.
+
+### Fixed — a transient model rejection no longer fails a whole investigation
+
+- The Access Auditor's model client retries a transient model-service error (429 and 5xx)
+  up to four attempts with capped, jittered exponential backoff (about 2, 4 and 8 s), and only
+  before the first response, so a partial answer is never duplicated. A 4xx such as 400 or 403
+  still raises at once, and exhausted attempts still fail the investigation closed.
+  Observed 7 November 2026: cohort H stopped at its 28th investigation when one Auditor call
+  received `429 RESOURCE_EXHAUSTED`; the Orchestrator refused to score an empty report and Pub/Sub
+  redelivery completed the investigation on its second attempt.
+- Every retry is an audit record, `model.request` / `retrying`, carrying the attempt, the HTTP
+  status and the wait, and attributed to the agent, invocation and investigation of the call.
+  The retry runs below the agent callbacks, so Model Armor screening, the fidelity check and the
+  `submitted`/`completed` pair still run once per model call.
+
 ## [0.9.0] - 2026-11-07
 
 Source release after an independent review. It carries the completion and parser fixes

@@ -26,7 +26,7 @@ Read HANDOFF.md next, then docs/research/report-plan.md and docs/UPGRADE-PLAN.md
 
 Bastion is a three-agent, read-only GCP IAM-review fleet and technical-report case study.
 The source pins Google ADK 2.14.0/A2A SDK 1.3.0 on Python 3.12. The core suite has
-360 tests with 100% configured statement and branch coverage. [VERSIONS](docs/VERSIONS.md)
+373 tests with 100% configured statement and branch coverage. [VERSIONS](docs/VERSIONS.md)
 separates source pins, measured/asserted Cloud Run packages and unreadable Runtime resolution.
 
 Cohort N is frozen on the August deployment. On 5 November both surfaces were updated, but F's

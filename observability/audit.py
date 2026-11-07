@@ -19,6 +19,7 @@ an agent that can decline to.
 
 from __future__ import annotations
 
+import contextvars
 import json
 import logging
 import re
@@ -113,6 +114,27 @@ def record(
     AuditRecord(event, outcome, actor, invocation_id, investigation_id, detail or {}).emit()
 
 
+# The model call in flight, as (actor, invocation, investigation). Set by the plugin before every
+# model call, in the same task as the call itself, so a retry inside the model client can be
+# attributed without the client ever seeing the callback context.
+_MODEL_CALL: contextvars.ContextVar[tuple[str, str, str] | None] = contextvars.ContextVar(
+    "bastion_model_call", default=None
+)
+
+
+def record_model_retry(*, attempt: int, status: int, delay_seconds: float) -> None:
+    """Record one retry of a transient model-service error: counts and a status, no payload."""
+    actor, invocation, investigation = _MODEL_CALL.get() or (UNKNOWN, UNKNOWN, UNKNOWN)
+    record(
+        "model.request",
+        outcome="retrying",
+        actor=actor,
+        invocation_id=invocation,
+        investigation_id=investigation,
+        detail={"attempt": attempt, "status": status, "delay_seconds": delay_seconds},
+    )
+
+
 def opaque_investigation_id(value: object) -> str:
     """The investigation id if it is a UUID, else the sentinel. Never raises."""
     return value if isinstance(value, str) and _UUID.match(value) else UNKNOWN
@@ -198,12 +220,16 @@ class AuditPlugin(BasePlugin):
     async def before_model_callback(
         self, *, callback_context: CallbackContext, llm_request: LlmRequest
     ) -> LlmResponse | None:
+        actor = getattr(callback_context, "agent_name", "unknown")
+        invocation = _invocation(callback_context)
+        investigation = _investigation(callback_context)
+        _MODEL_CALL.set((actor, invocation, investigation))
         record(
             "model.request",
             outcome="submitted",
-            actor=getattr(callback_context, "agent_name", "unknown"),
-            invocation_id=_invocation(callback_context),
-            investigation_id=_investigation(callback_context),
+            actor=actor,
+            invocation_id=invocation,
+            investigation_id=investigation,
             detail={"model": getattr(llm_request, "model", None)},
         )
         return None
