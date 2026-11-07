@@ -5,12 +5,14 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Current state — 7 November 2026
 
-- **Independent review remediation in progress** on branch `fix/review-remediation-2026-11-07`
-  (local commits `84b9d86`, `55e3647` and this handoff; not pushed). The review found no
-  numerical error in the report and verified the F/recovery seals, hashes, counts and billing
-  corroboration. Its findings and the ordered plan are in the private prompt
-  `.local/prompts/review-remediation-2026-11-07.md`; a verified bundle of `main` and all tags and a
-  copy of `report/` are in `.local/backups/`.
+- **v0.9.0 release prepared** on branch `fix/review-remediation-2026-11-07`: the review
+  remediation, `google-adk` 2.14.0 with OpenTelemetry 1.45.2 (the v0.8.0 advisory is resolved;
+  `pip-audit` clean with no exception) and the full documentation sweep. The maintainer approved,
+  on 7 November: v0.9.0 (merge with a merge commit, then tag), the v0.8.0 release-note addition,
+  keeping Vercel auto-deploy, cohort G on the v0.9.0 tag (200 SEK chunk cap, D3 total 400 SEK),
+  a report edition labelled for v0.9.0, and no GitHub repository-setting changes. The review's
+  findings and plan are in `.local/prompts/review-remediation-2026-11-07.md`; backups of `main`,
+  all tags and `report/` are in `.local/backups/`.
 - **Source-only fixes after the final deployment (not deployed):** the Escalation worker acts only
   on bare JSON or routing attributed to `policy_step` (latest wins); the Auditor refuses fields
   outside `AuditReport`; the Runtime app restores `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS=false` after
@@ -40,19 +42,15 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Next step
 
-0. Paused 7 November ~01:00 at the maintainer's request. Resume from the
-   "Morning resume" checklist in `.local/prompts/review-remediation-2026-11-07.md`: the v0.9.0
-   release sweep, an optional cohort G decision before the D4 window, then the approvals below.
-1. Maintainer decisions: push this branch and open a PR; merge with a merge commit after CI
-   (the merge redeploys the console); optional receipts that echo finding IDs (deploy-order
-   hazard); keep or disable Vercel auto-deploy; the v0.8.0 GitHub release-note addition; the
-   report edition label and date.
-2. After the merge: set `REVISION` in `report/build_report.py` to the merge commit, update the
-   A.1 link-base text, build the PDF once, review every page visually, re-verify all links and
-   record `qa/checks.json` honestly. Keep `report/` uncommitted.
-3. Resume D4 in the agreed 8–10 November window with an owner-reviewed dry run and residual-cost
-   decision. Do not bring shutdown forward or broaden deletion targets.
-4. Publication, tag, DOI and any GCP redeploy remain separate approvals.
+1. Push, open the PR, wait for all CI jobs, merge with a merge commit (this redeploys the
+   console), verify the live footer, tag the merge commit `v0.9.0` and verify the release, add
+   the v0.8.0 known-issue note to its GitHub release, and close issue #3.
+2. Cohort G: write and get approval for the protocol under `.local/measurements/2026-11-07-G/`,
+   deploy the exact v0.9.0 tag to both surfaces together, run it before the D4 window, seal it,
+   record evidence 26 and run the next-day billing check.
+3. Rebuild the report once as the v0.9.0 edition with its link base on the tag commit; review
+   every page and link; keep `report/` uncommitted.
+4. Resume D4 in the agreed 8–10 November window, dry run first, after G's billing check.
 
 ## Session log
 

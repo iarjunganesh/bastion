@@ -12,6 +12,13 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-07
+
+Source release after an independent review. It carries the completion and parser fixes
+deployed on 5 November, the review's source-only hardening and the move to ADK 2.14.0, which
+resolves the advisory accepted at v0.8.0. The tag is not itself a deployment: cohort G deploys
+this exact tag and records its own evidence. The 5 November deployments ran `google-adk` 2.13.0.
+
 ### Fixed — completion is confirmed, not inferred (deployed 5 November)
 
 - Durable ingress records an investigation completed only when the Runtime stream carries the
