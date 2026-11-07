@@ -98,8 +98,8 @@ metadata, image 04 shows inline screening but not the IAM read split, and image 
 correlation and retention but not cross-week exception continuity. Each underlying claim keeps its
 status here — the narrowing is about what a screenshot proves, not about what is true.
 
-**Version boundary:** the source targets Google ADK 2.13.0; the retained August and
-October cohorts describe the earlier deployment. A source pin does not establish a production
+**Version boundary:** the source targets Google ADK 2.14.0 (v0.9.0); the retained August and
+October cohorts describe the earlier deployment, and the 5 November cohorts ran `google-adk` 2.13.0. A source pin does not establish a production
 version. See [the canonical provenance table](../VERSIONS.md). Fresh captures must name
 new revisions and remain separate from the immutable historical bundles.
 

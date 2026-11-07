@@ -14,7 +14,7 @@
 #
 # The `antigravity` extra is not used. Its incompatibility was measured on the
 # August stack; see docs/adr/005-adk-as-the-agent-framework.md for the dated decision.
-google-adk[a2a,agent-identity,gcp,otel-gcp,mcp,tools]==2.13.0
+google-adk[a2a,agent-identity,gcp,otel-gcp,mcp,tools]==2.14.0
 
 # Pinned explicitly because the ADK extras above do not carry them, and the versions a
 # document may name must resolve to something.
@@ -41,10 +41,10 @@ google-cloud-firestore==2.29.0
 google-cloud-scheduler==2.20.0
 google-cloud-bigquery==3.44.0
 
-# Observability. ADK 2.13.0 caps the API/SDK pair at 1.44.0.
+# Observability. ADK 2.14.0 admits the API/SDK pair at 1.45.2, which fixes CVE-2026-114603.
 # Review the new default GenAI telemetry schema and the release security gate.
-opentelemetry-api==1.44.0
-opentelemetry-sdk==1.44.0
+opentelemetry-api==1.45.2
+opentelemetry-sdk==1.45.2
 opentelemetry-exporter-gcp-trace==1.15.0
 google-cloud-trace==1.20.0
 google-cloud-logging==3.16.3

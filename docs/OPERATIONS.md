@@ -22,8 +22,20 @@ attainment claims.
    separately when its graph/runtime source changes; `deploy.sh` alone does not do both.
 3. Verify the existing Registry, Gateway, Runtime, IAM, DLQ, audit and alert configuration;
    reprovision authority only under an approved infrastructure change.
-4. Run `python -m infrastructure.verify_fleet` and `python -m infrastructure.smoke_test`.
+4. Run `python -m infrastructure.verify_fleet` and `python -m infrastructure.smoke_test`. The
+   smoke Runtime check passes only on the completion gate's confirmation, not on any stream.
 5. Capture only redacted counts/statuses in `assets/evidence/`.
+
+Since 7 November the Escalation worker's receipts name their finding IDs and the completion gate
+compares them. A worker image or Runtime deployed without the other fails every investigation
+closed, so steps 2 and 3 are one change: deploy the Cloud Run image and the Runtime together.
+
+`infrastructure.deploy_agent_runtime` uses the SDK's public `runtimes.update`/`create`, which add
+`GOOGLE_CLOUD_AGENT_ENGINE_ENABLE_TELEMETRY` when it is absent; the deploy environment now declares
+it as `unspecified`. The 5 November Runtime update instead used a reviewed operator script that
+removed this SDK addition to keep the existing environment byte-for-byte, so the Runtime deployed
+then does not carry it. With `enable_tracing=True` the template reads `unspecified` like an unset
+value; ADK additionally sends its telemetry user-agent header.
 
 `infrastructure/rollback.py` is dry-run by default and permits only one of the two newest safe
 revisions. `infrastructure/teardown.py` is also dry-run by default and preserves Firestore,

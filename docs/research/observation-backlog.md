@@ -11,8 +11,8 @@ capability with code and no capture is deliberately not claimed.
 
 ## Upgrade verification — source and deployment are separate
 
-**Current source target: Google ADK 2.13.0.** The retained evidence describes the historical
-fleet. Both surfaces were updated on 5 November, but the F pilot failed on a quoted-routing
+**Current source target: Google ADK 2.14.0 (v0.9.0).** The retained evidence describes the
+historical fleet; the 5 November cohorts ran `google-adk` 2.13.0. Both surfaces were updated on 5 November, but the F pilot failed on a quoted-routing
 parser incompatibility; [evidence 24](../../assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)
 records the deployment and fail-closed outcome. The separate corrected recovery
 ([evidence 25](../../assets/evidence/25-corrected-cohort-F-verification.md)) then passed five normal

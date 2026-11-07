@@ -83,11 +83,10 @@ jobs:
         run: |
           uv venv .audit-venv --python "${{ env.PYTHON_VERSION }}"
           uv pip install --python .audit-venv/bin/python -r requirements.lock
-      # One maintainer-accepted advisory: CVE-2026-114603 in opentelemetry-api 1.44.0. Every
-      # google-adk release caps OpenTelemetry below the 1.45.1 fix (docs/DEPENDENCY-STATUS.md).
-      # Remove the ignore once an ADK release admits 1.45.1. Any other advisory still fails.
+      # No accepted advisory since v0.9.0: google-adk 2.14.0 admits the OpenTelemetry fix for
+      # CVE-2026-114603 (docs/DEPENDENCY-STATUS.md). Any known advisory fails this job.
       - name: Audit known vulnerabilities
-        run: uvx pip-audit -r requirements.lock --ignore-vuln CVE-2026-114603
+        run: uvx pip-audit -r requirements.lock
 
   tests:
     name: Tests and coverage

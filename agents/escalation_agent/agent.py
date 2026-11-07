@@ -180,7 +180,7 @@ def _parse_json_object(text: str) -> Any:
     if attribution is None or attribution.group(1) != POLICY_STEP_AUTHOR:
         return None
     stripped = text[attribution.end() :]
-    # ADK 2.13 quotes relayed text as data. Recover only an exact, complete block;
+    # ADK 2.13+ quotes relayed text as data. Recover only an exact, complete block;
     # the deterministic envelope validator still controls every delivery field.
     begin = "<<<BEGIN_QUOTED_AGENT_CONTENT>>>\n"
     end = "\n<<<END_QUOTED_AGENT_CONTENT>>>"

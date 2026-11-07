@@ -60,6 +60,15 @@ hackathon-era release plan is archived with the rest of the submission material.
   two read-only `gcloud run services describe` calls for a non-existent project; both failed and
   nothing changed. The suite needed no exemption.
 
+### Changed — ADK 2.14.0 resolves the accepted advisory
+
+- `google-adk` moves to 2.14.0 (published 7 November), which admits OpenTelemetry 1.45.2, the
+  fix for CVE-2026-114603. Only `google-adk` and the OpenTelemetry family moved in the lock;
+  `pip-audit` reports no known vulnerability, so the audit exception is removed. Release-note
+  breaking changes were checked against Bastion's path ([ADR-005](docs/adr/005-adk-as-the-agent-framework.md)).
+- The version gate no longer requires dated records (the frozen archive, evidence pages and
+  the generated manuscript) to name today's pins.
+
 ### Added — cohort F, audit and provenance
 
 - Evidence 23: the 28 October census and the August image's installed packages.
@@ -97,7 +106,7 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ### Changed — ADK source upgrade and shared continuity
 
-- Target Google ADK 2.13.0, A2A SDK 1.3.0, Google Cloud AI Platform/Agent Platform 2.6.0,
+- Target `google-adk` 2.13.0, A2A SDK 1.3.0, Google Cloud AI Platform/Agent Platform 2.6.0,
   and Model Armor client 0.7.3; refresh the universal Python 3.12 dependency lock.
   Remove unused evaluation-only extras from the shipped fleet and update Pillow to 13.0.0.
   One OpenTelemetry advisory (CVE-2026-114603) remains because every ADK release caps

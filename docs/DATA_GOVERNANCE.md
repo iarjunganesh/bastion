@@ -24,6 +24,9 @@ deterministic code and is neither persisted by Bastion nor sent to Gemini.
   are not part of the tool contract. Opaque finding IDs are carried so a human can approve a
   specific finding; they are validated to the Auditor's exact HMAC shape and omit the raw policy
   fields. They remain linkable across reviews, so pseudonymisation is not a zero-leakage guarantee.
+- Since v0.9.0, Escalation receipts name the opaque finding IDs delivered per department: the
+  same IDs the routing envelope already carries. They cross A2A back to the Orchestrator, live in
+  its managed session and never enter audit logs.
 - The reviewer on an approved exception is the verified caller identity, never a request field.
   It is deliberately retained in the durable ledger for accountability and never enters model
   state, audit logs, or committed evidence.

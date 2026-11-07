@@ -9,7 +9,8 @@ or production API requests. Removing the console does not change the fleet.
 record; an older record cannot substantiate a later deployment. `verifiedAt` refers only to
 the 28 October count-only inventory, not liveness or package resolution. Architecture images,
 submitted gallery and fixed video keep their historical dates. Local edits are not deployment,
-but a merge to `main` is: the Vercel project deploys production from `main`.
+but a merge to `main` is: the Vercel project deploys production from `main`, kept by the
+maintainer's decision on 7 November.
 
 ## Build and preview
 

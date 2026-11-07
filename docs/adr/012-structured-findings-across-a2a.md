@@ -201,6 +201,24 @@ minutes it took to find this. No principal, binding, or credential was in that c
 was still model/tool-adjacent text in a channel this codebase otherwise keeps payload-free by
 construction — an accepted, bounded exception for live incident diagnosis, not a precedent.
 
+## Amendment 2026-11-07 — the receiver checks who routed, the gate checks which findings
+
+An independent review found that the deterministic Escalation Agent accepted the first relayed
+part carrying `departments` from any attributed author. ADK relays the Access Auditor's
+model-written reply before `policy_step`'s, and `AuditReport` ignored unknown keys, so an Auditor
+answer with an extra top-level `departments` could have replaced the deterministic routing. The
+completion gate compared only departments and counts, so a same-count substitution would have
+confirmed. Nothing suggests either happened; schema-constrained output makes the extra key
+unlikely, but that is model behaviour rather than a deterministic control.
+
+Three contracts now close it: the Escalation Agent acts only on bare JSON or text attributed to
+`policy_step`, taking the latest; the Auditor's fidelity callback refuses fields outside
+`AuditReport`; and each receipt names the finding IDs it delivered, which the completion gate
+requires to equal the routed IDs. A receipt without IDs fails closed, so the Escalation worker
+and the Runtime are deployed together. A regression test builds the hop with ADK's own A2A
+message builder. These changes are in v0.9.0; until cohort G deploys that tag, the fleet keeps
+the earlier behaviour.
+
 ## Upstream contribution status
 
 ### Outcome (checked live 2026-10-27)
@@ -222,7 +240,7 @@ What changed upstream is observability, which is exactly what the surviving ask 
 warning when a caller-side state-only event cannot be forwarded and when a remote peer returns a
 non-empty state delta, and documents that session state does not cross A2A in either direction.
 Per-agent session semantics are unchanged. **This decision is unaffected**: the current
-source targets ADK 2.13.0, which includes the warnings; the historical deployed cohort predates
+source targets ADK 2.14.0, which includes the warnings; the historical deployed cohort predates
 them. The explicit message contracts and receipt gate remain required. Warnings do not replace
 that contract. See [version provenance](../VERSIONS.md).
 

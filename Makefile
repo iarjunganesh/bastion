@@ -64,10 +64,10 @@ format-check:
 typecheck:
 	mypy agents gateway identity registry runtime model_armor observability infrastructure
 
-# One maintainer-accepted advisory, CVE-2026-114603; see docs/DEPENDENCY-STATUS.md.
+# No accepted advisory since v0.9.0; see docs/DEPENDENCY-STATUS.md.
 audit-dependencies:
 	uv pip install --system -r requirements.lock
-	uvx pip-audit -r requirements.lock --ignore-vuln CVE-2026-114603
+	uvx pip-audit -r requirements.lock
 
 ci: lint format-check typecheck coverage markdown docs versions diagrams media-check audit-dependencies
 

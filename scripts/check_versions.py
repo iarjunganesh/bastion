@@ -117,9 +117,18 @@ def doc_files() -> list[Path]:
     return sorted(seen)
 
 
+# Dated records state the versions that were true when they were written. Demanding that they
+# track today's pin would mean replacing old version labels with current ones, which AGENTS.md
+# forbids; the frozen hackathon archive and the evidence pages are exactly such records. The
+# report's generated manuscript is derived from the checked section sources.
+DATED_RECORDS = ("archive/", "assets/evidence/", "report/manuscript.md")
+
+
 def check_documents(pins: dict[str, str]) -> None:
-    """No document names a tracked package at a version other than the pinned one."""
+    """No current document names a tracked package at a version other than the pinned one."""
     for path in doc_files():
+        if path.relative_to(ROOT).as_posix().startswith(DATED_RECORDS):
+            continue
         text = path.read_text(encoding="utf-8")
         for package, prefixes in TRACKED.items():
             expected = pins.get(package)
