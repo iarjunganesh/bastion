@@ -15,7 +15,9 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   on bare JSON or routing attributed to `policy_step` (latest wins); the Auditor refuses fields
   outside `AuditReport`; the Runtime app restores `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS=false` after
   the template's set-up; the smoke Runtime check requires the completion confirmation; operator
-  scripts are tested against the real SDK `Client`. 353 tests at 100% configured coverage. The
+  scripts are tested against the real SDK `Client`; receipts name their finding IDs and the
+  completion gate compares them (deploy worker and Runtime together); a suite-wide isolation
+  guard refuses child processes and non-loopback network. 360 tests at 100% configured coverage. The
   deployed fleet keeps the earlier behaviour; no GCP redeploy is planned or authorized.
 - **Documentation:** CHANGELOG `[Unreleased]` corrected (the completion fix was deployed on
   5 November) with a dated v0.8.0 known issue: the tag calls `Client.agent_engines`, absent from
@@ -125,7 +127,10 @@ Remediation on `fix/review-remediation-2026-11-07`: source-only code fixes with 
 documentation and append-only evidence notes (`55e3647`), and uncommitted report-source and
 builder corrections. While the new SDK-surface tests were being written, two read-only
 `gcloud run services describe` calls against a non-existent test project ran because of a wrong
-override variable name; both failed, nothing changed, and the tests now refuse any subprocess.
-Gates: Ruff/format, mypy (40 files), 353 tests at 100% configured coverage, docs, versions, site,
+override variable name; both failed and nothing changed. A suite-wide isolation guard now refuses
+child processes and non-loopback network or DNS in every test (the suite needed no exemption).
+Receipts now name their finding IDs and the completion gate compares them; deploy both surfaces
+together.
+Gates: Ruff/format, mypy (40 files), 360 tests at 100% configured coverage, docs, versions, site,
 diagram, redaction, Markdown lint, 9 study cases and 16 report checks. No push, merge, deployment,
 paid probe, PDF rebuild or publication.

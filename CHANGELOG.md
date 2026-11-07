@@ -49,6 +49,16 @@ hackathon-era release plan is archived with the rest of the submission material.
 - The smoke Runtime check requires the completion gate's confirmation instead of any streamed
   event. Operator scripts are tested against the real SDK `Client`; the deploy environment
   declares the SDK's implicit telemetry variable.
+- Escalation receipts name the finding IDs delivered per department, and the completion gate
+  requires them to equal the routed IDs, so a same-count substitution cannot confirm. A worker
+  or Runtime deployed without the other fails closed; deploy both surfaces together.
+
+### Changed — test isolation
+
+- A suite-wide guard refuses child processes and non-loopback network or DNS and fails the test
+  that tried. On 7 November a new test with a wrong override variable let an operator module run
+  two read-only `gcloud run services describe` calls for a non-existent project; both failed and
+  nothing changed. The suite needed no exemption.
 
 ### Added — cohort F, audit and provenance
 

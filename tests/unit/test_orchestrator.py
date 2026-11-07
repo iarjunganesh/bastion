@@ -529,12 +529,30 @@ def test_a_suppressed_finding_is_absent_from_what_crosses_to_escalation(monkeypa
 # --- P0.3: the gate that confirms escalation actually delivered what was routed --------------
 
 
+_ROUTED_IDS = ["a" * 24, "b" * 24, "c" * 24]
+
+
 def _routed_department(department: str, count: int = 1) -> dict:
-    return {"department": department, "finding_count": count}
+    return {
+        "department": department,
+        "finding_count": count,
+        "finding_ids": _ROUTED_IDS[:count],
+    }
 
 
-def _receipt(department: str, count: int = 1, outcome: str = "delivered") -> dict:
-    return {"department": department, "accepted_count": count, "outcome": outcome}
+def _receipt(
+    department: str,
+    count: int = 1,
+    outcome: str = "delivered",
+    finding_ids: object = None,
+) -> dict:
+    ids = _ROUTED_IDS[:count] if finding_ids is None else finding_ids
+    return {
+        "department": department,
+        "accepted_count": count,
+        "finding_ids": ids,
+        "outcome": outcome,
+    }
 
 
 def test_completion_mismatch_accepts_a_faithful_confirmation():
@@ -589,6 +607,28 @@ def test_completion_mismatch_rejects_a_count_mismatch():
     expected = [_routed_department("data-platform", count=2)]
     receipts = {"receipts": [_receipt("data-platform", count=1)]}
     assert orchestrator._completion_mismatch(expected, receipts) == "accepted_count_mismatch"
+
+
+@pytest.mark.parametrize(
+    "finding_ids",
+    [["c" * 24], [], "a" * 24, [1]],
+    ids=["same-count-substitution", "empty", "not-a-list", "not-strings"],
+)
+def test_completion_mismatch_rejects_receipts_for_other_findings(finding_ids):
+    """A same-count delivery of a different finding (a suppressed one, say) is not confirmation."""
+    expected = [_routed_department("data-platform")]
+    receipts = {"receipts": [_receipt("data-platform", finding_ids=finding_ids)]}
+    assert orchestrator._completion_mismatch(expected, receipts) == "finding_ids_mismatch"
+
+
+def test_completion_mismatch_rejects_a_receipt_without_finding_ids():
+    """A worker that predates the receipt contract fails closed: deploy both surfaces together."""
+    expected = [_routed_department("data-platform")]
+    receipt = _receipt("data-platform")
+    del receipt["finding_ids"]
+    assert orchestrator._completion_mismatch(expected, {"receipts": [receipt]}) == (
+        "finding_ids_mismatch"
+    )
 
 
 def test_completion_mismatch_rejects_a_missing_receipt():

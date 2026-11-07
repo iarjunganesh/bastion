@@ -21,7 +21,7 @@ Read HANDOFF.md next, then docs/research/report-plan.md and docs/UPGRADE-PLAN.md
 
 Bastion is a three-agent, read-only GCP IAM-review fleet and technical-report case study.
 The source pins Google ADK 2.13.0/A2A SDK 1.3.0 on Python 3.12. The core suite has
-353 tests with 100% configured statement and branch coverage. [VERSIONS](docs/VERSIONS.md)
+360 tests with 100% configured statement and branch coverage. [VERSIONS](docs/VERSIONS.md)
 separates source pins, measured/asserted Cloud Run packages and unreadable Runtime resolution.
 
 Cohort N is frozen on the August deployment. On 5 November both surfaces were updated, but F's
@@ -136,7 +136,10 @@ a separate deployment surface updated only by `python -m infrastructure.deploy_a
 (idempotent against the existing `BASTION_RUNTIME_AGENT_ENGINE_ID`). Observed 2026-08-23: changing
 `build_sub_agents()` to add a fifth step and redeploying only via `deploy.sh` left the Runtime
 silently running the old four-step graph — no error, `investigation.run` still reported
-`completed`. After any change to `agents/orchestrator/agent.py` or `runtime.py`, run both:
+`completed`. After any change to `agents/orchestrator/agent.py` or `runtime.py`, run both.
+Since 7 November the Escalation worker's receipts and the completion gate share a contract
+(each receipt names its routed finding IDs): a worker or Runtime deployed without the other
+fails every investigation closed, so deploy both surfaces together:
 
 ```powershell
 bash infrastructure/deploy.sh

@@ -71,7 +71,9 @@ unless `policy_step` left its own result in session state, so an investigation t
 score its findings fails visibly instead of escalating them un-evaluated. The Escalation Agent
 itself is model-free too (below), and `escalation_gate` refuses to report an investigation
 complete unless every routed department's delivery was confirmed by the Escalation Agent's own
-reply — the same fail-closed shape one hop later.
+reply — the same fail-closed shape one hop later. The deployed gate compares departments and
+counts; since 7 November the source also requires each receipt to name exactly the routed
+finding IDs, so the worker image and the Runtime must be deployed together (not deployed).
 
 Both gates live in the Orchestrator rather than inside the workers they check, because both
 workers are remote. A guard that travels over A2A is a guard the caller must trust the callee to

@@ -305,11 +305,9 @@ def _completion_mismatch(expected: list[Any], receipts: Any) -> str | None:
     if not isinstance(receipts, dict) or not isinstance(receipts.get("receipts"), list):
         return "missing_receipts"
 
-    expected_counts = {
-        entry["department"]: entry.get("finding_count")
-        for entry in expected
-        if isinstance(entry, dict) and "department" in entry
-    }
+    routed = [entry for entry in expected if isinstance(entry, dict) and "department" in entry]
+    expected_counts = {entry["department"]: entry.get("finding_count") for entry in routed}
+    expected_ids = {entry["department"]: entry.get("finding_ids") or [] for entry in routed}
 
     seen: set[Any] = set()
     for receipt in receipts["receipts"]:
@@ -325,10 +323,26 @@ def _completion_mismatch(expected: list[Any], receipts: Any) -> str | None:
             return "undelivered_receipt"
         if receipt.get("accepted_count") != expected_counts[department_id]:
             return "accepted_count_mismatch"
+        if not _same_findings(receipt.get("finding_ids"), expected_ids[department_id]):
+            return "finding_ids_mismatch"
 
     if seen != set(expected_counts):
         return "missing_receipt"
     return None
+
+
+def _same_findings(delivered: Any, routed: list[Any]) -> bool:
+    """Whether a receipt names exactly the opaque finding ids this department was routed.
+
+    Counts alone let a same-count substitution confirm -- a suppressed finding delivered in place
+    of an escalated one. A receipt without ids (a worker older than this contract) fails closed,
+    so the Runtime and the Escalation worker are deployed together.
+    """
+    return (
+        isinstance(delivered, list)
+        and all(isinstance(value, str) for value in delivered)
+        and sorted(delivered) == sorted(set(routed))
+    )
 
 
 class EscalationCompletionGate(BaseAgent):
@@ -339,7 +353,8 @@ class EscalationCompletionGate(BaseAgent):
     its own A2A task atomically on a bad delivery (P0.2), but nothing before this checked that a
     *successful-looking* remote task actually confirmed the department set `policy_step` routed
     — an untrusted peer's reply is exactly the kind of value that channel has carried a poisoned
-    payload through before (D6, D8, ADK issue google/adk-python#6854).
+    payload through before (D6, D8, ADK issue google/adk-python#6854). Since 7 November each
+    receipt must also name exactly the finding ids routed to its department.
 
     Zero routed departments is a real, complete outcome: `expected` and the receipts list are
     both empty, and `_completion_mismatch` returns `None` for that pair the same way it does for

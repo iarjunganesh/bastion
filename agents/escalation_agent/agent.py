@@ -326,6 +326,9 @@ class EscalationAgent(BaseAgent):
                 {
                     "department": department["department"],
                     "accepted_count": department["finding_count"],
+                    # Which findings, not only how many: the completion gate compares these with
+                    # the routing it computed, so a same-count substitution cannot confirm.
+                    "finding_ids": department["finding_ids"],
                     "outcome": "delivered" if result.get("delivered") else "skipped",
                 }
             )

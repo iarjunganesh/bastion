@@ -15,9 +15,14 @@ thing.
 from __future__ import annotations
 
 import os
+import socket
+import subprocess
+from collections.abc import Iterator
+from typing import Any
 from unittest.mock import MagicMock
 
 import google.auth
+import pytest
 from google.auth.credentials import AnonymousCredentials
 
 
@@ -74,3 +79,60 @@ def _anonymous_default(*args: object, **kwargs: object) -> tuple[AnonymousCreden
 # than on the code. Anonymous credentials make the contract explicit and enforce it: no test
 # can reach a real project, whatever the ambient gcloud configuration says.
 google.auth.default = _anonymous_default  # type: ignore[assignment]
+
+
+LOOPBACK = frozenset({"127.0.0.1", "::1", "localhost"})
+
+
+class IsolationBreach(RuntimeError):
+    """A test tried to start a process or reach beyond the loopback interface."""
+
+
+@pytest.fixture(autouse=True)
+def isolation_guard(monkeypatch: pytest.MonkeyPatch) -> Iterator[list[str]]:
+    """Refuse every child process and non-loopback connection, and fail the test that tried.
+
+    Neutralising ADC above does not bind the `gcloud` CLI, which carries the operator's own login.
+    On 7 November a new test set the wrong override variable, an operator module fell back to
+    `gcloud run services describe`, and two read-only calls reached Google Cloud for a project
+    that does not exist. They failed harmlessly; this guard makes the class impossible rather than
+    unlikely. Each breach is recorded as well as raised, so a library that swallows the exception
+    still fails the test at teardown. The suite needed no exemption when this was added.
+    """
+    attempts: list[str] = []
+    connect, connect_ex = socket.socket.connect, socket.socket.connect_ex
+    getaddrinfo = socket.getaddrinfo
+
+    def breach(action: str, target: object) -> IsolationBreach:
+        attempts.append(f"{action}: {target}")
+        return IsolationBreach(f"unit tests may not {action}: {target}")
+
+    def remote(address: object) -> bool:
+        return isinstance(address, tuple) and str(address[0]) not in LOOPBACK
+
+    class NoProcess:
+        def __init__(self, args: object, *_args: Any, **_kwargs: Any) -> None:
+            raise breach("start a process", args)
+
+    def guarded_connect(sock: socket.socket, address: Any) -> None:
+        if remote(address):
+            raise breach("connect", address)
+        connect(sock, address)
+
+    def guarded_connect_ex(sock: socket.socket, address: Any) -> int:
+        if remote(address):
+            raise breach("connect", address)
+        return connect_ex(sock, address)
+
+    def guarded_getaddrinfo(host: Any, *args: Any, **kwargs: Any) -> Any:
+        if host is not None and str(host) not in LOOPBACK:
+            raise breach("resolve", host)
+        return getaddrinfo(host, *args, **kwargs)
+
+    monkeypatch.setattr(subprocess, "Popen", NoProcess)
+    monkeypatch.setattr(socket.socket, "connect", guarded_connect)
+    monkeypatch.setattr(socket.socket, "connect_ex", guarded_connect_ex)
+    monkeypatch.setattr(socket, "getaddrinfo", guarded_getaddrinfo)
+    yield attempts
+    if attempts:
+        pytest.fail(f"Test isolation breached: {attempts}")

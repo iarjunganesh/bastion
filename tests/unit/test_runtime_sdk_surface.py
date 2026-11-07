@@ -11,7 +11,6 @@ from __future__ import annotations
 import asyncio
 import importlib
 import inspect
-import subprocess
 import sys
 from collections.abc import Callable, Iterator
 from types import ModuleType, SimpleNamespace
@@ -43,16 +42,11 @@ CONFIRMED = {
 def load(monkeypatch: pytest.MonkeyPatch) -> Iterator[Callable[[str], ModuleType]]:
     """Import an operator module fresh under test configuration, and forget it afterwards.
 
-    Every subprocess is refused: these scripts shell out to `gcloud`, and a unit test must never
-    reach a live project, even read-only.
+    These scripts shell out to `gcloud`; the suite-wide `isolation_guard` (tests/conftest.py)
+    fails any test that tries, so a wrong override name below cannot reach a live project.
     """
     for key, value in ENVIRONMENT.items():
         monkeypatch.setenv(key, value)
-
-    def refuse(*args: Any, **kwargs: Any) -> None:
-        raise AssertionError(f"unit test attempted a subprocess: {args[:1]}")
-
-    monkeypatch.setattr(subprocess, "run", refuse)
     loaded: list[str] = []
 
     def _load(name: str) -> ModuleType:

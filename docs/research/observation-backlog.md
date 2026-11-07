@@ -57,6 +57,8 @@ probe was run for either. Both fixes are source-only; the deployed fleet keeps t
   have replaced the deterministic routing, a same-count finding substitution included. An offline
   reproduction with ADK's own message builder confirmed the selection. Gemini's schema-constrained
   output makes the extra key unlikely, but that is model behaviour, not a deterministic control.
+  The source fix also makes receipts name their finding IDs and the completion gate compare
+  them, which requires deploying the Escalation worker and the Runtime together.
 - **Runtime span content.** With `enable_tracing=True`, the managed `AdkApp` template's `set_up()`
   sets `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS=true`, overriding the deployed "false". ADK puts
   model requests, responses and tool values on spans only for model or tool calls, and the Runtime

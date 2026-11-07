@@ -552,8 +552,18 @@ def test_delivers_every_routed_department_exactly_once(_endpoint):
     assert client.return_value.__enter__.return_value.post.call_count == 2
     receipts = json.loads(event.content.parts[0].text)["receipts"]
     assert receipts == [
-        {"department": "data-platform", "accepted_count": 1, "outcome": "delivered"},
-        {"department": "ml-engineering", "accepted_count": 1, "outcome": "delivered"},
+        {
+            "department": "data-platform",
+            "accepted_count": 1,
+            "finding_ids": [FINDING_IDS[0]],
+            "outcome": "delivered",
+        },
+        {
+            "department": "ml-engineering",
+            "accepted_count": 1,
+            "finding_ids": [FINDING_IDS[0]],
+            "outcome": "delivered",
+        },
     ]
 
 
