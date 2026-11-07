@@ -3,59 +3,51 @@
 Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-plan.md) and
 [upgrade closeout](docs/UPGRADE-PLAN.md). Update Current state, Next step and Session log before stopping.
 
-## Current state — 6 November 2026
+## Current state — 7 November 2026
 
-- **Final sweep and local PDF complete.** The maintainer requested whole-repo drift cleanup,
-  careful simplification and the final technical-report PDF. This supersedes the earlier report
-  build hold. Keep `report/` uncommitted. The later request authorizes public branch publication
-  and integration into `main` after hosted CI; GCP deployment and paid probes remain separate.
-- **Preservation:** before editing, 45 dirty/report files were backed up in
-  `.local/sweeps/2026-11-06-final-report/before-sweep.zip` with a manifest. Both F capture seals
-  and ZIPs are recorded separately. That snapshot retains the full previous handoff/session log.
-  Prior private history removed before 28 October was not restored.
-- **Evaluation complete:** N is frozen on the August deployment. Original F updated both surfaces,
-  then its pilot failed closed ([E24](assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)).
-  Separate corrected recovery passed five normal cases, direct confirmation and two replays;
-  its refusal join uses a read-only addendum after a collector false positive
-  ([E25](assets/evidence/25-corrected-cohort-F-verification.md)). Runtime stayed unchanged in recovery.
-  Preserve the raw collector stop, incomplete X1 and unresolved drain receipt. No further F run.
-- **Versions:** the released v0.8.0 tag is `4d70b1b`; the November deployments use later
-  descendants plus SDK/parser fixes. The current image asserted ADK 2.13.0/A2A 1.3.0/SDK 2.6.0; Runtime installed
-  packages remain unreadable. [VERSIONS](docs/VERSIONS.md) is authoritative. Core validation
-  passed 336 cases at 100% configured coverage in the final sweep; Ruff/format, mypy and
-  all docs/version/site/diagram/redaction/Markdown gates passed.
-- **Billing:** the 6 November reported-usage check passed. Screenshots refreshed balances/expiry;
-  the supplied CSV's 61 dated rows corroborate the daily totals and zero report total. Exact
-  per-chunk attribution, the small gross aggregation difference and late postings remain bounded.
-  Values and both full chunk reservations stay in `.local/credit-verification.json`.
-- **End state:** D4 remains 8–10 November, dry run first, before 11 November. Retained
-  Firestore, secrets, Runtime/Memory and audit state need an owner decision; none was deleted.
-- **Git and public surfaces:** public cleanup (`2a12f5f`) and release-provenance correction
-  (`289577d`) were merged through [PR #9](https://github.com/iarjunganesh/bastion/pull/9)
-  at `6c1c832`. All eight CI jobs passed before and after merge. A follow-up restores the
-  README anchors still used by generated Agent Cards and the frozen submission.
-  Integration preserves commit history and excludes `report/` and `.local/`; no release tag changes.
-  The site snapshot remains the
-  28 October inventory. Frozen gallery/video/architecture assets retain their dates and bytes.
-- **Report:** canonical `report/sections/` now incorporates the prepared audit corrections,
-  separate E24/E25 populations, bounded billing and verified primary references. The 14-page PDF is generated and visually reviewed, with
-  38 clickable references, no unresolved
-  placeholders or automated layout findings. Twelve report integrity checks passed; the
-  canonical sources/build inputs and cited files have a 58-file snapshot. The figure is unchanged.
-  No reliability rate, C4 result, universal privacy proof or completed shutdown is claimed.
+- **Independent review remediation in progress** on branch `fix/review-remediation-2026-11-07`
+  (local commits `84b9d86`, `55e3647` and this handoff; not pushed). The review found no
+  numerical error in the report and verified the F/recovery seals, hashes, counts and billing
+  corroboration. Its findings and the ordered plan are in the private prompt
+  `.local/prompts/review-remediation-2026-11-07.md`; a verified bundle of `main` and all tags and a
+  copy of `report/` are in `.local/backups/`.
+- **Source-only fixes after the final deployment (not deployed):** the Escalation worker acts only
+  on bare JSON or routing attributed to `policy_step` (latest wins); the Auditor refuses fields
+  outside `AuditReport`; the Runtime app restores `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS=false` after
+  the template's set-up; the smoke Runtime check requires the completion confirmation; operator
+  scripts are tested against the real SDK `Client`. 353 tests at 100% configured coverage. The
+  deployed fleet keeps the earlier behaviour; no GCP redeploy is planned or authorized.
+- **Documentation:** CHANGELOG `[Unreleased]` corrected (the completion fix was deployed on
+  5 November) with a dated v0.8.0 known issue: the tag calls `Client.agent_engines`, absent from
+  its own pinned SDK, so it is not deployable as tagged. VERSIONS records that and the `d7d6a99`
+  amendment of PR #8's `ed1d820`. Architecture, claim matrix and observation backlog bound the
+  routing-provenance and span-content findings. Evidence 13, 19 and 22 gained append-only notes.
+- **Site:** Vercel deploys production from `main`. The PR #9 merge redeployed the console; on
+  7 November its footer matched `2a12f5f`. Treat every merge to `main` as a site deployment.
+- **Evaluation, versions, billing and end state** are unchanged from 6 November: N frozen; F
+  failed closed (E24); corrected recovery passed its bounded controls (E25); Runtime packages
+  unreadable; the 6 November reported-usage check passed with values kept private; D4 remains
+  8–10 November, dry run first, before 11 November.
+- **Git:** PR #9 (`6c1c832`) and PR #10 (`000a227`) are merged; their branches were deleted locally
+  and on `origin` on 7 November. Integration keeps merge commits; no history rewrite or retag.
+- **Report:** `report/` sources now carry the review corrections (N1–N7 chunk names, routing and
+  release limitations, nits, a §7.4 addition) and builder checks (two-digit evidence citations, no
+  chunk-style E names, no split hyphenation, line-ending-canonical hashes, non-link code colour);
+  16 report checks pass. The 6 November PDF, manifest and snapshot are unchanged and **no longer
+  match the edited sources**; one rebuild follows the merge, with the link base moved to it.
 
 ## Next step
 
-1. Maintainer review of the completed local PDF at `report/bastion-technical-report-v1.pdf`.
-   Public source integration is recorded in [PR #9](https://github.com/iarjunganesh/bastion/pull/9);
-   review against the published source while preserving this edition's dated snapshot.
-   Report sources/output remain uncommitted and unpublished.
-2. Keep `report/source-manifest.json`, `source-snapshot.zip` and `qa/checks.json` with the PDF.
-   Unchanged citations use the base commit; changed/unpublished records use the local snapshot.
+1. Maintainer decisions: push this branch and open a PR; merge with a merge commit after CI
+   (the merge redeploys the console); optional receipts that echo finding IDs (deploy-order
+   hazard); keep or disable Vercel auto-deploy; the v0.8.0 GitHub release-note addition; the
+   report edition label and date.
+2. After the merge: set `REVISION` in `report/build_report.py` to the merge commit, update the
+   A.1 link-base text, build the PDF once, review every page visually, re-verify all links and
+   record `qa/checks.json` honestly. Keep `report/` uncommitted.
 3. Resume D4 in the agreed 8–10 November window with an owner-reviewed dry run and residual-cost
    decision. Do not bring shutdown forward or broaden deletion targets.
-4. Publication/tag/DOI/site release remain separate. Refresh upstream/public references on the
-   actual publication date. Keep report sources uncommitted unless explicitly instructed otherwise.
+4. Publication, tag, DOI and any GCP redeploy remain separate approvals.
 
 ## Session log
 
@@ -122,3 +114,18 @@ arrived after merge and identified removed README anchors still advertised by th
 and frozen submission. Verified both references and restored `the-fleet` and `quality-gates`
 beside the replacement sections. Runtime metadata and archived files need no changes.
 Report sources/output remain uncommitted and byte-identical; no report rebuild or cloud action.
+
+### 7 November — independent review and remediation
+
+An independent read-only review cross-checked code, evidence 16–25, the sealed F/recovery and
+billing records, and the PDF. It verified the numbers and seals and found two code-level gaps,
+an undisclosed v0.8.0 deployability issue, documentation drift and report clarity issues. Merged
+branches were deleted locally and on `origin`; `main` was backed up as a verified bundle.
+Remediation on `fix/review-remediation-2026-11-07`: source-only code fixes with tests (`84b9d86`),
+documentation and append-only evidence notes (`55e3647`), and uncommitted report-source and
+builder corrections. While the new SDK-surface tests were being written, two read-only
+`gcloud run services describe` calls against a non-existent test project ran because of a wrong
+override variable name; both failed, nothing changed, and the tests now refuse any subprocess.
+Gates: Ruff/format, mypy (40 files), 353 tests at 100% configured coverage, docs, versions, site,
+diagram, redaction, Markdown lint, 9 study cases and 16 report checks. No push, merge, deployment,
+paid probe, PDF rebuild or publication.

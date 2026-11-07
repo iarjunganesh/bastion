@@ -15,7 +15,7 @@ the synthetic harness has no results and generation remains disabled.
 | Original F, 5 Nov | Both surfaces updated; one pilot failed closed on a routing-parser incompatibility ([E24](../../assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)) |
 | Separate corrected recovery, 5 Nov | Five normal cases, direct confirmation control and two replays passed; refusal join verified read-only after a collector false positive ([E25](../../assets/evidence/25-corrected-cohort-F-verification.md)) |
 | Billing, 6 Nov | Daily reported-usage check passed, corroborated by the supplied CSV; balances/expiry refreshed privately. Final per-chunk cost and late postings remain bounded |
-| Report, 6 Nov | Authorized final reconciliation and simplification complete; 14-page local PDF generated and visually reviewed. The earlier build hold is superseded; keep `report/` uncommitted |
+| Report, 6–7 Nov | Authorized final reconciliation complete; 14-page local PDF generated on 6 Nov. The 7 Nov independent review's corrections are applied to the sources; one rebuild follows the remediation merge. Keep `report/` uncommitted |
 | Fleet end state | Still scheduled for 8–10 Nov, dry run first, before 11 Nov; no shutdown has been claimed |
 
 The original F failure, recovery and N remain separate. Runtime did not change during recovery;
