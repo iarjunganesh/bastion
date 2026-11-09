@@ -27,8 +27,16 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 ## Next step
 
 1. Validate and push the docs PR. CI must pass. Merging redeploys the site.
-2. D4 dry run (non-destructive). The maintainer decides each residual resource; editorial
-   approval is not deletion authority.
+2. D4: the dry run is done (9 November, read-only; `.local/d4/d4-dry-run-2026-11-09.json`). It
+   found four things:
+   - `teardown.py --apply` would abort at a non-existent registry entry (`bastion-orchestrator`)
+     before deleting the Gateway;
+   - 13 `google-*` registry endpoint entries are not covered;
+   - deleting the review subscription discards its 2 untouched messages;
+   - the residuals (Firestore, secrets, both Runtime engines, the audit bucket, a 9.67 GB image
+     repository, 2 storage buckets) could bill the card once the credits expire (11–12 November).
+
+   The maintainer decides each residual. Editorial approval is not deletion authority.
 3. Write the report once from the frozen blueprint, then the consistency and privacy checks and
    one build.
 4. Final billing check, the D4 end-state record, then the maintainer's choice of reference
