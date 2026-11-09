@@ -109,8 +109,9 @@ The [claim matrix](docs/research/claim-matrix.md) bounds each claim; the
 - The 6 November daily billing check passed for currently reported usage; exact per-chunk currency
   attribution and late postings remain bounded. Current balances and reservations stay private.
 - [Version provenance](docs/VERSIONS.md) separates source pins, image assertions and unreadable
-  Runtime installed packages. v0.9.0 is the 7 November source release on ADK 2.14.0, which
-  resolves the advisory accepted at v0.8.0 ([dependency status](docs/DEPENDENCY-STATUS.md)).
+  Runtime installed packages. v0.9.1 (7 November, ADK 2.14.0) is the current release and the final
+  deployment the report evaluates (evidence 26–29); v0.9.0 resolved the advisory accepted at
+  v0.8.0 ([dependency status](docs/DEPENDENCY-STATUS.md)).
 
 The technical report is local in `report/`, uncommitted and outside the release. Its v0.9.0
 edition is rebuilt once after cohort G. The agreed fleet end state remains 8–10 November,

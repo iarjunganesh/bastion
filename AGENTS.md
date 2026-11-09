@@ -21,6 +21,11 @@ Read HANDOFF.md next, then docs/research/report-plan.md and docs/UPGRADE-PLAN.md
   Vercel's auto-deploy from `main`, and cohort G on the v0.9.0 tag under a written protocol: a
   200 SEK credits-only chunk cap within a D3 total raised to 400 SEK. GitHub repository settings
   (branch protection, auto-delete, merge methods) stay unchanged.
+- The 7–9 November decisions add: v0.9.1 (bounded, audited model retry) deployed for cohort I;
+  separate chunks J–M to close the unreached controls, the trace and timeout gaps (credits only,
+  per-chunk caps); evidence frozen after run M; **one definitive report** from the blueprint
+  frozen on 9 November. No further live experiment is authorized. Editorial approval is not
+  authority to delete resources (D4).
 
 ## Project and current state
 
@@ -34,14 +39,17 @@ first pilot failed closed on an Escalation parser incompatibility ([E24](assets/
 Separate corrected recovery passed its bounded controls; the refusal join uses a read-only
 addendum after a collector false positive ([E25](assets/evidence/25-corrected-cohort-F-verification.md)).
 Runtime stayed unchanged during recovery. Daily reported-usage billing passed on 6 November;
-private values, late-posting and attribution limits stay in the credit record. No F rerun is planned;
-cohort G on the v0.9.0 tag is a separate, separately approved cohort.
+private values, late-posting and attribution limits stay in the credit record. On 7–8 November
+v0.9.0 (cohorts G, H) and v0.9.1 (I–M) were deployed and measured: I validated 98 of 98, J's
+controls passed, K and a census bounded trace export, and M observed a worker timeout reaching
+dead-letter review ([E26–E29](assets/README.md)). Stopped runs are retained, never rerun or pooled;
+protocols are pre-specified (local records, no external timestamp), not pre-registered.
 
-Report sources are canonical in `report/` and remain uncommitted. The 6 November request
-authorizes final reconciliation, careful documentation simplification and one local PDF,
-superseding the earlier build hold. C1–C3 have results; C4 is deferred with no results.
-Keep the author line “Independent researcher, Stockholm”, dated counts (62 bindings on
-25 August, 56 on 28 October), upstream contribution credit and every collection disclosure.
+Report sources are canonical in `report/` and remain uncommitted. The blueprint
+(`report/OUTLINE.md`) was frozen on 9 November: one definitive report, C1–C3, C4 deferred. The
+6–7 November PDFs are drafts. Keep the author line “Independent researcher, Stockholm”, dated
+counts (62 bindings on 25 August, 56 on 28 October, 62 at each 7–8 November preflight),
+upstream contribution credit and every collection disclosure.
 
 The hackathon is over. Tag `v0.7.0` is the 29 August submission; no award is claimed.
 [The archive](archive/hackathon-2026/README.md), gallery and fixed video remain frozen.

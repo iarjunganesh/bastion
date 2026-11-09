@@ -3,64 +3,36 @@
 Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-plan.md) and
 [upgrade closeout](docs/UPGRADE-PLAN.md). Update Current state, Next step and Session log before stopping.
 
-## Current state — 7 November 2026
+## Current state — 9 November 2026
 
-- **Night of 7 November (uncommitted; records in `.local/measurements/2026-11-07-G` and `-H`):**
-  cohort G deployed v0.9.0 (one build, amendment A1 for a stale keep-alive resume) and stopped at
-  G5 on an observation-read failure (`collector_RetryError`; 4 validated). Cohort H reused G's fleet
-  with bounded read retries (none were needed) and stopped at H28 (`unexpected_retry_or_failure`;
-  27 validated): the Access Auditor's model call got `429 RESOURCE_EXHAUSTED`, the Orchestrator
-  failed closed (`PolicyNotEnforcedError`), and Pub/Sub redelivery completed attempt 2. Both are
-  stopped with no rerun and not pooled. The maintainer chose (7 November, 23:2x local) to fix this
-  the production way: v0.9.1 adds a bounded, audited retry of transient model errors to the
-  Access Auditor, and cohort I deploys v0.9.1 and repeats the design with model retries counted,
-  not stops. Then E26, one docs PR, the 8 November billing check, the report edition, and D4.
-- **v0.9.0 release prepared** on branch `fix/review-remediation-2026-11-07`: the review
-  remediation, `google-adk` 2.14.0 with OpenTelemetry 1.45.2 (the v0.8.0 advisory is resolved;
-  `pip-audit` clean with no exception) and the full documentation sweep. The maintainer approved,
-  on 7 November: v0.9.0 (merge with a merge commit, then tag), the v0.8.0 release-note addition,
-  keeping Vercel auto-deploy, cohort G on the v0.9.0 tag (200 SEK chunk cap, D3 total 400 SEK),
-  a report edition labelled for v0.9.0, and no GitHub repository-setting changes. The review's
-  findings and plan are in `.local/prompts/review-remediation-2026-11-07.md`; backups of `main`,
-  all tags and `report/` are in `.local/backups/`.
-- **Source-only fixes after the final deployment (not deployed):** the Escalation worker acts only
-  on bare JSON or routing attributed to `policy_step` (latest wins); the Auditor refuses fields
-  outside `AuditReport`; the Runtime app restores `ADK_CAPTURE_MESSAGE_CONTENT_IN_SPANS=false` after
-  the template's set-up; the smoke Runtime check requires the completion confirmation; operator
-  scripts are tested against the real SDK `Client`; receipts name their finding IDs and the
-  completion gate compares them (deploy worker and Runtime together); a suite-wide isolation
-  guard refuses child processes and non-loopback network. 373 tests at 100% configured coverage. The
-  deployed fleet keeps the earlier behaviour; no GCP redeploy is planned or authorized.
-- **Documentation:** CHANGELOG `[Unreleased]` corrected (the completion fix was deployed on
-  5 November) with a dated v0.8.0 known issue: the tag calls `Client.agent_engines`, absent from
-  its own pinned SDK, so it is not deployable as tagged. VERSIONS records that and the `d7d6a99`
-  amendment of PR #8's `ed1d820`. Architecture, claim matrix and observation backlog bound the
-  routing-provenance and span-content findings. Evidence 13, 19 and 22 gained append-only notes.
-- **Site:** Vercel deploys production from `main`. The PR #9 merge redeployed the console; on
-  7 November its footer matched `2a12f5f`. Treat every merge to `main` as a site deployment.
-- **Evaluation, versions, billing and end state** are unchanged from 6 November: N frozen; F
-  failed closed (E24); corrected recovery passed its bounded controls (E25); Runtime packages
-  unreadable; the 6 November reported-usage check passed with values kept private; D4 remains
-  8–10 November, dry run first, before 11 November.
-- **Git:** PR #9 (`6c1c832`) and PR #10 (`000a227`) are merged; their branches were deleted locally
-  and on `origin` on 7 November. Integration keeps merge commits; no history rewrite or retag.
-- **Report:** `report/` sources now carry the review corrections (N1–N7 chunk names, routing and
-  release limitations, nits, a §7.4 addition) and builder checks (two-digit evidence citations, no
-  chunk-style E names, no split hyphenation, line-ending-canonical hashes, non-link code colour);
-  16 report checks pass. The 6 November PDF, manifest and snapshot are unchanged and **no longer
-  match the edited sources**; one rebuild follows the merge, with the link base moved to it.
+- **Evidence is frozen.** v0.9.0 (cohorts G, H) and v0.9.1 (cohort I, chunks J–M) were deployed
+  and measured on 7–8 November ([E26–E29](assets/README.md)). I validated 98 of 98, and its I99
+  addendum is separate. J's controls passed. K plus a 142-trace census show incomplete Runtime
+  graph-span export. M observed a worker timeout reaching dead-letter review, with worker
+  computation continuing after the timeout. L (an instrument stop) and M's preflight amendment are
+  retained. Nothing is rerun or pooled. Protocols are **pre-specified**, not pre-registered. Sealed
+  hashes: `.local/measurements/seal-2026-11-09.json`.
+- **Fleet:** v0.9.1 everywhere. The Auditor is on revision 00039 (I's image and configuration,
+  verified). The dead-letter review queue holds 2 untouched messages. Nothing is running locally.
+- **Report:** one definitive report. The blueprint was frozen on 9 November (`report/OUTLINE.md`,
+  local) after two external reviews and the maintainer's approval. The 6–7 November PDFs are drafts.
+  Title: *Bastion: Execution Boundaries, Control Evolution, and Bounded Evaluation of a Governed
+  Agent Fleet.*
+- **Billing:** daily checks passed on 6 and 8 November (2–8 November fully offset by credits, net
+  0). Late postings are expected; cost stays bounded.
+- **Docs PR in progress** on `docs/definitive-report-evidence`: E26–E29, the claim matrix, the
+  version ledger, the architecture, the backlog, the plans, the site paragraph, and the E19
+  docstring wording (comment only).
 
 ## Next step
 
-1. Push, open the PR, wait for all CI jobs, merge with a merge commit (this redeploys the
-   console), verify the live footer, tag the merge commit `v0.9.0` and verify the release, add
-   the v0.8.0 known-issue note to its GitHub release, and close issue #3.
-2. Cohort G: write and get approval for the protocol under `.local/measurements/2026-11-07-G/`,
-   deploy the exact v0.9.0 tag to both surfaces together, run it before the D4 window, seal it,
-   record evidence 26 and run the next-day billing check.
-3. Rebuild the report once as the v0.9.0 edition with its link base on the tag commit; review
-   every page and link; keep `report/` uncommitted.
-4. Resume D4 in the agreed 8–10 November window, dry run first, after G's billing check.
+1. Validate and push the docs PR. CI must pass. Merging redeploys the site.
+2. D4 dry run (non-destructive). The maintainer decides each residual resource; editorial
+   approval is not deletion authority.
+3. Write the report once from the frozen blueprint, then the consistency and privacy checks and
+   one build.
+4. Final billing check, the D4 end-state record, then the maintainer's choice of reference
+   (`report-2026-11` recommended), DOI and site release.
 
 ## Session log
 
@@ -145,3 +117,13 @@ together.
 Gates: Ruff/format, mypy (41 files), 373 tests at 100% configured coverage, docs, versions, site,
 diagram, redaction, Markdown lint, 9 study cases and 16 report checks. No push, merge, deployment,
 paid probe, PDF rebuild or publication.
+
+### 7–9 November — final deployment, measurement and blueprint freeze
+
+PR #11 (v0.9.0) and PR #12 (v0.9.1, the bounded audited model retry, after H28's 429) were merged
+and tagged. Measurement covered G and H on v0.9.0, and I–M on v0.9.1. Billing was checked on
+8 November. After a GPT/Codex second opinion, the maintainer chose one definitive report and
+approved a frozen blueprint (9 November), using "pre-specified" wording, three-part provenance
+statements and M's reconstructed protocol hash as a disclosed limitation. Read-only post-hoc
+analyses (the M ordering check and the trace census) are labelled as such. The G–M records were
+sealed on 9 November.

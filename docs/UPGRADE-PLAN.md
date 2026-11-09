@@ -1,6 +1,6 @@
 # ADK upgrade closeout
 
-Updated 7 November 2026. v0.8.0 was released as source on 28 October with one accepted
+Updated 9 November 2026. v0.8.0 was released as source on 28 October with one accepted
 OpenTelemetry advisory; v0.9.0 moves to ADK 2.14.0 and OpenTelemetry 1.45.2, which resolves it
 ([dependency status](DEPENDENCY-STATUS.md)). Source pins do not prove a
 deployed resolution; [VERSIONS.md](VERSIONS.md) is the canonical provenance table.
@@ -22,8 +22,9 @@ deployed resolution; [VERSIONS.md](VERSIONS.md) is the canonical provenance tabl
 
 ## Current verification and remaining work
 
-1. The 6 November reconciliation and local PDF are superseded by the 7 November review
-   remediation; the report's v0.9.0 edition is rebuilt once after cohort G.
+1. The 6 November reconciliation and local PDF are drafts, superseded. v0.9.0 and v0.9.1 were
+   deployed on 7 November and cohorts G–M are recorded (evidence 26–29). One definitive report
+   is written once from the blueprint frozen on 9 November.
    Preserve the audit corrections, collection disclosures and both separately sealed F records.
 2. The final offline gates passed; commands remain in [AGENTS.md](../AGENTS.md): core coverage, Ruff, mypy, docs/version,
    evidence redaction, diagram freshness, static site and Markdown checks. Check diagrams only;

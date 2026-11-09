@@ -183,9 +183,10 @@ async def run_managed_runtime(event: InvestigationEvent) -> None:
     """Dispatch durable Eventarc work into the identity-bearing, Gateway-bound Runtime.
 
     **The end of the stream is not success.** It was treated as success, and on 2026-11-03
-    (evidence 19) one investigation was recorded completed after the Runtime replaced its
-    instance and the stream ended with no work done: no audit record, no review, no model
-    call. Success now requires the completion gate's confirmation event; anything else raises,
+    (evidence 19) one investigation was recorded completed when the stream ended with no work
+    done: no audit record, no review, no model call. Two Runtime instances started during that
+    run; the Runtime-side cause is not established. Success now requires the completion gate's
+    confirmation event; anything else raises,
     the durable record is marked failed, and Eventarc's retry policy redelivers.
     """
     project = os.environ["GOOGLE_CLOUD_PROJECT"]

@@ -11,7 +11,8 @@ capability with code and no capture is deliberately not claimed.
 
 ## Upgrade verification — source and deployment are separate
 
-**Current source target: Google ADK 2.14.0 (v0.9.0).** The retained evidence describes the
+**Current source and final deployment: v0.9.1 on Google ADK 2.14.0**, deployed 7 November
+([evidence 26](../../assets/evidence/26-cohorts-g-h-i.md)); evidence is frozen after run M on 8 November. The retained evidence describes the
 historical fleet; the 5 November cohorts ran `google-adk` 2.13.0. Both surfaces were updated on 5 November, but the F pilot failed on a quoted-routing
 parser incompatibility; [evidence 24](../../assets/evidence/24-upgraded-deployment-and-stopped-pilot.md)
 records the deployment and fail-closed outcome. The separate corrected recovery
@@ -44,11 +45,14 @@ The recovery collector's final refusal check falsely counted a pre-refusal plugi
 the original stop is preserved with a separate reviewed read-only temporal/ID-join addendum.
 No further Gateway or original worker-timeout experiment is added by this follow-up.
 
-### Review findings, 7 November — fixed in source, not deployed
+### Review findings, 7 November — fixed in v0.9.0, deployed 7 November
 
 An independent review of the retained code and evidence found two gaps that tests at 100%
 configured coverage did not exercise. Neither was observed causing a wrong outcome, and no live
-probe was run for either. Both fixes are source-only; the deployed fleet keeps the behaviour below.
+probe was run for either at the time. Both fixes shipped in v0.9.0 and are deployed (v0.9.0 for
+cohorts G and H, v0.9.1 from cohort I). Routing provenance was exercised live on 8 November
+([evidence 27](../../assets/evidence/27-targeted-controls-j.md)) and span attributes were opened
+([evidence 28](../../assets/evidence/28-telemetry-census-k.md)). The text below describes the pre-fix behaviour.
 
 - **Routing provenance.** The deployed Escalation worker took the first relayed part carrying
   `departments` from any attributed agent. ADK 2.13 relays the Auditor's model-written reply before
@@ -97,7 +101,7 @@ No further live capture is planned; current claim wording is in the [matrix](cla
 | 4 | ~~Structured audit logs correlated by context ID for that same run, **including a refusal**~~ | — | **Closed 2026-08-25, with a stated boundary** — [evidence 11](../../assets/evidence/11-current-route-correlation.md) assembles 28 unique payload-free events across three invocation ids under one investigation id, and [evidence 12](../../assets/evidence/12-agent-mediated-model-armor-refusal.md) supplies a refusal recorded under the same audit contract. The refusal comes from a separate probe, not from the correlated run itself, so the guardrail trail is observed but the two are not one investigation. |
 | 5 | ~~The redacted real-IAM basis for the findings, from the current route~~ | — | **Closed 2026-08-25** — [evidence 11](../../assets/evidence/11-current-route-correlation.md). A count-only companion probe on the current route measured 62 live bindings, 3 deterministic findings, 2 canonical owning departments and 0 raw IAM fields at the model boundary. This supersedes [evidence 02](../../assets/evidence/02-gemini-investigation.md), which stays retained as historical pre-Gateway proof. |
 | 6 | Gateway refusals: unregistered caller, undeclared skill | — | **Two**, not three. The rate-limit refusal was removed by decision below, not deferred; both remaining refusals are asserted offline in `tests/security/test_gateway_policy.py`. **Not performed as designed; replaced for the report on 2026-11-04** by [evidence 20](../../assets/evidence/20-gateway-unmatched-egress-refusal.md): the Gateway is egress-only (`AGENT_TO_ANYWHERE`), so an unregistered-*caller* refusal cannot occur there; what was observed is fail-closed refusal of Runtime egress it did not match to a registered endpoint. Neither original probe is claimed and none is planned. |
-| 7 | A worker timing out, retrying, then escalating | Deployed Runtime | Retry is deployed and suite-tested; the sequence has not been watched end to end. **Replaced for the report on 2026-11-04** by [evidence 21](../../assets/evidence/21-redelivery-and-dead-letter.md): one rejected event on the production subscription, delivered five times in all (four redeliveries) and dead-lettered. That is a permanent rejection at the ingress, not a worker timeout; the timeout→retry→escalation sequence remains unobserved and is not claimed. |
+| 7 | A worker timing out, retrying, then escalating | Deployed Runtime | Retry is deployed and suite-tested; the sequence has not been watched end to end. **Replaced for the report on 2026-11-04** by [evidence 21](../../assets/evidence/21-redelivery-and-dead-letter.md): one rejected event on the production subscription, delivered five times in all (four redeliveries) and dead-lettered. That is a permanent rejection at the ingress, not a worker timeout; the timeout→retry→escalation sequence remains unobserved and is not claimed. **Observed 2026-11-08** by [evidence 29](../../assets/evidence/29-timeout-fault-injection-l-m.md): an injected 3 s Auditor timeout produced five failed attempts and dead-letter review, with worker computation continuing past the estimated timeout boundaries. |
 
 ## Scope note on capture 2
 
