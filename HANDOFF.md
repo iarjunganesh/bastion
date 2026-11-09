@@ -122,7 +122,7 @@ override variable name; both failed and nothing changed. A suite-wide isolation 
 child processes and non-loopback network or DNS in every test (the suite needed no exemption).
 Receipts now name their finding IDs and the completion gate compares them; deploy both surfaces
 together.
-Gates: Ruff/format, mypy (41 files), 373 tests at 100% configured coverage, docs, versions, site,
+Gates: Ruff/format, mypy (41 files), 373 core cases at 100% configured coverage, docs, versions, site,
 diagram, redaction, Markdown lint, 9 study cases and 16 report checks. No push, merge, deployment,
 paid probe, PDF rebuild or publication.
 

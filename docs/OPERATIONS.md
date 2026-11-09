@@ -38,8 +38,13 @@ then does not carry it. With `enable_tracing=True` the template reads `unspecifi
 value; ADK additionally sends its telemetry user-agent header.
 
 `infrastructure/rollback.py` is dry-run by default and permits only one of the two newest safe
-revisions. `infrastructure/teardown.py` is also dry-run by default and preserves Firestore,
-secrets, managed Runtime/Memory, and audit logs. Applying teardown requires the exact project ID.
+revisions. `infrastructure/teardown.py` is also dry-run by default: it verifies the exact
+project, describes every allowlisted serving resource, reconciles the regional Agent Registry
+(the worker and Runtime cards plus the 14 Google API endpoint registrations), and prints a JSON
+inventory. An unrecognised or non-Bastion registry entry, or any error other than an explicit
+not-found, stops it before deletion; the legacy dispatcher card is expected absent. `--apply`
+requires `--confirm-project` and a clean fresh inventory, and stops on the first failed delete.
+Firestore, secrets, managed Runtime/Memory, audit logs, images and IAM are never touched.
 
 ## Failure semantics
 
