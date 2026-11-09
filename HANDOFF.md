@@ -12,35 +12,40 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   computation continuing after the timeout. L (an instrument stop) and M's preflight amendment are
   retained. Nothing is rerun or pooled. Protocols are **pre-specified**, not pre-registered. Sealed
   hashes: `.local/measurements/seal-2026-11-09.json`.
-- **Fleet:** v0.9.1 everywhere. The Auditor is on revision 00039 (I's image and configuration,
-  verified). The dead-letter review queue holds 2 untouched messages. Nothing is running locally.
+- **Fleet retired (D4 closed 9 November).** Teardown A (`teardown.py` from `8f63fc6`) deleted
+  25 of 26 allowlisted serving resources. The Gateway `bastion-egress` is retained because the
+  retained Runtime engine's `agentGatewayConfig` references it (`FAILED_PRECONDITION`; an authz
+  policy also targets it). It was not retried, by the maintainer's decision. The image repository
+  and both build buckets are deleted (B). The 2 dead-letter messages were captured first by a
+  separately dated, non-acknowledging read-only inspection (A0): exact event-ID joins to F1 and M1.
+  The deployed v0.9.0/v0.9.1 images were exported by digest and verified.
 - **Report:** one definitive report. The blueprint was frozen on 9 November (`report/OUTLINE.md`,
   local) after two external reviews and the maintainer's approval. The 6–7 November PDFs are drafts.
   Title: *Bastion: Execution Boundaries, Control Evolution, and Bounded Evaluation of a Governed
   Agent Fleet.*
 - **Billing:** daily checks passed on 6 and 8 November (2–8 November fully offset by credits, net
-  0). Late postings are expected; cost stays bounded.
-- **Docs PR in progress** on `docs/definitive-report-evidence`: E26–E29, the claim matrix, the
-  version ledger, the architecture, the backlog, the plans, the site paragraph, and the E19
-  docstring wording (comment only).
+  0). On 9 November billing was disconnected from `bastion-fleet-2026` only (verified: no billing
+  account, billing disabled). The shared account and the other project are unchanged. Charges
+  incurred earlier, including soft-deleted storage, may still post.
+- **Retained, not deleted:** the Gateway (with its authz policy and extension), 2 Runtime engines
+  with Sessions/Memory, Firestore, 2 secrets, the `bastion-audit` log bucket, service accounts and
+  IAM. With billing off, billing-gated APIs refuse access, and these may become unrecoverable.
+- **Known teardown gap:** `teardown.py` does not inventory the Gateway's dependants (the authz
+  policy, the extension, the Runtime gateway reference). Its dry runs therefore could not predict
+  the stop.
+- **Preservation:** the local archives and an encrypted, independently verified off-laptop copy
+  (695 files: the seal, A0 and both OCI images). Records are in `.local/d4/`, including
+  `d4-closeout-2026-11-09.json`.
 
 ## Next step
 
-1. Validate and push the docs PR. CI must pass. Merging redeploys the site.
-2. D4: the dry run is done (9 November, read-only; `.local/d4/d4-dry-run-2026-11-09.json`). It
-   found four things:
-   - `teardown.py --apply` would abort at a non-existent registry entry (`bastion-orchestrator`)
-     before deleting the Gateway;
-   - 13 `google-*` registry endpoint entries are not covered;
-   - deleting the review subscription discards its 2 untouched messages;
-   - the residuals (Firestore, secrets, both Runtime engines, the audit bucket, a 9.67 GB image
-     repository, 2 storage buckets) could bill the card once the credits expire (11–12 November).
-
-   The maintainer decides each residual. Editorial approval is not deletion authority.
-3. Write the report once from the frozen blueprint, then the consistency and privacy checks and
-   one build.
-4. Final billing check, the D4 end-state record, then the maintainer's choice of reference
-   (`report-2026-11` recommended), DOI and site release.
+1. Write the complete manuscript once from the frozen blueprint (`report/OUTLINE.md`), using
+   the v0.9.1 source and E01–E29.
+2. Reconcile each claim against the evidence and code, verify citations, run the privacy check,
+   and build the PDF once for the maintainer's review.
+3. Run the final billing check after late postings.
+4. Only after the maintainer approves the manuscript and the publication manifest: the
+   `report-2026-11` tag, the DOI (Zenodo) and the site release. No new experiments.
 
 ## Session log
 
@@ -135,3 +140,20 @@ approved a frozen blueprint (9 November), using "pre-specified" wording, three-p
 statements and M's reconstructed protocol hash as a disclosed limitation. Read-only post-hoc
 analyses (the M ordering check and the trace census) are labelled as such. The G–M records were
 sealed on 9 November.
+
+### 9 November — D4 closeout
+
+PR #13 (E26–E29 and the documentation sweep) and PR #14 were merged. PR #14 is the
+inventory-first, allowlisted teardown, with four review findings fixed: status-only errors, exact
+not-found parsing, list/describe reconciliation and delete timeouts. Before teardown:
+
+- A0 inspected the 2 dead-letter messages without acknowledging them and joined them to F1 and
+  M1 by event ID. It is post hoc and separately dated; E29 is unchanged.
+- The two deployed images were exported by digest.
+- The cohort build sources were verified against the source manifests.
+- The encrypted off-laptop backup was independently verified.
+
+Then A deleted 25 of 26 resources; the Gateway was retained because of the Runtime dependency.
+The maintainer then ran B (the repository and 2 buckets) and C (billing unlinked from this project
+only) in their own terminal, because local permission rules blocked Claude's delete commands.
+Read-only checks confirmed the end state. The seals are unchanged (73/73 files).

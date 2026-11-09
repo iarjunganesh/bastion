@@ -52,8 +52,8 @@
 [![pytest](https://img.shields.io/badge/pytest-9.1.1-0A9EDC?logo=pytest&logoColor=white)](https://docs.pytest.org/)
 [![Vercel Hobby](https://img.shields.io/badge/Vercel-Hobby-000000?logo=vercel&logoColor=white)](https://vercel.com)
 
-<!-- Row 6 — the public evidence console's own live hosting. The operational fleet stays on GCP;
-     this is the presentation plane only, per the "public evidence console" note below. -->
+<!-- Row 6 — the public evidence console's own live hosting. The GCP fleet was retired on 9 November
+     2026; this is the presentation plane only, per the "public evidence console" note below. -->
 [![Vercel live frontend](https://img.shields.io/badge/Vercel-live_frontend-000000?logo=vercel&logoColor=white)](https://bastion.arjunganesh.dev)
 
 ---
@@ -115,7 +115,10 @@ The [claim matrix](docs/research/claim-matrix.md) bounds each claim; the
 
 The technical report is local in `report/`, uncommitted and outside the release. One
 definitive report is written once from the blueprint frozen on 9 November; the 6–7 November
-PDFs are drafts, not editions. The fleet end state (D4) follows its 9 November dry run.
+PDFs are drafts, not editions. **The fleet was retired on 9 November 2026 (D4):** its serving
+resources were deleted, the Agent Gateway is retained because a retained Runtime engine
+references it, and billing was disconnected from the project. The evidence above is dated
+history; see [HANDOFF](HANDOFF.md) for the verified end state.
 Report publication is a separate action. The public console redeploys from
 `main`, by maintainer decision: merging a PR publishes its `site/` changes.
 

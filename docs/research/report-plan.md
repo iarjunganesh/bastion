@@ -37,7 +37,7 @@ Live measurement ended with run M on 8 November. No further experiment is planne
 | K, 8 Nov | Trace-export isolation and the read-only 142-trace census ([E28](../../assets/evidence/28-telemetry-census-k.md)) |
 | L and M, 8 Nov | Timeout fault injection: L stopped on an instrument fault; M met its criteria ([E29](../../assets/evidence/29-timeout-fault-injection-l-m.md)) |
 | Billing | Daily checks passed on 6 and 8 Nov (the 2–8 Nov gross was fully offset by credits, net 0). Per-chunk cost stays bounded, never measured |
-| Fleet end state | D4 dry run in progress; no shutdown has been claimed |
+| Fleet end state | D4 closed on 9 Nov. 25 of 26 serving resources deleted; Gateway retained (Runtime dependency); image repository and build buckets deleted; billing disconnected from this project only. Firestore, secrets, Runtime/Memory, the audit bucket and IAM are retained and may become inaccessible |
 
 ## Provenance boundaries
 
@@ -69,16 +69,14 @@ Numeric balances and billing receipts stay in ignored `.local/`.
 
 ## Remaining sequence
 
-1. Docs PR: E26–E29, the claim matrix, the version ledger, the v0.9.1 documentation sweep, site
-   data and the E19 docstring wording.
-2. D4: dry run, then the maintainer's residual-resource decisions. Firestore, secrets,
-   Runtime/Memory and audit state are retained by default; nothing here authorizes their
-   deletion or an irreversible bucket lock.
-3. Write the report once from the frozen blueprint, then run a consistency check (report,
-   claim matrix, evidence) and the privacy check, then one build.
-4. Final billing check after late postings; record the D4 end state.
-5. Release: refresh public links, choose the immutable reference, and obtain the maintainer's
-   approval for the tag, DOI (Zenodo) and site.
+1. Done: the docs PR (#13) and the teardown fix (#14).
+2. Done: D4 (9 Nov). Recorded in HANDOFF and in `.local/d4/d4-closeout-2026-11-09.json`.
+3. Next: write the complete manuscript once from the frozen blueprint. Then a claim-by-claim
+   consistency check (report, claim matrix, evidence, code), citation verification, the privacy
+   check and one build, for the maintainer's review.
+4. Final billing check after late postings.
+5. Release, only on the maintainer's approval of the manuscript and publication manifest: refresh
+   public links, then the `report-2026-11` tag, the DOI (Zenodo) and the site.
 
 ## Evidence and manuscript rules
 
