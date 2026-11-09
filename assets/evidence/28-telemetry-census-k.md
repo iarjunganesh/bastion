@@ -52,8 +52,11 @@ Limits:
 - Traces are **not** joined one-to-one to investigations: about 149 dispatches fall in the
   window, against 142 traces.
 - Cloud Trace sampling is unknown.
-- Pre-upgrade samples of 30 traces each contained Runtime graph spans: 13 on 27 October and
-  10 on 3–4 November. Worker spans were separate traces then. These were samples, not a census.
+- Pre-upgrade comparison: in one sample of 30 traces per period (the first page of a
+  `span:invoke_agent` listing), **13 of 30** traces on 27 October and **10 of 30** on 3–4 November
+  contained Runtime graph spans (`invoke_workflow orchestrator`). Worker spans were separate
+  traces then, so one investigation produced up to three traces. These sample denominators are
+  therefore not comparable with the census's 5 of 142, which counts traces of a different shape.
 
 ## Findings, bounded
 

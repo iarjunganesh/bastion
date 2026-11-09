@@ -113,9 +113,10 @@ The [claim matrix](docs/research/claim-matrix.md) bounds each claim; the
   deployment the report evaluates (evidence 26–29); v0.9.0 resolved the advisory accepted at
   v0.8.0 ([dependency status](docs/DEPENDENCY-STATUS.md)).
 
-The technical report is local in `report/`, uncommitted and outside the release. Its v0.9.0
-edition is rebuilt once after cohort G. The agreed fleet end state remains 8–10 November,
-dry run first. Report publication is a separate action. The public console redeploys from
+The technical report is local in `report/`, uncommitted and outside the release. One
+definitive report is written once from the blueprint frozen on 9 November; the 6–7 November
+PDFs are drafts, not editions. The fleet end state (D4) follows its 9 November dry run.
+Report publication is a separate action. The public console redeploys from
 `main`, by maintainer decision: merging a PR publishes its `site/` changes.
 
 ## A boundary failure worth testing
