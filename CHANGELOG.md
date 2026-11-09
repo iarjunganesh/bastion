@@ -40,6 +40,17 @@ hackathon-era release plan is archived with the rest of the submission material.
 - The dispatcher docstring no longer attributes evidence 19's empty stream to a Runtime
   instance replacement; that cause is not established.
 
+### Fixed — teardown
+
+- `infrastructure/teardown.py` would have aborted halfway: it deleted a legacy registry card
+  that no longer exists, before reaching the Gateway, and it omitted the 14 Google API endpoint
+  registrations. It now inventories first, treats only the command's own not-found for the exact
+  resource as absence, expects the legacy card to be absent, refuses unrecognised or non-Bastion
+  registry entries and any listing/describe disagreement, requires the exact project for
+  `--apply`, and stops on the first failed or timed-out delete (a timeout's outcome is reported as
+  unknown). Errors are reported as status codes; gcloud stderr, which can name the authenticated
+  principal, is never printed. Retained state is untouched.
+
 ## [0.9.1] - 2026-11-07
 
 Patch release after cohort H. The Access Auditor retries a transient model-service rejection
