@@ -65,6 +65,13 @@
       "state": "DATED INVENTORY",
       "accent": "#a98bff",
       "recordUrl": "https://github.com/iarjunganesh/bastion/blob/e569bc8ee2538ac20661f4fd01bcb4c7a2af9dac/assets/evidence/15-fleet-inventory.md"
+    },
+    {
+      "title": "Final v0.9.1 evaluation",
+      "summary": "7–8 November: 98 of 98 serial investigations validated in cohort I, targeted controls passed, and an injected worker timeout failed closed into dead-letter review. Stopped runs retained; pre-specified, bounded observations, not a reliability rate.",
+      "state": "FINAL DEPLOYMENT",
+      "accent": "#45d3d0",
+      "recordUrl": "https://github.com/iarjunganesh/bastion/blob/080ea0730303f8db1ec57e73cbce59b43b4905ce/assets/evidence/26-cohorts-g-h-i.md"
     }
   ],
   "video": {

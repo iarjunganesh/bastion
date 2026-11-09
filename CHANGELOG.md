@@ -12,6 +12,34 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ## [Unreleased]
 
+### Added — final deployment evidence (7–8 November)
+
+- Evidence 26: cohorts G and H on v0.9.0 and cohort I on v0.9.1. I validated 98 of 98 serial
+  investigations, with one audited model retry that recovered (I57), and stopped at I99 on a
+  Cloud Logging outage. H stopped when H28's model 429 failed closed, which led to v0.9.1. G
+  stopped on a transient Firestore read. A read-only addendum shows I99 met every criterion; it
+  stays outside the 98.
+- Evidence 27: on I's fleet, the direct Runtime control, five completed-event replays, a Model
+  Armor refusal and the forged-envelope pair all passed. Auditor-attributed routing is rejected
+  live.
+- Evidence 28: one connected 172-span trace on v0.9.1 with no content-bearing attributes. A
+  read-only census of 142 traces found Runtime graph spans in only 5, so per-investigation tracing
+  is not claimed after the upgrade.
+- Evidence 29: capture 7 observed. An injected 3-second Auditor timeout failed one
+  investigation closed through five attempts into dead-letter review. The worker's own
+  computation continued past the estimated timeout boundaries. The preceding run L, an
+  instrument stop, is retained.
+
+### Changed
+
+- Protocols for G–M are described as **pre-specified**, not pre-registered: they are local
+  records with execution-time hash checks and no external timestamp. Hashes sealed on 9 November
+  establish integrity from that date only.
+- The claim matrix, version ledger, architecture, observation backlog and report plan describe
+  v0.9.0/v0.9.1 as deployed. Evidence is frozen and one definitive report follows.
+- The dispatcher docstring no longer attributes evidence 19's empty stream to a Runtime
+  instance replacement; that cause is not established.
+
 ## [0.9.1] - 2026-11-07
 
 Patch release after cohort H. The Access Auditor retries a transient model-service rejection

@@ -216,8 +216,8 @@ Three contracts now close it: the Escalation Agent acts only on bare JSON or tex
 `AuditReport`; and each receipt names the finding IDs it delivered, which the completion gate
 requires to equal the routed IDs. A receipt without IDs fails closed, so the Escalation worker
 and the Runtime are deployed together. A regression test builds the hop with ADK's own A2A
-message builder. These changes are in v0.9.0; until cohort G deploys that tag, the fleet keeps
-the earlier behaviour.
+message builder. These changes are in v0.9.0, deployed 7 November with cohort G; evidence 27 exercises
+the provenance rule live on v0.9.1.
 
 ## Upstream contribution status
 

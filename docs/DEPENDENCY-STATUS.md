@@ -1,6 +1,6 @@
-# Dependency status — 7 November 2026
+# Dependency status — 9 November 2026
 
-v0.9.0 has **no accepted advisory**. `google-adk` 2.14.0, published 7 November, admits
+v0.9.0 and v0.9.1 have **no accepted advisory** (v0.9.1 changed no dependency). `google-adk` 2.14.0, published 7 November, admits
 `opentelemetry-api`/`sdk` 1.45.2, which fixes CVE-2026-114603. The lock moved only `google-adk`
 and the OpenTelemetry family; `pip-audit` reports no known vulnerability without any exception,
 and the CI audit and `make audit-dependencies` no longer skip an ID. This closes

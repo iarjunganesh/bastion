@@ -8,8 +8,8 @@ Bastion's central claim is backed by redacted captures rather than architecture 
 
 ## Evidence ledger
 
-The [4–5 November audit and corrections](../docs/research/evidence-audit-2026-11-04.md) cover all
-23 records. Keep original captures unchanged and use the corrected derived values and proof
+The [4–5 November audit and corrections](../docs/research/evidence-audit-2026-11-04.md) cover the
+first 23 records; evidence 24–29 carry their own disclosures. Keep original captures unchanged and use the corrected derived values and proof
 boundaries when making current claims.
 
 | Evidence | Captured fact | Boundary |
@@ -39,6 +39,10 @@ boundaries when making current claims.
 | [23 - deployment census and packages](evidence/23-deployment-census.md) | 28 Oct census (56 bindings, 3 findings) and 4 Nov image packages: one digest across four services, `google-adk` 2.7.1, 161 distributions | Runtime packages unreadable; no census on the evaluation days; original census seal unavailable, while the separate package bundle is sealed |
 | [24 - upgraded deployment and stopped F pilot](evidence/24-upgraded-deployment-and-stopped-pilot.md) | 5 Nov: four Cloud Run image updates and one Runtime update verified; one pilot failed across five automatic deliveries, with 10 completed model audit records and no reviews | Missing routing envelope; completion stayed failed. Source drained, one review-queue message retained; aggregate time-window join only. Positive completion/refusal-join controls were not run in this stopped chunk; the later recovery is evidence 25 |
 | [25 - corrected F functional verification](evidence/25-corrected-cohort-F-verification.md) | 5 Nov: five normal investigations, one separate true-wire control, two completed-event replays and one direct refusal join passed; 12 model completions | One-attempt normal cases; delivery joins use isolated time windows, not message IDs. Refusal join uses a read-only addendum after a collector temporal false positive. Original failed F retained separately; 6 Nov daily billing check passed for reported usage; no exact per-chunk cost or reliability rate |
+| [26 - cohorts G, H and I](evidence/26-cohorts-g-h-i.md) | 7–8 Nov: v0.9.0 cohorts G (4 validated, instrument stop) and H (27 validated, then H28's model 429 failed closed); v0.9.1 cohort I: 98 of 98 validated, one audited model retry (I57), instrument stop at I99 on a Cloud Logging outage | Separate stopped cohorts, never pooled or rerun; I99's read-only addendum is outside the 98; pre-specified (local records, no external timestamp); the 3.01% bound is a conditional illustration only; no SLO or reliability rate |
+| [27 - targeted controls J](evidence/27-targeted-controls-j.md) | 8 Nov, I's fleet: direct Runtime control, five completed-event replays (I98 for the never-run I100), one direct Model Armor refusal and the forged-envelope pair all passed | Routing test shows Auditor-attributed routing rejected, not that unauthorized routing is impossible; replays show no additional effects in 120 s windows, not exactly-once delivery |
+| [28 - telemetry census and isolation K](evidence/28-telemetry-census-k.md) | 8 Nov: J0's connected 172-span trace; K1 exported Runtime graph spans and K2 did not; read-only census of 142 agent traces (5–8 Nov) found the Runtime graph in 5 and zero content-bearing attributes | Post-hoc; traces not joined one-to-one to investigations; sampling unknown; root cause unresolved; bounds inspected traces only |
+| [29 - timeout fault injection L and M](evidence/29-timeout-fault-injection-l-m.md) | 8 Nov: L stopped on an instrument fault before its fault reached anything; M's injected 3 s Auditor timeout gave 5 failed attempts (503 after 504), 0 reviews and dead-letter review; worker execution continued past estimated timeout boundaries | Dead-letter attribution by isolated window, not message ID; cancellation analysis post hoc with estimated boundaries; M's original protocol hash reconstructed; configuration restored and verified |
 
 The August captures and gallery remain dated publication records. Evidence 14 adds a
 separately dated operational validation and verified data bundle; it does not refresh the
