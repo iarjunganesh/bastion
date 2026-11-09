@@ -71,9 +71,9 @@ Numeric balances and billing receipts stay in ignored `.local/`.
 
 1. Done: the docs PR (#13) and the teardown fix (#14).
 2. Done: D4 (9 Nov). Recorded in HANDOFF and in `.local/d4/d4-closeout-2026-11-09.json`.
-3. Next: write the complete manuscript once from the frozen blueprint. Then a claim-by-claim
-   consistency check (report, claim matrix, evidence, code), citation verification, the privacy
-   check and one build, for the maintainer's review.
+3. Review draft built (local): the complete manuscript from the frozen blueprint, the
+   claim-by-claim reconciliation, citation verification (one open author-name check) and a
+   validated build. Next: the maintainer's review, then one final build.
 4. Final billing check after late postings.
 5. Release, only on the maintainer's approval of the manuscript and publication manifest: refresh
    public links, then the `report-2026-11` tag, the DOI (Zenodo) and the site.

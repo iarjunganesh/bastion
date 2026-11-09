@@ -39,10 +39,13 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Next step
 
-1. Write the complete manuscript once from the frozen blueprint (`report/OUTLINE.md`), using
-   the v0.9.1 source and E01–E29.
-2. Reconcile each claim against the evidence and code, verify citations, run the privacy check,
-   and build the PDF once for the maintainer's review.
+1. **Done (local, uncommitted `report/`):** the complete manuscript was written from the frozen
+   blueprint. It has 10 sections, Appendices A–C, 3 figures and about 11,400 words, and it builds
+   to 23 pages with no validation findings. The claim-by-claim reconciliation is in
+   `report/qa/claim-reconciliation.md`. One citation item is open: the first-author name of R7
+   ("Gray Failure", HotOS 2017).
+2. **Next:** the maintainer reviews the PDF (`report/bastion-technical-report-2026-11.pdf`).
+   Corrections are verified evidence or accuracy fixes only, then one final build.
 3. Run the final billing check after late postings.
 4. Only after the maintainer approves the manuscript and the publication manifest: the
    `report-2026-11` tag, the DOI (Zenodo) and the site release. No new experiments.
@@ -157,3 +160,8 @@ Then A deleted 25 of 26 resources; the Gateway was retained because of the Runti
 The maintainer then ran B (the repository and 2 buckets) and C (billing unlinked from this project
 only) in their own terminal, because local permission rules blocked Claude's delete commands.
 Read-only checks confirmed the end state. The seals are unchanged (73/73 files).
+
+Then the complete manuscript was written once from the frozen blueprint. The previous drafts are
+archived privately. It has 3 new figures (topology and trust boundaries, chronology, M's timeout
+timeline), was reconciled claim by claim against E01–E29 and the v0.9.1 source, and was built to
+a 23-page review draft with no layout or citation findings. The tag and DOI are not created.
