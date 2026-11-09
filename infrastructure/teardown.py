@@ -7,15 +7,22 @@ refuses to start unless a fresh inventory is clean.
 
 What "clean" means, and why each rule exists (D4 dry run, 9 November 2026):
 
-- A target is either *present* (describe succeeded) or *absent* (describe failed with an
-  explicit not-found). Any other failure -- permission, wrong project, quota -- stops the run;
-  errors are never broadly suppressed.
+- A target is either *present* (describe succeeded) or *absent* (the primary gcloud error is
+  that command's own not-found for that exact resource). Any other failure -- permission,
+  authentication, quota, timeout, an unparseable error -- stops the run; errors are never
+  broadly suppressed, and text elsewhere in stderr (an account name, for example) cannot turn a
+  refusal into absence.
+- gcloud stderr is never echoed: it can name the authenticated principal. Failures are reported
+  as an allowlisted status code against the affected target.
 - The legacy Cloud Run dispatcher's former registry card (``bastion-orchestrator``) is
   *expected* to be absent: ``register_agents`` deletes it. The previous script tried to delete
   it unconditionally and would have aborted halfway, before the Gateway.
 - Every registry service in the location must be on the allowlist, which now includes the
-  thirteen Google API endpoint registrations ``register_agents`` creates for Gateway egress.
-  An unrecognised entry stops the run rather than being skipped or deleted.
+  fourteen Google API endpoint registrations ``register_agents`` creates for Gateway egress.
+  An unrecognised entry stops the run rather than being skipped or deleted, and so does any
+  disagreement between the listing and the individual describes.
+- A delete that times out has an unknown outcome: the run stops, reports how many deletions
+  completed, and requires a fresh inventory before any retry.
 - Each registry entry must look like Bastion's: exact resource name, the display name Bastion
   writes, and, for endpoint registrations, only Google API interface hosts.
 
@@ -71,7 +78,32 @@ CLOUD_RUN_SERVICES = (
     "bastion-findings-api",
 )
 
-_NOT_FOUND = re.compile(r"NOT_FOUND|was not found|Cannot find service|could not be found", re.I)
+# gcloud's primary error line: ``ERROR: (gcloud.<command>) <message>``. Only the first such line
+# is parsed; the rest of stderr is ignored and never printed.
+_PRIMARY_ERROR = re.compile(r"^ERROR: \(gcloud\.(?P<command>[\w.-]+)\) (?P<message>.*)$", re.M)
+_STATUS = re.compile(r"(?P<code>[A-Z][A-Z_]+):")
+# Canonical RPC status codes; anything else is reported as "unclassified".
+_KNOWN_STATUS = frozenset(
+    {
+        "NOT_FOUND",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "RESOURCE_EXHAUSTED",
+        "FAILED_PRECONDITION",
+        "INVALID_ARGUMENT",
+        "ALREADY_EXISTS",
+        "ABORTED",
+        "UNAVAILABLE",
+        "DEADLINE_EXCEEDED",
+        "INTERNAL",
+        "UNKNOWN",
+        "CANCELLED",
+        "UNIMPLEMENTED",
+        "OUT_OF_RANGE",
+        "DATA_LOSS",
+    }
+)
+_REFUSALS = re.compile(r"\b(PERMISSION_DENIED|UNAUTHENTICATED|RESOURCE_EXHAUSTED)\b")
 
 
 @dataclass(frozen=True)
@@ -164,9 +196,37 @@ class TeardownError(RuntimeError):
     """A condition that makes deletion unsafe; the run stops and says why."""
 
 
-def _error_line(process: subprocess.CompletedProcess[str]) -> str:
-    lines = (process.stderr or "").strip().splitlines()
-    return lines[-1][:200] if lines else f"exit {process.returncode}"
+def _status(process: subprocess.CompletedProcess[str]) -> str:
+    """An allowlisted status for a failed gcloud call; never any raw stderr text."""
+    primary = _PRIMARY_ERROR.search(process.stderr or "")
+    code = _STATUS.match(primary.group("message")) if primary else None
+    if code and code.group("code") in _KNOWN_STATUS:
+        return code.group("code")
+    return f"unclassified gcloud error (exit {process.returncode})"
+
+
+def _is_not_found(target: Target, process: subprocess.CompletedProcess[str]) -> bool:
+    """True only for this command's own not-found naming this exact resource."""
+    stderr = process.stderr or ""
+    primary = _PRIMARY_ERROR.search(stderr)
+    if not primary or primary.group("command") != ".".join(target.describe[:3]):
+        return False
+    if _REFUSALS.search(stderr):
+        return False
+    message = primary.group("message")
+    name = re.escape(target.name)
+    if target.kind == "cloud_run_service":
+        pattern = rf"Cannot find service \[{name}\]"
+    else:
+        pattern = rf"NOT_FOUND: Resource (?:'[^']*/{name}'|not found \(resource={name}\))"
+    return re.match(pattern, message) is not None
+
+
+def _call(run: Runner, args: Sequence[str], what: str) -> subprocess.CompletedProcess[str]:
+    try:
+        return run(args)
+    except subprocess.TimeoutExpired as exc:
+        raise TeardownError(f"{what} timed out") from exc
 
 
 def _registry_problems(target: Target, record: dict[str, Any]) -> list[str]:
@@ -188,15 +248,17 @@ def _registry_problems(target: Target, record: dict[str, Any]) -> list[str]:
 
 def inventory(run: Runner) -> dict[str, Any]:
     """Read-only. Raises `TeardownError` on any condition that would make deletion unsafe."""
-    project = run(("projects", "describe", PROJECT, "--format=json"))
+    project = _call(run, ("projects", "describe", PROJECT, "--format=json"), "project describe")
     if project.returncode != 0:
-        raise TeardownError(f"cannot describe project {PROJECT}: {_error_line(project)}")
+        raise TeardownError(f"cannot describe project {PROJECT}: {_status(project)}")
     if json.loads(project.stdout).get("projectId") != PROJECT:
         raise TeardownError("described project does not match GCP_PROJECT_ID")
     rows = []
     problems: list[str] = []
     for target in targets():
-        process = run((*target.describe, "--format=json"))
+        process = _call(
+            run, (*target.describe, "--format=json"), f"describe of {target.kind} {target.name}"
+        )
         if process.returncode == 0:
             state = "present"
             if target.kind == "agent_registry_service":
@@ -204,12 +266,10 @@ def inventory(run: Runner) -> dict[str, Any]:
                     problems.append(f"{target.name}: {problem}")
             if target.expected_absent:
                 problems.append(f"{target.name}: expected absent but present")
-        elif _NOT_FOUND.search(process.stderr or ""):
+        elif _is_not_found(target, process):
             state = "absent"
         else:
-            raise TeardownError(
-                f"cannot describe {target.kind} {target.name}: {_error_line(process)}"
-            )
+            raise TeardownError(f"cannot describe {target.kind} {target.name}: {_status(process)}")
         rows.append(
             {
                 "kind": target.kind,
@@ -218,16 +278,33 @@ def inventory(run: Runner) -> dict[str, Any]:
                 "expected_absent": target.expected_absent,
             }
         )
-    listing = run(
-        ("agent-registry", "services", "list", f"--location={REGISTRY_REGION}", "--format=json")
+    listing = _call(
+        run,
+        ("agent-registry", "services", "list", f"--location={REGISTRY_REGION}", "--format=json"),
+        "Agent Registry listing",
     )
     if listing.returncode != 0:
-        raise TeardownError(f"cannot list the Agent Registry: {_error_line(listing)}")
+        raise TeardownError(f"cannot list the Agent Registry: {_status(listing)}")
     allowed = {t.name for t in targets() if t.kind == "agent_registry_service"}
+    described: set[str] = {
+        str(r["name"])
+        for r in rows
+        if r["kind"] == "agent_registry_service" and r["state"] == "present"
+    }
     services = json.loads(listing.stdout or "[]")
     listed = {str(s.get("name", "")).rsplit("/", 1)[-1] for s in services}
     problems += [
         f"{name}: unrecognised Agent Registry service" for name in sorted(listed - allowed)
+    ]
+    # The listing and the describes must agree exactly; a disagreement means the catalog changed
+    # mid-inventory (or one read is wrong), so nothing is deleted on the strength of either.
+    problems += [
+        f"{name}: listed in the Agent Registry but described as absent"
+        for name in sorted((listed & allowed) - described)
+    ]
+    problems += [
+        f"{name}: described as present but missing from the Agent Registry listing"
+        for name in sorted(described - listed)
     ]
     return {
         "project": PROJECT,
@@ -262,11 +339,18 @@ def apply(run: Runner, record: dict[str, Any]) -> list[str]:
     for target in targets():
         if (target.kind, target.name) not in present:
             continue
-        process = run(target.delete)
+        try:
+            process = run(target.delete)
+        except subprocess.TimeoutExpired as exc:
+            raise TeardownError(
+                f"delete of {target.kind} {target.name} timed out after {len(deleted)} completed "
+                "deletions; its outcome is unknown. Run the dry-run inventory again before any "
+                "retry."
+            ) from exc
         if process.returncode != 0:
             raise TeardownError(
                 f"delete failed for {target.kind} {target.name} after {len(deleted)} deletions: "
-                f"{_error_line(process)}"
+                f"{_status(process)}. Run the dry-run inventory again before any retry."
             )
         deleted.append(target.name)
     return deleted

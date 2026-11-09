@@ -32,6 +32,18 @@ def _registry_record(name: str) -> dict[str, object]:
     return record
 
 
+PRINCIPAL = "ops-sa@example-project.iam.gserviceaccount.com"
+
+
+def _gcloud_error(args: Sequence[str], message: str, principal: str = PRINCIPAL) -> str:
+    """gcloud's real stderr shape: the primary line names the active account."""
+    return (
+        f"ERROR: (gcloud.{'.'.join(args[:3])}) {message} This command is authenticated as "
+        f"{principal} which is the active account specified by the [core/account] property\n"
+        "- '@type': type.googleapis.com/google.rpc.ResourceInfo\n"
+    )
+
+
 class FakeCloud:
     """A scripted gcloud: everything present except the expected-absent legacy card."""
 
@@ -39,8 +51,10 @@ class FakeCloud:
         self.absent = set(teardown.LEGACY_EXPECTED_ABSENT)
         self.registry_overrides: dict[str, dict[str, object]] = {}
         self.extra_registry: list[str] = []
+        self.unlisted: set[str] = set()
         self.errors: dict[str, str] = {}
         self.fail_delete: set[str] = set()
+        self.timeout_on: tuple[str, str] | None = None
         self.project_id = P
         self.calls: list[tuple[str, ...]] = []
 
@@ -55,21 +69,28 @@ class FakeCloud:
                 for t in teardown.targets()
                 if t.kind == "agent_registry_service" and t.name not in self.absent
             ]
-            names += self.extra_registry
+            names = [n for n in names if n not in self.unlisted] + self.extra_registry
             return _done(
                 out=json.dumps(
                     [{"name": f"projects/{P}/locations/{REG}/services/{n}"} for n in names]
                 )
             )
         name = args[3]
+        if self.timeout_on == (args[2], name):
+            raise subprocess.TimeoutExpired(list(args), 300)
         if name in self.errors:
             return _done(1, err=self.errors[name])
         if "delete" in args:
-            return _done(1, err="ERROR: PERMISSION_DENIED") if name in self.fail_delete else _done()
+            if name in self.fail_delete:
+                return _done(1, err=_gcloud_error(args, "PERMISSION_DENIED: Permission denied."))
+            return _done()
         # The legacy registry card shares its name with a live Cloud Run service; absence is
         # scoped to the registry so the two are never conflated.
         if args[0] == "agent-registry" and name in self.absent:
-            return _done(1, err=f"ERROR: NOT_FOUND: Resource '{name}' was not found.")
+            resource = f"projects/{P}/locations/{REG}/services/{name}"
+            return _done(
+                1, err=_gcloud_error(args, f"NOT_FOUND: Resource '{resource}' was not found.")
+            )
         if args[0] == "agent-registry":
             return _done(out=json.dumps(self.registry_overrides.get(name, _registry_record(name))))
         return _done(out="{}")
@@ -190,7 +211,9 @@ def test_a_present_legacy_card_or_missing_endpoint_spec_is_a_problem():
 
 def test_permission_errors_are_never_treated_as_absence(capsys):
     cloud = FakeCloud()
-    cloud.errors["bastion-findings-api"] = "ERROR: PERMISSION_DENIED: denied"
+    cloud.errors["bastion-findings-api"] = _gcloud_error(
+        ("run", "services", "describe"), "PERMISSION_DENIED: Permission denied."
+    )
     assert teardown.main([], run=cloud) == 1
     assert "cannot describe cloud_run_service bastion-findings-api" in capsys.readouterr().err
 
@@ -238,3 +261,133 @@ def test_main_stops_before_deletion_when_the_inventory_is_unsafe(capsys):
     cloud = FakeCloud()
     cloud.extra_registry = ["unknown"]
     assert teardown.main([], run=cloud) == 1
+
+
+# Regression tests for the PR #14 review findings.
+
+
+def test_failures_report_an_allowlisted_status_and_never_echo_stderr(capsys):
+    cloud = FakeCloud()
+    cloud.errors["bastion-findings-api"] = _gcloud_error(
+        ("run", "services", "describe"), "PERMISSION_DENIED: Permission denied."
+    )
+    assert teardown.main([], run=cloud) == 1
+    err = capsys.readouterr().err
+    assert "bastion-findings-api: PERMISSION_DENIED" in err
+    assert PRINCIPAL not in err and "authenticated as" not in err
+
+    cloud = FakeCloud()
+    cloud.fail_delete = {"bastion-investigations"}
+    assert teardown.main(["--apply", "--confirm-project", P], run=cloud) == 1
+    captured = capsys.readouterr()
+    assert "PERMISSION_DENIED" in captured.err
+    assert PRINCIPAL not in captured.err + captured.out
+
+    cloud = FakeCloud()
+    cloud.errors["bastion-findings-api"] = f"Traceback: something odd for {PRINCIPAL}"
+    assert teardown.main([], run=cloud) == 1
+    err = capsys.readouterr().err
+    assert "unclassified gcloud error (exit 1)" in err and PRINCIPAL not in err
+
+
+# Real not-found shapes, captured read-only from gcloud on 9 November 2026.
+NOT_FOUND_SHAPES = [
+    (
+        "eventarc_trigger",
+        "bastion-investigations-to-orchestrator",
+        "NOT_FOUND: Resource 'projects/{P}/locations/europe-north2/triggers/{n}' was not found.",
+    ),
+    (
+        "pubsub_subscription",
+        "bastion-dead-letter-review",
+        "NOT_FOUND: Resource not found (resource={n}).",
+    ),
+    ("pubsub_topic", "bastion-investigations", "NOT_FOUND: Resource not found (resource={n})."),
+    ("cloud_run_service", "bastion-findings-api", "Cannot find service [{n}]"),
+    (
+        "agent_registry_service",
+        "google-model-armor",
+        "NOT_FOUND: Resource 'projects/{P}/locations/{R}/services/{n}' was not found.",
+    ),
+    (
+        "agent_gateway",
+        "bastion-egress",
+        "NOT_FOUND: Resource 'projects/{P}/locations/{R}/agentGateways/{n}' was not found.",
+    ),
+]
+
+
+@pytest.mark.parametrize(("kind", "name", "message"), NOT_FOUND_SHAPES)
+def test_each_commands_own_not_found_for_the_exact_resource_is_absence(kind, name, message):
+    target = next(t for t in teardown.targets() if t.kind == kind and t.name == name)
+    text = message.format(P=P, R=REG, n=name)
+    assert teardown._is_not_found(target, _done(1, err=_gcloud_error(target.describe, text)))
+
+
+def test_incidental_not_found_text_never_turns_a_refusal_into_absence():
+    target = next(t for t in teardown.targets() if t.name == "google-model-armor")
+    resource = f"projects/{P}/locations/{REG}/services/google-model-armor"
+    other = f"projects/{P}/locations/{REG}/services/other"
+    refusals = [
+        # A principal whose name contains "not_found".
+        _gcloud_error(
+            target.describe, "PERMISSION_DENIED: Permission denied.", "not_found@example.com"
+        ),
+        _gcloud_error(target.describe, "UNAUTHENTICATED: Request had invalid credentials."),
+        _gcloud_error(target.describe, "RESOURCE_EXHAUSTED: Quota exceeded."),
+        # A not-found that also carries a refusal code elsewhere in stderr.
+        _gcloud_error(target.describe, f"NOT_FOUND: Resource '{resource}' was not found.")
+        + "PERMISSION_DENIED on a dependency\n",
+        # A not-found for a different resource, or from a different command.
+        _gcloud_error(target.describe, f"NOT_FOUND: Resource '{other}' was not found."),
+        _gcloud_error(
+            ("agent-registry", "services", "list"),
+            f"NOT_FOUND: Resource '{resource}' was not found.",
+        ),
+        "ERROR: NOT_FOUND: was not found",
+    ]
+    for stderr in refusals:
+        assert not teardown._is_not_found(target, _done(1, err=stderr)), stderr
+    cloud = FakeCloud()
+    cloud.errors["google-model-armor"] = refusals[0]
+    with pytest.raises(teardown.TeardownError, match="google-model-armor: PERMISSION_DENIED"):
+        teardown.inventory(cloud)
+
+
+def test_a_listing_that_disagrees_with_the_describes_stops_before_any_deletion():
+    cloud = FakeCloud()
+    cloud.extra_registry = ["bastion-orchestrator"]  # legacy card appears after its describe
+    assert teardown.inventory(cloud)["problems"] == [
+        "bastion-orchestrator: listed in the Agent Registry but described as absent"
+    ]
+    assert teardown.main(["--apply", "--confirm-project", P], run=cloud) == 1
+    assert not any("delete" in call for call in cloud.calls)
+
+    cloud = FakeCloud()
+    cloud.unlisted = {"google-cloud-logging"}
+    assert teardown.inventory(cloud)["problems"] == [
+        "google-cloud-logging: described as present but missing from the Agent Registry listing"
+    ]
+    assert teardown.main(["--apply", "--confirm-project", P], run=cloud) == 1
+    assert not any("delete" in call for call in cloud.calls)
+
+
+def test_a_delete_timeout_stops_with_progress_and_an_unknown_outcome(capsys):
+    cloud = FakeCloud()
+    cloud.timeout_on = ("delete", "bastion-orchestrator")
+    assert teardown.main(["--apply", "--confirm-project", P], run=cloud) == 1
+    err = capsys.readouterr().err
+    assert "cloud_run_service bastion-orchestrator timed out after 4 completed deletions" in err
+    assert "outcome is unknown" in err and "inventory again before any retry" in err
+    deletes = [c[3] for c in cloud.calls if "delete" in c]
+    assert deletes[-1] == "bastion-orchestrator" and "bastion-egress" not in deletes
+
+
+def test_a_describe_timeout_stops_before_any_deletion(capsys):
+    cloud = FakeCloud()
+    cloud.timeout_on = ("describe", "bastion-egress")
+    assert teardown.main(["--apply", "--confirm-project", P], run=cloud) == 1
+    assert "Stopped before any deletion: describe of agent_gateway bastion-egress timed out" in (
+        capsys.readouterr().err
+    )
+    assert not any("delete" in call for call in cloud.calls)

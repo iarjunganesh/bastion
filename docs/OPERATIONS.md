@@ -41,9 +41,13 @@ value; ADK additionally sends its telemetry user-agent header.
 revisions. `infrastructure/teardown.py` is also dry-run by default: it verifies the exact
 project, describes every allowlisted serving resource, reconciles the regional Agent Registry
 (the worker and Runtime cards plus the 14 Google API endpoint registrations), and prints a JSON
-inventory. An unrecognised or non-Bastion registry entry, or any error other than an explicit
-not-found, stops it before deletion; the legacy dispatcher card is expected absent. `--apply`
-requires `--confirm-project` and a clean fresh inventory, and stops on the first failed delete.
+inventory. An unrecognised or non-Bastion registry entry, a disagreement between the registry
+listing and the individual describes, a timeout, or any error other than that command's own
+not-found for that exact resource stops it before deletion; the legacy dispatcher card is
+expected absent. Failures are reported as status codes only; gcloud stderr, which can name the
+authenticated principal, is never printed. `--apply` requires `--confirm-project` and a clean
+fresh inventory, and stops on the first failed or timed-out delete, reporting the completed
+count; a timed-out delete has an unknown outcome and needs a fresh inventory before any retry.
 Firestore, secrets, managed Runtime/Memory, audit logs, images and IAM are never touched.
 
 ## Failure semantics
