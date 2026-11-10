@@ -74,8 +74,10 @@ Numeric balances and billing receipts stay in ignored `.local/`.
 3. Done: all 16 follow-up findings (1 Important, 15 Minor) are verified
    (`report/qa/final-closeout-2026-11-10.md`). The release build (`81c2dfce…0706`) changes only
    the running header and the Appendix A.2 release sentence
-   (`report/qa/release-build-2026-11-10.md`). Next: merge the release PR, then the maintainer
-   approves the manuscript and `report/PUBLICATION-MANIFEST.md`.
+   (`report/qa/release-build-2026-11-10.md`). PR #18 merged the sources at `41f292f…`.
+   Licence: CC BY 4.0 (report and evidence), MIT (code). Next: the maintainer reserves the
+   Zenodo DOI, one final build adds the DOI and licence line, then the maintainer approves the
+   final hashes and `report/PUBLICATION-MANIFEST.md`.
 4. Final billing check after late postings.
 5. Release, only on the maintainer's approval of the manuscript and publication manifest: the
    `report-2026-11` tag, the GitHub release, the DOI (Zenodo) and the site. Links stay pinned to
