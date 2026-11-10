@@ -1,0 +1,4 @@
+# Local document tooling only; never included in the deployed dependency graph.
+reportlab==5.1.0
+pymupdf==2.1
+pillow==13.0.0

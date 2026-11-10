@@ -33,14 +33,21 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   `report/qa/final-closeout-2026-11-10.md`. Finite text/metadata/link checks found no prohibited
   private-value patterns. The closeout changed QA/status records only; the PDF was not rebuilt.
   The reviewer's earlier authorship remains disclosed; no independent peer review is claimed.
-  R7 remains confirmed as Peng Huang. Sources/output stay uncommitted; the blueprint, stop
-  records and evidence are unchanged. The report is ready for the publication-manifest step.
+  R7 remains confirmed as Peng Huang. The blueprint, stop records and evidence are unchanged.
+- **Release build and publication manifest (10 November):** the release build
+  (`75c57e3a…23d2`, manifest `549e61a4…72d2`) differs from the verified build only in its
+  running header (`report-2026-11`) and the Appendix A.2 release sentence; page-by-page text,
+  link and figure comparisons confirm it (`report/qa/release-build-2026-11-10.md`). Links stay
+  pinned to `aa398f6`, where every cited file is byte-identical. The report sources, figures and
+  review records are committed for the first time in the release PR; generated outputs stay
+  ignored and are attached at release. `report/PUBLICATION-MANIFEST.md` lists the artifacts,
+  what is published and what stays private, and the maintainer's decisions (licence, Zenodo
+  method, DOI in the PDF). Nothing is tagged, released or deposited.
 - **Git housekeeping (10 November):** `main` was fast-forwarded through PR #16 (`8f52fc3`). The
   four branches for merged PRs #13–#16 were removed locally and from `origin` after
   exact-head/ancestry checks and a verified recovery bundle. The review-status update `835df67`
   was then committed directly on `main` and pushed without a PR; its CI run failed because three
-  handoff lines read as suite test-count claims. This branch corrects that record and the
-  wording. `report/` remains intentionally untracked and `.local/` ignored; nothing was published.
+  handoff lines read as suite test-count claims; PR #17 corrected the record and the wording.
   Preservation and cleanup receipts: `.local/git-cleanup/2026-11-10T012206/`.
 - **Billing:** daily checks passed on 6 and 8 November (2–8 November fully offset by credits, net
   0). On 9 November billing was disconnected from `bastion-fleet-2026` only (verified: no billing
@@ -58,18 +65,14 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Next step
 
-1. **Technical review complete (local, uncommitted `report/`):** all 16 follow-up findings are
-   verified in the current 25-page PDF. Full visual review, reconciliation and QA receipts are
-   complete; no further manuscript correction was found.
-   Public guidance is recorded separately in Git; the only remaining untracked work is the
-   intentionally private report directory. Only `main` remains locally and on `origin`.
-2. **Next:** prepare the publication manifest against the verified local artifact hashes, then
-   obtain the maintainer's final manuscript/manifest approval before release. The existing
-   PDF is current and the frozen blueprint remains unchanged.
-   The local build does not create a tag, DOI or site release.
+1. **Release PR:** review and merge the PR that adds `report/` (sources, figures, review
+   records and the publication manifest). Ask Codex for the read-only release review first.
+2. **Maintainer approval** of the manuscript (`75c57e3a…23d2`) and of
+   `report/PUBLICATION-MANIFEST.md`, including the licence, the Zenodo method and whether the
+   DOI is printed in the PDF (printing it needs one more rebuild).
 3. Run the final billing check after late postings.
-4. Only after the maintainer approves the manuscript and the publication manifest: the
-   `report-2026-11` tag, the DOI (Zenodo) and the site release. No new experiments.
+4. Only after that approval: the `report-2026-11` tag on the merge commit, the GitHub release
+   with the three hashed artifacts, the Zenodo DOI and the site update. No new experiments.
 
 ## Session log
 
@@ -294,3 +297,16 @@ phrase the suite count guard reads as a total. On branch `fix/handoff-ci-and-dis
 "report checks", the push is recorded accurately, and private-context material that does not
 belong in public guidance was removed. Report sources and evidence are unchanged. Redundant
 local caches and duplicate Git bundles were removed after reachability checks against `origin`.
+
+### 10 November — release build and publication manifest
+
+Rebuilt once for release: the running header now reads `report-2026-11`, Appendix A.2 states the
+release tag and the immutable link base, and the generated provenance line describes the
+manifest's scope. A page-by-page comparison with the verified build (`f3b2bb95…9071`) shows no
+other text, link or figure change; pages 1 and 20–22 were inspected in full. The 17 report
+checks, all 70 manifest/snapshot hashes, ZIP CRC and finite privacy scans of the PDF and every
+report file to be committed pass. Wrote the release build record, `release-integrity.json` and
+`report/PUBLICATION-MANIFEST.md`; removed an oblique reference to unrelated billing from the
+reconciliation; tracked the QA Markdown/JSON records while keeping generated outputs ignored.
+Repository Ruff, Markdown lint, docs/version/site checks and 398 tests pass with `report/`
+staged. No tag, release, deposit, experiment or cloud action occurred.

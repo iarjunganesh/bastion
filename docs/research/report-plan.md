@@ -71,17 +71,15 @@ Numeric balances and billing receipts stay in ignored `.local/`.
 
 1. Done: the docs PR (#13) and the teardown fix (#14).
 2. Done: D4 (9 Nov). Recorded in HANDOFF and in `.local/d4/d4-closeout-2026-11-09.json`.
-3. Done: all 16 follow-up findings (1 Important, 15 Minor) are verified in the 25-page PDF
-   (`f3b2bb95…9071`). All 25 pages received full visual inspection. Reconciliation, dated
-   closeout, integrity/privacy receipts and report README now identify this build. The 17
-   report checks, all 70 source/snapshot hashes/CRC, Ruff, docs/version and Markdown checks pass.
-   R7 remains confirmed; the blueprint and stopped/amended protocol records are unchanged.
-   See `report/qa/final-closeout-2026-11-10.md`. Next: prepare the publication manifest for
-   the maintainer's final manuscript/manifest approval. No rebuild was needed for QA closeout;
-   earlier reviewer authorship and the actual visual-review scope remain disclosed.
+3. Done: all 16 follow-up findings (1 Important, 15 Minor) are verified
+   (`report/qa/final-closeout-2026-11-10.md`). The release build (`75c57e3a…23d2`) changes only
+   the running header and the Appendix A.2 release sentence
+   (`report/qa/release-build-2026-11-10.md`). Next: merge the release PR, then the maintainer
+   approves the manuscript and `report/PUBLICATION-MANIFEST.md`.
 4. Final billing check after late postings.
-5. Release, only on the maintainer's approval of the manuscript and publication manifest: refresh
-   public links, then the `report-2026-11` tag, the DOI (Zenodo) and the site.
+5. Release, only on the maintainer's approval of the manuscript and publication manifest: the
+   `report-2026-11` tag, the GitHub release, the DOI (Zenodo) and the site. Links stay pinned to
+   the immutable base commit `aa398f6`, where every cited file is unchanged.
 
 ## Evidence and manuscript rules
 
