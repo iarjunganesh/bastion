@@ -1,6 +1,6 @@
 # Publication manifest: `report-2026-11`
 
-**Status: final build pending; awaiting the maintainer's approval.** Nothing has been tagged,
+**Status: final build complete; awaiting the maintainer's approval.** Nothing has been tagged,
 released, deposited or announced. PR #18 merged the report sources on 10 November at
 `41f292f54493925526d043def10c493768080bf0`; that merge did not approve the manuscript or any
 publication step. Approving this manifest together with the manuscript authorises the release
@@ -12,32 +12,31 @@ approval (step 1).
 | Field | Value |
 |---|---|
 | Title | *Bastion: Execution Boundaries, Control Evolution, and Bounded Evaluation of a Governed Agent Fleet* |
-| Author | Arjun Ganesh |
+| Author | Arjun Ganesh (ORCID [0009-0004-4720-7057](https://orcid.org/0009-0004-4720-7057)) |
 | Affiliation | Independent researcher, Stockholm |
 | Date | November 2026 |
 | Type | Technical report; not peer reviewed (AI assistance disclosed in Appendix A.5) |
 | Licence | CC BY 4.0 for report text, figures and evidence records; MIT for code (`../LICENSE-CONTENT.md`) |
 | Release tag | `report-2026-11` |
+| DOI | [10.5281/zenodo.24120596](https://doi.org/10.5281/zenodo.24120596) (reserved; printed in the PDF; resolves after publication) |
 | Repository link base | `aa398f6953de6dd3d56d84b2ae981a4a06591474` (immutable; every cited file byte-identical) |
 | Deployed system described | `v0.9.0` (`be5c621`) and `v0.9.1` (`755dd07`) |
 
 ## Release artifacts
 
-**Pending the final build.** The final build adds the reserved DOI and the licence line to the
-title page, and the source snapshot gains the two licence notices. It therefore replaces the
-release candidate below, which the 10 November release review verified
-([qa/release-build-2026-11-10.md](qa/release-build-2026-11-10.md)). Its hashes describe that
-candidate only and are kept for the record; the final hashes will replace this table.
+Final build, 10 November 2026; record:
+[qa/release-build-2026-11-10.md](qa/release-build-2026-11-10.md) (section "Final build"). It
+replaces the release candidate `81c2dfce…0706`, which the release review verified.
 
-| Artifact (release candidate, superseded) | Published as | SHA-256 |
+| Artifact | Published as | SHA-256 |
 |---|---|---|
-| `bastion-technical-report-2026-11.pdf` (25 pages, 740,890 bytes) | GitHub release asset; Zenodo file | `81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706` |
-| `source-manifest.json` | GitHub release asset; Zenodo file | `0e399dc83af237e7df127dd5ec8dd2b95017d40810daf8136ab1d2863c46a342` |
-| `source-snapshot.zip` (71 members) | GitHub release asset; Zenodo file | `4c2e6b489028c6c64b24b25475d13c2b52b9a3aea15834979be5a90716c77732` |
+| `bastion-technical-report-2026-11.pdf` (25 pages, 741,684 bytes) | GitHub release asset; Zenodo file | `ec710124910bba89dcb4fd3bbd769f714347074f3989869c00b74f31a013dcb3` |
+| `source-manifest.json` (72 entries) | GitHub release asset; Zenodo file | `b8606936efff176be3b89f2de77fa6fec59095530ff235ad66c5fb6aebbf891a` |
+| `source-snapshot.zip` (73 members, including `LICENSE` and `LICENSE-CONTENT.md`) | GitHub release asset; Zenodo file | `3433623337a5069130fbfb1f545fdc1ef4cca6a4325fce588d5ad59e1515a912` |
 | `figures/figure1-topology.png` | In the tagged tree | `56160fae4551924b8467d31b7a42c12f19f4c8a8f0fc74c49c0702552af4f40d` |
 | `figures/figure2-chronology.png` | In the tagged tree | `66e5ae34d1b173f6aa1982561ab4ec77b64543953609b5ec2b318fbff750f8ba` |
 | `figures/figure3-timeout.png` | In the tagged tree | `1d6207266b19e4ed7f768f894ea1d83bfccbf1faf521e09d201b18c2c4fba4b0` |
-| `OUTLINE.md` (frozen blueprint) | In the tagged tree | `fae36638d94e567cc3888e37af0c65c177efe7f07d3a23be9d72ddee59259015` |
+| `OUTLINE.md` (frozen blueprint; LF bytes as committed) | In the tagged tree | `fae36638d94e567cc3888e37af0c65c177efe7f07d3a23be9d72ddee59259015` |
 
 The PDF and ZIP embed timestamps, so a rebuild produces different bytes. The source manifest is
 the reproducibility anchor: each snapshot member and cited file must hash to its entry.
@@ -77,8 +76,9 @@ any private correspondence. The source snapshot contains no `.local` path; the b
 
 | Field | Value |
 |---|---|
-| Upload type | Publication → Technical report |
-| Creator | Arjun Ganesh; affiliation "Independent researcher, Stockholm" |
+| Resource type | Publication → Report |
+| DOI | `10.5281/zenodo.24120596` (reserved in the draft) |
+| Creator | Arjun Ganesh (ORCID 0009-0004-4720-7057); affiliation "Independent researcher, Stockholm" |
 | Description | The report abstract, the Section 8 scope statement and the licence scopes above |
 | Keywords | AI agents; agent security; distributed systems; execution boundaries; data minimisation; IAM; failure analysis; fault injection |
 | Related identifiers | GitHub release `report-2026-11` (is supplemented by); repository `iarjunganesh/bastion` |
@@ -90,9 +90,11 @@ files. The GitHub–Zenodo integration would instead archive the whole tagged re
 requires enabling the repository in Zenodo, an external account setting.
 
 The DOI is printed in the PDF. This was chosen before final artifact approval: the maintainer
-reserves the DOI in Zenodo without publishing; the final build includes it; its replacement-build
-verification is completed; and the maintainer approves its new artifact hashes before the tag
-is created or either record is published.
+reserved `10.5281/zenodo.24120596` in a Zenodo draft without publishing, and the final build
+includes it. The maintainer approves the final artifact hashes above before the tag is created
+or either record is published. The Zenodo GitHub integration must stay off for
+`iarjunganesh/bastion` until the release is complete, so the GitHub release does not create a
+second Zenodo record.
 
 ## Decisions for the maintainer
 

@@ -120,3 +120,11 @@ the verified build are recorded in `release-build-2026-11-10.md`.
 PDF SHA-256: `81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706`.
 Source-manifest SHA-256: `0e399dc83af237e7df127dd5ec8dd2b95017d40810daf8136ab1d2863c46a342`.
 Receipts: `checks.json`, `figure-layout.json` and `release-integrity.json`.
+
+## Final build — 10 November
+
+The final build adds the ORCID iD, reserved DOI and licence line on p.1 and the DOI and licence
+scope in Appendix A.2; the snapshot carries both licence notices. No claim row changed.
+
+PDF SHA-256: `ec710124910bba89dcb4fd3bbd769f714347074f3989869c00b74f31a013dcb3`.
+Source-manifest SHA-256: `b8606936efff176be3b89f2de77fa6fec59095530ff235ad66c5fb6aebbf891a`.

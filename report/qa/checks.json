@@ -1,13 +1,13 @@
 {
   "pages": 25,
-  "pdf_bytes": 740890,
-  "clickable_https_links": 62,
+  "pdf_bytes": 741684,
+  "clickable_https_links": 64,
   "figures_present": true,
   "findings": [],
   "visual_review": "passed",
   "base_revision": "aa398f6953de6dd3d56d84b2ae981a4a06591474",
   "local_snapshot_sources": [],
-  "pdf_sha256": "81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706",
+  "pdf_sha256": "ec710124910bba89dcb4fd3bbd769f714347074f3989869c00b74f31a013dcb3",
   "visual_review_date": "2026-11-10",
   "visual_reviewer": "Claude",
   "visual_review_scope": {
@@ -15,9 +15,12 @@
       1,
       20,
       21,
-      22
+      22,
+      23,
+      24,
+      25
     ],
-    "other_pages": "text layer, links and images identical to the verified build apart from the running header; that build received full 25-page visual inspection"
+    "other_pages": "pp.2-19 text layer, links and images identical to the verified candidate"
   },
   "release_closeout": "release-build-2026-11-10.md"
 }

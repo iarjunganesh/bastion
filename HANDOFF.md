@@ -65,14 +65,12 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Next step
 
-1. **Final build:** PR #18 merged the report sources on 10 November at `41f292f…`; its head
-   and post-merge CI passed. Codex's release review (ready after fixes: I1–I2, M1–M4) is
-   addressed in the licensing PR: CC BY 4.0 for report and evidence, MIT for code, licence
-   notices in the source snapshot, and approval stops for replacement bytes. Next, the
-   maintainer reserves the Zenodo DOI; one final build then adds the DOI and licence line, and
-   its release diff, hashes and privacy checks are re-verified.
-2. **Maintainer approval** of the final manuscript hashes and `report/PUBLICATION-MANIFEST.md`.
-   The PR #18 merge did not approve the manuscript or any publication step.
+1. **Final build done (PR pending):** DOI `10.5281/zenodo.24120596` (reserved, unpublished
+   draft) and ORCID `0009-0004-4720-7057` are on p.1 with CC BY 4.0. Final PDF `ec710124…dcb3`,
+   manifest `b8606936…891a`, snapshot `34336233…a912` (`report/qa/release-build-2026-11-10.md`).
+   Codex checks only this build's delta; then merge.
+2. **Maintainer approval** of those final hashes and `report/PUBLICATION-MANIFEST.md`. Keep the
+   Zenodo GitHub switch for `iarjunganesh/bastion` off until the release is complete.
 3. Run the final billing check after late postings.
 4. Only after that approval: the `report-2026-11` tag on the merge commit, the GitHub release
    with the three hashed artifacts, the Zenodo DOI and the site update. No new experiments.
@@ -333,3 +331,13 @@ Zenodo upload and a DOI printed in the PDF. The licensing PR adds `LICENSE-CONTE
 the README licence statement, puts both licence notices in the source snapshot (with a test),
 narrows the generated provenance sentence and applies the manifest fixes. The release
 candidate's hashes are kept as superseded; the final build follows the DOI reservation.
+
+### 10 November — final build
+
+The maintainer reserved DOI `10.5281/zenodo.24120596` in an unpublished Zenodo draft and gave
+ORCID `0009-0004-4720-7057`. The final build puts both on p.1 with CC BY 4.0, adds the DOI and
+licence scope to Appendix A.2, and packages `LICENSE` and `LICENSE-CONTENT.md` in the snapshot.
+Compared with the reviewed candidate, only p.1, p.20 and reflow on pp.20–25 change; pages 1 and
+20–25 were inspected in full. 19 report checks, 72 manifest entries, 73 snapshot members, ZIP
+CRC and privacy scans pass. The candidate was preserved privately. No tag, release, deposit or
+publication occurred.

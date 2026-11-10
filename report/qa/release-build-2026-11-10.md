@@ -48,3 +48,34 @@ The PDF and the snapshot ZIP embed timestamps and are not byte-reproducible; the
 manifest is the reproducibility anchor. AI assistance is disclosed in Appendix A.5; no
 independent peer review is claimed. Publication requires the maintainer's approval of the
 manuscript and of `../PUBLICATION-MANIFEST.md`.
+
+## Final build — 10 November 2026
+
+This build replaces the release candidate above (`81c2dfce…0706`), which the release review
+verified. It follows the maintainer's decisions (CC BY 4.0 for report and evidence, MIT for
+code, manual Zenodo upload, DOI in the PDF) and the review's packaging fix.
+
+| Change | Source | Effect in the PDF |
+|---|---|---|
+| ORCID iD on the author line; reserved DOI and CC BY 4.0 on the date line, both linked | `sections/00-front.md` | p.1 (no added lines) |
+| Appendix A.2 adds the Zenodo DOI and the licence scope | `sections/appendix-a-reproducibility.md` | p.20 |
+| Provenance line names the snapshot's actual scope; the snapshot carries `LICENSE` and `LICENSE-CONTENT.md` | `build_report.py` (PR #19) | p.20, with the new manifest hash |
+
+**Verification against the candidate:** page-by-page, the text layer differs only on p.1 and
+p.20 as listed, plus reflow on pp.20–25 (one A.4 bullet, Appendix B row E18, Appendix C.1 row L,
+the References heading and five reference entries move to the next page). Two links are added
+on p.1; the other 62 link targets are unchanged and five move from p.24 to p.25. All embedded
+figure images are byte-identical. Pages 1 and 20–25 were inspected in full: table headers repeat
+across the pp.21–22 and pp.22–23 splits and p.25 ends cleanly. 19 report checks pass;
+automated layout findings are empty; 25 pages, 64 links. All 72 manifest entries match the files
+and the 73 snapshot members; the ZIP CRC passes; no overlay; the snapshot's `LICENSE` is
+LF-normalised. The frozen outline is unchanged (`fae36638…9259015`, LF-normalised). Privacy
+checks over the PDF, metadata, links, manuscript and committed report text returned zero hits.
+
+| Final artifact | SHA-256 |
+|---|---|
+| `bastion-technical-report-2026-11.pdf` (25 pages, 741,684 bytes) | `ec710124910bba89dcb4fd3bbd769f714347074f3989869c00b74f31a013dcb3` |
+| `source-manifest.json` (72 entries) | `b8606936efff176be3b89f2de77fa6fec59095530ff235ad66c5fb6aebbf891a` |
+| `source-snapshot.zip` (73 members) | `3433623337a5069130fbfb1f545fdc1ef4cca6a4325fce588d5ad59e1515a912` |
+
+The DOI link resolves only after the Zenodo record is published.
