@@ -55,6 +55,11 @@ This build replaces the release candidate above (`81c2dfce…0706`), which the r
 verified. It follows the maintainer's decisions (CC BY 4.0 for report and evidence, MIT for
 code, manual Zenodo upload, DOI in the PDF) and the review's packaging fix.
 
+| Identifier | Value |
+|---|---|
+| DOI | `10.5281/zenodo.24120596` (reserved; resolves after Zenodo publication) |
+| ORCID iD | `0009-0004-4720-7057` |
+
 | Change | Source | Effect in the PDF |
 |---|---|---|
 | ORCID iD on the author line; reserved DOI and CC BY 4.0 on the date line, both linked | `sections/00-front.md` | p.1 (no added lines) |
@@ -63,7 +68,8 @@ code, manual Zenodo upload, DOI in the PDF) and the review's packaging fix.
 
 **Verification against the candidate:** page-by-page, the text layer differs only on p.1 and
 p.20 as listed, plus reflow on pp.20–25 (one A.4 bullet, Appendix B row E18, Appendix C.1 row L,
-the References heading and five reference entries move to the next page). Two links are added
+the References heading and four reference entries (S15, E03, E05 and E06, containing five
+links) move to the next page). Two links are added
 on p.1; the other 62 link targets are unchanged and five move from p.24 to p.25. All embedded
 figure images are byte-identical. Pages 1 and 20–25 were inspected in full: table headers repeat
 across the pp.21–22 and pp.22–23 splits and p.25 ends cleanly. 19 report checks pass;

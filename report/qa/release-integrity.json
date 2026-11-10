@@ -18,7 +18,7 @@
   "difference_from_verified_build": [
     "p.1: author line adds the ORCID iD (linked); date line adds the DOI (linked) and CC BY 4.0",
     "Appendix A.2: Zenodo DOI and licence-scope sentence; provenance line names the snapshot's actual scope; new cited-source manifest hash",
-    "reflow only on pp.20-25 (one A.4 bullet, Appendix B row E18, Appendix C.1 row L, the References heading and five reference entries move to the next page)",
+    "reflow only on pp.20-25 (one A.4 bullet, Appendix B row E18, Appendix C.1 row L, the References heading and four reference entries (S15, E03, E05 and E06, containing five links) move to the next page)",
     "source snapshot adds LICENSE and LICENSE-CONTENT.md (72 manifest entries, 73 members)"
   ],
   "unchanged_from_verified_build": [
