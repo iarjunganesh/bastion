@@ -12,6 +12,17 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-11-11
+
+Source-only release; never deployed. The final deployment, which the report evaluates, is
+v0.9.1. Agent code is unchanged apart from one docstring, and no dependency changed. The
+GitHub release is archived on Zenodo as software, described by `.zenodo.json`.
+
+### Added — citation metadata (11 November)
+
+- `CITATION.cff` (GitHub's citation prompt, which cites the report) and `.zenodo.json` (the
+  Zenodo software archive's creator, ORCID, MIT licence and link to the report DOI `10.5281/zenodo.24120596`).
+
 ### Added — technical report released (10 November)
 
 - The definitive technical report, *Bastion: Execution Boundaries, Control Evolution, and

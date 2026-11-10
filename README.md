@@ -110,8 +110,9 @@ The [claim matrix](docs/research/claim-matrix.md) bounds each claim; the
 - The 6 November daily billing check passed for currently reported usage; exact per-chunk currency
   attribution and late postings remain bounded. Current balances and reservations stay private.
 - [Version provenance](docs/VERSIONS.md) separates source pins, image assertions and unreadable
-  Runtime installed packages. v0.9.1 (7 November, ADK 2.14.0) is the current release and the final
-  deployment the report evaluates (evidence 26–29); v0.9.0 resolved the advisory accepted at
+  Runtime installed packages. v0.9.2 (11 November) is the current source release and was never
+  deployed; v0.9.1 (7 November, ADK 2.14.0) is the final deployment the report evaluates
+  (evidence 26–29); v0.9.0 resolved the advisory accepted at
   v0.8.0 ([dependency status](docs/DEPENDENCY-STATUS.md)).
 
 **Technical report:** *Bastion: Execution Boundaries, Control Evolution, and Bounded

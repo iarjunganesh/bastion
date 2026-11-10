@@ -26,6 +26,9 @@ Read HANDOFF.md next, then docs/research/report-plan.md and docs/UPGRADE-PLAN.md
   per-chunk caps); evidence frozen after run M; **one definitive report** from the blueprint
   frozen on 9 November. No further live experiment is authorized. Editorial approval is not
   authority to delete resources (D4).
+- The 11 November decision adds v0.9.2, a source-only release that is never deployed, archived
+  on Zenodo through the GitHub integration with `.zenodo.json` metadata. References to v0.9.1 as
+  the deployed, evaluated version stay unchanged.
 
 ## Project and current state
 

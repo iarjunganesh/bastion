@@ -1,0 +1,32 @@
+{
+  "title": "Bastion: a governed agent fleet for Google Cloud IAM review (source code, v0.9.2)",
+  "upload_type": "software",
+  "version": "v0.9.2",
+  "description": "<p>Source code of Bastion, a three-agent fleet that reviewed Google Cloud IAM access with deterministic policy authority, explicit agent handoffs and completion confirmations. v0.9.2 is a source-only release and was never deployed; the final deployment, evaluated in the technical report, was v0.9.1. The fleet was retired on 9 November 2026.</p><p>Technical report: https://doi.org/10.5281/zenodo.24120596</p><p>Licences: code under MIT; the report sources and evidence records in this archive are under CC BY 4.0, as set out in LICENSE-CONTENT.md.</p>",
+  "creators": [
+    {
+      "name": "Ganesh, Arjun",
+      "orcid": "0009-0004-4720-7057",
+      "affiliation": "Independent researcher, Stockholm"
+    }
+  ],
+  "access_right": "open",
+  "license": "mit",
+  "language": "eng",
+  "keywords": [
+    "AI agents",
+    "multi-agent systems",
+    "agent security",
+    "execution boundaries",
+    "Google Cloud IAM",
+    "Agent Development Kit (ADK)",
+    "A2A protocol"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://doi.org/10.5281/zenodo.24120596",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-report"
+    }
+  ]
+}
