@@ -1,29 +1,29 @@
 {
-  "checked_at_utc": "2026-11-10T20:37:38.938159+00:00",
+  "checked_at_utc": "2026-11-10T21:52:46.569111+00:00",
   "checker": "Claude",
-  "build": "release build for report-2026-11",
+  "build": "final release build for report-2026-11 (DOI 10.5281/zenodo.24120596)",
   "pages": 25,
-  "pdf_sha256": "81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706",
-  "pdf_bytes": 740890,
-  "manifest_sha256": "0e399dc83af237e7df127dd5ec8dd2b95017d40810daf8136ab1d2863c46a342",
-  "source_snapshot_sha256": "4c2e6b489028c6c64b24b25475d13c2b52b9a3aea15834979be5a90716c77732",
-  "manuscript_sha256": "3074e429b21d6c7c8915640a8fba614789f172db97cbb8036f379cf740057272",
+  "pdf_sha256": "ec710124910bba89dcb4fd3bbd769f714347074f3989869c00b74f31a013dcb3",
+  "pdf_bytes": 741684,
+  "manifest_sha256": "b8606936efff176be3b89f2de77fa6fec59095530ff235ad66c5fb6aebbf891a",
+  "source_snapshot_sha256": "3433623337a5069130fbfb1f545fdc1ef4cca6a4325fce588d5ad59e1515a912",
+  "manuscript_sha256": "982a2219013589ba836a55660d64bcef13f328d00ec1b16cb155fc9a7ded4a3b",
   "outline_sha256": "fae36638d94e567cc3888e37af0c65c177efe7f07d3a23be9d72ddee59259015",
   "figures_sha256": {
     "figure1-topology.png": "56160fae4551924b8467d31b7a42c12f19f4c8a8f0fc74c49c0702552af4f40d",
     "figure2-chronology.png": "66e5ae34d1b173f6aa1982561ab4ec77b64543953609b5ec2b318fbff750f8ba",
     "figure3-timeout.png": "1d6207266b19e4ed7f768f894ea1d83bfccbf1faf521e09d201b18c2c4fba4b0"
   },
-  "previous_verified_build_pdf_sha256": "f3b2bb95f5ae52b9e9d964519f92dd367fceeb58342e0570d07274692e5f9071",
+  "previous_verified_build_pdf_sha256": "81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706",
   "difference_from_verified_build": [
-    "running header: 'Review draft' replaced by 'report-2026-11'",
-    "Appendix A.2: release-tag sentence replaces the pre-release placeholder",
-    "Appendix A.2: provenance line wording and new cited-source manifest hash",
-    "reflow: one A.4 bullet moved from p.20 to p.21; Appendix B row E19 from p.21 to p.22"
+    "p.1: author line adds the ORCID iD (linked); date line adds the DOI (linked) and CC BY 4.0",
+    "Appendix A.2: Zenodo DOI and licence-scope sentence; provenance line names the snapshot's actual scope; new cited-source manifest hash",
+    "reflow only on pp.20-25 (one A.4 bullet, Appendix B row E18, Appendix C.1 row L, the References heading and four reference entries (S15, E03, E05 and E06, containing five links) move to the next page)",
+    "source snapshot adds LICENSE and LICENSE-CONTENT.md (72 manifest entries, 73 members)"
   ],
   "unchanged_from_verified_build": [
     "all other PDF text-layer lines (page-by-page diff)",
-    "all 62 link targets, per page",
+    "all 62 previous link targets (two links added on p.1; five reference links move from p.24 to p.25)",
     "all embedded figure images, byte for byte"
   ],
   "visual_review": {
@@ -31,13 +31,16 @@
       1,
       20,
       21,
-      22
+      22,
+      23,
+      24,
+      25
     ],
-    "other_pages": "text layer, links and images identical to the verified build apart from the running header; that build received full 25-page visual inspection"
+    "other_pages": "pp.2-19 text layer, links and images identical to the verified candidate"
   },
-  "source_files_verified": 70,
+  "source_files_verified": 72,
   "snapshot_crc": "passed",
-  "snapshot_member_count": 71,
+  "snapshot_member_count": 73,
   "source_overlay": [],
   "frozen_outline": "byte-identical",
   "stop_and_dead_letter_table_rows": "unchanged",
@@ -155,5 +158,11 @@
   },
   "privacy_scope_note": "Finite regex checks across all listed scopes; every pattern returned zero hits. Not a general disclosure guarantee.",
   "reproducibility_note": "The PDF embeds a creation timestamp and the snapshot ZIP embeds member timestamps, so neither is byte-reproducible across builds. Reproducibility is established by the source manifest: every snapshot member and cited file hashes to its manifest entry.",
-  "builder_change": "load_live_validation compares LF-normalised public captures with the exact-byte-verified bundle members (Codex review comment on PR #18)"
+  "previous_verified_build_note": "release candidate verified by the 10 November release review; it in turn differed from the content-verified build f3b2bb95\u20269071 only in the running header and A.2",
+  "outline_note": "LF-normalised hash; equals the committed blob (the Windows checkout uses CRLF)",
+  "licence_notices_in_snapshot": [
+    "LICENSE",
+    "LICENSE-CONTENT.md"
+  ],
+  "clickable_https_links": 64
 }

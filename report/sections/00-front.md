@@ -1,10 +1,10 @@
 # Bastion: Execution Boundaries, Control Evolution, and Bounded Evaluation of a Governed Agent Fleet
 
-Arjun Ganesh
+Arjun Ganesh | ORCID [0009-0004-4720-7057](https://orcid.org/0009-0004-4720-7057)
 
 Independent researcher, Stockholm
 
-November 2026 | Technical report
+November 2026 | Technical report | DOI [10.5281/zenodo.24120596](https://doi.org/10.5281/zenodo.24120596) | CC BY 4.0
 
 ## Abstract
 
