@@ -1,10 +1,12 @@
 # Publication manifest: `report-2026-11`
 
-**Status: released on GitHub; Zenodo publication pending.** The maintainer approved the
+**Status: published.** Zenodo record [https://zenodo.org/records/24120596](https://zenodo.org/records/24120596), DOI
+[10.5281/zenodo.24120596](https://doi.org/10.5281/zenodo.24120596), published 10 November. The maintainer approved the
 manuscript and this manifest with the three final hashes on 10 November. The annotated tag
 `report-2026-11` points to the PR #20 merge commit `e9e86b0f46e2cc1ba50897de7dff4f3104117b95`.
 The [GitHub release](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11) carries the three artifacts; their downloaded SHA-256 values match
-the table below. PR #18 merged the report sources on 10 November at
+the table below. The three files downloaded from the Zenodo record match the same hashes
+(and the MD5 values Zenodo lists), and the DOI resolves to the record. PR #18 merged the report sources on 10 November at
 `41f292f54493925526d043def10c493768080bf0`. Any change to the artifact bytes would need renewed
 approval (step 1).
 
