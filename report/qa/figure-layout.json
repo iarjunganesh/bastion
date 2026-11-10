@@ -1,0 +1,32 @@
+[
+  {
+    "file": "figure1-topology.png",
+    "width_px": 1600,
+    "height_px": 1880,
+    "placed_width_pt": 499.27559055118115,
+    "minimum_font_pt": 8.425275590551182,
+    "label_lines": 41,
+    "clipping": [],
+    "text_collisions": []
+  },
+  {
+    "file": "figure2-chronology.png",
+    "width_px": 1600,
+    "height_px": 1900,
+    "placed_width_pt": 499.27559055118115,
+    "minimum_font_pt": 8.425275590551182,
+    "label_lines": 42,
+    "clipping": [],
+    "text_collisions": []
+  },
+  {
+    "file": "figure3-timeout.png",
+    "width_px": 1600,
+    "height_px": 1550,
+    "placed_width_pt": 499.27559055118115,
+    "minimum_font_pt": 8.425275590551182,
+    "label_lines": 30,
+    "clipping": [],
+    "text_collisions": []
+  }
+]

@@ -1,0 +1,141 @@
+{
+  "checked_at_utc": "2026-11-09T23:46:32.386944+00:00",
+  "reviewer": "Codex",
+  "review_date": "2026-11-10",
+  "pages": 25,
+  "pdf_sha256": "f3b2bb95f5ae52b9e9d964519f92dd367fceeb58342e0570d07274692e5f9071",
+  "manifest_sha256": "923952eb7c1f6f9f4081405642d20b4714add7c3678c68b0f5fcf354fee7bd3f",
+  "source_snapshot_sha256": "a23554b962fad34e785a48dae21a4ed539e5b565ffd8a0f2c918c52db27572c2",
+  "manuscript_sha256": "0498fd9b0982bf9e831dd31b5253411f40d3b0695a59abe892b5a2eec06423c3",
+  "outline_sha256": "fae36638d94e567cc3888e37af0c65c177efe7f07d3a23be9d72ddee59259015",
+  "source_files_verified": 70,
+  "snapshot_crc": "passed",
+  "snapshot_manifest": "matches",
+  "canonical_assembly": "matches after CRLF/LF normalisation",
+  "frozen_outline": "byte-identical to preserved pre-correction copy",
+  "stop_and_dead_letter_table_rows": "unchanged",
+  "evaluation_tables": "unchanged apart from replay label",
+  "privacy_pattern_hits": {
+    "email": 0,
+    "service_account_email": 0,
+    "private_key": 0,
+    "access_token": 0,
+    "jwt": 0,
+    "private_service_url": 0,
+    "billing_account_id": 0,
+    "iam_principal": 0,
+    "explicit_credit_balance": 0
+  },
+  "privacy_scopes": [
+    "manuscript",
+    "pdf_text",
+    "pdf_metadata",
+    "pdf_links",
+    "canonical_sections"
+  ],
+  "privacy_patterns": {
+    "email": "\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b",
+    "service_account_email": "\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.gserviceaccount\\.com\\b",
+    "private_key": "-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----",
+    "access_token": "\\b(?:ya29\\.[A-Z0-9._~-]+|AIza[A-Z0-9_-]{35}|sk-(?:proj-)?[A-Z0-9_-]{20,})",
+    "jwt": "\\beyJ[A-Z0-9_-]{5,}\\.[A-Z0-9_-]{5,}\\.[A-Z0-9_-]{5,}\\b",
+    "private_service_url": "https?://[^\\s<>]*?(?:\\.run\\.app|\\.cloudfunctions\\.net|\\.internal|\\.local)(?:[:/\\s<>]|$)",
+    "billing_account_id": "\\b[0-9A-F]{6}-[0-9A-F]{6}-[0-9A-F]{6}\\b",
+    "iam_principal": "\\b(?:serviceAccount|user|group|domain|principal|principalSet):[^\\s<>]+",
+    "explicit_credit_balance": "(?:credit balance|remaining credits|available credits)\\s*[:=]\\s*(?:[A-Z]{3}\\s*)?[0-9]"
+  },
+  "privacy_scope_note": "Finite regex and full-page/text review; not a general disclosure guarantee. Private raw response contents and unrelated billing/IAM/credential files were not opened.",
+  "manual_privacy_review": {
+    "affiliation": "Independent researcher, Stockholm",
+    "employer_affiliation": "none observed",
+    "raw_iam_or_unredacted_findings": "none observed in report",
+    "credit_balances": "none observed"
+  },
+  "pdf_embedded_files": 0,
+  "private_snapshot_paths": [],
+  "statistic_sections": [
+    "5.7 Statistical interpretation",
+    "8. What the evaluation does not demonstrate"
+  ],
+  "statistic_pdf_pages": [
+    9,
+    17
+  ],
+  "figures": [
+    {
+      "page": 5,
+      "file": "figure1-topology.png",
+      "minimum_font_pt": 8.425275590551182,
+      "embedded_pixels_match": true
+    },
+    {
+      "page": 10,
+      "file": "figure2-chronology.png",
+      "minimum_font_pt": 8.425275590551182,
+      "embedded_pixels_match": true
+    },
+    {
+      "page": 15,
+      "file": "figure3-timeout.png",
+      "minimum_font_pt": 8.425275590551182,
+      "embedded_pixels_match": true
+    }
+  ],
+  "source_overlay": [],
+  "visual_review": "passed",
+  "visual_review_pages": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+  ],
+  "visual_review_scale": 1.5,
+  "page_render_mismatches": [],
+  "text_outside_page": [],
+  "page_headers_missing": [],
+  "final_review_items_closed": 14,
+  "verification_findings_closed": 16,
+  "closeout": "final-closeout-2026-11-10.md",
+  "previous_receipt_pdf_sha256": "116893839be3022d99a2663f00d219b4304f78831ed46c94ba0a95b79f8dba76",
+  "previous_receipt_preserved_in": ".local/report-drafts/pre-verification-fixes-2026-11-10-1794266713.zip",
+  "pdf_rebuilt_during_closeout": false,
+  "validation": {
+    "report_tests": {
+      "count": 17,
+      "status": "passed"
+    },
+    "ruff_check": "passed",
+    "ruff_format": "passed",
+    "docs_check": "passed",
+    "version_check": {
+      "documents": 107,
+      "pins": 18,
+      "status": "passed"
+    },
+    "markdown_lint": {
+      "files": 23,
+      "status": "passed"
+    }
+  }
+}

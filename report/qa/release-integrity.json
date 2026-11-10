@@ -1,0 +1,159 @@
+{
+  "checked_at_utc": "2026-11-10T20:37:38.938159+00:00",
+  "checker": "Claude",
+  "build": "release build for report-2026-11",
+  "pages": 25,
+  "pdf_sha256": "81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706",
+  "pdf_bytes": 740890,
+  "manifest_sha256": "0e399dc83af237e7df127dd5ec8dd2b95017d40810daf8136ab1d2863c46a342",
+  "source_snapshot_sha256": "4c2e6b489028c6c64b24b25475d13c2b52b9a3aea15834979be5a90716c77732",
+  "manuscript_sha256": "3074e429b21d6c7c8915640a8fba614789f172db97cbb8036f379cf740057272",
+  "outline_sha256": "fae36638d94e567cc3888e37af0c65c177efe7f07d3a23be9d72ddee59259015",
+  "figures_sha256": {
+    "figure1-topology.png": "56160fae4551924b8467d31b7a42c12f19f4c8a8f0fc74c49c0702552af4f40d",
+    "figure2-chronology.png": "66e5ae34d1b173f6aa1982561ab4ec77b64543953609b5ec2b318fbff750f8ba",
+    "figure3-timeout.png": "1d6207266b19e4ed7f768f894ea1d83bfccbf1faf521e09d201b18c2c4fba4b0"
+  },
+  "previous_verified_build_pdf_sha256": "f3b2bb95f5ae52b9e9d964519f92dd367fceeb58342e0570d07274692e5f9071",
+  "difference_from_verified_build": [
+    "running header: 'Review draft' replaced by 'report-2026-11'",
+    "Appendix A.2: release-tag sentence replaces the pre-release placeholder",
+    "Appendix A.2: provenance line wording and new cited-source manifest hash",
+    "reflow: one A.4 bullet moved from p.20 to p.21; Appendix B row E19 from p.21 to p.22"
+  ],
+  "unchanged_from_verified_build": [
+    "all other PDF text-layer lines (page-by-page diff)",
+    "all 62 link targets, per page",
+    "all embedded figure images, byte for byte"
+  ],
+  "visual_review": {
+    "pages_inspected_in_full": [
+      1,
+      20,
+      21,
+      22
+    ],
+    "other_pages": "text layer, links and images identical to the verified build apart from the running header; that build received full 25-page visual inspection"
+  },
+  "source_files_verified": 70,
+  "snapshot_crc": "passed",
+  "snapshot_member_count": 71,
+  "source_overlay": [],
+  "frozen_outline": "byte-identical",
+  "stop_and_dead_letter_table_rows": "unchanged",
+  "pdf_embedded_files": 0,
+  "committed_report_text_files_scanned": [
+    "report/build_report.py",
+    "report/make_figures.py",
+    "report/OUTLINE.md",
+    "report/PUBLICATION-MANIFEST.md",
+    "report/qa/checks.json",
+    "report/qa/claim-reconciliation.md",
+    "report/qa/figure-layout.json",
+    "report/qa/final-closeout-2026-11-10.md",
+    "report/qa/final-fix-integrity.json",
+    "report/qa/final-review-2026-11-09.md",
+    "report/qa/release-build-2026-11-10.md",
+    "report/qa/release-integrity.json",
+    "report/README.md",
+    "report/requirements-build.txt",
+    "report/sections/00-front.md",
+    "report/sections/01-introduction.md",
+    "report/sections/02-background.md",
+    "report/sections/03-threat-model.md",
+    "report/sections/04-design.md",
+    "report/sections/05-method.md",
+    "report/sections/06-failures.md",
+    "report/sections/07-evaluation.md",
+    "report/sections/08-not-demonstrated.md",
+    "report/sections/09-discussion.md",
+    "report/sections/10-conclusion.md",
+    "report/sections/appendix-a-reproducibility.md",
+    "report/sections/appendix-b-evidence.md",
+    "report/sections/appendix-c-protocols.md",
+    "report/sections/references.md",
+    "report/test_build_report.py"
+  ],
+  "privacy_pattern_hits": {
+    "email": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    },
+    "service_account_email": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    },
+    "private_key": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    },
+    "access_token": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    },
+    "jwt": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    },
+    "private_service_url": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    },
+    "billing_account_id": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    },
+    "iam_principal": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    },
+    "explicit_credit_balance": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    },
+    "other_project_name_or_number": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    },
+    "eth_application_material": {
+      "manuscript": 0,
+      "pdf_text": 0,
+      "pdf_metadata": 0,
+      "pdf_links": 0,
+      "committed_report_text_files": 0
+    }
+  },
+  "privacy_scope_note": "Finite regex checks across all listed scopes; every pattern returned zero hits. Not a general disclosure guarantee.",
+  "reproducibility_note": "The PDF embeds a creation timestamp and the snapshot ZIP embeds member timestamps, so neither is byte-reproducible across builds. Reproducibility is established by the source manifest: every snapshot member and cited file hashes to its manifest entry.",
+  "builder_change": "load_live_validation compares LF-normalised public captures with the exact-byte-verified bundle members (Codex review comment on PR #18)"
+}
