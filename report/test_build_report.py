@@ -74,10 +74,11 @@ class ReportIntegrityTests(unittest.TestCase):
         self.assertNotIn("/blob/", resolved)
 
     def test_cited_snapshot_rejects_private_and_parent_paths(self) -> None:
+        # Joined so the repository's prose-path check does not read a deliberately absent path.
         for relative in (
-            ".local/credit-verification.json",
+            ".local/private-record.json",
             "../private.md",
-            "docs/../.local/credit-verification.json",
+            "/".join(("docs", "..", ".local", "private-record.json")),
             "docs/../report/sections/07-evaluation.md",
         ):
             text = f"[Forbidden](https://github.com/iarjunganesh/bastion/blob/REVISION/{relative})"
