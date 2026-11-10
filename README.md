@@ -114,13 +114,16 @@ The [claim matrix](docs/research/claim-matrix.md) bounds each claim; the
   deployment the report evaluates (evidence 26–29); v0.9.0 resolved the advisory accepted at
   v0.8.0 ([dependency status](docs/DEPENDENCY-STATUS.md)).
 
-The technical report is local in `report/`, uncommitted and outside the release. One
-definitive report is written once from the blueprint frozen on 9 November; the 6–7 November
-PDFs are drafts, not editions. **The fleet was retired on 9 November 2026 (D4):** its serving
+**Technical report:** *Bastion: Execution Boundaries, Control Evolution, and Bounded
+Evaluation of a Governed Agent Fleet* (10 November 2026, 25 pages), DOI
+[10.5281/zenodo.24120596](https://doi.org/10.5281/zenodo.24120596). The PDF, source manifest
+and source snapshot are attached to the [`report-2026-11` release](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11); their hashes are
+in the [publication manifest](report/PUBLICATION-MANIFEST.md). Sources are in [`report/`](report/).
+It is the one definitive report; the 6–7 November PDFs were drafts, not editions. **The fleet was retired on 9 November 2026 (D4):** its serving
 resources were deleted, the Agent Gateway is retained because a retained Runtime engine
 references it, and billing was disconnected from the project. The evidence above is dated
 history; see [HANDOFF](HANDOFF.md) for the verified end state.
-Report publication is a separate action. The public console redeploys from
+The public console redeploys from
 `main`, by maintainer decision: merging a PR publishes its `site/` changes.
 
 ## A boundary failure worth testing

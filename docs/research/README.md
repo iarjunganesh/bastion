@@ -1,7 +1,7 @@
 # Research documents
 
 Working documents for the Bastion technical report. They bound what the report and the public
-pages may claim; the report sources themselves are kept locally in `report/` until approval.
+pages may claim; the report sources are in [`report/`](../../report/README.md), released as tag `report-2026-11`.
 
 | Document | Purpose |
 |---|---|

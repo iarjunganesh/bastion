@@ -1,10 +1,11 @@
 # Publication manifest: `report-2026-11`
 
-**Status: final build complete; awaiting the maintainer's approval.** Nothing has been tagged,
-released, deposited or announced. PR #18 merged the report sources on 10 November at
-`41f292f54493925526d043def10c493768080bf0`; that merge did not approve the manuscript or any
-publication step. Approving this manifest together with the manuscript authorises the release
-steps below for the exact artifact hashes listed; any change to those bytes needs renewed
+**Status: released on GitHub; Zenodo publication pending.** The maintainer approved the
+manuscript and this manifest with the three final hashes on 10 November. The annotated tag
+`report-2026-11` points to the PR #20 merge commit `e9e86b0f46e2cc1ba50897de7dff4f3104117b95`.
+The [GitHub release](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11) carries the three artifacts; their downloaded SHA-256 values match
+the table below. PR #18 merged the report sources on 10 November at
+`41f292f54493925526d043def10c493768080bf0`. Any change to the artifact bytes would need renewed
 approval (step 1).
 
 ## Work
@@ -91,15 +92,15 @@ requires enabling the repository in Zenodo, an external account setting.
 
 The DOI is printed in the PDF. This was chosen before final artifact approval: the maintainer
 reserved `10.5281/zenodo.24120596` in a Zenodo draft without publishing, and the final build
-includes it. The maintainer approves the final artifact hashes above before the tag is created
-or either record is published. The Zenodo GitHub integration must stay off for
+includes it. The maintainer approved the final artifact hashes above before the tag was
+created. The Zenodo GitHub integration must stay off for
 `iarjunganesh/bastion` until the release is complete, so the GitHub release does not create a
 second Zenodo record.
 
 ## Decisions for the maintainer
 
-1. Approve the manuscript (the final PDF, by hash).
-2. Approve this manifest with the final hashes.
+1. Approved 10 November: the manuscript (the final PDF, by hash).
+2. Approved 10 November: this manifest with the final hashes.
 3. Decided 10 November: **CC BY 4.0** for the report and evidence records, MIT for code.
 4. Decided 10 November: **manual Zenodo upload**, with the **DOI printed in the PDF**.
 

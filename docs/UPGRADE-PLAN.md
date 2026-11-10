@@ -29,8 +29,9 @@ deployed resolution; [VERSIONS.md](VERSIONS.md) is the canonical provenance tabl
 2. The final offline gates passed; commands remain in [AGENTS.md](../AGENTS.md): core coverage, Ruff, mypy, docs/version,
    evidence redaction, diagram freshness, static site and Markdown checks. Check diagrams only;
    rendering them changes assets embedded in the frozen Devpost entry.
-3. Keep report sources/build output uncommitted. The 6 November maintainer request supersedes
-   the earlier report build hold; generation is part of this final pass, not a routine code gate.
+3. The report sources were committed by PR #18 and released on 10 November as tag
+   `report-2026-11`; build output stays ignored and is attached to the release. Report
+   generation is not a routine code gate.
 4. Follow D4's existing 8–10 November dry-run-first end-state window and residual-resource decision
    in the [report plan](research/report-plan.md). Do not broaden deletion targets.
 5. Public code, documentation and E24/E25 are published through
