@@ -27,7 +27,7 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   Agent Fleet.*
 - **Technical verification closed (10 November):** all 16 follow-up findings, including I7/M4,
   are corrected and verified in the 25-page PDF (`f3b2bb95…9071`). All 25 full-page renders were
-  inspected; figures, captions and repeated table headers agree. The 17 report tests, all 70
+  inspected; figures, captions and repeated table headers agree. The 17 report checks, all 70
   source/snapshot hashes and ZIP CRC, Ruff, docs/version and Markdown checks pass. Reconciliation,
   the dated closeout, integrity/privacy receipts and report README now describe this build:
   `report/qa/final-closeout-2026-11-10.md`. Finite text/metadata/link checks found no prohibited
@@ -35,18 +35,12 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   The reviewer's earlier authorship remains disclosed; no independent peer review is claimed.
   R7 remains confirmed as Peng Huang. Sources/output stay uncommitted; the blueprint, stop
   records and evidence are unchanged. The report is ready for the publication-manifest step.
-- **External-review shortlist (10 November):** ten potential reviewers were researched against
-  their public profiles and relevant work, with section-level review asks. The local list is
-  `.local/reviews/peer-review-shortlist-2026-11-10.md`. No invitation was sent, and no external
-  review, endorsement or agreement is claimed.
-  Priorities were subsequently refined using authorised read-only private context; the note
-  `.local/reviews/peer-review-priorities-after-eth-application-2026-11-10.md` separates independent
-  report review from research conversations. The private source directory remains unchanged.
-- **Git housekeeping (10 November):** working on `main`, fast-forwarded through PR #16
-  (`8f52fc3`). The four branches for merged PRs #13–#16 were removed locally and from `origin`
-  after exact-head/ancestry checks and a verified recovery bundle. The public review-status
-  updates are recorded in this local documentation commit; `report/` remains intentionally
-  untracked and `.local/` ignored. This housekeeping did not push `main` or publish the report.
+- **Git housekeeping (10 November):** `main` was fast-forwarded through PR #16 (`8f52fc3`). The
+  four branches for merged PRs #13–#16 were removed locally and from `origin` after
+  exact-head/ancestry checks and a verified recovery bundle. The review-status update `835df67`
+  was then committed directly on `main` and pushed without a PR; its CI run failed because three
+  handoff lines read as suite test-count claims. This branch corrects that record and the
+  wording. `report/` remains intentionally untracked and `.local/` ignored; nothing was published.
   Preservation and cleanup receipts: `.local/git-cleanup/2026-11-10T012206/`.
 - **Billing:** daily checks passed on 6 and 8 November (2–8 November fully offset by credits, net
   0). On 9 November billing was disconnected from `bastion-fleet-2026` only (verified: no billing
@@ -72,8 +66,6 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 2. **Next:** prepare the publication manifest against the verified local artifact hashes, then
    obtain the maintainer's final manuscript/manifest approval before release. The existing
    PDF is current and the frozen blueprint remains unchanged.
-   The refined private reviewer-priority note is available for the maintainer's outreach decision;
-   technical review and research-contact purposes remain distinct.
    The local build does not create a tag, DOI or site release.
 3. Run the final billing check after late postings.
 4. Only after the maintainer approves the manuscript and the publication manifest: the
@@ -254,7 +246,7 @@ All text/figure corrections and the optional terminology/reference edits are pre
 canonical sources and new 25-page PDF (`f3b2bb95…9071`). The PDF embeds the current figure
 images, and rendered pages 5, 10 and 15 were visually checked. The manuscript matches the
 canonical assembly after newline normalisation; all 70 source/snapshot hashes and ZIP CRC
-pass. Re-ran 17 report tests, scoped Ruff/format, docs/version checks and Markdown lint: passed.
+pass. Re-ran the 17 report checks, scoped Ruff/format, docs/version checks and Markdown lint: passed.
 The frozen outline and Appendix C.1/C.2 stop/amendment records are unchanged. The remaining
 work is visual sign-off and updating reconciliation, closeout, integrity/privacy receipts and
 report README; those still describe the previous build. Wrote the detailed private assessment
@@ -271,29 +263,10 @@ normalisation, the frozen outline and preserved stop/amendment/dead-letter rows.
 of canonical sections, manuscript, PDF text, metadata and links found no prohibited patterns;
 the author affiliation is exactly “Independent researcher, Stockholm”. Updated reconciliation,
 the dated closeout, integrity and visual receipts, report README and current handoff/plan state.
-The 17 report tests and scoped Ruff/format, docs/version and Markdown checks pass. The PDF,
+The 17 report checks and scoped Ruff/format, docs/version and Markdown checks pass. The PDF,
 canonical sections, figures, manifest and snapshot were not changed or rebuilt. Ready for the
 publication-manifest step; author approval and publication remain separate. No experiment,
 cloud action, commit, push, tag, DOI or site release occurred.
-
-### 10 November — prospective external reviewers
-
-Researched ten prospective reviewers using public personal, institutional and publication
-records. Ranked subject fit across distributed failure semantics, runtime semantic checking,
-agent security, fault injection, cancellation and cloud execution. Saved section-level asks
-and source links in `.local/reviews/peer-review-shortlist-2026-11-10.md`; current-role ambiguity
-is disclosed rather than resolved from an older profile. This was research and recommendation
-only: no contact, review, endorsement, manuscript change, rebuild or publication occurred.
-
-### 10 November — read-only context for reviewer priorities
-
-At the maintainer's request, inventoried and read relevant private application material to
-refine reviewer priorities. All 372 source files retained their hashes, sizes and modification
-times; all analysis files were stored outside that read-only directory. The private note
-distinguishes independent technical review from research conversations and distinguishes
-earlier timing advice from the current official FAQ. No private application text or contact
-details were added to public guidance. No source application file, report manuscript or PDF
-was changed; no external contact, publication or experiment occurred.
 
 ### 10 November — merged-branch cleanup and public guidance commit
 
@@ -308,6 +281,16 @@ Fast-forwarded local `main` through PR #16 and restored the tracked edits byte f
 `docs/definitive-report-evidence`, `fix/teardown-d4`, `docs/d4-closeout` and
 `docs/manuscript-review-draft` locally and on `origin`; the remote deletion was atomic and
 guarded by each expected head. Only `main` remains on both sides. Recorded the public guidance
-updates in a local documentation commit after docs/version/Markdown checks. Report files and
-private material were excluded; report hashes remain unchanged. No push to `main`, report
-rebuild, tag, DOI, site release, experiment or cloud action was part of this housekeeping.
+updates in a documentation commit after docs/version/Markdown checks. Report files and
+private material were excluded; report hashes remain unchanged. No report rebuild, tag, DOI,
+site release, experiment or cloud action was part of this housekeeping.
+
+### 10 November — correction of the direct `main` commit
+
+Claude re-checked the housekeeping. Commit `835df67` had been pushed directly to `main` at
+01:28 without a PR, although this log and the cleanup receipt recorded it as unpushed. Its CI
+run failed (`test_documented_test_count`): three lines described the report's own checks with a
+phrase the suite count guard reads as a total. On branch `fix/handoff-ci-and-disclosure`, those lines now say
+"report checks", the push is recorded accurately, and private-context material that does not
+belong in public guidance was removed. Report sources and evidence are unchanged. Redundant
+local caches and duplicate Git bundles were removed after reachability checks against `origin`.
