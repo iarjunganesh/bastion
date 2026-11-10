@@ -72,7 +72,7 @@ Numeric balances and billing receipts stay in ignored `.local/`.
 1. Done: the docs PR (#13) and the teardown fix (#14).
 2. Done: D4 (9 Nov). Recorded in HANDOFF and in `.local/d4/d4-closeout-2026-11-09.json`.
 3. Done: all 16 follow-up findings (1 Important, 15 Minor) are verified
-   (`report/qa/final-closeout-2026-11-10.md`). The release build (`75c57e3a…23d2`) changes only
+   (`report/qa/final-closeout-2026-11-10.md`). The release build (`81c2dfce…0706`) changes only
    the running header and the Appendix A.2 release sentence
    (`report/qa/release-build-2026-11-10.md`). Next: merge the release PR, then the maintainer
    approves the manuscript and `report/PUBLICATION-MANIFEST.md`.

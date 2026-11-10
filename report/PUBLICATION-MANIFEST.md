@@ -24,9 +24,9 @@ Built on 10 November 2026 from the sources in this directory. Record:
 
 | Artifact | Published as | SHA-256 |
 |---|---|---|
-| `bastion-technical-report-2026-11.pdf` (25 pages, 740,892 bytes) | GitHub release asset; Zenodo file | `75c57e3aab8f19af1b39cec7b6a28385e6df1f92865928e0707c345e01b223d2` |
-| `source-manifest.json` | GitHub release asset; Zenodo file | `549e61a4d2fa4ceded6b00c65329da7c93f64fd3cb6ede5a9148fceb9b4772d2` |
-| `source-snapshot.zip` (71 members: cited public files, build inputs, manifest) | GitHub release asset; Zenodo file | `bde01b6375a856809aedb3389c4c21ad06a5c4b57cec1498a2005627e9c1d94c` |
+| `bastion-technical-report-2026-11.pdf` (25 pages, 740,890 bytes) | GitHub release asset; Zenodo file | `81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706` |
+| `source-manifest.json` | GitHub release asset; Zenodo file | `0e399dc83af237e7df127dd5ec8dd2b95017d40810daf8136ab1d2863c46a342` |
+| `source-snapshot.zip` (71 members: cited public files, build inputs, manifest) | GitHub release asset; Zenodo file | `4c2e6b489028c6c64b24b25475d13c2b52b9a3aea15834979be5a90716c77732` |
 | `figures/figure1-topology.png` | In the tagged tree | `56160fae4551924b8467d31b7a42c12f19f4c8a8f0fc74c49c0702552af4f40d` |
 | `figures/figure2-chronology.png` | In the tagged tree | `66e5ae34d1b173f6aa1982561ab4ec77b64543953609b5ec2b318fbff750f8ba` |
 | `figures/figure3-timeout.png` | In the tagged tree | `1d6207266b19e4ed7f768f894ea1d83bfccbf1faf521e09d201b18c2c4fba4b0` |

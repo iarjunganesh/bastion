@@ -1,13 +1,13 @@
 {
   "pages": 25,
-  "pdf_bytes": 740892,
+  "pdf_bytes": 740890,
   "clickable_https_links": 62,
   "figures_present": true,
   "findings": [],
   "visual_review": "passed",
   "base_revision": "aa398f6953de6dd3d56d84b2ae981a4a06591474",
   "local_snapshot_sources": [],
-  "pdf_sha256": "75c57e3aab8f19af1b39cec7b6a28385e6df1f92865928e0707c345e01b223d2",
+  "pdf_sha256": "81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706",
   "visual_review_date": "2026-11-10",
   "visual_reviewer": "Claude",
   "visual_review_scope": {

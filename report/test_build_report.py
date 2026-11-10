@@ -55,6 +55,18 @@ class ReportIntegrityTests(unittest.TestCase):
             ):
                 build_report.load_live_validation()
 
+    def test_lf_checkout_of_public_captures_is_accepted(self) -> None:
+        """Git may check the CRLF captures out with LF endings; the content is unchanged."""
+        with tempfile.TemporaryDirectory(prefix="bastion-report-") as directory:
+            target = Path(directory)
+            self.copy_data(target)
+            for name in ("summary.json", "runs.csv", "stages.csv"):
+                path = target / name
+                path.write_bytes(path.read_bytes().replace(b"\r\n", b"\n"))
+            with patch.object(build_report, "LIVE_DATA", target):
+                summary = build_report.load_live_validation()
+            self.assertEqual(summary["validated_run_audit_events"], 560)
+
     def test_version_gate_includes_canonical_section_sources(self) -> None:
         self.assertTrue(set(build_report.source_sections()) <= set(check_versions.doc_files()))
 

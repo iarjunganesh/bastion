@@ -11,7 +11,8 @@ No finding, claim, figure or evidence statement changed.
 | Running header reads `report-2026-11` instead of `Review draft` | `build_report.py` | Every page header |
 | Appendix A.2 states that sources, build inputs and the publication manifest are released under `report-2026-11`, with links pinned to the immutable base commit | `sections/appendix-a-reproducibility.md` | p.20 |
 | The generated provenance line describes the manifest's scope instead of disclaiming public release | `build_report.py` | p.20, with the new manifest hash |
-| One line wrapped in `test_build_report.py` (lint only) | `test_build_report.py` | None |
+| One line wrapped; the path-refusal test no longer names a private file | `test_build_report.py` | None |
+| The live-validation check compares LF-normalised public captures with the exact-byte-verified bundle members, so an LF checkout no longer fails; one test added (PR #18 review comment) | `build_report.py`, `test_build_report.py` | None; only the manifest hash on p.20 changes |
 
 Repository links remain pinned to base commit `aa398f6953de6dd3d56d84b2ae981a4a06591474`.
 Every cited file is byte-identical there (no local-snapshot overlay), and since that commit only
@@ -27,7 +28,7 @@ immutable link target than a tag, so the links were not moved.
 - **Visual inspection:** pages 1, 20, 21 and 22 in full at the 1.5× render. Table headers repeat
   across the p.21–22 split. The other pages are unchanged from the verified build, which
   received a full 25-page inspection, apart from the header.
-- **Build checks:** 17 report checks pass; automated layout findings are empty; 25 pages.
+- **Build checks:** 18 report checks pass; automated layout findings are empty; 25 pages.
 - **Integrity:** all 70 source-manifest entries match the files and the snapshot members; the
   ZIP CRC passes; no overlay. The frozen outline, Appendix C stop/amendment rows and the C.4
   dead-letter table are unchanged. The statistical illustration stays in §§5.7 and 8.
@@ -39,9 +40,9 @@ immutable link target than a tag, so the links were not moved.
 
 | Artifact | SHA-256 |
 |---|---|
-| `bastion-technical-report-2026-11.pdf` (740,892 bytes) | `75c57e3aab8f19af1b39cec7b6a28385e6df1f92865928e0707c345e01b223d2` |
-| `source-manifest.json` | `549e61a4d2fa4ceded6b00c65329da7c93f64fd3cb6ede5a9148fceb9b4772d2` |
-| `source-snapshot.zip` (71 members) | `bde01b6375a856809aedb3389c4c21ad06a5c4b57cec1498a2005627e9c1d94c` |
+| `bastion-technical-report-2026-11.pdf` (740,890 bytes) | `81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706` |
+| `source-manifest.json` | `0e399dc83af237e7df127dd5ec8dd2b95017d40810daf8136ab1d2863c46a342` |
+| `source-snapshot.zip` (71 members) | `4c2e6b489028c6c64b24b25475d13c2b52b9a3aea15834979be5a90716c77732` |
 
 The PDF and the snapshot ZIP embed timestamps and are not byte-reproducible; the source
 manifest is the reproducibility anchor. AI assistance is disclosed in Appendix A.5; no

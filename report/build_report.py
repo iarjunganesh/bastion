@@ -297,10 +297,19 @@ def load_live_validation() -> dict[str, Any]:
     public_hashes = json.loads((LIVE_DATA / "sha256.json").read_text(encoding="utf-8"))
     if set(public_hashes) != public_files:
         raise ValueError("Live-validation public-file manifest is incomplete")
-    for name, digest in public_hashes.items():
-        if hashlib.sha256((LIVE_DATA / name).read_bytes()).hexdigest() != digest:
-            raise ValueError(f"Live-validation public-file hash mismatch: {name}")
+    if public_hashes[LIVE_BUNDLE] != LIVE_BUNDLE_SHA256:
+        raise ValueError(f"Live-validation public-file hash mismatch: {LIVE_BUNDLE}")
     with zipfile.ZipFile(bundle) as archive:
+        # The recorded hashes describe the bundle members' exact (CRLF) bytes. Git may check the
+        # public copies out with LF endings, so those are compared after line-ending
+        # normalisation; the bundle and its members are still checked byte for byte.
+        for name in public_files - {LIVE_BUNDLE}:
+            member = archive.read(name)
+            checked_out = (LIVE_DATA / name).read_bytes()
+            if hashlib.sha256(member).hexdigest() != public_hashes[name] or member.replace(
+                b"\r\n", b"\n"
+            ) != checked_out.replace(b"\r\n", b"\n"):
+                raise ValueError(f"Live-validation public-file hash mismatch: {name}")
         if archive.testzip() is not None:
             raise ValueError("Live-validation bundle CRC check failed")
         member_hashes = json.loads(archive.read("sha256.json"))
@@ -309,9 +318,6 @@ def load_live_validation() -> dict[str, Any]:
         for name, digest in member_hashes.items():
             if hashlib.sha256(archive.read(name)).hexdigest() != digest:
                 raise ValueError(f"Live-validation member hash mismatch: {name}")
-        for name in public_files - {LIVE_BUNDLE}:
-            if (LIVE_DATA / name).read_bytes() != archive.read(name):
-                raise ValueError(f"Live-validation public data differs from bundle: {name}")
         summary = json.loads(archive.read("summary.json"))
         metrics = json.loads(archive.read("metrics.json"))
     runs = metrics["runs"]

@@ -1,13 +1,13 @@
 {
-  "checked_at_utc": "2026-11-10T20:27:08.910773+00:00",
+  "checked_at_utc": "2026-11-10T20:37:38.938159+00:00",
   "checker": "Claude",
   "build": "release build for report-2026-11",
   "pages": 25,
-  "pdf_sha256": "75c57e3aab8f19af1b39cec7b6a28385e6df1f92865928e0707c345e01b223d2",
-  "pdf_bytes": 740892,
-  "manifest_sha256": "549e61a4d2fa4ceded6b00c65329da7c93f64fd3cb6ede5a9148fceb9b4772d2",
-  "source_snapshot_sha256": "bde01b6375a856809aedb3389c4c21ad06a5c4b57cec1498a2005627e9c1d94c",
-  "manuscript_sha256": "6312aeb3330bf88babb94fae44715fa425438b58786c120d9f3a4439115d4861",
+  "pdf_sha256": "81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706",
+  "pdf_bytes": 740890,
+  "manifest_sha256": "0e399dc83af237e7df127dd5ec8dd2b95017d40810daf8136ab1d2863c46a342",
+  "source_snapshot_sha256": "4c2e6b489028c6c64b24b25475d13c2b52b9a3aea15834979be5a90716c77732",
+  "manuscript_sha256": "3074e429b21d6c7c8915640a8fba614789f172db97cbb8036f379cf740057272",
   "outline_sha256": "fae36638d94e567cc3888e37af0c65c177efe7f07d3a23be9d72ddee59259015",
   "figures_sha256": {
     "figure1-topology.png": "56160fae4551924b8467d31b7a42c12f19f4c8a8f0fc74c49c0702552af4f40d",
@@ -46,12 +46,15 @@
     "report/build_report.py",
     "report/make_figures.py",
     "report/OUTLINE.md",
+    "report/PUBLICATION-MANIFEST.md",
     "report/qa/checks.json",
     "report/qa/claim-reconciliation.md",
     "report/qa/figure-layout.json",
     "report/qa/final-closeout-2026-11-10.md",
     "report/qa/final-fix-integrity.json",
     "report/qa/final-review-2026-11-09.md",
+    "report/qa/release-build-2026-11-10.md",
+    "report/qa/release-integrity.json",
     "report/README.md",
     "report/requirements-build.txt",
     "report/sections/00-front.md",
@@ -151,5 +154,6 @@
     }
   },
   "privacy_scope_note": "Finite regex checks across all listed scopes; every pattern returned zero hits. Not a general disclosure guarantee.",
-  "reproducibility_note": "The PDF embeds a creation timestamp and the snapshot ZIP embeds member timestamps, so neither is byte-reproducible across builds. Reproducibility is established by the source manifest: every snapshot member and cited file hashes to its manifest entry."
+  "reproducibility_note": "The PDF embeds a creation timestamp and the snapshot ZIP embeds member timestamps, so neither is byte-reproducible across builds. Reproducibility is established by the source manifest: every snapshot member and cited file hashes to its manifest entry.",
+  "builder_change": "load_live_validation compares LF-normalised public captures with the exact-byte-verified bundle members (Codex review comment on PR #18)"
 }

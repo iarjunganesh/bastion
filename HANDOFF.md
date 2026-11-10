@@ -35,7 +35,7 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   The reviewer's earlier authorship remains disclosed; no independent peer review is claimed.
   R7 remains confirmed as Peng Huang. The blueprint, stop records and evidence are unchanged.
 - **Release build and publication manifest (10 November):** the release build
-  (`75c57e3a…23d2`, manifest `549e61a4…72d2`) differs from the verified build only in its
+  (`81c2dfce…0706`, manifest `0e399dc8…a342`) differs from the verified build only in its
   running header (`report-2026-11`) and the Appendix A.2 release sentence; page-by-page text,
   link and figure comparisons confirm it (`report/qa/release-build-2026-11-10.md`). Links stay
   pinned to `aa398f6`, where every cited file is byte-identical. The report sources, figures and
@@ -67,7 +67,7 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 1. **Release PR:** review and merge the PR that adds `report/` (sources, figures, review
    records and the publication manifest). Ask Codex for the read-only release review first.
-2. **Maintainer approval** of the manuscript (`75c57e3a…23d2`) and of
+2. **Maintainer approval** of the manuscript (`81c2dfce…0706`) and of
    `report/PUBLICATION-MANIFEST.md`, including the licence, the Zenodo method and whether the
    DOI is printed in the PDF (printing it needs one more rebuild).
 3. Run the final billing check after late postings.
@@ -310,3 +310,11 @@ report file to be committed pass. Wrote the release build record, `release-integ
 reconciliation; tracked the QA Markdown/JSON records while keeping generated outputs ignored.
 Repository Ruff, Markdown lint, docs/version/site checks and 398 tests pass with `report/`
 staged. No tag, release, deposit, experiment or cloud action occurred.
+
+PR #18 CI then failed on the docs path check: the report's path-refusal test named a private
+file that exists only locally. The test now uses a generic name. A Codex review comment showed
+that `load_live_validation()` rejected an LF checkout of the CRLF public captures; it now
+compares LF-normalised copies with the exact-byte-verified bundle members, with a new test
+(18 report checks). The builder change altered the source manifest, so the release PDF was
+rebuilt once more (`81c2dfce…0706`, manifest `0e399dc8…a342`); its comparison with the
+verified build is unchanged apart from the manifest hash.

@@ -117,6 +117,6 @@ header and the Appendix A.2 release sentence and provenance line; every claim ro
 unchanged and was not re-adjudicated. Page-by-page text, link and figure comparisons against
 the verified build are recorded in `release-build-2026-11-10.md`.
 
-PDF SHA-256: `75c57e3aab8f19af1b39cec7b6a28385e6df1f92865928e0707c345e01b223d2`.
-Source-manifest SHA-256: `549e61a4d2fa4ceded6b00c65329da7c93f64fd3cb6ede5a9148fceb9b4772d2`.
+PDF SHA-256: `81c2dfce5886426bde5ee81f5db461d2c83dc79a37b3c949c066f94c6220c706`.
+Source-manifest SHA-256: `0e399dc83af237e7df127dd5ec8dd2b95017d40810daf8136ab1d2863c46a342`.
 Receipts: `checks.json`, `figure-layout.json` and `release-integrity.json`.
