@@ -57,8 +57,11 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 1. Run the final billing check after late postings.
 2. No new experiments. Do not move the tag, replace release or Zenodo files, or rebuild the PDF.
    Cite the version DOI `10.5281/zenodo.24120596`, not the concept DOI.
-3. The Zenodo GitHub integration for `iarjunganesh/bastion` may be re-enabled only by the
-   maintainer; a later GitHub release would then create a new Zenodo version automatically.
+3. **v0.9.2 (source only, never deployed):** after the release PR merges, tag the merge commit
+   and create the GitHub release. The maintainer re-enabled the Zenodo GitHub integration on
+   10 November, so that release is archived on Zenodo as software per `.zenodo.json`; verify the
+   new record's metadata and that it links the report DOI. Every later GitHub release, including
+   any report release, will also be archived.
 
 ## Session log
 
@@ -345,3 +348,11 @@ public API: published, open access, resource type Report, creator with ORCID and
 "Independent researcher, Stockholm", licences CC BY 4.0 and MIT, version `report-2026-11`, both
 related identifiers. The three downloaded files match the approved SHA-256 values, and
 `doi.org/10.5281/zenodo.24120596` resolves to the record. The site now links the report by DOI.
+
+### 11 November — v0.9.2 release preparation
+
+The maintainer chose a v0.9.2 source release, archived on Zenodo (option A). The release PR bumps
+only current-source-version references (pyproject, site footer, README, VERSIONS, dependency
+status, AGENTS, CHANGELOG) and adds `CITATION.cff` (GitHub cites the report) and `.zenodo.json`
+(creator, ORCID, MIT, link to the report DOI). References to v0.9.1 as the deployed, evaluated
+version are unchanged. Agent code is unchanged since v0.9.1 apart from one docstring.

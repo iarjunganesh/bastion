@@ -61,13 +61,13 @@ class ResponseTests(unittest.TestCase):
     def test_project_override_does_not_use_inferred_project(self) -> None:
         settings = configuration.load_config()
         credentials = Mock()
-        loader = Mock(return_value=(credentials, "jnanasagara"))
+        loader = Mock(return_value=(credentials, "other-project"))
         returned = configuration.explicit_credentials(loader, settings)
         credentials.with_quota_project.assert_called_once_with("bastion-fleet-2026")
         self.assertIs(returned, credentials.with_quota_project.return_value)
         for key, value in (
-            ("project", "jnanasagara"),
-            ("quota_project", "jnanasagara"),
+            ("project", "other-project"),
+            ("quota_project", "other-project"),
             ("model_generation_enabled", True),
             ("max_spend_sek", 101),
         ):

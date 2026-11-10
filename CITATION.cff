@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use Bastion, please cite the technical report below."
+title: "Bastion"
+type: software
+version: 0.9.2
+date-released: 2026-11-11
+license: MIT
+repository-code: "https://github.com/iarjunganesh/bastion"
+abstract: >-
+  A three-agent fleet that reviewed Google Cloud IAM access with deterministic policy
+  authority, explicit agent handoffs and completion confirmations. v0.9.2 is a source-only
+  release; the deployment evaluated in the technical report was v0.9.1. Report and evidence
+  records are under CC BY 4.0 (see LICENSE-CONTENT.md).
+authors:
+  - family-names: Ganesh
+    given-names: Arjun
+    affiliation: "Independent researcher, Stockholm"
+    orcid: "https://orcid.org/0009-0004-4720-7057"
+keywords:
+  - AI agents
+  - multi-agent systems
+  - agent security
+  - execution boundaries
+  - Google Cloud IAM
+preferred-citation:
+  type: report
+  title: "Bastion: Execution Boundaries, Control Evolution, and Bounded Evaluation of a Governed Agent Fleet"
+  authors:
+    - family-names: Ganesh
+      given-names: Arjun
+      affiliation: "Independent researcher, Stockholm"
+      orcid: "https://orcid.org/0009-0004-4720-7057"
+  year: 2026
+  month: 11
+  publisher:
+    name: Zenodo
+  doi: "10.5281/zenodo.24120596"
+  url: "https://doi.org/10.5281/zenodo.24120596"
+  license: CC-BY-4.0
