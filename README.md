@@ -120,6 +120,8 @@ Evaluation of a Governed Agent Fleet* (10 November 2026, 25 pages), DOI
 [10.5281/zenodo.24120596](https://doi.org/10.5281/zenodo.24120596). The PDF, source manifest
 and source snapshot are attached to the [`report-2026-11` release](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11); their hashes are
 in the [publication manifest](report/PUBLICATION-MANIFEST.md). Sources are in [`report/`](report/).
+The v0.9.2 source code is archived on Zenodo as software, DOI
+[10.5281/zenodo.24121343](https://doi.org/10.5281/zenodo.24121343).
 It is the one definitive report; the 6–7 November PDFs were drafts, not editions. **The fleet was retired on 9 November 2026 (D4):** its serving
 resources were deleted, the Agent Gateway is retained because a retained Runtime engine
 references it, and billing was disconnected from the project. The evidence above is dated
