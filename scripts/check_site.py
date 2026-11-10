@@ -24,6 +24,7 @@ CONTENT = SITE / "data" / "site-content.json"
 TEXT_SUFFIXES = {".css", ".html", ".js", ".json", ".md", ".mjs", ".svg", ".txt", ".xml"}
 ALLOWED_HTTPS_HOSTS = {
     "bastion.arjunganesh.dev",
+    "doi.org",
     "github.com",
     "openapi.vercel.sh",
     "player.vimeo.com",

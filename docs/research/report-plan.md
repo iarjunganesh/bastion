@@ -80,9 +80,9 @@ Numeric balances and billing receipts stay in ignored `.local/`.
    maintainer approved the final hashes and `report/PUBLICATION-MANIFEST.md` on 10 November.
 4. Final billing check after late postings.
 5. Done 10 November: the annotated `report-2026-11` tag on merge commit `e9e86b0` and the
-   [GitHub release](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11) with the three artifacts (downloaded hashes verified). Next: the
-   maintainer publishes the Zenodo record (DOI `10.5281/zenodo.24120596`) with the same three
-   files, the downloads are verified, and the site links the report. Links stay pinned to
+   [GitHub release](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11) with the three artifacts (downloaded hashes verified). The
+   maintainer published the [Zenodo record](https://zenodo.org/records/24120596) (DOI `10.5281/zenodo.24120596`) with the same
+   three files; their downloaded hashes match and the DOI resolves. The site links the report. Links stay pinned to
    the immutable base commit `aa398f6`, where every cited file is unchanged.
 
 ## Evidence and manuscript rules

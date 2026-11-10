@@ -27,8 +27,9 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   `report/PUBLICATION-MANIFEST.md` with the final hashes: PDF `ec710124…dcb3` (25 pages),
   manifest `b8606936…891a`, snapshot `34336233…a912`. Annotated tag `report-2026-11` on the
   PR #20 merge `e9e86b0`; the [GitHub release](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11) carries the three artifacts, and their
-  downloaded hashes match. The reserved DOI `10.5281/zenodo.24120596` and ORCID
-  `0009-0004-4720-7057` are printed on p.1; licences CC BY 4.0 (report, evidence) and MIT (code).
+  downloaded hashes match. The [Zenodo record](https://zenodo.org/records/24120596) (DOI `10.5281/zenodo.24120596`)
+  holds the same three files, verified by download; the DOI and ORCID `0009-0004-4720-7057`
+  are printed on p.1; licences CC BY 4.0 (report, evidence) and MIT (code).
   Review history: `report/qa/` (final review, closeout, release build). No independent peer
   review is claimed.
 - **Git housekeeping (10 November):** `main` was fast-forwarded through PR #16 (`8f52fc3`). The
@@ -53,12 +54,11 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Next step
 
-1. **Zenodo (maintainer):** complete the reserved draft with the same three files and publish.
-   Keep the Zenodo GitHub switch for `iarjunganesh/bastion` off until this is done.
-2. Download the Zenodo files, verify their SHA-256 values and that the DOI resolves; then add the
-   report link to the site and mark the record published in `report/PUBLICATION-MANIFEST.md`.
-3. Run the final billing check after late postings.
-4. No new experiments. Do not move the tag, replace release assets or rebuild the PDF.
+1. Run the final billing check after late postings.
+2. No new experiments. Do not move the tag, replace release or Zenodo files, or rebuild the PDF.
+   Cite the version DOI `10.5281/zenodo.24120596`, not the concept DOI.
+3. The Zenodo GitHub integration for `iarjunganesh/bastion` may be re-enabled only by the
+   maintainer; a later GitHub release would then create a new Zenodo version automatically.
 
 ## Session log
 
@@ -337,3 +337,11 @@ source manifest and snapshot; the downloaded assets match all three hashes. Dele
 the report is uncommitted or awaiting approval (AGENTS, README, upgrade plan, research index,
 report README, plan, manifest); dated historical entries were left as written. Zenodo not yet
 published.
+
+### 10 November — Zenodo publication
+
+The maintainer completed and published the reserved Zenodo draft (<https://zenodo.org/records/24120596>). Read back through the
+public API: published, open access, resource type Report, creator with ORCID and affiliation
+"Independent researcher, Stockholm", licences CC BY 4.0 and MIT, version `report-2026-11`, both
+related identifiers. The three downloaded files match the approved SHA-256 values, and
+`doi.org/10.5281/zenodo.24120596` resolves to the record. The site now links the report by DOI.
