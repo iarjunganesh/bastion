@@ -41,7 +41,9 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 - **Billing:** daily checks passed on 6 and 8 November (2–8 November fully offset by credits, net
   0). On 9 November billing was disconnected from `bastion-fleet-2026` only (verified: no billing
   account, billing disabled). D4 made no change to the shared account or other projects. Charges
-  incurred earlier, including soft-deleted storage, may still post.
+  incurred earlier, including soft-deleted storage, may still post. On 11 November the billing
+  account Overview reported net 0 for 1–11 November (costs fully offset by credits, forecast 0);
+  values in `.local/billing/`. Reported usage, not an invoice.
 - **Retained, not deleted:** the Gateway (with its authz policy and extension), 2 Runtime engines
   with Sessions/Memory, Firestore, 2 secrets, the `bastion-audit` log bucket, service accounts and
   IAM. With billing off, billing-gated APIs refuse access, and these may become unrecoverable.
@@ -54,14 +56,11 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Next step
 
-1. Run the final billing check after late postings.
-2. No new experiments. Do not move the tag, replace release or Zenodo files, or rebuild the PDF.
-   Cite the version DOI `10.5281/zenodo.24120596`, not the concept DOI.
-3. **v0.9.2 (source only, never deployed):** after the release PR merges, tag the merge commit
-   and create the GitHub release. The maintainer re-enabled the Zenodo GitHub integration on
-   10 November, so that release is archived on Zenodo as software per `.zenodo.json`; verify the
-   new record's metadata and that it links the report DOI. Every later GitHub release, including
-   any report release, will also be archived.
+1. Look once more at the billing account at month close (early December) for late postings.
+2. No new experiments. Do not move the tags, replace release or Zenodo files, or rebuild the PDF.
+   Cite the report's version DOI `10.5281/zenodo.24120596`, not the concept DOI.
+3. The Zenodo GitHub integration is on: every later GitHub release will be archived as a new
+   Zenodo version of the software record (`10.5281/zenodo.24121343`).
 
 ## Session log
 
@@ -356,3 +355,13 @@ only current-source-version references (pyproject, site footer, README, VERSIONS
 status, AGENTS, CHANGELOG) and adds `CITATION.cff` (GitHub cites the report) and `.zenodo.json`
 (creator, ORCID, MIT, link to the report DOI). References to v0.9.1 as the deployed, evaluated
 version are unchanged. Agent code is unchanged since v0.9.1 apart from one docstring.
+
+### 11 November — v0.9.2 released and billing check
+
+PR #23 merged at `4e3aefe` (tree identical to the reviewed head; main CI passed). Created the
+annotated tag `v0.9.2` and the GitHub release (source only, never deployed). The Zenodo GitHub
+integration archived it as software: record 24121343, DOI `10.5281/zenodo.24121343`, creator with ORCID and
+affiliation, MIT, `isSupplementTo` the report DOI. The downloaded archive has the tag's 327
+files, passes CRC, and contains no other-project identifier. The billing account Overview
+(maintainer screenshot) reported net 0 for 1–11 November; private values are in
+`.local/billing/2026-11-11-final-billing-observation.json`.
