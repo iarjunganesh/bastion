@@ -20,9 +20,8 @@ files in `assets/evidence/live-validation-2026-10-27/`.
 Review history: the 9 November review and its original findings are in
 [qa/final-review-2026-11-09.md](qa/final-review-2026-11-09.md); the
 [10 November closeout](qa/final-closeout-2026-11-10.md) records all 16 follow-up findings as
-verified. The [release build record](qa/release-build-2026-11-10.md) documents the final build:
-it differs from the verified build only in its running header and the Appendix A.2 release
-sentence. The frozen blueprint and evidence are unchanged.
+verified. The [release build record](qa/release-build-2026-11-10.md) documents the release candidate and
+the final build, which added the reserved DOI, ORCID iD and licence line. The frozen blueprint and evidence are unchanged.
 
 Use Python 3.12 in a separate build environment. These dependencies are never shipped to the fleet.
 
@@ -37,4 +36,4 @@ $env:PYTHONPATH = "$PWD;$PWD/report"
 
 The report text, figures and review records are licensed under CC BY 4.0 and the build scripts under MIT; see [LICENSE-CONTENT.md](../LICENSE-CONTENT.md).
 
-The builder reads Windows system fonts (Times New Roman, Arial). Do not create the `report-2026-11` tag, a DOI or a site release until the maintainer approves the manuscript and the publication manifest. See the [report plan](../docs/research/report-plan.md).
+The builder reads Windows system fonts (Times New Roman, Arial). The report was released on 10 November as [`report-2026-11`](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11) after the maintainer approved the manuscript and the publication manifest. Do not move the tag, replace its assets or rebuild the released PDF. See the [report plan](../docs/research/report-plan.md).

@@ -12,8 +12,8 @@ Read HANDOFF.md next, then docs/research/report-plan.md and docs/UPGRADE-PLAN.md
   repository and removed at the maintainer's request; do not recreate it from old copies.
 - Root guidance and roadmaps contain only public-safe project state.
 - The 28 October maintainer request authorizes the ADK upgrade, documentation/site reconciliation,
-  and a v0.8.0 release after validation (released 28 October). Keep report sources uncommitted
-  in `report/` as explicitly requested; exclude report sources/build tools from release commits.
+  and a v0.8.0 release after validation (released 28 October). Report sources stayed uncommitted
+  until the 10 November release PR (#18); they are now tracked in `report/`.
 - Prepare the control matrix before paid execution; record a numeric study budget and stop rules.
   Credit availability alone is not a per-run spending cap. Previous study authorization is spent.
 - The 7 November maintainer decisions authorize the review remediation, the `google-adk`
@@ -45,7 +45,10 @@ controls passed, K and a census bounded trace export, and M observed a worker ti
 dead-letter review ([E26–E29](assets/README.md)). Stopped runs are retained, never rerun or pooled;
 protocols are pre-specified (local records, no external timestamp), not pre-registered.
 
-Report sources are canonical in `report/` and remain uncommitted. The blueprint
+Report sources are canonical and committed in `report/`. The report was released on
+10 November as tag `report-2026-11` (merge commit `e9e86b0`), with the hashed PDF, source
+manifest and snapshot attached to the GitHub release and DOI `10.5281/zenodo.24120596`.
+Never move the tag, replace its assets or rebuild the released PDF. The blueprint
 (`report/OUTLINE.md`) was frozen on 9 November: one definitive report, C1–C3, C4 deferred. The
 6–7 November PDFs are drafts. Keep the author line “Independent researcher, Stockholm”, dated
 counts (62 bindings on 25 August, 56 on 28 October, 62 at each 7–8 November preflight),
@@ -223,5 +226,5 @@ Never change billing linkage, payment methods, IAM or enable paid products to by
 
 The original order was code/dependencies/site, deployment and feasible evidence first, then
 one clean report. The maintainer explicitly authorized the final source/builder reconciliation
-and local PDF on 6 November. Keep `report/` uncommitted, validate and review before building,
-and avoid iterative rebuilds. Publication, site deployment and the D4 end state remain separate.
+and local PDF on 6 November. The report was built, reviewed and released on 10 November
+(`report-2026-11`); do not rebuild or re-release it. Publication, site deployment and the D4 end state remain separate.

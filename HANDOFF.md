@@ -21,28 +21,16 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   and both build buckets are deleted (B). The 2 dead-letter messages were captured first by a
   separately dated, non-acknowledging read-only inspection (A0): exact event-ID joins to F1 and M1.
   The deployed v0.9.0/v0.9.1 images were exported by digest and verified.
-- **Report:** one definitive report. The blueprint was frozen on 9 November (`report/OUTLINE.md`,
-  local) after two external reviews and the maintainer's approval. The 6–7 November PDFs are drafts.
-  Title: *Bastion: Execution Boundaries, Control Evolution, and Bounded Evaluation of a Governed
-  Agent Fleet.*
-- **Technical verification closed (10 November):** all 16 follow-up findings, including I7/M4,
-  are corrected and verified in the 25-page PDF (`f3b2bb95…9071`). All 25 full-page renders were
-  inspected; figures, captions and repeated table headers agree. The 17 report checks, all 70
-  source/snapshot hashes and ZIP CRC, Ruff, docs/version and Markdown checks pass. Reconciliation,
-  the dated closeout, integrity/privacy receipts and report README now describe this build:
-  `report/qa/final-closeout-2026-11-10.md`. Finite text/metadata/link checks found no prohibited
-  private-value patterns. The closeout changed QA/status records only; the PDF was not rebuilt.
-  The reviewer's earlier authorship remains disclosed; no independent peer review is claimed.
-  R7 remains confirmed as Peng Huang. The blueprint, stop records and evidence are unchanged.
-- **Release build and publication manifest (10 November):** the release build
-  (`81c2dfce…0706`, manifest `0e399dc8…a342`) differs from the verified build only in its
-  running header (`report-2026-11`) and the Appendix A.2 release sentence; page-by-page text,
-  link and figure comparisons confirm it (`report/qa/release-build-2026-11-10.md`). Links stay
-  pinned to `aa398f6`, where every cited file is byte-identical. The report sources, figures and
-  review records are committed for the first time in the release PR; generated outputs stay
-  ignored and are attached at release. `report/PUBLICATION-MANIFEST.md` lists the artifacts,
-  what is published and what stays private, and the maintainer's decisions (licence, Zenodo
-  method, DOI in the PDF). Nothing is tagged, released or deposited.
+- **Report released (10 November):** *Bastion: Execution Boundaries, Control Evolution, and
+  Bounded Evaluation of a Governed Agent Fleet*, one definitive report from the blueprint frozen
+  on 9 November (`report/OUTLINE.md`). The maintainer approved the manuscript and
+  `report/PUBLICATION-MANIFEST.md` with the final hashes: PDF `ec710124…dcb3` (25 pages),
+  manifest `b8606936…891a`, snapshot `34336233…a912`. Annotated tag `report-2026-11` on the
+  PR #20 merge `e9e86b0`; the [GitHub release](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11) carries the three artifacts, and their
+  downloaded hashes match. The reserved DOI `10.5281/zenodo.24120596` and ORCID
+  `0009-0004-4720-7057` are printed on p.1; licences CC BY 4.0 (report, evidence) and MIT (code).
+  Review history: `report/qa/` (final review, closeout, release build). No independent peer
+  review is claimed.
 - **Git housekeeping (10 November):** `main` was fast-forwarded through PR #16 (`8f52fc3`). The
   four branches for merged PRs #13–#16 were removed locally and from `origin` after
   exact-head/ancestry checks and a verified recovery bundle. The review-status update `835df67`
@@ -65,15 +53,12 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Next step
 
-1. **Final build done (PR pending):** DOI `10.5281/zenodo.24120596` (reserved, unpublished
-   draft) and ORCID `0009-0004-4720-7057` are on p.1 with CC BY 4.0. Final PDF `ec710124…dcb3`,
-   manifest `b8606936…891a`, snapshot `34336233…a912` (`report/qa/release-build-2026-11-10.md`).
-   Codex checks only this build's delta; then merge.
-2. **Maintainer approval** of those final hashes and `report/PUBLICATION-MANIFEST.md`. Keep the
-   Zenodo GitHub switch for `iarjunganesh/bastion` off until the release is complete.
+1. **Zenodo (maintainer):** complete the reserved draft with the same three files and publish.
+   Keep the Zenodo GitHub switch for `iarjunganesh/bastion` off until this is done.
+2. Download the Zenodo files, verify their SHA-256 values and that the DOI resolves; then add the
+   report link to the site and mark the record published in `report/PUBLICATION-MANIFEST.md`.
 3. Run the final billing check after late postings.
-4. Only after that approval: the `report-2026-11` tag on the merge commit, the GitHub release
-   with the three hashed artifacts, the Zenodo DOI and the site update. No new experiments.
+4. No new experiments. Do not move the tag, replace release assets or rebuild the PDF.
 
 ## Session log
 
@@ -341,3 +326,14 @@ Compared with the reviewed candidate, only p.1, p.20 and reflow on pp.20–25 ch
 20–25 were inspected in full. 19 report checks, 72 manifest entries, 73 snapshot members, ZIP
 CRC and privacy scans pass. The candidate was preserved privately. No tag, release, deposit or
 publication occurred.
+
+### 10 November — release and repository sweep
+
+The maintainer merged PR #20 (`e9e86b0`, content identical to the reviewed head `d8657a1`; main
+CI passed) and approved the manuscript and publication manifest with the three hashes. Created
+and pushed the annotated tag `report-2026-11` on `e9e86b0` and the GitHub release with the PDF,
+source manifest and snapshot; the downloaded assets match all three hashes. Deleted the merged
+`release/final-build` branch locally and on `origin`. Swept tracked guidance for statements that
+the report is uncommitted or awaiting approval (AGENTS, README, upgrade plan, research index,
+report README, plan, manifest); dated historical entries were left as written. Zenodo not yet
+published.

@@ -62,7 +62,7 @@ retain separate protocols and results, including M's preflight stop and amendmen
 | D2 | Defer C4 to a later study |
 | D3 | Per-chunk approval with written cost/count caps and stop rules, within 400 SEK in total (7 Nov). Credits only; card charges unauthorized. Reserve unposted chunks conservatively |
 | D4 | Reach the agreed fleet end state before 11 Nov. Dry run first; the owner chooses export, removal or accepted cost for each residual resource. Editorial approval is not deletion authority |
-| D5 | Report reference, tag/DOI and release need maintainer approval. The deployed code is v0.9.1; the report cites a later source reference (`report-2026-11` recommended) |
+| D5 | Report reference, tag/DOI and release need maintainer approval (given 10 Nov). The deployed code is v0.9.1; the report cites a later source reference (`report-2026-11` recommended) |
 | D6 | One definitive report and a frozen blueprint (9 Nov) |
 
 Numeric balances and billing receipts stay in ignored `.local/`.
@@ -76,11 +76,13 @@ Numeric balances and billing receipts stay in ignored `.local/`.
    the running header and the Appendix A.2 release sentence
    (`report/qa/release-build-2026-11-10.md`). PR #18 merged the sources at `41f292f…`.
    Licence: CC BY 4.0 (report and evidence), MIT (code). The final build (`ec710124…dcb3`)
-   carries the reserved DOI `10.5281/zenodo.24120596`, the ORCID iD and the licence line. Next:
-   the maintainer approves the final hashes and `report/PUBLICATION-MANIFEST.md`.
+   carries the reserved DOI `10.5281/zenodo.24120596`, the ORCID iD and the licence line. The
+   maintainer approved the final hashes and `report/PUBLICATION-MANIFEST.md` on 10 November.
 4. Final billing check after late postings.
-5. Release, only on the maintainer's approval of the manuscript and publication manifest: the
-   `report-2026-11` tag, the GitHub release, the DOI (Zenodo) and the site. Links stay pinned to
+5. Done 10 November: the annotated `report-2026-11` tag on merge commit `e9e86b0` and the
+   [GitHub release](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11) with the three artifacts (downloaded hashes verified). Next: the
+   maintainer publishes the Zenodo record (DOI `10.5281/zenodo.24120596`) with the same three
+   files, the downloads are verified, and the site links the report. Links stay pinned to
    the immutable base commit `aa398f6`, where every cited file is unchanged.
 
 ## Evidence and manuscript rules

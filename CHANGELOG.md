@@ -12,6 +12,15 @@ hackathon-era release plan is archived with the rest of the submission material.
 
 ## [Unreleased]
 
+### Added — technical report released (10 November)
+
+- The definitive technical report, *Bastion: Execution Boundaries, Control Evolution, and
+  Bounded Evaluation of a Governed Agent Fleet* (25 pages), is released as tag `report-2026-11`
+  with its PDF, source manifest and source snapshot ([release](https://github.com/iarjunganesh/bastion/releases/tag/report-2026-11),
+  [publication manifest](report/PUBLICATION-MANIFEST.md)). DOI `10.5281/zenodo.24120596`.
+- The report and evidence records are licensed under CC BY 4.0; code remains MIT
+  ([LICENSE-CONTENT.md](LICENSE-CONTENT.md)).
+
 ### Added — final deployment evidence (7–8 November)
 
 - Evidence 26: cohorts G and H on v0.9.0 and cohort I on v0.9.1. I validated 98 of 98 serial
