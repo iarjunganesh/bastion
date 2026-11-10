@@ -129,12 +129,17 @@ def repository_sources(text: str) -> list[str]:
 
 
 TEXT_SUFFIXES = frozenset({".md", ".py", ".txt", ".toml", ".lock", ".json", ".yml", ".yaml"})
+TEXT_NAMES = frozenset({"LICENSE"})
+# The snapshot bundles MIT-licensed code, which must keep its copyright and permission notice,
+# and CC BY report content, whose scope notice must travel with it.
+LICENCE_FILES = ("LICENSE", "LICENSE-CONTENT.md")
 
 
 def canonical_bytes(path: Path) -> bytes:
     """Text with LF line endings, binary unchanged, so hashes survive a Windows checkout."""
     data = path.read_bytes()
-    return data.replace(b"\r\n", b"\n") if path.suffix.lower() in TEXT_SUFFIXES else data
+    text = path.suffix.lower() in TEXT_SUFFIXES or path.name in TEXT_NAMES
+    return data.replace(b"\r\n", b"\n") if text else data
 
 
 def is_base_file(relative: str) -> bool:
@@ -155,6 +160,7 @@ def source_manifest(text: str) -> dict[str, Any]:
     build_inputs = ("build_report.py", "make_figures.py", "requirements-build.txt")
     paths.extend(f"report/{name}" for name in build_inputs)
     paths.extend(f"report/figures/{name}" for name in FIGURES)
+    paths.extend(LICENCE_FILES)
     return {
         "base_revision": REVISION,
         "local_edition_date": REPORT_DATE,
@@ -235,8 +241,9 @@ def assemble() -> str:
     fingerprint = hashlib.sha256(manifest_bytes).hexdigest()
     provenance = (
         f"Cited-source manifest SHA-256: `{fingerprint}`. "
-        "The manifest records the exact bytes of every cited repository file and build input; "
-        "the source snapshot carries those bytes.\n\n"
+        "The manifest records canonical bytes for the listed cited sources, report scripts, "
+        "sections, figures, dependency files and licence notices; the source snapshot carries "
+        "those bytes.\n\n"
     )
     raw = raw.replace("### A.3 Offline checks", provenance + "### A.3 Offline checks")
     text = resolve_repository_links(raw)

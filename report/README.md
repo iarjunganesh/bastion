@@ -12,7 +12,10 @@ These are the canonical sources for the one definitive report, *Bastion: Executi
 | `PUBLICATION-MANIFEST.md` | Release artifacts, their hashes, what is published and what stays private |
 | `qa/` | Review records, the claim reconciliation and machine-readable build receipts |
 
-Generated outputs are not tracked: the PDF (`bastion-technical-report-2026-11.pdf`), `manuscript.md`, `source-manifest.json`, `source-snapshot.zip` and the rendered QA pages. The release attaches the PDF, source manifest and source snapshot.
+Generated outputs are not tracked: the PDF (`bastion-technical-report-2026-11.pdf`), `manuscript.md`, `source-manifest.json`, `source-snapshot.zip` and the rendered QA pages. The release attaches the PDF, source manifest and source snapshot. The snapshot is a
+manifest-verifiable subset, not a standalone checkout: rebuilding needs the full tagged
+checkout, Git history containing the pinned link-base commit, and the public live-validation
+files in `assets/evidence/live-validation-2026-10-27/`.
 
 Review history: the 9 November review and its original findings are in
 [qa/final-review-2026-11-09.md](qa/final-review-2026-11-09.md); the
@@ -31,5 +34,7 @@ $env:PYTHONPATH = "$PWD;$PWD/report"
 ./.local/report-build-venv/Scripts/python.exe report/make_figures.py
 ./.local/report-build-venv/Scripts/python.exe report/build_report.py
 ```
+
+The report text, figures and review records are licensed under CC BY 4.0 and the build scripts under MIT; see [LICENSE-CONTENT.md](../LICENSE-CONTENT.md).
 
 The builder reads Windows system fonts (Times New Roman, Arial). Do not create the `report-2026-11` tag, a DOI or a site release until the maintainer approves the manuscript and the publication manifest. See the [report plan](../docs/research/report-plan.md).

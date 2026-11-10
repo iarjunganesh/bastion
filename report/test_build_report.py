@@ -67,6 +67,14 @@ class ReportIntegrityTests(unittest.TestCase):
                 summary = build_report.load_live_validation()
             self.assertEqual(summary["validated_run_audit_events"], 560)
 
+    def test_snapshot_carries_both_licence_notices(self) -> None:
+        """The snapshot bundles MIT code and CC BY content, so both notices travel with it."""
+        files = build_report.source_manifest("")["files"]
+        self.assertIn("LICENSE", files)
+        self.assertIn("LICENSE-CONTENT.md", files)
+        licence = build_report.ROOT / "LICENSE"
+        self.assertNotIn(b"\r\n", build_report.canonical_bytes(licence))
+
     def test_version_gate_includes_canonical_section_sources(self) -> None:
         self.assertTrue(set(build_report.source_sections()) <= set(check_versions.doc_files()))
 

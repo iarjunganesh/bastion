@@ -65,11 +65,14 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
 
 ## Next step
 
-1. **Release PR:** review and merge the PR that adds `report/` (sources, figures, review
-   records and the publication manifest). Ask Codex for the read-only release review first.
-2. **Maintainer approval** of the manuscript (`81c2dfce…0706`) and of
-   `report/PUBLICATION-MANIFEST.md`, including the licence, the Zenodo method and whether the
-   DOI is printed in the PDF (printing it needs one more rebuild).
+1. **Final build:** PR #18 merged the report sources on 10 November at `41f292f…`; its head
+   and post-merge CI passed. Codex's release review (ready after fixes: I1–I2, M1–M4) is
+   addressed in the licensing PR: CC BY 4.0 for report and evidence, MIT for code, licence
+   notices in the source snapshot, and approval stops for replacement bytes. Next, the
+   maintainer reserves the Zenodo DOI; one final build then adds the DOI and licence line, and
+   its release diff, hashes and privacy checks are re-verified.
+2. **Maintainer approval** of the final manuscript hashes and `report/PUBLICATION-MANIFEST.md`.
+   The PR #18 merge did not approve the manuscript or any publication step.
 3. Run the final billing check after late postings.
 4. Only after that approval: the `report-2026-11` tag on the merge commit, the GitHub release
    with the three hashed artifacts, the Zenodo DOI and the site update. No new experiments.
@@ -318,3 +321,15 @@ compares LF-normalised copies with the exact-byte-verified bundle members, with 
 (18 report checks). The builder change altered the source manifest, so the release PDF was
 rebuilt once more (`81c2dfce…0706`, manifest `0e399dc8…a342`); its comparison with the
 verified build is unchanged apart from the manifest hash.
+
+### 10 November — Codex release review and licensing
+
+Codex's read-only release review found the release diff, hashes, links and committed inputs
+correct, with two Important and four Minor fixes: the source snapshot bundled MIT code without
+its notice; the release steps allowed changed bytes without renewed approval; the snapshot's
+scope needed qualifying; stale merge steps; the Zenodo affiliation; and Zenodo read-back. The
+maintainer chose CC BY 4.0 for the report and evidence records and MIT for code, a manual
+Zenodo upload and a DOI printed in the PDF. The licensing PR adds `LICENSE-CONTENT.md`, splits
+the README licence statement, puts both licence notices in the source snapshot (with a test),
+narrows the generated provenance sentence and applies the manifest fixes. The release
+candidate's hashes are kept as superseded; the final build follows the DOI reservation.

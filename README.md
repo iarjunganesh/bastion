@@ -21,7 +21,8 @@
 [![CI](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml)
 [![Codecov](https://codecov.io/gh/iarjunganesh/bastion/graph/badge.svg)](https://codecov.io/gh/iarjunganesh/bastion)
 [![Release](https://img.shields.io/badge/release-latest-2ea44f?logo=github&logoColor=white)](https://github.com/iarjunganesh/bastion/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Code: MIT](https://img.shields.io/badge/Code-MIT-yellow.svg)](LICENSE)
+[![Content: CC BY 4.0](https://img.shields.io/badge/Content-CC_BY_4.0-lightgrey.svg)](LICENSE-CONTENT.md)
 [![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)](https://youtu.be/Xpj8YmzFfpk)
 
 <!-- Row 2 — what Bastion is actually built on, plus the program badge earned before it. -->
@@ -228,4 +229,5 @@ The [hackathon archive](archive/hackathon-2026/README.md), gallery and fixed
 [video](https://youtu.be/Xpj8YmzFfpk) retain their submission dates. No award is claimed.
 Do not re-render embedded architecture assets during routine cleanup.
 
-Personal research software, without a support or patch SLA. [MIT License](LICENSE).
+Personal research software, without a support or patch SLA. Code is under the [MIT License](LICENSE);
+the technical report and the evidence records are under [CC BY 4.0](LICENSE-CONTENT.md).
