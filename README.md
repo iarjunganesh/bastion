@@ -15,7 +15,8 @@
 
 <p align="center">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</p>
 
-<!-- Row 1 — repository state. Same five as the sibling repositories, same order.
+<!-- Row 1 — repository state. The sibling repositories' five, then content licence, the two
+     Zenodo DOIs (report version DOI; code concept DOI, always the latest archive) and the video.
      Nothing may be inserted between these badge lines: a comment breaks the paragraph and
      drops the badge after it onto a row of its own. -->
 [![CI](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml)
@@ -23,6 +24,8 @@
 [![Release](https://img.shields.io/badge/release-latest-2ea44f?logo=github&logoColor=white)](https://github.com/iarjunganesh/bastion/releases/latest)
 [![Code: MIT](https://img.shields.io/badge/Code-MIT-yellow.svg)](LICENSE)
 [![Content: CC BY 4.0](https://img.shields.io/badge/Content-CC_BY_4.0-lightgrey.svg)](LICENSE-CONTENT.md)
+[![Report DOI](https://img.shields.io/badge/Report_DOI-10.5281%2Fzenodo.24120596-1682D4)](https://doi.org/10.5281/zenodo.24120596)
+[![Code DOI](https://img.shields.io/badge/Code_DOI-10.5281%2Fzenodo.24121342-1682D4)](https://doi.org/10.5281/zenodo.24121342)
 [![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)](https://youtu.be/Xpj8YmzFfpk)
 
 <!-- Row 2 — what Bastion is actually built on, plus the program badge earned before it. -->
