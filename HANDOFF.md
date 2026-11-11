@@ -37,7 +37,8 @@ Read [AGENTS.md](AGENTS.md), this file, the [report plan](docs/research/report-p
   exact-head/ancestry checks and a verified recovery bundle. The review-status update `835df67`
   was then committed directly on `main` and pushed without a PR; its CI run failed because three
   handoff lines read as suite test-count claims; PR #17 corrected the record and the wording.
-  Preservation and cleanup receipts: `.local/git-cleanup/2026-11-10T012206/`.
+  Preservation and cleanup receipts were moved to a private archive outside the repository on
+  11 November.
 - **Billing:** daily checks passed on 6 and 8 November (2–8 November fully offset by credits, net
   0). On 9 November billing was disconnected from `bastion-fleet-2026` only (verified: no billing
   account, billing disabled). D4 made no change to the shared account or other projects. Charges
@@ -365,3 +366,13 @@ affiliation, MIT, `isSupplementTo` the report DOI. The downloaded archive has th
 files, passes CRC, and contains no other-project identifier. The billing account Overview
 (maintainer screenshot) reported net 0 for 1–11 November; private values are in
 `.local/billing/2026-11-11-final-billing-observation.json`.
+
+### 11 November — local cleanup
+
+Removed regenerable caches and build outputs (type-check and lint caches, `__pycache__`, the site
+build, report QA page renders and the assembled manuscript). Moved private history that is no
+longer needed in the working tree (Git safety bundles from the 5 and 10 November cleanups, report
+drafts and candidates, sweeps, backups, audits and prompts) to a hash-verified private archive
+outside the repository. `.local/` now holds only the evidence and records: `d4/`, `measurements/`,
+`billing/`, `reviews/` and the credit record. Dated history entries still name their original
+locations.
