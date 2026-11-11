@@ -387,3 +387,5 @@ marker, and the line beside it gives the run period and retirement date. Both ba
 rendered and compared. The 16:9 hackathon banners, architecture diagrams, report, tags, release
 assets and Zenodo records are unchanged. Documentation, version, diagram, redaction and Markdown
 checks pass. The repository description on GitHub was updated to mention the report.
+The console's proof strip now reads "IAM bindings measured 25 Aug" in place of "live bindings",
+and the title-card caption says the card is shown as submitted in August 2026.
