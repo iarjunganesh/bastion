@@ -1,6 +1,6 @@
 # Technical report
 
-These are the canonical sources for the one definitive report, *Bastion: Execution Boundaries, Control Evolution, and Bounded Evaluation of a Governed Agent Fleet*. It is written from the blueprint frozen on 9 November 2026 (`OUTLINE.md`). The drafts of 6–7 November are archived privately under `.local/report-drafts/`; they are not editions.
+These are the canonical sources for the one definitive report, *Bastion: Execution Boundaries, Control Evolution, and Bounded Evaluation of a Governed Agent Fleet*. It is written from the blueprint frozen on 9 November 2026 (`OUTLINE.md`). The drafts of 6–7 November are archived privately outside the repository; they are not editions.
 
 | File | Purpose |
 |---|---|
