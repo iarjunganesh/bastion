@@ -15,8 +15,7 @@
 
 <p align="center">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</p>
 
-<!-- Row 1 — repository state. The sibling repositories' five, then content licence, the two
-     Zenodo DOIs (report version DOI; code concept DOI, always the latest archive) and the video.
+<!-- Row 1 — repository state. Same five as the sibling repositories, same order.
      Nothing may be inserted between these badge lines: a comment breaks the paragraph and
      drops the badge after it onto a row of its own. -->
 [![CI](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iarjunganesh/bastion/actions/workflows/ci.yml)
@@ -24,16 +23,19 @@
 [![Release](https://img.shields.io/badge/release-latest-2ea44f?logo=github&logoColor=white)](https://github.com/iarjunganesh/bastion/releases/latest)
 [![Code: MIT](https://img.shields.io/badge/Code-MIT-yellow.svg)](LICENSE)
 [![Content: CC BY 4.0](https://img.shields.io/badge/Content-CC_BY_4.0-lightgrey.svg)](LICENSE-CONTENT.md)
-[![Report DOI](https://img.shields.io/badge/Report_DOI-10.5281%2Fzenodo.24120596-1682D4)](https://doi.org/10.5281/zenodo.24120596)
-[![Code DOI](https://img.shields.io/badge/Code_DOI-10.5281%2Fzenodo.24121342-1682D4)](https://doi.org/10.5281/zenodo.24121342)
 [![Watch Video](https://img.shields.io/badge/%E2%96%B6_Watch-4--min_demo-FF0000?logo=youtube&logoColor=white)](https://youtu.be/Xpj8YmzFfpk)
 
-<!-- Row 2 — what Bastion is actually built on, plus the program badge earned before it. -->
+<!-- Row 2 — the citable Zenodo records: the report (version DOI) and the code archive (concept
+     DOI, which always resolves to the latest archived release). -->
+[![Report DOI](https://img.shields.io/badge/Report_DOI-10.5281%2Fzenodo.24120596-1682D4)](https://doi.org/10.5281/zenodo.24120596)
+[![Code DOI](https://img.shields.io/badge/Code_DOI-10.5281%2Fzenodo.24121342-1682D4)](https://doi.org/10.5281/zenodo.24121342)
+
+<!-- Row 3 — what Bastion is actually built on, plus the program badge earned before it. -->
 [![Google ADK 2.14.0](https://img.shields.io/badge/Google_ADK-2.14.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
 [![A2A SDK](https://img.shields.io/badge/A2A_SDK-1.3.0-1A73E8)](https://github.com/a2aproject/a2a-python)
 [![Gemini Enterprise Agent Ready](https://img.shields.io/badge/GEAR-Gemini_Enterprise_Agent_Ready-4285F4?logo=google&logoColor=white)](https://developers.google.com/profile/badges/community/gear?u=iarjunganesh)
 
-<!-- Row 3 — the seven GEAP pillars, six of them managed products rather than modules here. -->
+<!-- Row 4 — the seven GEAP pillars, six of them managed products rather than modules here. -->
 [![Agent Runtime](https://img.shields.io/badge/Agent_Runtime-managed-4285F4?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale)
 [![Agent Identity](https://img.shields.io/badge/Agent_Identity-least_privilege-4285F4?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity)
 [![Agent Gateway](https://img.shields.io/badge/Agent_Gateway-default_deny-4285F4?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/gateways/agent-gateway-overview)
@@ -42,21 +44,21 @@
 [![Model Armor](https://img.shields.io/badge/Model_Armor-fails_closed-EA4335?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/model-armor/model-armor-vertex-integration)
 [![Observability](https://img.shields.io/badge/Observability-payload--free-4285F4?logo=googlecloud&logoColor=white)](https://docs.cloud.google.com/gemini-enterprise-agent-platform/optimize/observability/overview)
 
-<!-- Row 4 — the rest of the deployed surface. -->
+<!-- Row 5 — the rest of the deployed surface. -->
 [![Cloud Run](https://img.shields.io/badge/Cloud_Run-private_services-4285F4?logo=googlecloud&logoColor=white)](https://cloud.google.com/run)
 [![Eventarc](https://img.shields.io/badge/Eventarc-durable_delivery-4285F4?logo=googlecloud&logoColor=white)](https://cloud.google.com/eventarc)
 [![Firestore](https://img.shields.io/badge/Firestore-durable_state-FFA000?logo=firebase&logoColor=white)](https://cloud.google.com/firestore)
 [![Cloud Asset Inventory](https://img.shields.io/badge/Asset_Inventory-read--only-34A853?logo=googlecloud&logoColor=white)](https://cloud.google.com/asset-inventory/docs)
 [![Gemini 3.5 Flash](https://img.shields.io/badge/Gemini_3.5_Flash-rationale_only-8E75B2?logo=googlegemini&logoColor=white)](https://cloud.google.com/vertex-ai)
 
-<!-- Row 5 — language and toolchain. check_badge_versions() asserts these against the pins. -->
+<!-- Row 6 — language and toolchain. check_badge_versions() asserts these against the pins. -->
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Ruff](https://img.shields.io/badge/Ruff-lint%20%2B%20format-D7FF64?logo=ruff&logoColor=111827)](https://docs.astral.sh/ruff/)
 [![Mypy](https://img.shields.io/badge/Mypy-strict-2A6DB2?logo=python&logoColor=white)](https://mypy-lang.org/)
 [![pytest](https://img.shields.io/badge/pytest-9.1.1-0A9EDC?logo=pytest&logoColor=white)](https://docs.pytest.org/)
 [![Vercel Hobby](https://img.shields.io/badge/Vercel-Hobby-000000?logo=vercel&logoColor=white)](https://vercel.com)
 
-<!-- Row 6 — the public evidence console's own live hosting. The GCP fleet was retired on 9 November
+<!-- Row 7 — the public evidence console's own live hosting. The GCP fleet was retired on 9 November
      2026; this is the presentation plane only, per the "public evidence console" note below. -->
 [![Vercel live frontend](https://img.shields.io/badge/Vercel-live_frontend-000000?logo=vercel&logoColor=white)](https://bastion.arjunganesh.dev)
 
