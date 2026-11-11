@@ -376,3 +376,14 @@ drafts and candidates, sweeps, backups, audits and prompts) to a hash-verified p
 outside the repository. `.local/` now holds only the evidence and records: `d4/`, `measurements/`,
 `billing/`, `reviews/` and the credit record. Dated history entries still name their original
 locations.
+
+### 11 November — README leads with the report
+
+At the maintainer's request, the README now states the report citation and the retired status
+directly under the banner, adds a short key-finding section taken from the report's abstract and
+Section 9, and folds the platform and toolchain badge rows into a collapsed block. The README
+banner pair no longer says the fleet is live: the status pill reads "FLEET RETIRED" with a static
+marker, and the line beside it gives the run period and retirement date. Both banners were
+rendered and compared. The 16:9 hackathon banners, architecture diagrams, report, tags, release
+assets and Zenodo records are unchanged. Documentation, version, diagram, redaction and Markdown
+checks pass. The repository description on GitHub was updated to mention the report.

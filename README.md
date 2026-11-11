@@ -13,7 +13,13 @@
   <strong>Three institutional agents. One durable investigation identity. No raw IAM binding crosses the model or human-notification boundary.</strong>
 </p>
 
-<p align="center">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</p>
+**Technical report (10 November 2026):** *Bastion: Execution Boundaries, Control Evolution, and
+Bounded Evaluation of a Governed Agent Fleet*, DOI
+[10.5281/zenodo.24120596](https://doi.org/10.5281/zenodo.24120596). Not peer reviewed.
+
+**Status:** the fleet ran on Google Cloud from August to November 2026 and was retired on
+9 November 2026. This repository is the archived source, evidence and report. It began as an
+entry to the All Things Agentic Hackathon 2026 (Fortified Enterprise Fleet).
 
 <!-- Row 1 — repository state. Same five as the sibling repositories, same order.
      Nothing may be inserted between these badge lines: a comment breaks the paragraph and
@@ -29,6 +35,9 @@
      DOI, which always resolves to the latest archived release). -->
 [![Report DOI](https://img.shields.io/badge/Report_DOI-10.5281%2Fzenodo.24120596-1682D4)](https://doi.org/10.5281/zenodo.24120596)
 [![Code DOI](https://img.shields.io/badge/Code_DOI-10.5281%2Fzenodo.24121342-1682D4)](https://doi.org/10.5281/zenodo.24121342)
+
+<details>
+<summary>Platform and toolchain badges</summary>
 
 <!-- Row 3 — what Bastion is actually built on, plus the program badge earned before it. -->
 [![Google ADK 2.14.0](https://img.shields.io/badge/Google_ADK-2.14.0-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
@@ -58,11 +67,27 @@
 [![pytest](https://img.shields.io/badge/pytest-9.1.1-0A9EDC?logo=pytest&logoColor=white)](https://docs.pytest.org/)
 [![Vercel Hobby](https://img.shields.io/badge/Vercel-Hobby-000000?logo=vercel&logoColor=white)](https://vercel.com)
 
+</details>
+
 <!-- Row 7 — the public evidence console's own live hosting. The GCP fleet was retired on 9 November
      2026; this is the presentation plane only, per the "public evidence console" note below. -->
 [![Vercel live frontend](https://img.shields.io/badge/Vercel-live_frontend-000000?logo=vercel&logoColor=white)](https://bastion.arjunganesh.dev)
 
 ---
+
+## Key finding
+
+Between August and November 2026, five dated failures showed the same gap: a local signal did
+not establish that the intended work had run across an agent boundary. The signals were a
+completed status, a worker-local state key, a state-only policy decision, an error-free remote
+reply and a closed response stream. Three of the failures escaped a test suite with 100%
+configured statement and branch coverage, because the tests exercised an in-process topology in
+which state is shared.
+
+The repairs made policy execution, handoffs and downstream completion explicitly checkable. The
+[technical report](https://doi.org/10.5281/zenodo.24120596) documents the failures, the repairs
+and a bounded evaluation on one project and one workload. It is not a reliability rate or a
+general security guarantee.
 
 ## What it does
 

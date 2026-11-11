@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="Bastion — a private enterprise agent fleet for access governance">
-  <title>Bastion — three ADK agents auditing a live GCP IAM policy, including their own</title>
+  <title>Bastion — three ADK agents that audited a live GCP IAM policy, including their own</title>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#F8FAFC"/>
@@ -17,17 +17,15 @@
   <g font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif">
     <text x="64" y="100" font-size="64" font-weight="700" letter-spacing="1" fill="#0B1B2B">BASTION</text>
     <text x="66" y="136" font-size="21" fill="#334155">The access review that reviews itself.</text>
-    <text x="66" y="168" font-size="16" fill="#64748B">Three ADK agents audit a live GCP IAM policy, including their own.</text>
+    <text x="66" y="168" font-size="16" fill="#64748B">Three ADK agents audited a live GCP IAM policy, including their own.</text>
     <text x="66" y="198" font-size="15" font-weight="600" fill="#1D4ED8">All Things Agentic Hackathon 2026 · Fortified Enterprise Fleet</text>
 
     <g transform="translate(66 236)">
       <rect width="152" height="34" rx="17" fill="#FFFFFF" stroke="#B8C9DC"/>
-      <circle cx="18" cy="17" r="7" fill="#16A34A">
-        <animate attributeName="opacity" values="1;.35;1" dur="1.5s" repeatCount="indefinite"/>
-      </circle>
-      <text x="34" y="23" font-size="14" font-weight="700" fill="#10233D">PRIVATE · LIVE</text>
+      <circle cx="18" cy="17" r="7" fill="#64748B"/>
+      <text x="34" y="23" font-size="14" font-weight="700" fill="#10233D">FLEET RETIRED</text>
     </g>
-    <text x="236" y="258" font-size="15" fill="#4B627E">21/21 APIs enabled · 39 deployed resources</text>
+    <text x="236" y="258" font-size="15" fill="#4B627E">Ran August–November 2026 · retired 9 November</text>
 
     <!-- The control-plane hub mirrors the diagrams and the 16x9 title card, rather than a
          standalone padlock mark: one visual language for "what Bastion is" everywhere it
